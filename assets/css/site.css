@@ -156,3 +156,10 @@ html[data-lang="en"] .cc-arrow-cta:hover .cc-arrow{transform:translateX(6px);}
 .cc-pol-ul{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:10px;}
 .cc-pol-ul li{font-size:15.5px;line-height:1.7;color:var(--cc-grey-700);}
 .cc-pol-cta{text-align:center;margin-top:44px;}
+
+/* ===== New brand composite photos (blob + person + gold line) ===== */
+.cc-cons-photo{width:236px;height:auto;margin:0 auto;position:static;}
+.cc-cons-photo img{width:100%;height:auto;display:block;}
+.cc-cl-photo{flex:none;width:250px;max-width:44vw;align-self:center;}
+.cc-cl-photo img{width:100%;height:auto;display:block;background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-md);}
+@media(max-width:760px){.cc-cl-photo{width:200px;margin-top:8px;}}
