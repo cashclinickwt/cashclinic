@@ -1,0 +1,93 @@
+/* Cash Clinic — Color tokens
+   ------------------------------------------------------------------
+   Sampled directly from the brand mark & "elements in use" artwork.
+   Deep aubergine purple is the primary; teal, gold, olive, sage,
+   cream, pale-blue and lavender form the secondary palette. Burgundy
+   anchors the "tangle" journey illustration. */
+
+:root {
+  /* ---- Brand core ---- */
+  --cc-purple:        #2F1748;  /* primary — the mark, headings, dark surfaces */
+  --cc-purple-700:    #3D2160;
+  --cc-purple-500:    #5A3E84;
+  --cc-purple-300:    #9384AD;
+  --cc-purple-100:    #E3DEEC;
+  --cc-purple-050:    #F3F0F8;
+
+  --cc-teal:          #2A898C;  /* secondary signature — clarity / stability */
+  --cc-teal-700:      #1F696B;
+  --cc-teal-300:      #7FB8B9;
+  --cc-teal-100:      #D9ECEC;
+
+  --cc-gold:          #D5A347;  /* accent — value, premium, highlights */
+  --cc-gold-700:      #AD8132;
+  --cc-gold-300:      #E7C887;
+  --cc-gold-100:      #F7ECD3;
+
+  /* ---- Brand secondary ---- */
+  --cc-olive:         #515732;  /* grounded, growth */
+  --cc-olive-300:     #9DA177;
+  --cc-sage:          #CFD2AA;  /* soft growth tint */
+  --cc-cream:         #FFE7BC;  /* warm light surface / line-on-dark */
+  --cc-paleblue:      #D6ECF7;  /* cool light surface */
+  --cc-lavender:      #D1D4E3;  /* muted neutral tint of purple */
+  --cc-burgundy:      #962D38;  /* "complexity" end of the journey */
+
+  /* ---- Journey gradient (chaos → clarity) ---- */
+  --cc-journey-1:     #962D38;  /* complexity   */
+  --cc-journey-2:     #5A2350;  /* analysis     */
+  --cc-journey-3:     #2F1748;  /* organization */
+  --cc-journey-4:     #2D4A6B;  /* solution     */
+  --cc-journey-5:     #2A898C;  /* stability    */
+  --cc-journey: linear-gradient(180deg,
+      var(--cc-journey-1) 0%,
+      var(--cc-journey-2) 28%,
+      var(--cc-journey-3) 50%,
+      var(--cc-journey-4) 74%,
+      var(--cc-journey-5) 100%);
+
+  /* ---- Neutrals (warm-cool greys keyed to the purple) ---- */
+  --cc-ink:           #1B1226;  /* near-black, tinted purple */
+  --cc-grey-900:      #2B2435;
+  --cc-grey-700:      #4A4356;
+  --cc-grey-500:      #756E80;
+  --cc-grey-400:      #9C95A6;
+  --cc-grey-300:      #C7C2CF;
+  --cc-grey-200:      #E4E1EA;
+  --cc-grey-100:      #F1EFF4;
+  --cc-grey-050:      #FAF9FB;
+  --cc-white:         #FFFFFF;
+
+  /* ---- Semantic status ---- */
+  --cc-success:       #2A898C;  /* reuse teal */
+  --cc-warning:       #D5A347;  /* reuse gold */
+  --cc-danger:        #962D38;  /* reuse burgundy */
+  --cc-info:          #2D4A6B;
+
+  /* ---- Semantic aliases ---- */
+  --surface-page:        var(--cc-grey-050);
+  --surface-card:        var(--cc-white);
+  --surface-raised:      var(--cc-white);
+  --surface-sunken:      var(--cc-grey-100);
+  --surface-inverse:     var(--cc-purple);
+  --surface-accent-soft: var(--cc-purple-050);
+
+  --text-primary:        var(--cc-ink);
+  --text-secondary:      var(--cc-grey-700);
+  --text-muted:          var(--cc-grey-500);
+  --text-on-inverse:     var(--cc-cream);
+  --text-on-inverse-dim: var(--cc-purple-300);
+  --text-brand:          var(--cc-purple);
+  --text-link:           var(--cc-teal-700);
+
+  --border-subtle:       var(--cc-grey-200);
+  --border-default:      var(--cc-grey-300);
+  --border-strong:       var(--cc-purple);
+  --border-on-inverse:   rgba(255,231,188,0.22);
+
+  --accent-primary:      var(--cc-purple);
+  --accent-secondary:    var(--cc-teal);
+  --accent-gold:         var(--cc-gold);
+
+  --focus-ring:          var(--cc-teal);
+}

@@ -1,0 +1,15 @@
+/* ==================================================================
+   Cash Clinic — Design System  ·  global entry point
+   النقش الراقي  ·  the refined visual identity
+
+   This is the single file consumers link. It only @imports —
+   no rules are declared here. Everything reachable from this
+   closure (tokens + @font-face) ships to consuming projects.
+   ================================================================== */
+
+@import "./fonts/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/effects.css";
+@import "./tokens/base.css";
