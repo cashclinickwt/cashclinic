@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>إتمام الطلب | كاش كلينك</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--purple:#2F1748;--gold:#D5A347;--gold-700:#AD8132;--teal:#2A898C;--cream:#FFE7BC;
+    --ink:#1B1226;--g700:#4A4356;--g500:#756E80;--g200:#E4E1EA;--g100:#F1EFF4;--g050:#FAF9FB;--burgundy:#962D38;
+    --purple-050:#F3F0F8;--radius:12px;--pill:999px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;
+    background:var(--g050);color:var(--ink);padding:20px;line-height:1.7}
+  .card{background:#fff;max-width:460px;width:100%;border-radius:24px;padding:34px 28px;
+    box-shadow:0 18px 48px rgba(47,23,72,.12);border:1px solid var(--g200)}
+  .lock{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px}
+  .lock img{height:38px}.lock .wm{font-size:22px;font-weight:300;color:var(--ink)}.lock .wm b{font-weight:600}
+  h1{font-size:21px;font-weight:500;text-align:center;color:var(--purple);margin-bottom:6px}
+  .sub{color:var(--g500);font-size:14px;text-align:center;margin-bottom:22px}
+  .book{display:flex;gap:14px;align-items:center;background:var(--purple-050);border:1px solid var(--g200);
+    border-radius:16px;padding:16px;margin-bottom:22px}
+  .book .ic{width:46px;height:46px;flex:0 0 auto;border-radius:12px;background:var(--purple);color:var(--cream);display:grid;place-items:center;font-size:22px}
+  .book h2{font-size:15.5px;font-weight:600;line-height:1.4;color:var(--purple);margin-bottom:2px}
+  .book .price{color:var(--gold-700);font-weight:600;font-size:15px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-weight:500;font-size:13px;margin-bottom:6px;color:var(--g700)}
+  .field input{width:100%;font-family:inherit;font-size:16px;padding:13px 14px;border:1.5px solid var(--g200);border-radius:11px;transition:.15s}
+  .field input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,137,140,.18)}
+  .btn{width:100%;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:18px;border-radius:13px;padding:16px;
+    background:var(--gold);color:var(--purple);transition:.18s;margin-top:6px}
+  .btn:hover{background:var(--gold-700);color:#fff}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .err{color:var(--burgundy);font-size:13px;font-weight:500;min-height:18px;margin:4px 2px 2px}
+  .secure{display:flex;align-items:center;justify-content:center;gap:7px;color:var(--g500);font-size:12px;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>
+  <h1>إتمام الطلب</h1>
+  <p class="sub">عبّي بياناتك وبتوصلك نسخة الكتاب على إيميلك مباشرة بعد الدفع.</p>
+
+  <div class="book">
+    <span class="ic">📘</span>
+    <div>
+      <h2>دليل الوفرة المالية</h2>
+      <span class="price">٢٠ د.ك — نسخة رقمية (PDF)</span>
+    </div>
+  </div>
+
+  <div class="field"><label for="bName">الاسم</label><input id="bName" autocomplete="name" placeholder="اسمك الكامل" /></div>
+  <div class="field"><label for="bEmail">الإيميل</label><input id="bEmail" type="email" inputmode="email" autocomplete="email" placeholder="example@email.com" /></div>
+  <div class="field"><label for="bPhone">رقم الواتساب (اختياري)</label><input id="bPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" /></div>
+  <div class="err" id="mErr"></div>
+  <button class="btn" id="pay">ادفع ٢٠ د.ك</button>
+  <div class="secure">🔒 الدفع آمن عبر Tap — ما نحفظ بيانات بطاقتك</div>
+</div>
+
+<script type="module">
+const CONFIG = {
+  firebase: {
+    apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so", authDomain:"cash-quiz-906a6.firebaseapp.com",
+    projectId:"cash-quiz-906a6", storageBucket:"cash-quiz-906a6.firebasestorage.app",
+    messagingSenderId:"547780714224", appId:"1:547780714224:web:0e97107045a803623dec35"
+  },
+  functionsRegion:"us-central1", whatsapp:"96522268020"
+};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const app=initializeApp(CONFIG.firebase);
+const createTapCharge=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createTapCharge");
+
+const q=new URLSearchParams(location.search);
+const first=(q.get("first_name")||"").trim(), last=(q.get("last_name")||"").trim();
+const name=(q.get("name")|| (first+" "+last)).trim();
+if(name) document.getElementById("bName").value=name;
+if(q.get("email")) document.getElementById("bEmail").value=q.get("email").trim();
+if(q.get("phone")) document.getElementById("bPhone").value=q.get("phone").trim();
+
+const pay=document.getElementById("pay"), mErr=document.getElementById("mErr");
+const val=id=>document.getElementById(id).value.trim();
+pay.addEventListener("click", async ()=>{
+  const name=val("bName"), email=val("bEmail"), phone=val("bPhone");
+  mErr.textContent="";
+  if(name.length<2){ mErr.textContent="اكتب اسمك من فضلك."; return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ mErr.textContent="تأكد من صيغة الإيميل."; return; }
+  pay.disabled=true; pay.textContent="جاري التحويل…";
+  try{
+    const res=await createTapCharge({ leadId:null, name, email, phone });
+    const url=res.data && res.data.url;
+    if(!url) throw new Error("no url");
+    window.location.href=url;
+  }catch(e){
+    console.error(e);
+    mErr.textContent="صار خطأ بإنشاء الدفعة، جرب مرة ثانية أو راسلنا واتساب.";
+    pay.disabled=false; pay.textContent="ادفع ٢٠ د.ك";
+  }
+});
+</script>
+</body>
+</html>
