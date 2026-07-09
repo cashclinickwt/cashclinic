@@ -38,15 +38,15 @@
 </head>
 <body>
 <div class="card">
-  <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>
+  <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b id="wmWord">clinic</b></span></div>
   <h1>إتمام الطلب</h1>
   <p class="sub">عبّي بياناتك وبتوصلك نسخة الكتاب على إيميلك مباشرة بعد الدفع.</p>
 
   <div class="book">
-    <span class="ic">📘</span>
+    <span class="ic" id="bookIc">📘</span>
     <div>
-      <h2>دليل الوفرة المالية</h2>
-      <span class="price">٢٠ د.ك — نسخة رقمية (PDF)</span>
+      <h2 id="bookTitle">دليل الوفرة المالية</h2>
+      <span class="price" id="bookPrice">٢٠ د.ك — نسخة رقمية (PDF)</span>
     </div>
   </div>
 
@@ -54,7 +54,7 @@
   <div class="field"><label for="bEmail">الإيميل</label><input id="bEmail" type="email" inputmode="email" autocomplete="email" placeholder="example@email.com" /></div>
   <div class="field"><label for="bPhone">رقم الواتساب (اختياري)</label><input id="bPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" /></div>
   <div class="err" id="mErr"></div>
-  <button class="btn" id="pay">ادفع ٢٠ د.ك</button>
+  <button class="btn" id="pay">ادفع</button>
   <div class="secure">🔒 الدفع آمن عبر Tap — ما نحفظ بيانات بطاقتك</div>
 </div>
 
@@ -67,12 +67,27 @@ const CONFIG = {
   },
   functionsRegion:"us-central1", whatsapp:"96522268020"
 };
+
+/* display config only — the real price is enforced server-side */
+const PRODUCTS = {
+  dalil:  { title:"دليل الوفرة المالية", price:"٢٠ د.ك — نسخة رقمية (PDF)", pay:"ادفع ٢٠ د.ك", ic:"📘", word:"clinic" },
+  riyada: { title:"سحر إدارة الكاش",      price:"١٠ د.ك — نسخة رقمية (PDF)", pay:"ادفع ١٠ د.ك", ic:"📗", word:"riyada" }
+};
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 const app=initializeApp(CONFIG.firebase);
 const createTapCharge=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createTapCharge");
 
 const q=new URLSearchParams(location.search);
+const productKey = PRODUCTS[q.get("product")] ? q.get("product") : "dalil";
+const P = PRODUCTS[productKey];
+document.getElementById("wmWord").textContent    = P.word;
+document.getElementById("bookIc").textContent    = P.ic;
+document.getElementById("bookTitle").textContent = P.title;
+document.getElementById("bookPrice").textContent = P.price;
+document.getElementById("pay").textContent       = P.pay;
+
 const first=(q.get("first_name")||"").trim(), last=(q.get("last_name")||"").trim();
 const name=(q.get("name")|| (first+" "+last)).trim();
 if(name) document.getElementById("bName").value=name;
@@ -88,14 +103,14 @@ pay.addEventListener("click", async ()=>{
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ mErr.textContent="تأكد من صيغة الإيميل."; return; }
   pay.disabled=true; pay.textContent="جاري التحويل…";
   try{
-    const res=await createTapCharge({ leadId:null, name, email, phone });
+    const res=await createTapCharge({ leadId:null, name, email, phone, product:productKey });
     const url=res.data && res.data.url;
     if(!url) throw new Error("no url");
     window.location.href=url;
   }catch(e){
     console.error(e);
     mErr.textContent="صار خطأ بإنشاء الدفعة، جرب مرة ثانية أو راسلنا واتساب.";
-    pay.disabled=false; pay.textContent="ادفع ٢٠ د.ك";
+    pay.disabled=false; pay.textContent=P.pay;
   }
 });
 </script>

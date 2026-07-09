@@ -44,9 +44,10 @@ const app=initializeApp(CONFIG.firebase);
 const getOrderStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getOrderStatus");
 const card=document.getElementById("card");
 const orderId=new URLSearchParams(location.search).get("order");
+let productName="الكتاب";
 const L='<div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>';
 function ok(){card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع بنجاح 🎉</h1>
-  <p>أرسلنا لك <span class="mail">دليل الوفرة المالية</span> على إيميلك مباشرة.</p>
+  <p>أرسلنا لك <span class="mail">${productName}</span> على إيميلك مباشرة.</p>
   <p>لو ما وصلتك الرسالة خلال دقائق، تأكد من صندوق <b>Spam / المهملات</b>.</p>
   <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;}
 function pending(){card.innerHTML=L+`<div class="ic wait">⏳</div><h1>استلمنا طلبك</h1>
@@ -58,6 +59,7 @@ function fail(){card.innerHTML=L+`<div class="ic fail">!</div><h1>ما تمت ا
 async function poll(t=0){
   if(!orderId){pending();return;}
   try{const r=await getOrderStatus({orderId});const s=r.data.status;
+    if(r.data.product) productName=r.data.product;
     if(s==="paid"){ok();return;} if(["failed","declined","cancelled"].includes(s)){fail();return;}
   }catch(e){console.warn(e);}
   if(t<8){setTimeout(()=>poll(t+1),2500);}else{pending();}
