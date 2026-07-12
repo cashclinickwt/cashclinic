@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة المبيعات | كاش كلينك</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--purple:#2F1748;--purple-2:#614588;--gold:#D5A347;--gold-700:#AD8132;--teal:#2A898C;--cream:#FFE7BC;
+    --ink:#1B1226;--g700:#4A4356;--g500:#756E80;--g200:#E4E1EA;--g100:#F1EFF4;--g050:#FAF9FB;--burgundy:#962D38;
+    --purple-050:#F3F0F8;--green:#2f7d5b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--g050);color:var(--ink);
+    line-height:1.7;padding:18px;min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto}
+  .lock{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px}
+  .lock img{height:34px}.lock .wm{font-size:20px;font-weight:300;color:var(--ink)}.lock .wm b{font-weight:600}
+
+  /* gate */
+  .gate{max-width:400px;margin:8vh auto 0;background:#fff;border:1px solid var(--g200);border-radius:22px;
+    padding:32px 26px;box-shadow:0 18px 48px rgba(47,23,72,.12);text-align:center}
+  .gate h1{font-size:20px;color:var(--purple);margin-bottom:6px;font-weight:600}
+  .gate p{color:var(--g500);font-size:14px;margin-bottom:20px}
+  .gate input{width:100%;font-family:inherit;font-size:16px;padding:13px 14px;border:1.5px solid var(--g200);
+    border-radius:11px;text-align:center;margin-bottom:12px}
+  .gate input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,137,140,.18)}
+  .btn{border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:16px;border-radius:12px;padding:13px 22px;
+    background:var(--gold);color:var(--purple);transition:.18s}
+  .btn:hover{background:var(--gold-700);color:#fff}
+  .btn.ghost{background:#fff;color:var(--purple);border:1.5px solid var(--g200)}
+  .btn.ghost:hover{border-color:var(--teal);color:var(--teal)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .err{color:var(--burgundy);font-size:13px;font-weight:500;min-height:18px;margin-top:4px}
+
+  /* dashboard */
+  .hidden{display:none}
+  .topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+  .topbar h1{font-size:20px;color:var(--purple);font-weight:600}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+  .stat{background:var(--purple);color:#fff;border-radius:16px;padding:18px 20px}
+  .stat.alt{background:#fff;color:var(--ink);border:1px solid var(--g200)}
+  .stat .l{font-size:13px;opacity:.85;color:var(--cream)}
+  .stat.alt .l{color:var(--g500)}
+  .stat .v{font-size:26px;font-weight:700;margin-top:2px}
+  .stat.alt .v{color:var(--purple)}
+  .stat .v small{font-size:14px;font-weight:500;opacity:.8}
+
+  .byprod{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:14px}
+  .pcard{background:#fff;border:1px solid var(--g200);border-radius:16px;padding:16px 18px}
+  .pcard .nm{font-size:15px;font-weight:600;color:var(--purple)}
+  .pcard .rw{display:flex;justify-content:space-between;margin-top:8px;font-size:14px;color:var(--g700)}
+  .pcard .rw b{color:var(--gold-700)}
+
+  .profit{background:var(--purple-050);border:1px solid var(--g200);border-radius:16px;padding:16px 18px;margin-bottom:16px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .profit label{font-size:14px;color:var(--g700);font-weight:500}
+  .profit input{width:110px;font-family:inherit;font-size:15px;padding:9px 12px;border:1.5px solid var(--g200);border-radius:10px}
+  .profit input:focus{outline:none;border-color:var(--teal)}
+  .profit .net{margin-inline-start:auto;font-size:15px;color:var(--g700)}
+  .profit .net b{font-size:20px;color:var(--green);font-weight:700}
+
+  .filters{display:flex;gap:8px;margin-bottom:12px}
+  .chip{cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;padding:8px 16px;border-radius:999px;
+    border:1.5px solid var(--g200);background:#fff;color:var(--g700)}
+  .chip.on{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+  .tablewrap{background:#fff;border:1px solid var(--g200);border-radius:16px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+  th,td{padding:12px 14px;text-align:right;border-bottom:1px solid var(--g100);white-space:nowrap}
+  th{background:var(--purple);color:var(--cream);font-weight:600;position:sticky;top:0}
+  tr:last-child td{border-bottom:0}
+  td.amt{color:var(--gold-700);font-weight:600}
+  .empty{padding:30px;text-align:center;color:var(--g500)}
+  .muted{color:var(--g500);font-size:12px;text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- GATE -->
+  <div class="gate" id="gate">
+    <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>
+    <h1>لوحة المبيعات</h1>
+    <p>أدخل كلمة المرور للاطلاع على الطلبات.</p>
+    <input id="pass" type="password" placeholder="كلمة المرور" />
+    <button class="btn" id="enter" style="width:100%">دخول</button>
+    <div class="err" id="gErr"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" class="hidden">
+    <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>
+    <div class="topbar">
+      <h1>لوحة المبيعات</h1>
+      <div class="actions">
+        <button class="btn ghost" id="refresh">تحديث ↻</button>
+        <button class="btn" id="csv">تصدير CSV</button>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="stat"><div class="l">إجمالي الإيرادات</div><div class="v" id="tRev">—</div></div>
+      <div class="stat alt"><div class="l">عدد المبيعات</div><div class="v" id="tCount">—</div></div>
+    </div>
+
+    <div class="byprod" id="byprod"></div>
+
+    <div class="profit">
+      <label>تكلفة/رسوم لكل عملية (د.ك):</label>
+      <input id="cost" type="number" inputmode="decimal" step="0.001" min="0" value="0" />
+      <div class="net">صافي الربح التقديري: <b id="net">—</b> د.ك</div>
+    </div>
+
+    <div class="filters">
+      <button class="chip on" data-f="all">الكل</button>
+      <button class="chip" data-f="month">هذا الشهر</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>التاريخ</th><th>الاسم</th><th>الإيميل</th><th>الفون</th><th>الكتاب</th><th>المبلغ</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty hidden" id="empty">لا توجد مبيعات بعد.</div>
+    </div>
+    <div class="muted">الأرقام تعتمد على الطلبات المدفوعة فقط (status = paid).</div>
+  </div>
+
+</div>
+
+<script type="module">
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},
+  functionsRegion:"us-central1"};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const app=initializeApp(CONFIG.firebase);
+const getSalesReport=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesReport");
+
+const $=id=>document.getElementById(id);
+let PASS="", DATA=null, FILTER="all";
+
+/* gate */
+$("enter").addEventListener("click", unlock);
+$("pass").addEventListener("keydown", e=>{ if(e.key==="Enter") unlock(); });
+async function unlock(){
+  const pass=$("pass").value.trim();
+  if(!pass){ $("gErr").textContent="أدخل كلمة المرور."; return; }
+  $("enter").disabled=true; $("enter").textContent="جاري الدخول…"; $("gErr").textContent="";
+  try{
+    const r=await getSalesReport({ pass });
+    PASS=pass; DATA=r.data;
+    $("gate").classList.add("hidden"); $("dash").classList.remove("hidden");
+    render();
+  }catch(e){
+    $("gErr").textContent = (e && e.message) ? e.message : "تعذر الدخول، تأكد من كلمة المرور.";
+  }finally{
+    $("enter").disabled=false; $("enter").textContent="دخول";
+  }
+}
+
+/* refresh */
+$("refresh").addEventListener("click", async ()=>{
+  $("refresh").disabled=true; $("refresh").textContent="…";
+  try{ const r=await getSalesReport({ pass:PASS }); DATA=r.data; render(); }
+  catch(e){ alert("تعذر التحديث."); }
+  finally{ $("refresh").disabled=false; $("refresh").textContent="تحديث ↻"; }
+});
+
+/* filters */
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  c.classList.add("on"); FILTER=c.dataset.f; render();
+}));
+
+/* cost -> net */
+$("cost").addEventListener("input", updateNet);
+
+function fmt(n){ return Number(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:3}); }
+function fdate(ms){ if(!ms) return "—"; const d=new Date(ms);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function inThisMonth(ms){ const d=new Date(ms),n=new Date(); return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
+function filtered(){ const o=(DATA&&DATA.orders)||[]; return FILTER==="month"?o.filter(x=>inThisMonth(x.when)):o; }
+
+function render(){
+  const list=filtered();
+  const rev=list.reduce((s,x)=>s+Number(x.amount||0),0);
+  const cnt=list.length;
+  $("tRev").innerHTML=fmt(rev)+' <small>د.ك</small>';
+  $("tCount").textContent=fmt(cnt);
+
+  // per product (from filtered list so it matches the view)
+  const map={};
+  list.forEach(x=>{ const k=x.product||"—"; if(!map[k])map[k]={product:k,count:0,revenue:0};
+    map[k].count++; map[k].revenue+=Number(x.amount||0); });
+  const prods=Object.values(map).sort((a,b)=>b.revenue-a.revenue);
+  $("byprod").innerHTML=prods.map(p=>`
+    <div class="pcard"><div class="nm">${esc(p.product)}</div>
+      <div class="rw"><span>عدد المبيعات</span><b>${fmt(p.count)}</b></div>
+      <div class="rw"><span>الإيرادات</span><b>${fmt(p.revenue)} د.ك</b></div>
+    </div>`).join("") || `<div class="muted">لا توجد بيانات.</div>`;
+
+  // table
+  const rows=$("rows"), empty=$("empty");
+  if(!list.length){ rows.innerHTML=""; empty.classList.remove("hidden"); }
+  else{
+    empty.classList.add("hidden");
+    rows.innerHTML=list.map(x=>`<tr>
+      <td>${fdate(x.when)}</td><td>${esc(x.name)}</td><td>${esc(x.email)}</td>
+      <td>${esc(x.phone||"—")}</td><td>${esc(x.product)}</td>
+      <td class="amt">${fmt(x.amount)} د.ك</td></tr>`).join("");
+  }
+  updateNet();
+}
+
+function updateNet(){
+  const list=filtered();
+  const rev=list.reduce((s,x)=>s+Number(x.amount||0),0);
+  const cost=Number($("cost").value)||0;
+  const net=rev - (cost*list.length);
+  $("net").textContent=fmt(net);
+}
+
+/* CSV export */
+$("csv").addEventListener("click", ()=>{
+  const list=filtered();
+  const head=["التاريخ","الاسم","الإيميل","الفون","الكتاب","المبلغ","العملة"];
+  const lines=[head.join(",")].concat(list.map(x=>[
+    fdate(x.when), csv(x.name), csv(x.email), csv(x.phone||""), csv(x.product), x.amount, x.currency||"KWD"
+  ].join(",")));
+  const blob=new Blob(["\uFEFF"+lines.join("\n")],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="cashclinic-sales-"+new Date().toISOString().slice(0,10)+".csv";
+  a.click(); URL.revokeObjectURL(a.href);
+});
+
+function csv(s){ s=String(s==null?"":s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+</script>
+</body>
+</html>
