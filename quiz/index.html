@@ -56,11 +56,11 @@ img{max-width:100%;display:block}
 .intro-grid{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:center}
 .intro-photo img{width:100%;border-radius:20px;border:1px solid var(--line);
   box-shadow:0 20px 50px rgba(0,0,0,.35)}
-.intro-photos{display:flex;flex-direction:column;gap:18px}
-.pcard{text-align:center}
-.pcard img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.35)}
-.pcard .pname{margin-top:9px;font-weight:800;font-size:15px}
-.pcard .prole{color:var(--muted);font-size:13px;margin-top:2px}
+.intro-photos{display:flex;gap:14px}
+.pcard{flex:1;min-width:0;text-align:center}
+.pcard img{width:100%;border-radius:16px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.32)}
+.pcard .pname{margin-top:9px;font-weight:800;font-size:14px}
+.pcard .prole{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.5}
 .intro-txt h2{font-size:clamp(22px,3.6vw,30px);font-weight:800;line-height:1.4;margin:0 0 12px}
 .intro-txt .lead{color:var(--gold);font-size:clamp(16px,2.4vw,20px);font-weight:600;margin:0 0 16px;line-height:1.7}
 .intro-txt .body{color:var(--muted);font-size:15px;line-height:1.95;margin:0 0 22px}
@@ -164,8 +164,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 @media (max-width:720px){
   .intro-grid{grid-template-columns:1fr;gap:22px}
   .intro-photo{max-width:260px;margin:0 auto}
-  .intro-photos{flex-direction:row;gap:12px}
-  .pcard{flex:1;min-width:0}
+  .intro-photos{gap:10px}
   .pcard .pname{font-size:13px}
   .pcard .prole{font-size:11px}
   .axes-grid,.mgrid{grid-template-columns:1fr}
@@ -200,7 +199,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 
     <section class="axes">
       <h2 class="axes-title">محاور اختبار الجاهزية الأربعة</h2>
-      <div class="axes-grid"><div class="pcard"><img src="ghaliya.jpg" alt="غالية النويف"/><div class="pname">غالية النويف</div><div class="prole">مؤسِسة كاش كلينيك · مُعِدّة الاختبار</div></div><div class="pcard"><img src="sara.jpg" alt="سارة الهندي"/><div class="pname">سارة الهندي</div><div class="prole">شريكة ومختصة السلوك المالي</div></div></div>
+      <div class="axes-grid"><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>العقلية المالية</h3><p>كيف تفكر وتتصرف مع فلوسك، ووعيك بالتخطيط قبل الصرف.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>الانضباط السلوكي</h3><p>مدى تتبعك لمصاريفك والتزاماتك ومعرفتك وين تروح فلوسك.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>المرونة المالية</h3><p>قدرتك على امتصاص المفاجآت والصمود لو وقف الدخل فجأة.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>الاستعداد للنمو</h3><p>جاهزيتك للتغيير والتنفيذ ووضوح خطوتك القادمة نحو الوفرة.</p></div></div>
     </section>
 
     <section class="cta-band">

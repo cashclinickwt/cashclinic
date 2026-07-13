@@ -349,7 +349,7 @@
   var params = new URLSearchParams(location.search);
   function goCheckout(){
     var q = new URLSearchParams();
-    ['first_name','last_name','email','phone'].forEach(function(k){
+    ['first_name','last_name','name','email','phone'].forEach(function(k){
       if(params.get(k)) q.set(k, params.get(k));
     });
     q.set('product','riyada');

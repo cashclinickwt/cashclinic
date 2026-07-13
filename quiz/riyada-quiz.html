@@ -56,11 +56,11 @@ img{max-width:100%;display:block}
 .intro-grid{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:center}
 .intro-photo img{width:100%;border-radius:20px;border:1px solid var(--line);
   box-shadow:0 20px 50px rgba(0,0,0,.35)}
-.intro-photos{display:flex;flex-direction:column;gap:18px}
-.pcard{text-align:center}
-.pcard img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.35)}
-.pcard .pname{margin-top:9px;font-weight:800;font-size:15px}
-.pcard .prole{color:var(--muted);font-size:13px;margin-top:2px}
+.intro-photos{display:flex;gap:14px}
+.pcard{flex:1;min-width:0;text-align:center}
+.pcard img{width:100%;border-radius:16px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.32)}
+.pcard .pname{margin-top:9px;font-weight:800;font-size:14px}
+.pcard .prole{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.5}
 .intro-txt h2{font-size:clamp(22px,3.6vw,30px);font-weight:800;line-height:1.4;margin:0 0 12px}
 .intro-txt .lead{color:var(--gold);font-size:clamp(16px,2.4vw,20px);font-weight:600;margin:0 0 16px;line-height:1.7}
 .intro-txt .body{color:var(--muted);font-size:15px;line-height:1.95;margin:0 0 22px}
@@ -164,8 +164,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 @media (max-width:720px){
   .intro-grid{grid-template-columns:1fr;gap:22px}
   .intro-photo{max-width:260px;margin:0 auto}
-  .intro-photos{flex-direction:row;gap:12px}
-  .pcard{flex:1;min-width:0}
+  .intro-photos{gap:10px}
   .pcard .pname{font-size:13px}
   .pcard .prole{font-size:11px}
   .axes-grid,.mgrid{grid-template-columns:1fr}
@@ -252,9 +251,9 @@ const ORDER = ["cash", "pricing", "sales", "product", "ops", "strategy"];
 const DIAG = {"low": "تشخيص مشروعك يبيّن إنه في مرحلة تحتاج تدخّل سريع: في محاور أساسية فيها تسريبات تأثر على استقرار كاش مشروعك. لا تخاف من الأرقام، الخبر الزين إن معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على محور واحد في كل مرة وابدأ من الكاش.", "mid": "تشخيص مشروعك يبيّن إنك بنيت أساس لا بأس فيه، بس في محاور تحتاج تشتغل عليها عشان تثبّت وتكبر. عندك نقاط قوة واضحة ونقاط فيها تسريبات تأثر على كاش مشروعك. معالجة أهم محورين أو ثلاثة بتنقلك نقلة كبيرة.", "high": "تشخيص مشروعك يبيّن إنه في وضع صحي وقوي: عندك أساس متين في أغلب المحاور، وتشتغل بأرقام وأنظمة مو بس بالإحساس. الفرصة الحين إنك تنتقل من الاستقرار للنمو المتسارع، وتبني على نقاط قوتك عشان توسّع بثقة."};
 const B1 = 40, B2 = 70;
 const BANDS = ["ضعيف", "متوسط", "جيد"];
-const WIDGET = "donut", CTA = "tap";
+const WIDGET = "donut", CTA = "book";
 const SOURCE = "riyada-quiz", PRODUCT = "riyada";
-const BOOK_NAME = "سحر إدارة الكاش", BOOK_URL = "";
+const BOOK_NAME = "سحر إدارة الكاش", BOOK_URL = "riyada.html";
 const PRICE_LABEL = "نسخة رقمية تصلك على إيميلك فوراً — ١٠ د.ك", WHATSAPP = "96522260820";
 const ANALYSIS = false, SHOW_CARD_DESC = true;
 const RESULT_TITLE = "أبارك لك إكمال فحص صحة كاش مشروعك 🎉", CARDS_TITLE = "تشخيص مشروعك عبر المحاور الستة";
