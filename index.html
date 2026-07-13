@@ -129,6 +129,12 @@
       <span class="cc-eyebrow" data-ar="عياداتنا الثلاث" data-en="Our Three Clinics">عياداتنا الثلاث</span>
       <h2 class="cc-h2" data-ar="اختر العيادة المناسبة لك" data-en="Choose the right clinic for you">اختر العيادة المناسبة لك</h2>
       <p class="cc-lede" data-ar="كل عيادة لها استشاري متخصص، وباقات مصمّمة لكل حالة، ودعم مباشر عبر واتساب." data-en="Each clinic has a dedicated consultant, packages designed for every case, and direct support on WhatsApp.">كل عيادة لها استشاري متخصص، وباقات مصمّمة لكل حالة، ودعم مباشر عبر واتساب.</p>
+      <div style="margin-top:26px;">
+        <button type="button" data-quiz-open class="cc-btn cc-btn-quiz" style="font-size:15.5px;padding:14px 28px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span data-ar="مو متأكد أي عيادة تناسبك؟ سوِّ الاختبار" data-en="Not sure which clinic fits? Take the quiz">مو متأكد أي عيادة تناسبك؟ سوِّ الاختبار</span>
+        </button>
+      </div>
     </div>
     <div class="cc-clinics-grid">
       <!-- Cash Nas -->
@@ -318,6 +324,79 @@
   </div>
 </footer>
 
+<!-- ===== QUIZ CHOOSER ===== -->
+<style>
+.cc-btn-quiz{background:var(--cc-teal);color:var(--cc-cream);}
+.cc-btn-quiz:hover{background:var(--cc-teal-700);}
+.cc-quiz-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(47,23,72,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .2s;}
+.cc-quiz-overlay[hidden]{display:none;}
+.cc-quiz-overlay.is-open{opacity:1;}
+.cc-quiz-modal{position:relative;width:100%;max-width:680px;max-height:calc(100vh - 40px);overflow:auto;background:var(--cc-white);border-radius:var(--radius-xl);padding:44px 34px 38px;box-shadow:0 30px 80px rgba(47,23,72,.35);transform:translateY(14px);transition:transform .2s;}
+.cc-quiz-overlay.is-open .cc-quiz-modal{transform:translateY(0);}
+.cc-quiz-close{position:absolute;top:14px;inset-inline-end:16px;width:38px;height:38px;border:none;background:var(--cc-purple-050);color:var(--cc-purple);border-radius:var(--radius-pill);font-size:24px;line-height:1;cursor:pointer;transition:background .18s;}
+.cc-quiz-close:hover{background:var(--cc-purple-100);}
+.cc-quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px;}
+.cc-quiz-card{display:block;background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:var(--radius-lg);padding:26px 22px;transition:border-color .18s,box-shadow .18s,transform .18s;}
+.cc-quiz-card:hover{border-color:var(--qc);box-shadow:0 14px 34px rgba(47,23,72,.12);transform:translateY(-3px);}
+.cc-quiz-ico{width:66px;height:66px;border-radius:var(--radius-lg);background:var(--qc-soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.cc-quiz-go{display:inline-block;margin-top:16px;font-size:14.5px;font-weight:600;color:var(--qc);}
+@media(max-width:560px){.cc-quiz-grid{grid-template-columns:1fr;}.cc-quiz-modal{padding:40px 20px 30px;}}
+</style>
+
+<div class="cc-quiz-overlay" data-quiz-overlay hidden>
+  <div class="cc-quiz-modal" role="dialog" aria-modal="true" aria-labelledby="ccQuizTitle">
+    <button type="button" class="cc-quiz-close" data-quiz-close aria-label="إغلاق">&times;</button>
+    <div style="text-align:center;">
+      <span class="cc-eyebrow" data-ar="التشخيص المالي" data-en="Financial Diagnosis">التشخيص المالي</span>
+      <h2 id="ccQuizTitle" style="font-size:clamp(24px,3vw,32px);font-weight:300;margin:12px 0 0;color:var(--cc-ink);" data-ar="أي اختبار يناسبك؟" data-en="Which quiz fits you?">أي اختبار يناسبك؟</h2>
+      <p style="font-size:15.5px;line-height:1.65;color:var(--cc-grey-700);margin:12px auto 0;max-width:42ch;" data-ar="اختر الاختبار حسب وضعك، وخذ نتيجتك خلال دقائق." data-en="Pick the quiz that matches your situation and get your result in minutes.">اختر الاختبار حسب وضعك، وخذ نتيجتك خلال دقائق.</p>
+    </div>
+    <div class="cc-quiz-grid">
+      <!-- Personal quiz -> Cash Nas -->
+      <a class="cc-quiz-card" href="quiz/index.html" style="--qc:#505632;--qc-soft:#E7E9D3;">
+        <div class="cc-quiz-ico"><img src="brand/nas-logo.png" alt="" width="46" height="46"></div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--qc);" data-ar="للأفراد" data-en="For Individuals">للأفراد</div>
+        <h3 style="font-size:20px;font-weight:500;margin:5px 0 0;color:var(--cc-ink);" data-ar="اختبار الوفرة المالية" data-en="Financial Abundance Quiz">اختبار الوفرة المالية</h3>
+        <p style="font-size:14px;line-height:1.6;color:var(--cc-grey-700);margin:9px 0 0;" data-ar="قِس جاهزيتك المالية واكتشف وين تقف من الوفرة." data-en="Measure your financial readiness and see where you stand.">قِس جاهزيتك المالية واكتشف وين تقف من الوفرة.</p>
+        <span class="cc-quiz-go" data-ar="ابدأ الاختبار ←" data-en="Start Quiz →">ابدأ الاختبار ←</span>
+      </a>
+      <!-- Business quiz -> Cash Riyada -->
+      <a class="cc-quiz-card" href="quiz/riyada-quiz.html" style="--qc:#2F8789;--qc-soft:#D6EAF2;">
+        <div class="cc-quiz-ico"><img src="brand/riyada-logo.png" alt="" width="46" height="46"></div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--qc);" data-ar="لأصحاب المشاريع" data-en="For Business Owners">لأصحاب المشاريع</div>
+        <h3 style="font-size:20px;font-weight:500;margin:5px 0 0;color:var(--cc-ink);" data-ar="فحص صحة كاش مشروعك" data-en="Business Cash Health Check">فحص صحة كاش مشروعك</h3>
+        <p style="font-size:14px;line-height:1.6;color:var(--cc-grey-700);margin:9px 0 0;" data-ar="شخّص صحة الكاش في مشروعك خلال دقائق." data-en="Diagnose your project's cash health in minutes.">شخّص صحة الكاش في مشروعك خلال دقائق.</p>
+        <span class="cc-quiz-go" data-ar="ابدأ الاختبار ←" data-en="Start Quiz →">ابدأ الاختبار ←</span>
+      </a>
+    </div>
+  </div>
+</div>
+
 <script src="assets/js/i18n.js"></script>
+<script>
+(function(){
+  var overlay = document.querySelector('[data-quiz-overlay]');
+  if(!overlay) return;
+  function open(){
+    overlay.hidden = false;
+    void overlay.offsetWidth;
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function close(){
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(function(){ overlay.hidden = true; }, 200);
+  }
+  var openers = document.querySelectorAll('[data-quiz-open]');
+  for(var i=0;i<openers.length;i++) openers[i].addEventListener('click', open);
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay || (e.target.hasAttribute && e.target.hasAttribute('data-quiz-close'))) close();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !overlay.hidden) close();
+  });
+})();
+</script>
 </body>
 </html>
