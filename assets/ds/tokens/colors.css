@@ -7,11 +7,11 @@
 
 :root {
   /* ---- Brand core ---- */
-  --cc-purple:        #2F1748;  /* primary — the mark, headings, dark surfaces */
+  --cc-purple:        #2F1749;  /* official Deep Purple */  /* primary — the mark, headings, dark surfaces */
   --cc-purple-700:    #3D2160;
-  --cc-purple-500:    #5A3E84;
+  --cc-purple-500:    #614588;  /* official Royal Purple */
   --cc-purple-300:    #9384AD;
-  --cc-purple-100:    #E3DEEC;
+  --cc-purple-100:    #D2D3E1;  /* official Lavender Grey */
   --cc-purple-050:    #F3F0F8;
 
   --cc-teal:          #2A898C;  /* secondary signature — clarity / stability */
