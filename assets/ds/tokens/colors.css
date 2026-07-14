@@ -14,31 +14,31 @@
   --cc-purple-100:    #D2D3E1;  /* official Lavender Grey */
   --cc-purple-050:    #F3F0F8;
 
-  --cc-teal:          #2A898C;  /* secondary signature — clarity / stability */
+  --cc-teal:          #2F8789;  /* secondary signature — clarity / stability */
   --cc-teal-700:      #1F696B;
   --cc-teal-300:      #7FB8B9;
   --cc-teal-100:      #D9ECEC;
 
-  --cc-gold:          #D5A347;  /* accent — value, premium, highlights */
+  --cc-gold:          #D3A146;  /* accent — value, premium, highlights */
   --cc-gold-700:      #AD8132;
   --cc-gold-300:      #E7C887;
   --cc-gold-100:      #F7ECD3;
 
   /* ---- Brand secondary ---- */
-  --cc-olive:         #515732;  /* grounded, growth */
+  --cc-olive:         #505632;  /* grounded, growth */
   --cc-olive-300:     #9DA177;
-  --cc-sage:          #CFD2AA;  /* soft growth tint */
-  --cc-cream:         #FFE7BC;  /* warm light surface / line-on-dark */
+  --cc-sage:          #CFD1AB;  /* soft growth tint */
+  --cc-cream:         #FFE6BB;  /* warm light surface / line-on-dark */
   --cc-paleblue:      #D6ECF7;  /* cool light surface */
-  --cc-lavender:      #D1D4E3;  /* muted neutral tint of purple */
-  --cc-burgundy:      #962D38;  /* "complexity" end of the journey */
+  --cc-lavender:      #D2D3E1;  /* muted neutral tint of purple */
+  --cc-burgundy:      #962E37;  /* "complexity" end of the journey */
 
   /* ---- Journey gradient (chaos → clarity) ---- */
-  --cc-journey-1:     #962D38;  /* complexity   */
+  --cc-journey-1:     #962E37;  /* complexity   */
   --cc-journey-2:     #5A2350;  /* analysis     */
-  --cc-journey-3:     #2F1748;  /* organization */
+  --cc-journey-3:     #2F1749;  /* organization */
   --cc-journey-4:     #2D4A6B;  /* solution     */
-  --cc-journey-5:     #2A898C;  /* stability    */
+  --cc-journey-5:     #2F8789;  /* stability    */
   --cc-journey: linear-gradient(180deg,
       var(--cc-journey-1) 0%,
       var(--cc-journey-2) 28%,
@@ -59,9 +59,9 @@
   --cc-white:         #FFFFFF;
 
   /* ---- Semantic status ---- */
-  --cc-success:       #2A898C;  /* reuse teal */
-  --cc-warning:       #D5A347;  /* reuse gold */
-  --cc-danger:        #962D38;  /* reuse burgundy */
+  --cc-success:       #2F8789;  /* reuse teal */
+  --cc-warning:       #D3A146;  /* reuse gold */
+  --cc-danger:        #962E37;  /* reuse burgundy */
   --cc-info:          #2D4A6B;
 
   /* ---- Semantic aliases ---- */
