@@ -33,6 +33,11 @@ img{max-width:100%;}
 .cc-wrap{max-width:1200px;margin:0 auto;padding:0 28px;}
 .cc-sec-head{text-align:center;max-width:640px;margin:0 auto;}
 .cc-eyebrow{font-size:14.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cc-teal-700);}
+/* Arabic is cursive — Latin letter-spacing/uppercase are for English (LTR) only */
+html[dir="rtl"] .cc-eyebrow,
+html[dir="rtl"] .cc-pol-eyebrow,
+html[dir="rtl"] .cc-lat-track{letter-spacing:normal!important;text-transform:none!important;}
+
 html{scroll-padding-top:88px;}
 .cc-arrow-cta{white-space:nowrap;}
 .cc-h2{font-size:clamp(28px,3.6vw,42px);font-weight:300;letter-spacing:-.01em;margin:14px 0 0;color:var(--cc-ink);}
