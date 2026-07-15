@@ -10,10 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --purple:#2F1748;--purple-700:#3D2160;--purple-500:#5A3E84;--purple-300:#9384AD;--purple-050:#F3F0F8;
-    --gold:#D5A347;--gold-700:#AD8132;--gold-100:#F7ECD3;
-    --teal:#2A898C;--teal-700:#1F696B;
-    --cream:#FFE7BC;--burgundy:#962D38;--olive:#515732;
+    --purple:#2F1749;--purple-700:#3D2160;--purple-500:#5A3E84;--purple-300:#9384AD;--purple-050:#F3F0F8;
+    --gold:#D3A146;--gold-700:#AD8132;--gold-100:#F7ECD3;
+    --teal:#2F8789;--teal-700:#1F696B;
+    --cream:#FFE6BB;--burgundy:#962E37;--olive:#505632;
     --ink:#1B1226;--g700:#4A4356;--g500:#756E80;--g300:#C7C2CF;--g200:#E4E1EA;--g100:#F1EFF4;--g050:#FAF9FB;--white:#fff;
     --radius:12px;--radius-lg:18px;--radius-xl:28px;--pill:999px;
     --shadow-sm:0 2px 6px rgba(47,23,72,.07);--shadow-md:0 8px 24px rgba(47,23,72,.09);--shadow-lg:0 18px 48px rgba(47,23,72,.14);
@@ -33,7 +33,7 @@
   .btn-wa{background:var(--teal);color:#fff;box-shadow:0 8px 22px rgba(42,137,140,.32)}
   .btn-wa:hover{background:var(--teal-700);color:#fff;transform:translateY(-1px)}
   .btn-wa svg{width:20px;height:20px;fill:currentColor}
-  .eyebrow{font-size:12.8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  .eyebrow{font-size:14.5px;font-weight:600;letter-spacing:normal}
   .lock{display:inline-flex;align-items:center;gap:11px}
   .lock img{height:38px;width:auto}
   .lock .wm{font-size:23px;font-weight:300;line-height:1;letter-spacing:-.01em}
@@ -83,7 +83,7 @@
   .pcard{background:#fff;border:1px solid var(--g200);border-radius:var(--radius-xl);padding:30px 26px;box-shadow:var(--shadow-sm);transition:.22s var(--ease)}
   .pcard:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
   .pcard .bar{width:8px;height:32px;border-radius:var(--pill);background:var(--cc);margin-bottom:18px}
-  .pcard .n{font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--g500);text-transform:uppercase}
+  .pcard .n{font-size:13px;font-weight:600;letter-spacing:normal;color:var(--g500)}
   .pcard h3{font-size:21px;font-weight:500;color:var(--purple);margin:4px 0 16px}
   .pcard ul{list-style:none;display:flex;flex-direction:column;gap:11px}
   .pcard li{display:flex;gap:10px;font-size:14.5px;color:var(--g700);line-height:1.7}
@@ -122,7 +122,12 @@
   .final p{color:rgba(255,255,255,.9);max-width:560px;margin:16px auto 30px;font-size:17px}
   .final .price{display:block;margin-top:16px;color:rgba(255,255,255,.82);font-size:14px}
 
-  footer{background:var(--purple);color:var(--purple-300);padding:44px 0;text-align:center;font-size:13.5px}
+  footer{background:var(--purple);color:var(--purple-300);padding:44px 0 52px;text-align:center;font-size:13.5px}
+  /* the logo is inline-flex, so force the © line onto its own row and keep the ending tidy */
+  footer .lock{display:flex;justify-content:center;margin:0 0 14px}
+  footer a{color:var(--cream)}
+  /* leave room for the floating WhatsApp button so it never sits on the text */
+  @media(max-width:640px){footer{padding:36px 0 96px}}
   footer .lock{margin-bottom:14px}
   footer .lock .wm{color:var(--cream)}
   footer a{color:var(--cream);font-weight:600}
@@ -154,7 +159,7 @@
       <span class="eyebrow">دليل رقمي شامل · نسخة PDF</span>
       <h1>دليل <b>الوفرة المالية</b></h1>
       <div class="tag">من الصدمة المالية إلى بناء الثروة الحقيقية</div>
-      <p>مو دورة نظرية ولا نصايح عامة تنقرا. دليل عملي بالأرقام يجمع بين علم السلوكيات المالية وأدوات المحاسبة الشخصية — مصمم للواقع الخليجي، ومبني على ١٢ سنة تعامل مع آلاف الأسر.</p>
+      <p>مو دورة نظرية ولا نصايح عامة تنقرا. دليل عملي بالأرقام يجمع بين علم السلوكيات المالية وأدوات المحاسبة الشخصية... مصمم للواقع الخليجي، ومبني على ١٢ سنة تعامل مع آلاف الأسر.</p>
       <div class="row">
         <a class="btn btn-gold cta-link">احصل على الدليل الآن ←</a>
         <a class="btn btn-wa" href="https://wa.me/96522260820?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AF%D9%84%D9%8A%D9%84%20%D8%A7%D9%84%D9%88%D9%81%D8%B1%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 2.1.55 4.15 1.6 5.96L2 22l4.25-1.11a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 1.8c2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.37 5.72c0 4.46-3.63 8.09-8.09 8.09-1.48 0-2.93-.4-4.19-1.15l-.3-.18-2.52.66.67-2.46-.2-.31a8.02 8.02 0 0 1-1.23-4.29c0-4.46 3.63-8.09 8.09-8.09zm4.44 10.16c-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.39-.41-.54-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.15.2-.57.2-1.06.14-1.15-.06-.1-.22-.16-.46-.28z"/></svg> تواصل معنا عبر الواتساب</a>
@@ -179,8 +184,8 @@
 <section>
   <div class="wrap">
     <div class="kick"><span class="eyebrow">شنو بتلقى داخل الدليل</span>
-      <h2 class="sec">جزأين يمشّونك خطوة بخطوة</h2>
-      <p class="lead">من فهم علاقتك بالفلوس، إلى بناء خطة عملية بالأرقام تلتزم فيها فعلاً.</p>
+      <h2 class="sec">جزأين يمشونك خطوة بخطوة</h2>
+      <p class="lead">من فهم علاقتك بالفلوس، إلى بناء خطة عملية بالأرقام تلتزم فيها فعلا.</p>
     </div>
     <div class="parts-grid">
       <div class="pcard" style="--cc:var(--teal)">
@@ -189,7 +194,7 @@
         <ul>
           <li>ليش نعرف ولا نطبق؟ الصدمة المالية الخليجية</li>
           <li>جذور علاقتك بالفلوس من طفولتك</li>
-          <li>الأنماط المالية الستة — أنت وين؟</li>
+          <li>الأنماط المالية الستة · أنت وين؟</li>
           <li>كسر الخزي المالي + تمارين عملية للتغيير</li>
         </ul>
       </div>
@@ -198,7 +203,7 @@
         <h3>المحاسبة والخطة</h3>
         <ul>
           <li>هويتك المالية ونموذج كاش كلينك</li>
-          <li>الميزانية الصفرية — كل دينار له مهمة</li>
+          <li>الميزانية الصفرية · كل دينار له مهمة</li>
           <li>إدارة الديون بذكاء (زين / محايد / شين)</li>
           <li>بناء الأصول والاستثمار المناسب للخليجيين</li>
         </ul>
@@ -215,11 +220,11 @@
     </div>
     <div class="why-grid">
       <div class="item"><div class="dot" style="background:var(--teal)"></div>
-        <h4>مبني على الأرقام</h4><p>أمثلة وقصص حقيقية بالدينار — عمر، أم عبدالله، فاطمة — مو كلام عام.</p></div>
+        <h4>مبني على الأرقام</h4><p>أمثلة وقصص حقيقية بالدينار... عمر، أم عبدالله، فاطمة... مو كلام عام.</p></div>
       <div class="item"><div class="dot" style="background:var(--purple-500)"></div>
         <h4>مصمم للواقع الخليجي</h4><p>نماذج ميزانية مخصصة للأسرة الخليجية، مو قوالب مترجمة من الغرب.</p></div>
       <div class="item"><div class="dot" style="background:var(--gold)"></div>
-        <h4>سلوك + محاسبة</h4><p>يعالج جذور علاقتك بالفلوس، وبعدها يبني الخطة — عشان تلتزم فعلاً.</p></div>
+        <h4>سلوك + محاسبة</h4><p>يعالج جذور علاقتك بالفلوس، وبعدها يبني الخطة... عشان تلتزم فعلا.</p></div>
     </div>
   </div>
 </section>
@@ -227,15 +232,15 @@
 <!-- AUTHOR -->
 <section>
   <div class="wrap">
-    <div class="kick"><span class="eyebrow">عن فريق الدليل</span><h2 class="sec">مين وراء الدليل</h2></div>
+    <div class="kick"><span class="eyebrow">عن فريق الدليل</span><h2 class="sec">من وراء هذا الدليل</h2></div>
     <div class="author" style="margin-top:44px">
       <img class="bg" src="cc-pattern.jpg" alt="">
       <img class="ph" src="ghaliya.jpg" alt="غالية مبارك النويف">
       <div class="in">
-        <div class="role">مؤسِسة كاش كلينك — المستشارة المالية الشخصية</div>
+        <div class="role">مؤسسة كاش كلينك · المستشارة المالية الشخصية</div>
         <h3>أ/ غالية مبارك النويف</h3>
-        <p>محاسبة متخصصة في المحاسبة الشخصية وإعداد الميزانيات وإدارة التدفق النقدي للأفراد والأسر الخليجية. خبرة تجمع بين المحاسبة المالية والعمل الميداني — كل اللي بتقرأه في الدليل عاشته بنفسها أو وقفت جنب العميل وهو يطلع منه.</p>
-        <p>بكالوريوس محاسبة ومن العشرة الأوائل على قائمة الشرف في جامعة الكويت. صممت نموذج التشخيص المالي المعتمد في كاش كلينك — مبني على الواقع بالأرقام. اشتغلت مع أصعب الحالات إنسانياً ونقلتهم من الحضيض المالي إلى خطة خروج واضحة.</p>
+        <p>محاسبة متخصصة في المحاسبة الشخصية وإعداد الميزانيات وإدارة التدفق النقدي للأفراد والأسر الخليجية. خبرة تجمع بين المحاسبة المالية والعمل الميداني... كل اللي بتقرأه في الدليل عاشته بنفسها أو وقفت جنب العميل وهو يطلع منه.</p>
+        <p>بكالوريوس محاسبة ومن العشرة الأوائل على قائمة الشرف في جامعة الكويت. صممت نموذج التشخيص المالي المعتمد في كاش كلينك... مبني على الواقع بالأرقام. اشتغلت مع أصعب الحالات إنسانيا ونقلتهم من الحضيض المالي إلى خطة خروج واضحة.</p>
         <div class="stats">
           <div><b>+١٢</b><span>سنة خبرة ميدانية</span></div>
           <div><b>آلاف</b><span>الأسر الكويتية والخليجية</span></div>
@@ -248,14 +253,14 @@
       <img class="bg" src="cc-pattern.jpg" alt="">
       <img class="ph" src="sara.jpg" alt="ساره الهندي">
       <div class="in">
-        <div class="role">استشارية كاش إنفست — مختصة بالأزمات المالية والأهداف</div>
+        <div class="role">استشارية كاش إنفست · مختصة بالأزمات المالية والأهداف</div>
         <h3>م. ساره الهندي</h3>
-        <p>تشتغل على جذور الأزمة المالية مو على أعراضها. من خلال تحليل السلوك المالي والأنماط النفسية وتاريخ القرارات، تساعد العميل يبني وعي مالي جديد ويحوّل الأزمة من نقطة ضغط إلى نقطة تحوّل — بخطة واقعية تناسب دخله وحياته، وبمساحة آمنة للفهم بدون لوم.</p>
-        <p>مدرّبة معتمدة (ISTD)، بكالوريوس هندسة كهربائية من جامعة الكويت، أخصائية اجتماعية ومستشارة أسرية، ومتخصصة في الصدمات المالية والاستشارات النفسية والاجتماعية. وهي مؤلِفة محتوى السلوكيات المالية في الدليل.</p>
+        <p>تشتغل على جذور الأزمة المالية مو على أعراضها. من خلال تحليل السلوك المالي والأنماط النفسية وتاريخ القرارات، تساعد العميل يبني وعي مالي جديد ويحول الأزمة من نقطة ضغط إلى نقطة تحول... بخطة واقعية تناسب دخله وحياته، وبمساحة آمنة للفهم بدون لوم.</p>
+        <p>مدربة معتمدة (ISTD)، بكالوريوس هندسة كهربائية من جامعة الكويت، أخصائية اجتماعية ومستشارة أسرية، ومتخصصة في الصدمات المالية والاستشارات النفسية والاجتماعية. وهي مؤلفة محتوى السلوكيات المالية في الدليل.</p>
         <div class="stats">
-          <div><b>+٥٠</b><span>عميل تمّت مساعدته</span></div>
+          <div><b>+٥٠</b><span>عميل تمت مساعدته</span></div>
           <div><b>+٥</b><span>سنوات خبرة</span></div>
-          <div><b>ISTD</b><span>مدرّبة معتمدة</span></div>
+          <div><b>ISTD</b><span>مدربة معتمدة</span></div>
         </div>
       </div>
     </div>
@@ -265,10 +270,10 @@
 <!-- WHAT YOU GET -->
 <section class="why">
   <div class="wrap">
-    <div class="kick"><span class="eyebrow">شنو بتوصلك</span><h2 class="sec">نسخة رقمية تصلك فوراً</h2></div>
+    <div class="kick"><span class="eyebrow">ما الذي سيصل إليك</span><h2 class="sec">نسخة رقمية تصلك فورا</h2></div>
     <div class="get">
       <div><span>📩</span> يوصلك على إيميلك مباشرة بعد الدفع</div>
-      <div><span>📘</span> ملف PDF كامل — جزأين</div>
+      <div><span>📘</span> ملف PDF كامل · جزأين</div>
       <div><span>✍️</span> تمارين وأمثلة عملية بالأرقام</div>
       <div><span>📱</span> تفتحه على أي جهاز، وقت ما تبي</div>
     </div>
@@ -279,16 +284,16 @@
 <section class="final">
   <div class="wrap">
     <h2>ابدأ رحلتك للوفرة المالية اليوم</h2>
-    <p>خطوة وحدة صغيرة الحين بتختصر عليك سنوات من التخبّط. احصل على الدليل وابدأ تبني نظامك المالي.</p>
+    <p>خطوة وحدة صغيرة الحين بتختصر عليك سنوات من التخبط. احصل على الدليل وابدأ تبني نظامك المالي.</p>
     <a class="btn btn-cream cta-link">احصل على الدليل الآن ←</a>
-    <span class="price">نسخة رقمية تصلك على إيميلك فوراً — ١٠ د.ك</span>
+    <span class="price">نسخة رقمية تصلك على إيميلك فورا · ١٠ د.ك</span>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <div class="lock" style="justify-content:center"><img src="cc-mark-cream.png" alt=""><span class="wm">cash <b>clinic</b></span></div>
-    © ٢٠٢٦ كاش كلينك — الكويت &nbsp;·&nbsp; <a href="https://wa.me/96522260820" target="_blank" rel="noopener">تواصل واتساب</a>
+    © ٢٠٢٦ كاش كلينك · الكويت &nbsp;·&nbsp; <a href="https://wa.me/96522260820" target="_blank" rel="noopener">تواصل واتساب</a>
   </div>
 </footer>
 

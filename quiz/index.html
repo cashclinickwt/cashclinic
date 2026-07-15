@@ -12,7 +12,7 @@
 :root{
   --bg:#2b1442; --bg2:#1e0f2e;
   --ink:#ffffff; --muted:#cbb8e6; --muted2:#a892c8;
-  --gold:#D5A347; --teal:#2A898C; --teal-d:#20716f; --cream:#FFE7BC; --royal:#614588;
+  --gold:#D3A146; --teal:#2F8789; --teal-d:#20716f; --cream:#FFE6BB; --royal:#614588;
   --panel:rgba(255,255,255,.055); --panel2:rgba(255,255,255,.09); --line:rgba(255,255,255,.14);
   --opt:#ffffff; --optink:#2b1140;
   --red:#F2778A; --green:#4FD1A0; --amber:#E7B84C;
@@ -41,13 +41,16 @@ img{max-width:100%;display:block}
 /* ---------- brand lockup ---------- */
 .brandlock{display:inline-flex;align-items:center;gap:10px}
 .brandlock img{height:40px;width:auto}
-.brandlock .wm{font-size:22px;font-weight:300;color:#fff;letter-spacing:-.01em}
+.brandlock .wm{font-size:22px;font-weight:300;color:#FFE6BB;letter-spacing:-.01em}
 .brandlock .wm b{font-weight:600}
 .brandlock.sm img{height:34px}
 
 /* ================= LANDING ================= */
 .landing{max-width:1080px;margin:0 auto;padding:0 20px 40px}
-.lhead{display:flex;justify-content:center;padding:22px 0}
+.lhead{display:flex;justify-content:center;align-items:center;padding:22px 0;position:relative}
+.lback{position:absolute;inset-inline-start:0;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--cream);opacity:.85;border:1px solid var(--line);border-radius:999px;padding:8px 14px;transition:.18s}
+.lback:hover{opacity:1;border-color:var(--cream)}
+@media(max-width:560px){.lhead{flex-direction:column;gap:12px}.lback{position:static;transform:none;align-self:flex-start}}
 .hero{text-align:center;padding:40px 10px 46px;position:relative}
 .hero h1{font-size:clamp(27px,6vw,44px);font-weight:800;line-height:1.35;margin:0 0 16px}
 .hero .sub{color:var(--muted);font-size:clamp(15px,2.6vw,19px);max-width:640px;margin:0 auto 30px;line-height:1.9}
@@ -70,7 +73,7 @@ img{max-width:100%;display:block}
 .axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .acard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 24px;text-align:center;transition:.18s}
 .acard:hover{background:var(--panel2);transform:translateY(-3px)}
-.acard .ic{margin:0 auto 16px}
+.acard .ic{margin:0 auto 16px;color:var(--cream)}
 .acard h3{font-size:19px;font-weight:800;margin:0 0 10px}
 .acard p{color:var(--muted);font-size:14.5px;line-height:1.85;margin:0}
 
@@ -88,7 +91,7 @@ img{max-width:100%;display:block}
 .qwrap.qout{animation:qout .18s ease forwards}
 @keyframes qin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes qout{to{opacity:0;transform:translateY(-10px)}}
-.eyebrow{color:var(--gold);font-weight:700;font-size:13px;margin-bottom:12px;text-align:center;letter-spacing:.3px}
+.eyebrow{color:var(--gold);font-weight:700;font-size:14.5px;margin-bottom:12px;text-align:center;letter-spacing:normal}
 h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0 26px;text-align:center}
 .opts{display:flex;flex-direction:column;gap:12px}
 .opt{display:flex;align-items:center;gap:12px;background:var(--opt);color:var(--optink);
@@ -181,7 +184,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 
 <div id="landing">
   <div class="landing">
-    <header class="lhead"><div class="brandlock"><img src="cc-mark-cream.png" alt="Cash Clinic"/><span class="wm">cash <b>clinic</b></span></div></header>
+    <header class="lhead"><a class="lback" href="../index.html"><span aria-hidden="true">→</span> رجوع للموقع</a><div class="brandlock"><img src="cc-mark-cream.png" alt="Cash Clinic"/><span class="wm">cash <b>clinic</b></span></div></header>
 
     <section class="hero">
       <h1>تعاني من ضياع فلوسك بدون ما تشوف أي تقدم؟</h1>
@@ -191,11 +194,11 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 
     <section class="intro">
       <div class="intro-grid">
-        <div class="intro-photos"><div class="pcard"><img src="ghaliya.jpg" alt="غالية النويف"/><div class="pname">غالية النويف</div><div class="prole">مؤسِسة كاش كلينيك · مُعِدّة الاختبار</div></div><div class="pcard"><img src="sara.jpg" alt="سارة الهندي"/><div class="pname">سارة الهندي</div><div class="prole">شريكة ومختصة السلوك المالي</div></div></div>
+        <div class="intro-photos"><div class="pcard"><img src="ghaliya.jpg" alt="غالية النويف"/><div class="pname">غالية النويف</div><div class="prole">مؤسسة كاش كلينيك · معدة الاختبار</div></div><div class="pcard"><img src="sara.jpg" alt="سارة الهندي"/><div class="pname">سارة الهندي</div><div class="prole">شريكة ومختصة السلوك المالي</div></div></div>
         <div class="intro-txt">
           <h2>جاهز للوضوح المالي؟</h2>
           <p class="lead">اختبر نفسك واكتشف خطوتك التالية نحو الوفرة المالية الحقيقية.</p>
-          <p class="body">١١ سؤالاً بسيطاً يكشفون لك جاهزيتك للوفرة عبر أربعة محاور: عقليتك المالية، انضباطك السلوكي، مرونتك المالية، واستعدادك للنمو. بعد ما تخلّص توصلك نتيجة واضحة مع نقاط قوتك والنقاط اللي تحتاج تشتغل عليها، وأول خطوة عملية تبدأ فيها. الاختبار من إعداد غالية النويف، مؤسِسة كاش كلينيك.</p>
+          <p class="body">١١ سؤالا بسيطا يكشفون لك جاهزيتك للوفرة عبر أربعة محاور: عقليتك المالية، انضباطك السلوكي، مرونتك المالية، واستعدادك للنمو. بعد ما تخلص توصلك نتيجة واضحة مع نقاط قوتك والنقاط اللي تحتاج تشتغل عليها، وأول خطوة عملية تبدأ فيها. الاختبار من إعداد غالية النويف، مؤسسة كاش كلينيك.</p>
           <button class="btn teal" onclick="startQuiz()">ابدأ اختبار الجاهزية للوفرة الآن</button>
         </div>
       </div>
@@ -203,12 +206,12 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 
     <section class="axes">
       <h2 class="axes-title">محاور اختبار الجاهزية الأربعة</h2>
-      <div class="axes-grid"><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>العقلية المالية</h3><p>كيف تفكر وتتصرف مع فلوسك، ووعيك بالتخطيط قبل الصرف.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>الانضباط السلوكي</h3><p>مدى تتبعك لمصاريفك والتزاماتك ومعرفتك وين تروح فلوسك.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>المرونة المالية</h3><p>قدرتك على امتصاص المفاجآت والصمود لو وقف الدخل فجأة.</p></div><div class="acard"><svg class="ic" viewBox="0 0 46 46" width="46" height="46" aria-hidden="true"><circle cx="23" cy="23" r="23" fill="#fff"/><circle cx="17" cy="17" r="3.3" fill="#2b1140"/><circle cx="29" cy="17" r="3.3" fill="#2b1140"/><circle cx="17" cy="29" r="3.3" fill="#2b1140"/><circle cx="29" cy="29" r="3.3" fill="#2b1140"/></svg><h3>الاستعداد للنمو</h3><p>جاهزيتك للتغيير والتنفيذ ووضوح خطوتك القادمة نحو الوفرة.</p></div></div>
+      <div class="axes-grid"><div class="acard"><svg class="ic" viewBox="0 0 44 44" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 9a8.5 8.5 0 0 0-5 15.4c1 .7 1.6 1.8 1.6 3V28h6.8v-.6c0-1.2.6-2.3 1.6-3A8.5 8.5 0 0 0 22 9Z"/><path d="M19 32h6"/><path d="M20.5 35h3"/></svg><h3>العقلية المالية</h3><p>كيف تفكر وتتصرف مع فلوسك، ووعيك بالتخطيط قبل الصرف.</p></div><div class="acard"><svg class="ic" viewBox="0 0 44 44" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="11.5" y="8.5" width="21" height="27" rx="3.5"/><path d="M16.5 17l2 2 4-4"/><path d="M16.5 26l2 2 4-4"/><path d="M26 16.5h3.5"/><path d="M26 25.5h3.5"/></svg><h3>الانضباط السلوكي</h3><p>مدى تتبعك لمصاريفك والتزاماتك ومعرفتك وين تروح فلوسك.</p></div><div class="acard"><svg class="ic" viewBox="0 0 44 44" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 8.5l11 4v8.7c0 6.9-4.6 11.9-11 13.8-6.4-1.9-11-6.9-11-13.8V12.5l11-4Z"/><path d="M17.2 21.8l3.6 3.6 6.6-7"/></svg><h3>المرونة المالية</h3><p>قدرتك على امتصاص المفاجآت والصمود لو وقف الدخل فجأة.</p></div><div class="acard"><svg class="ic" viewBox="0 0 44 44" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 29.5l7.5-7.5 5 5 10.5-10.5"/><path d="M25.5 16.5h7.5V24"/><path d="M10 35.5h24"/></svg><h3>الاستعداد للنمو</h3><p>جاهزيتك للتغيير والتنفيذ ووضوح خطوتك القادمة نحو الوفرة.</p></div></div>
     </section>
 
     <section class="cta-band">
       <div class="eyebrow">جاهز تعرف موقعك على مسار الوفرة؟</div>
-      <h2>ابدأ اختبار جاهزيتك للوفرة المالية الآن، مجانًا، وخذ أول خطوة عملية نحو الوضوح والاستقرار والوفرة</h2>
+      <h2>ابدأ اختبار جاهزيتك للوفرة المالية الآن، مجانا، وخذ أول خطوة عملية نحو الوضوح والاستقرار والوفرة</h2>
       <button class="btn dark" onclick="startQuiz()">ابدأ اختبار الجاهزية</button>
     </section>
 
@@ -224,10 +227,10 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 <div id="gate" class="modal">
   <div class="sheet">
     <h3>خطوة أخيرة قبل نتيجتك</h3>
-    <p>دخّل معلوماتك عشان نجهّز لك تقريرك التفصيلي.</p>
-    <div class="field" id="f-name"><label>الاسم</label><input id="g-name" placeholder="اسمك"/><div class="err">دخّل اسمك</div></div>
-    <div class="field" id="f-email"><label>الإيميل</label><input id="g-email" type="email" placeholder="you@email.com" inputmode="email"/><div class="err">دخّل إيميل صحيح</div></div>
-    <div class="field" id="f-phone"><label>رقم الواتساب</label><input id="g-phone" type="tel" placeholder="مثال: 9xxxxxxx" inputmode="tel"/><div class="err">دخّل رقم صحيح</div></div>
+    <p>دخل معلوماتك عشان نجهز لك تقريرك التفصيلي.</p>
+    <div class="field" id="f-name"><label>الاسم</label><input id="g-name" placeholder="اسمك"/><div class="err">دخل اسمك</div></div>
+    <div class="field" id="f-email"><label>الإيميل</label><input id="g-email" type="email" placeholder="you@email.com" inputmode="email"/><div class="err">دخل إيميل صحيح</div></div>
+    <div class="field" id="f-phone"><label>رقم الواتساب</label><input id="g-phone" type="tel" placeholder="مثال: 9xxxxxxx" inputmode="tel"/><div class="err">دخل رقم صحيح</div></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -249,20 +252,20 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
   try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); fns=firebase.functions(); }catch(e){ console.warn("firebase init",e); }
 </script>
 <script>
-const Q = [{"id": "q1", "seg": true, "text": "قبل ما نبدأ، قول لنا .. أنت تتعامل مع الفلوس بأي صفة؟", "opts": [{"t": "مسؤول عن ميزانية بيتي و عائلتي", "seg": "family"}, {"t": "مسؤول عن مالي الشخصي بس", "seg": "personal"}, {"t": "الاثنين مع بعض (شخصية + عائلية)", "seg": "family"}]}, {"id": "q2", "dim": "mindset", "text": "لو وصلتك مكافأة فجأة (٥٠٠ دك)، شنو أول رد فعل عندك؟", "fb": {"high": "عندك وعي ممتاز بتقسيم المكافآت والتخطيط لها قبل لا توصل.", "low": "ركز على وضع خطة للمبالغ المفاجئة قبل لا تصرفها، عشان تشتغل لصالحك."}, "opts": [{"t": "أصرفها على شي أحتاجه أو نحتاجه من زمان", "s": 0}, {"t": "أحطها بالحساب بدون خطة محددة", "s": 2}, {"t": "أوزعها بين مصاريف وادخار", "s": 3}, {"t": "عندي بالضبط خطة لها قبل لا توصل", "s": 4}]}, {"id": "q3", "dim": "mindset", "text": "لو سألك أحد المقربين \"شلون أنظم فلوسي؟\"، شنو راح تقول له؟", "fb": {"high": "تعرف أهمية الميزانية الشهرية، وهذا يغطي لك جانب كبير من التحكم المالي.", "low": "ابدأ بنظام بسيط لتنظيم فلوسك حتى يكون عندك جواب واضح ومجرب."}, "opts": [{"t": "صراحة ما عندي جواب واضح أعطيه", "s": 1}, {"t": "لا تصرف على اللي ما تحتاجه", "s": 2}, {"t": "سو ميزانية شهرية أو جدول مصاريف", "s": 3}, {"t": "عندي نظام محدد ومجرب أعلمه إياه", "s": 4}]}, {"id": "q4", "text": "بناء الوفرة يبدأ من الوعي الجماعي، الكلام عن الفلوس في بيتكم أو مع شريك حياتك:", "fb": {"high": "عندك مراجعة منتظمة للوضع المالي، وهذا أساس بناء الوفرة.", "low": "الحديث عن الأمور المالية غالباً يكون وقت المشاكل فقط، حاول تفتح الحوار بشكل منتظم."}, "dimByVariant": {"family": "mindset", "personal": null}, "variants": {"family": [{"t": "موضوع حساس نتجنبه", "s": 1}, {"t": "نتكلم فيه بس لما تطلع مشكلة", "s": 2}, {"t": "نتكلم فيه عادي بس بدون خطة منظمة", "s": 3}, {"t": "عندنا مراجعة منتظمة لوضعنا المالي", "s": 4}], "personal": [{"t": "ما أتكلم عن فلوسي مع أحد", "s": 1}, {"t": "أتكلم بس لما يصير عندي مشكلة", "s": 2}, {"t": "أتكلم مع المقربين بشكل عام", "s": 3}, {"t": "أراجع وضعي المالي بشكل منتظم مع نفسي", "s": 4}]}}, {"id": "q5", "dim": "discipline", "text": "آخر مرة عرفت بالضبط وين راحت فلوسك الشهر اللي طاف:", "fb": {"high": "تقدر تحدد فئات مصاريفك، يعني عندك نظرة عامة على وين تروح فلوسك.", "low": "ركز أكثر على تتبع تفاصيل المصاريف الصغيرة عشان تكون عندك صورة أوضح."}, "opts": [{"t": "ما أتذكر أو ما أتابع", "s": 1}, {"t": "أعرف بشكل تقريبي عام", "s": 2}, {"t": "أعرف الفئات الكبيرة (إيجار، أكل، فواتير)", "s": 3}, {"t": "عندي تتبع تفصيلي لكل بند", "s": 4}]}, {"id": "q6", "dim": "resilience", "text": "لو طلعت لك مفاجأة مصروف ٣٠٠ دك هاليوم (تصليح، علاج، طاري)، شلون تتعامل معاها؟", "fb": {"high": "لديك مرونة بالتعامل مع المفاجآت المالية وعندك مخصص للطوارئ.", "low": "المفاجآت تربكك مالياً، ابدأ ببناء مخصص بسيط للطوارئ يغطيها بدون قلق."}, "opts": [{"t": "أدبر بأي طريقة (تقسيط، أتسلف، تأجيل)", "s": 1}, {"t": "استخدم بطاقة ائتمانية أو حساب جاري", "s": 2}, {"t": "آخذ من حساب التوفير العام", "s": 3}, {"t": "عندي مخصص للطوارئ يغطيها بدون قلق", "s": 4}]}, {"id": "q7", "dim": "discipline", "text": "الالتزامات المالية الشهرية عندك (أقساط، قروض، بطاقات ائتمان):", "fb": {"high": "التزاماتك الشهرية تحت السيطرة وهذا يعطيك مساحة مالية مريحة.", "low": "نسبة الالتزامات الشهرية عالية وتستهلك أكثر من نص الدخل، تحتاج توازن أفضل بين الدخل والمصروفات."}, "opts": [{"t": "تستهلك أكثر من نص الدخل", "s": 1}, {"t": "تستهلك من ربع لنص الدخل", "s": 2}, {"t": "تستهلك أقل من ربع الدخل", "s": 3}, {"t": "ما عندي التزامات", "s": 4}]}, {"id": "q8", "dim": "resilience", "text": "لو وقف الدخل فجأة، إشكثر تقدر تعيش بنفس المستوى؟", "fb": {"high": "احتياطيك المالي قوي ويغطيك فترة كافية لو وقف الدخل.", "low": "احتياطيك المالي ضعيف لو وقف الدخل فجأة، ركز على بناء صندوق طوارئ يغطي ٣ أشهر على الأقل."}, "opts": [{"t": "أقل من شهر", "s": 1}, {"t": "شهر إلى ٣ أشهر", "s": 2}, {"t": "٣ إلى ٦ أشهر", "s": 3}, {"t": "أكثر من ٦ أشهر", "s": 4}]}, {"id": "q9", "dim": "growth", "text": "شنو أكثر شي يقلقك بالجانب المالي؟ (اختار الأقرب لك)", "fb": {"high": "وضعك تحت السيطرة وما عندك قلق مالي كبير، استثمر هالاستقرار في النمو.", "low": "الشعور بالحصار من الديون يحتاج خطة واضحة للخروج، وهذا أول شي نقدر نشتغل عليه."}, "opts": [{"t": "ما أعرف وين تروح فلوسي بالضبط", "s": 1}, {"t": "محاصر بديون أو التزامات ثقيلة", "s": 1}, {"t": "ما أقدر أحقق أحلامي وأهدافي", "s": 2}, {"t": "خايف من المستقبل وكبر السن", "s": 2}, {"t": "ما عندي قلق حقيقي، الوضع تحت السيطرة", "s": 4}]}, {"id": "q10", "psy": true, "text": "لما توصل للوفرة المالية، شنو راح يتغير في حياتك بشكل ملموس؟ (اختر الأقرب لك)", "opts": [{"t": "نوم مرتاح بدون قلق يومي", "key": "sleep"}, {"t": "وقت أكثر وحضور أعمق مع عائلتي", "key": "family"}, {"t": "راح أقدر أحقق هدف معين (سفر، عقار، تعليم)", "key": "goal"}, {"t": "مساحة للعطاء ومساعدة الأهل والمجتمع", "key": "give"}]}, {"id": "q11", "dim": "growth", "text": "لو قدمت لك خارطة واضحة لحل وضعك المالي، إشكثر استعدادك للتنفيذ؟", "fb": {"high": "عندك رغبة واضحة بالتطوير ومستعد تتلقى توجيه مستمر عشان تحقق هدفك.", "low": "الالتزام بخطط محددة صعب عليك حالياً، نبدأ بخطوات صغيرة جداً تناسب إيقاعك."}, "opts": [{"t": "صعب علي ألتزم بخطط محددة", "s": 1}, {"t": "ممكن أجرب بس عندي تحفظات", "s": 2}, {"t": "مستعد بس أحتاج توجيه مستمر", "s": 3}, {"t": "مستعد الآن، أحتاج بس البداية الصحيحة", "s": 4}]}];
+const Q = [{"id": "q1", "seg": true, "text": "قبل ما نبدأ، قول لنا .. أنت تتعامل مع الفلوس بأي صفة؟", "opts": [{"t": "مسؤول عن ميزانية بيتي و عائلتي", "seg": "family"}, {"t": "مسؤول عن مالي الشخصي بس", "seg": "personal"}, {"t": "الاثنين مع بعض (شخصية + عائلية)", "seg": "family"}]}, {"id": "q2", "dim": "mindset", "text": "لو وصلتك مكافأة فجأة (٥٠٠ دك)، شنو أول رد فعل عندك؟", "fb": {"high": "عندك وعي ممتاز بتقسيم المكافآت والتخطيط لها قبل لا توصل.", "low": "ركز على وضع خطة للمبالغ المفاجئة قبل لا تصرفها، عشان تشتغل لصالحك."}, "opts": [{"t": "أصرفها على شي أحتاجه أو نحتاجه من زمان", "s": 0}, {"t": "أحطها بالحساب بدون خطة محددة", "s": 2}, {"t": "أوزعها بين مصاريف وادخار", "s": 3}, {"t": "عندي بالضبط خطة لها قبل لا توصل", "s": 4}]}, {"id": "q3", "dim": "mindset", "text": "لو سألك أحد المقربين \"شلون أنظم فلوسي؟\"، شنو راح تقول له؟", "fb": {"high": "تعرف أهمية الميزانية الشهرية، وهذا يغطي لك جانب كبير من التحكم المالي.", "low": "ابدأ بنظام بسيط لتنظيم فلوسك حتى يكون عندك جواب واضح ومجرب."}, "opts": [{"t": "صراحة ما عندي جواب واضح أعطيه", "s": 1}, {"t": "لا تصرف على اللي ما تحتاجه", "s": 2}, {"t": "سو ميزانية شهرية أو جدول مصاريف", "s": 3}, {"t": "عندي نظام محدد ومجرب أعلمه إياه", "s": 4}]}, {"id": "q4", "text": "بناء الوفرة يبدأ من الوعي الجماعي، الكلام عن الفلوس في بيتكم أو مع شريك حياتك:", "fb": {"high": "عندك مراجعة منتظمة للوضع المالي، وهذا أساس بناء الوفرة.", "low": "الحديث عن الأمور المالية غالبا يكون وقت المشاكل فقط، حاول تفتح الحوار بشكل منتظم."}, "dimByVariant": {"family": "mindset", "personal": null}, "variants": {"family": [{"t": "موضوع حساس نتجنبه", "s": 1}, {"t": "نتكلم فيه بس لما تطلع مشكلة", "s": 2}, {"t": "نتكلم فيه عادي بس بدون خطة منظمة", "s": 3}, {"t": "عندنا مراجعة منتظمة لوضعنا المالي", "s": 4}], "personal": [{"t": "ما أتكلم عن فلوسي مع أحد", "s": 1}, {"t": "أتكلم بس لما يصير عندي مشكلة", "s": 2}, {"t": "أتكلم مع المقربين بشكل عام", "s": 3}, {"t": "أراجع وضعي المالي بشكل منتظم مع نفسي", "s": 4}]}}, {"id": "q5", "dim": "discipline", "text": "آخر مرة عرفت بالضبط وين راحت فلوسك الشهر اللي طاف:", "fb": {"high": "تقدر تحدد فئات مصاريفك، يعني عندك نظرة عامة على وين تروح فلوسك.", "low": "ركز أكثر على تتبع تفاصيل المصاريف الصغيرة عشان تكون عندك صورة أوضح."}, "opts": [{"t": "ما أتذكر أو ما أتابع", "s": 1}, {"t": "أعرف بشكل تقريبي عام", "s": 2}, {"t": "أعرف الفئات الكبيرة (إيجار، أكل، فواتير)", "s": 3}, {"t": "عندي تتبع تفصيلي لكل بند", "s": 4}]}, {"id": "q6", "dim": "resilience", "text": "لو طلعت لك مفاجأة مصروف ٣٠٠ دك هاليوم (تصليح، علاج، طاري)، شلون تتعامل معاها؟", "fb": {"high": "لديك مرونة بالتعامل مع المفاجآت المالية وعندك مخصص للطوارئ.", "low": "المفاجآت تربكك ماليا، ابدأ ببناء مخصص بسيط للطوارئ يغطيها بدون قلق."}, "opts": [{"t": "أدبر بأي طريقة (تقسيط، أتسلف، تأجيل)", "s": 1}, {"t": "استخدم بطاقة ائتمانية أو حساب جاري", "s": 2}, {"t": "آخذ من حساب التوفير العام", "s": 3}, {"t": "عندي مخصص للطوارئ يغطيها بدون قلق", "s": 4}]}, {"id": "q7", "dim": "discipline", "text": "الالتزامات المالية الشهرية عندك (أقساط، قروض، بطاقات ائتمان):", "fb": {"high": "التزاماتك الشهرية تحت السيطرة وهذا يعطيك مساحة مالية مريحة.", "low": "نسبة الالتزامات الشهرية عالية وتستهلك أكثر من نص الدخل، تحتاج توازن أفضل بين الدخل والمصروفات."}, "opts": [{"t": "تستهلك أكثر من نص الدخل", "s": 1}, {"t": "تستهلك من ربع لنص الدخل", "s": 2}, {"t": "تستهلك أقل من ربع الدخل", "s": 3}, {"t": "ما عندي التزامات", "s": 4}]}, {"id": "q8", "dim": "resilience", "text": "لو وقف الدخل فجأة، إشكثر تقدر تعيش بنفس المستوى؟", "fb": {"high": "احتياطيك المالي قوي ويغطيك فترة كافية لو وقف الدخل.", "low": "احتياطيك المالي ضعيف لو وقف الدخل فجأة، ركز على بناء صندوق طوارئ يغطي ٣ أشهر على الأقل."}, "opts": [{"t": "أقل من شهر", "s": 1}, {"t": "شهر إلى ٣ أشهر", "s": 2}, {"t": "٣ إلى ٦ أشهر", "s": 3}, {"t": "أكثر من ٦ أشهر", "s": 4}]}, {"id": "q9", "dim": "growth", "text": "شنو أكثر شي يقلقك بالجانب المالي؟ (اختار الأقرب لك)", "fb": {"high": "وضعك تحت السيطرة وما عندك قلق مالي كبير، استثمر هالاستقرار في النمو.", "low": "الشعور بالحصار من الديون يحتاج خطة واضحة للخروج، وهذا أول شي نقدر نشتغل عليه."}, "opts": [{"t": "ما أعرف وين تروح فلوسي بالضبط", "s": 1}, {"t": "محاصر بديون أو التزامات ثقيلة", "s": 1}, {"t": "ما أقدر أحقق أحلامي وأهدافي", "s": 2}, {"t": "خايف من المستقبل وكبر السن", "s": 2}, {"t": "ما عندي قلق حقيقي، الوضع تحت السيطرة", "s": 4}]}, {"id": "q10", "psy": true, "text": "لما توصل للوفرة المالية، شنو راح يتغير في حياتك بشكل ملموس؟ (اختر الأقرب لك)", "opts": [{"t": "نوم مرتاح بدون قلق يومي", "key": "sleep"}, {"t": "وقت أكثر وحضور أعمق مع عائلتي", "key": "family"}, {"t": "راح أقدر أحقق هدف معين (سفر، عقار، تعليم)", "key": "goal"}, {"t": "مساحة للعطاء ومساعدة الأهل والمجتمع", "key": "give"}]}, {"id": "q11", "dim": "growth", "text": "لو قدمت لك خارطة واضحة لحل وضعك المالي، إشكثر استعدادك للتنفيذ؟", "fb": {"high": "عندك رغبة واضحة بالتطوير ومستعد تتلقى توجيه مستمر عشان تحقق هدفك.", "low": "الالتزام بخطط محددة صعب عليك حاليا، نبدأ بخطوات صغيرة جدا تناسب إيقاعك."}, "opts": [{"t": "صعب علي ألتزم بخطط محددة", "s": 1}, {"t": "ممكن أجرب بس عندي تحفظات", "s": 2}, {"t": "مستعد بس أحتاج توجيه مستمر", "s": 3}, {"t": "مستعد الآن، أحتاج بس البداية الصحيحة", "s": 4}]}];
 const DIMS = {"mindset": {"title": "العقلية المالية", "color": "#B79BEA", "icon": "🧠"}, "discipline": {"title": "الانضباط السلوكي", "color": "#F2778A", "icon": "🎯"}, "resilience": {"title": "المرونة المالية", "color": "#E7B84C", "icon": "🛡️"}, "growth": {"title": "الاستعداد للنمو", "color": "#4FD1A0", "icon": "🚀"}};
 const ORDER = ["mindset", "discipline", "resilience", "growth"];
-const DIAG = {"high": "تشخيصك يبيّن أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقاً.", "mid": "تشخيصك يبيّن أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبيّن أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."};
+const DIAG = {"high": "تشخيصك يبين أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقا.", "mid": "تشخيصك يبين أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبين أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."};
 const B1 = 50, B2 = 75;
 const BANDS = ["منخفض", "متوسط", "ممتاز"];
 const WIDGET = "gauge", CTA = "book";
 const SOURCE = "abundance-quiz", PRODUCT = "dalil";
 const BOOK_NAME = "دليل الوفرة المالية", BOOK_URL = "book.html";
-const PRICE_LABEL = "دليل رقمي عملي — يوصلك فوراً على إيميلك", WHATSAPP = "96522260820";
+const PRICE_LABEL = "دليل رقمي عملي... يوصلك فورا على إيميلك", WHATSAPP = "96522260820";
 const ANALYSIS = true, SHOW_CARD_DESC = false;
-const RESULT_TITLE = "مبروك! خلّصت اختبار جاهزيتك للوفرة المالية 🎉", CARDS_TITLE = "تشخيصك عبر المحاور الأربعة";
+const RESULT_TITLE = "مبروك! خلصت اختبار جاهزيتك للوفرة المالية 🎉", CARDS_TITLE = "تشخيصك عبر المحاور الأربعة";
 const CTA_TITLE = "خطوتك القادمة نحو الوفرة", CTA_SUB = "نتيجتك اليوم هي نقطة البداية. «دليل الوفرة المالية» يعطيك خطوات عملية بسيطة تنقلك من التخبط للوضوح المالي وتبني بها وفرتك خطوة بخطوة.", CTA_BTN = "احصل على دليل الوفرة المالية";
-const WA_TEXT = "أو احجز استشارتك مع فريق كاش كلينيك عبر الواتساب", EMPTY = "نتيجتك متوازنة، ما فيه جانب بارز يحتاج تدخّل عاجل — استمر على نفس النهج.";
+const WA_TEXT = "أو احجز استشارتك مع فريق كاش كلينيك عبر الواتساب", EMPTY = "نتيجتك متوازنة، ما فيه جانب بارز يحتاج تدخل عاجل... استمر على نفس النهج.";
 const WA_MSG_INTRO = "سويت اختبار جاهزيتي للوفرة المالية، وهذي نتيجتي:", WA_MSG_OUTRO = "أبي أحجز استشارة مع فريق كاش كلينيك 🙏";
 
 let state = { i:0, answers:{}, seg:"family" };
@@ -337,21 +340,21 @@ function donut(sc){
   const cx=130, cy=130, r=88, C=2*Math.PI*r, gap=7, dash=C/ORDER.length-gap;
   const rings=ORDER.map((k,i)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${DIMS[k].color}" stroke-width="26" stroke-dasharray="${dash.toFixed(2)} ${(C-dash).toFixed(2)}" stroke-dashoffset="${(-i*C/ORDER.length).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`).join('');
   const labels=ORDER.map((k,i)=>{ const th=((i+0.5)/ORDER.length)*2*Math.PI, x=cx+r*Math.sin(th), y=cy-r*Math.cos(th);
-    return `<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${toAr(sc[k])}%</text>`; }).join('');
+    return `<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" direction="ltr" unicode-bidi="isolate">${toAr(sc[k])}%</text>`; }).join('');
   return `<svg viewBox="0 0 260 260" width="100%" role="img" aria-label="النتيجة ${toAr(sc.overall)}%">${rings}${labels}
     <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="13" fill="var(--muted)" font-weight="700">النتيجة الكلية</text>
-    <text id="ovNum" x="${cx}" y="${cy+32}" text-anchor="middle" font-size="44" fill="${bandC(sc.overall)}" font-weight="800">٠%</text></svg>`;
+    <text id="ovNum" x="${cx}" y="${cy+32}" text-anchor="middle" font-size="44" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">٠%</text></svg>`;
 }
 function gauge(sc){
   const cx=140, cy=140, r=112, sw=24;
   const arc=(a0,a1,color)=>{ const p0=pt(cx,cy,r,a0), p1=pt(cx,cy,r,a1), large=(a0-a1)>180?1:0;
     return `<path d="M ${p0.x.toFixed(1)} ${p0.y.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`; };
   const a1=180-B1/100*180, a2=180-B2/100*180, st=pt(cx,cy,r-34,180);
-  return `<svg viewBox="0 0 280 178" width="100%" role="img" aria-label="النتيجة ${toAr(sc.overall)}%">
+  return `<svg viewBox="0 0 280 200" width="100%" role="img" aria-label="النتيجة ${toAr(sc.overall)}%">
     ${arc(180,a1,'var(--red)')}${arc(a1,a2,'var(--amber)')}${arc(a2,0,'var(--green)')}
     <line id="ndl" x1="${cx}" y1="${cy}" x2="${st.x.toFixed(1)}" y2="${st.y.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
     <circle cx="${cx}" cy="${cy}" r="8" fill="#fff"/>
-    <text id="ovNum" x="${cx}" y="${cy-22}" text-anchor="middle" font-size="42" fill="${bandC(sc.overall)}" font-weight="800">٠%</text></svg>`;
+    <text id="ovNum" x="${cx}" y="${cy+42}" text-anchor="middle" font-size="42" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">٠%</text></svg>`;
 }
 function metricCard(key,pct){
   const m=DIMS[key];
@@ -447,7 +450,7 @@ function countUp(el,to,dur){ if(!el)return; if(!dur){el.textContent=toAr(to)+"%"
   const t0=performance.now(); (function f(now){ const t=Math.min(1,(now-t0)/dur);
     el.textContent=toAr(Math.round(to*(1-Math.pow(1-t,3))))+"%"; if(t<1)requestAnimationFrame(f); })(t0); }
 function launchConfetti(){ try{
-  const C=["#D5A347","#2A898C","#FFE7BC","#B79BEA","#4FD1A0"], N=64, box=document.body;
+  const C=["#D3A146","#2F8789","#FFE6BB","#B79BEA","#4FD1A0"], N=64, box=document.body;
   for(let i=0;i<N;i++){ const s=document.createElement("i");
     s.style.cssText=`position:fixed;top:-12px;left:${Math.random()*100}vw;width:9px;height:9px;
       background:${C[i%C.length]};z-index:99;border-radius:${Math.random()<.5?'50%':'2px'};
@@ -479,12 +482,21 @@ async function submitGate(){
   if(_afterGate) _afterGate(leadId);
 }
 
+function showLanding(){
+  document.getElementById("landing").style.display="";
+  document.getElementById("app").hidden=true;
+  var r=document.getElementById("result"); if(r) r.hidden=true;
+  window.scrollTo(0,0);
+}
 function startQuiz(){
   document.getElementById("landing").style.display="none";
   document.getElementById("app").hidden=false;
   window.scrollTo(0,0);
   render(1);
+  /* add a history entry so the phone's Back button returns to this intro page */
+  try{ history.pushState({cc:"quiz"},"","#quiz"); }catch(e){}
 }
+window.addEventListener("popstate",function(){ showLanding(); });
 
 </script>
 </body>
