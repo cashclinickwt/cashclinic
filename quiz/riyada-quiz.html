@@ -172,6 +172,11 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 .field .err{color:#c0392b;font-size:12px;margin-top:5px;display:none}
 .field.bad input{border-color:#e07a86}
 .field.bad .err{display:block}
+.phone-row{display:flex;gap:8px;direction:ltr}
+.phone-row select{flex:0 0 auto;max-width:46%;border:2px solid #e6e0ef;border-radius:12px;padding:13px 8px;font-size:15px;font-family:inherit;background:#faf8fc;color:var(--bg);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23594c7a' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 10px center;background-size:11px;padding-right:28px}
+.phone-row select:focus{outline:0;border-color:var(--teal);background-color:#fff}
+.phone-row input{flex:1 1 auto;min-width:0;text-align:left}
+.field.bad .phone-row select{border-color:#e07a86}
 .sheet .btn{width:100%;margin-top:6px}
 .sheet .note{text-align:center;color:#9a92ad;font-size:12px;margin-top:14px}
 
@@ -205,7 +210,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
         <div class="intro-txt">
           <h2>اختبار تشخيصي عملي لكل صاحب مشروع في الخليج</h2>
           <p class="lead">اعرف وين القوة ووين التسريبات في مشروعك خلال دقائق وبدون تعقيد.</p>
-          <p class="body">الفحص يغطي ٦ محاور أساسية تحدد صحة كاش مشروعك: الكاش والمالية، التسعير، المبيعات والتسويق، المنتج، العمليات، والاستراتيجية. بعد ما تخلص، توصلك نتيجة واضحة لكل محور مع تشخيص عملي يعطيك أول خطوة تشتغل عليها. الفحص مبني على خبرة حسن أكبر مع أصحاب المشاريع في الخليج.</p>
+          <p class="body">الفحص يغطي 6 محاور أساسية تحدد صحة كاش مشروعك: الكاش والمالية، التسعير، المبيعات والتسويق، المنتج، العمليات، والاستراتيجية. بعد ما تخلص، توصلك نتيجة واضحة لكل محور مع تشخيص عملي يعطيك أول خطوة تشتغل عليها. الفحص مبني على خبرة حسن أكبر مع أصحاب المشاريع في الخليج.</p>
           <button class="btn teal" onclick="startQuiz()">ابدأ اختبار صحة كاش مشروعك</button>
         </div>
       </div>
@@ -237,7 +242,44 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
     <p>دخل معلوماتك عشان نجهز لك تقريرك التفصيلي.</p>
     <div class="field" id="f-name"><label>الاسم</label><input id="g-name" placeholder="اسمك"/><div class="err">دخل اسمك</div></div>
     <div class="field" id="f-email"><label>الإيميل</label><input id="g-email" type="email" placeholder="you@email.com" inputmode="email"/><div class="err">دخل إيميل صحيح</div></div>
-    <div class="field" id="f-phone"><label>رقم الواتساب</label><input id="g-phone" type="tel" placeholder="مثال: 9xxxxxxx" inputmode="tel"/><div class="err">دخل رقم صحيح</div></div>
+    <div class="field" id="f-phone"><label>رقم الواتساب</label>
+      <div class="phone-row">
+        <select id="g-cc" aria-label="مفتاح الدولة">
+        <option value="965" selected>🇰🇼 +965 الكويت</option>
+        <option value="966">🇸🇦 +966 السعودية</option>
+        <option value="971">🇦🇪 +971 الإمارات</option>
+        <option value="974">🇶🇦 +974 قطر</option>
+        <option value="973">🇧🇭 +973 البحرين</option>
+        <option value="968">🇴🇲 +968 عُمان</option>
+        <option value="20">🇪🇬 +20 مصر</option>
+        <option value="962">🇯🇴 +962 الأردن</option>
+        <option value="961">🇱🇧 +961 لبنان</option>
+        <option value="964">🇮🇶 +964 العراق</option>
+        <option value="963">🇸🇾 +963 سوريا</option>
+        <option value="967">🇾🇪 +967 اليمن</option>
+        <option value="970">🇵🇸 +970 فلسطين</option>
+        <option value="249">🇸🇩 +249 السودان</option>
+        <option value="218">🇱🇾 +218 ليبيا</option>
+        <option value="216">🇹🇳 +216 تونس</option>
+        <option value="213">🇩🇿 +213 الجزائر</option>
+        <option value="212">🇲🇦 +212 المغرب</option>
+        <option value="91">🇮🇳 +91 الهند</option>
+        <option value="92">🇵🇰 +92 باكستان</option>
+        <option value="880">🇧🇩 +880 بنغلاديش</option>
+        <option value="63">🇵🇭 +63 الفلبين</option>
+        <option value="94">🇱🇰 +94 سريلانكا</option>
+        <option value="977">🇳🇵 +977 نيبال</option>
+        <option value="90">🇹🇷 +90 تركيا</option>
+        <option value="98">🇮🇷 +98 إيران</option>
+        <option value="44">🇬🇧 +44 بريطانيا</option>
+        <option value="1">🇺🇸 +1 أمريكا / كندا</option>
+        <option value="49">🇩🇪 +49 ألمانيا</option>
+        <option value="33">🇫🇷 +33 فرنسا</option>
+        <option value="61">🇦🇺 +61 أستراليا</option>
+        </select>
+        <input id="g-phone" type="tel" placeholder="9xxxxxxx" inputmode="tel"/>
+      </div>
+      <div class="err">دخل رقم صحيح</div></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -268,7 +310,7 @@ const BANDS = ["ضعيف", "متوسط", "جيد"];
 const WIDGET = "donut", CTA = "book";
 const SOURCE = "riyada-quiz", PRODUCT = "riyada";
 const BOOK_NAME = "سحر إدارة الكاش", BOOK_URL = "riyada.html";
-const PRICE_LABEL = "نسخة رقمية تصلك على إيميلك فورا... ١٠ د.ك", WHATSAPP = "96522260820";
+const PRICE_LABEL = "نسخة رقمية تصلك على إيميلك فورا... 10 د.ك", WHATSAPP = "96522260820";
 const ANALYSIS = false, SHOW_CARD_DESC = true;
 const RESULT_TITLE = "أبارك لك إكمال فحص صحة كاش مشروعك 🎉", CARDS_TITLE = "تشخيص مشروعك عبر المحاور الستة";
 const CTA_TITLE = "ما هي خطوتك القادمة؟", CTA_SUB = "نتيجتك اليوم هي البداية. دليل «سحر إدارة الكاش» لحسن أكبر يعطيك نظام عملي خطوة بخطوة عشان تعالج تسريبات الكاش وتبني مشروع ينمو بثقة... بدون تعقيد.", CTA_BTN = "احصل على دليل سحر إدارة الكاش";
@@ -350,7 +392,7 @@ function donut(sc){
     return `<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" direction="ltr" unicode-bidi="isolate">${toAr(sc[k])}%</text>`; }).join('');
   return `<svg viewBox="0 0 260 260" width="100%" role="img" aria-label="النتيجة ${toAr(sc.overall)}%">${rings}${labels}
     <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="13" fill="var(--muted)" font-weight="700">النتيجة الكلية</text>
-    <text id="ovNum" x="${cx}" y="${cy+32}" text-anchor="middle" font-size="44" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">٠%</text></svg>`;
+    <text id="ovNum" x="${cx}" y="${cy+32}" text-anchor="middle" font-size="44" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">0%</text></svg>`;
 }
 function gauge(sc){
   const cx=140, cy=140, r=112, sw=24;
@@ -361,7 +403,7 @@ function gauge(sc){
     ${arc(180,a1,'var(--red)')}${arc(a1,a2,'var(--amber)')}${arc(a2,0,'var(--green)')}
     <line id="ndl" x1="${cx}" y1="${cy}" x2="${st.x.toFixed(1)}" y2="${st.y.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
     <circle cx="${cx}" cy="${cy}" r="8" fill="#fff"/>
-    <text id="ovNum" x="${cx}" y="${cy+42}" text-anchor="middle" font-size="42" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">٠%</text></svg>`;
+    <text id="ovNum" x="${cx}" y="${cy+42}" text-anchor="middle" font-size="42" fill="${bandC(sc.overall)}" font-weight="800" direction="ltr" unicode-bidi="isolate">0%</text></svg>`;
 }
 function metricCard(key,pct){
   const m=DIMS[key];
@@ -369,7 +411,7 @@ function metricCard(key,pct){
     <div class="mhead"><span class="mic" style="background:${m.color}26">${m.icon}</span><h3>${m.title}</h3></div>
     ${SHOW_CARD_DESC?`<p>${descFor(m,pct)}</p>`:''}
     <div class="bar"><i style="background:${m.color}"></i></div>
-    <div class="val" style="color:${m.color}"><span class="cnum">٠%</span><span class="tag">${band(pct)}</span></div>
+    <div class="val" style="color:${m.color}"><span class="cnum">0%</span><span class="tag">${band(pct)}</span></div>
   </div>`;
 }
 function analysisBlock(){
@@ -451,8 +493,8 @@ function animateResult(sc){
 }
 
 
-const AR="٠١٢٣٤٥٦٧٨٩";
-const toAr = n => String(n).replace(/[0-9]/g,d=>AR[+d]);
+/* numbers render in English (Latin) digits */
+const toAr = n => String(n);
 function countUp(el,to,dur){ if(!el)return; if(!dur){el.textContent=toAr(to)+"%";return;}
   const t0=performance.now(); (function f(now){ const t=Math.min(1,(now-t0)/dur);
     el.textContent=toAr(Math.round(to*(1-Math.pow(1-t,3))))+"%"; if(t<1)requestAnimationFrame(f); })(t0); }
@@ -474,11 +516,15 @@ function openGate(cb){ _afterGate=cb; document.getElementById("gate").classList.
 function _mark(id,ok){ document.getElementById(id).classList.toggle("bad",!ok); return ok; }
 async function submitGate(){
   const name=document.getElementById("g-name").value, email=document.getElementById("g-email").value, phone=document.getElementById("g-phone").value;
+  const _cc=(document.getElementById("g-cc")||{value:"965"}).value;
+  let _local=phone.replace(/\D/g,"").replace(/^0+/,"");
+  if(_cc && _local.indexOf(_cc)===0 && _local.length>_cc.length) _local=_local.slice(_cc.length);
+  const _fullPhone="+"+_cc+_local;
   const ok = _mark("f-name",_v.name(name)) & _mark("f-email",_v.email(email)) & _mark("f-phone",_v.phone(phone));
   if(!ok) return;
   const btn=document.getElementById("g-btn"); btn.disabled=true; btn.textContent="لحظة…";
   const extra = (typeof leadExtra==='function') ? leadExtra() : {};
-  const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:phone.trim(),
+  const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone,
     source:QUIZ_SOURCE, score:LAST_SCORE?LAST_SCORE.overall:null, createdAt:new Date().toISOString(), ...extra };
   let leadId=null;
   try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }
