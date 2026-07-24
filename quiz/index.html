@@ -380,7 +380,10 @@ const descFor = (m,p) => p>=B2?m.high : p>=B1?m.mid : m.low;
 /* ---------- lead payload for gate ---------- */
 function leadExtra(){
   const readable={}; Q.forEach(q=>{ const i=state.answers[q.id]; if(i===undefined) return; readable[q.id]=optionsFor(q)[i].t; });
-  return { scores:LAST_SCORE, answers:readable, product:BOOK_NAME, purchased:false };
+  const _ov = LAST_SCORE ? LAST_SCORE.overall : 0;
+  const _lvl = _ov>=B2 ? 'high' : (_ov>=B1 ? 'mid' : 'low');
+  return { scores:LAST_SCORE, answers:readable, product:BOOK_NAME, purchased:false,
+           band: band(_ov), diagnosis: DIAG[_lvl], quizTitle: "اختبار جاهزيتك للوفرة المالية" };
 }
 
 /* ---------- result widgets ---------- */
@@ -529,6 +532,13 @@ async function submitGate(){
   let leadId=null;
   try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }
   catch(e){ console.warn("lead save",e); }
+  /* email the result to the customer (fire-and-forget: never blocks showing the result) */
+  try{
+    if(fns && leadId){
+      fns.httpsCallable("sendQuizResult")({ leadId: leadId })
+         .catch(function(e){ console.warn("result mail", e); });
+    }
+  }catch(e){ console.warn("result mail", e); }
   window.__LEAD={...lead, leadId};
   document.getElementById("gate").classList.remove("on");
   btn.disabled=false; btn.textContent="شوف نتيجتي";
