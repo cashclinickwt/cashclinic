@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>لوحة تحكم الفريق | كاش كلينك</title>
+<style>
+  :root{ --auber:#2F1748; --gold:#D3A146; --teal:#2F8789; --olive:#505632;
+         --cream:#FFE7BC; --ink:#2F1748; --muted:#6B6577; --line:#E4E1EA; --bg:#F7F6F9; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+  /* ---- login ---- */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 30px;max-width:400px;width:100%;box-shadow:0 18px 50px rgba(47,23,72,.08)}
+  .card h1{font-size:22px;margin:0 0 4px}
+  .card p{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .fld input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;direction:ltr;text-align:right}
+  .fld input:focus{outline:none;border-color:var(--auber)}
+  .btn{width:100%;padding:14px;border:0;border-radius:999px;background:var(--auber);color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+  .btn:disabled{opacity:.6;cursor:default}
+  .err{background:#FDE5E9;color:#962E37;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-bottom:14px;display:none}
+  .logo{width:150px;display:block;margin:0 auto 18px}
+  /* ---- dashboard ---- */
+  #dash{display:none}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .top .who{font-size:14px;color:var(--muted)}
+  .top .who b{color:var(--ink);display:block;font-size:16px}
+  .lo{padding:9px 18px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-family:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+  .sec{margin-bottom:34px}
+  .sec h2{font-size:19px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+  .sec h2 span{width:8px;height:20px;border-radius:3px;background:var(--gold)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+  .kpi .n{font-size:28px;font-weight:800;direction:ltr;text-align:right}
+  .kpi .l{font-size:13px;color:var(--muted);margin-top:2px}
+  .tbl{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:12px 14px;text-align:right;border-bottom:1px solid var(--line)}
+  th{background:#FAF9FB;font-weight:600;color:var(--muted);font-size:13px}
+  tr:last-child td{border-bottom:0}
+  td.num{direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
+  .badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#fff}
+  .empty{padding:26px;text-align:center;color:var(--muted);font-size:14px}
+  .muted{color:var(--muted);font-size:13px}
+  .flt{display:inline-flex;gap:6px;margin-bottom:12px}
+  .flt button{padding:7px 16px;border:1.5px solid var(--line);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
+  .flt button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="card">
+    <img class="logo" src="https://cashclinic.net/brand/logo/logo-primary.png" alt="Cash Clinic"
+         onerror="this.style.display='none'">
+    <h1>لوحة تحكم الفريق</h1>
+    <p>سجّل دخولك بحساب كاش كلينك</p>
+    <div class="err" id="loginErr"></div>
+    <div class="fld"><label>البريد الإلكتروني</label>
+      <input id="email" type="email" autocomplete="username" placeholder="name@cashclinic.net"></div>
+    <div class="fld"><label>كلمة المرور</label>
+      <input id="pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn" id="loginBtn">دخول</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash"><div class="wrap">
+  <div class="top">
+    <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span></div>
+    <button class="lo" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+
+  <div class="sec">
+    <h2><span></span> المبيعات</h2>
+    <div class="flt" id="salesFlt">
+      <button data-f="all" class="on">الكل</button>
+      <button data-f="month">هذا الشهر</button>
+    </div>
+    <div class="kpis" id="salesKpis"></div>
+    <div class="tbl" id="salesTbl"></div>
+  </div>
+
+  <div class="sec">
+    <h2><span></span> نتائج الاختبارات</h2>
+    <div class="kpis" id="quizKpis"></div>
+    <div class="tbl" id="quizTbl"></div>
+  </div>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFunctions, httpsCallable }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},
+  functionsRegion:"us-central1"};
+
+const app=initializeApp(CONFIG.firebase);
+const auth=getAuth(app);
+const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDashboard");
+
+const $=s=>document.querySelector(s);
+const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
+let DATA=null, SFILTER="all";
+
+const fmt=n=>Number(n||0).toLocaleString("en-US");
+const money=n=>fmt(n)+" د.ك";
+const dt=ms=>{ if(!ms) return "—"; const d=new Date(ms);
+  return d.toLocaleDateString("en-GB")+" · "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); };
+const bandColor=b=>{ if(/ممتاز|جيد/.test(b))return"#2F8789"; if(/متوسط/.test(b))return"#D3A146"; return"#962E37"; };
+const esc=t=>String(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- login ---------- */
+$("#loginBtn").addEventListener("click", doLogin);
+$("#pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+async function doLogin(){
+  const err=$("#loginErr"); err.style.display="none";
+  const email=$("#email").value.trim(), pass=$("#pass").value;
+  if(!email||!pass){ return showErr("اكتب البريد وكلمة المرور"); }
+  $("#loginBtn").disabled=true; $("#loginBtn").textContent="جارٍ الدخول…";
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e){ showErr(authMsg(e)); }
+  finally{ $("#loginBtn").disabled=false; $("#loginBtn").textContent="دخول"; }
+}
+function showErr(m){ const e=$("#loginErr"); e.textContent=m; e.style.display="block"; }
+function authMsg(e){
+  const c=(e&&e.code)||"";
+  if(c.includes("invalid-cred")||c.includes("wrong-password")||c.includes("user-not-found")) return "البريد أو كلمة المرور غير صحيحة";
+  if(c.includes("too-many")) return "محاولات كثيرة، جرّب بعد شوي";
+  if(c.includes("invalid-email")) return "صيغة البريد غير صحيحة";
+  return "تعذّر الدخول، حاول مرة ثانية";
+}
+$("#logoutBtn").addEventListener("click", ()=>signOut(auth));
+
+/* ---------- auth state ---------- */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ $("#dash").style.display="none"; $("#login").style.display="flex"; DATA=null; return; }
+  $("#login").style.display="none"; $("#dash").style.display="block";
+  $("#uName").textContent=user.email;
+  try{
+    const r=await getDashboard(); DATA=r.data;
+    $("#uRole").textContent=ROLE_AR[DATA.role]||"";
+    render();
+  }catch(e){
+    const msg=(e&&e.message)||"تعذّر تحميل البيانات";
+    $("#salesTbl").innerHTML=`<div class="empty">${esc(msg)}</div>`;
+    $("#quizTbl").innerHTML="";
+    if((e&&e.code)==="functions/permission-denied"){ setTimeout(()=>signOut(auth),2500); }
+  }
+});
+
+/* ---------- filters ---------- */
+document.querySelectorAll("#salesFlt button").forEach(b=>b.addEventListener("click",()=>{
+  SFILTER=b.dataset.f;
+  document.querySelectorAll("#salesFlt button").forEach(x=>x.classList.toggle("on",x===b));
+  renderSales();
+}));
+function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date();
+  return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
+
+/* ---------- render ---------- */
+function render(){ renderSales(); renderQuiz(); }
+
+function renderSales(){
+  const S=DATA.sales;
+  let orders=S.orders.slice();
+  if(SFILTER==="month") orders=orders.filter(o=>inThisMonth(o.when));
+  const rev=orders.reduce((a,o)=>a+Number(o.amount||0),0);
+  $("#salesKpis").innerHTML=`
+    <div class="kpi"><div class="n">${money(rev)}</div><div class="l">إجمالي الإيرادات</div></div>
+    <div class="kpi"><div class="n">${fmt(orders.length)}</div><div class="l">عدد الطلبات</div></div>`+
+    S.byProduct.map(p=>`<div class="kpi"><div class="n">${money(p.revenue)}</div><div class="l">${esc(p.product)} · ${fmt(p.count)} طلب</div></div>`).join("");
+  if(!orders.length){ $("#salesTbl").innerHTML=`<div class="empty">لا توجد طلبات بعد</div>`; return; }
+  $("#salesTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th><th>الجوال</th></tr></thead><tbody>`+
+    orders.map(o=>`<tr>
+      <td class="num">${dt(o.when)}</td><td>${esc(o.name)||"—"}</td>
+      <td>${esc(o.product)}</td><td class="num">${money(o.amount)}</td>
+      <td class="num">${esc(o.phone)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+
+function renderQuiz(){
+  const Q=DATA.quiz;
+  $("#quizKpis").innerHTML=`
+    <div class="kpi"><div class="n">${fmt(Q.totals.count)}</div><div class="l">عدد من أنهوا الاختبار</div></div>`+
+    Q.byQuiz.map(q=>`<div class="kpi"><div class="n">${fmt(q.count)}</div><div class="l">${esc(q.title||q.source)}</div></div>`).join("");
+  if(!Q.leads.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بعد</div>`; return; }
+  const multi=DATA.scope.length>1;
+  $("#quizTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+    Q.leads.map(l=>`<tr>
+      <td class="num">${dt(l.when)}</td><td>${esc(l.name)||"—"}</td>
+      ${multi?`<td>${esc(l.quizTitle||l.source)}</td>`:""}
+      <td class="num">${l.score!=null?l.score+"%":"—"}</td>
+      <td>${l.band?`<span class="badge" style="background:${bandColor(l.band)}">${esc(l.band)}</span>`:"—"}</td>
+      <td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+</script>
+</body>
+</html>
