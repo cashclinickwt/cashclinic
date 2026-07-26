@@ -50,6 +50,26 @@
   .flt{display:inline-flex;gap:6px;margin-bottom:12px}
   .flt button{padding:7px 16px;border:1.5px solid var(--line);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
   .flt button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
+  .view-btn{padding:6px 14px;border:1.5px solid var(--auber);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--auber);white-space:nowrap}
+  .view-btn:hover{background:var(--auber);color:#fff}
+  /* modal */
+  .ovl{position:fixed;inset:0;background:rgba(47,23,72,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
+  .ovl.on{display:flex}
+  .modal{background:#fff;border-radius:22px;max-width:560px;width:100%;box-shadow:0 24px 70px rgba(0,0,0,.25);overflow:hidden}
+  .m-x{position:absolute;top:20px;left:20px;width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:var(--auber);font-size:22px;cursor:pointer;line-height:1}
+  .m-hero{background:var(--auber);color:#fff;text-align:center;padding:34px 26px 28px;position:relative}
+  .m-hero .who{font-size:15px;opacity:.85;margin-bottom:14px}
+  .m-hero .big{font-size:54px;font-weight:800;direction:ltr;line-height:1}
+  .m-hero .bnd{display:inline-block;margin-top:12px;padding:6px 20px;border-radius:999px;font-size:14px;font-weight:700;color:#fff}
+  .m-body{padding:26px}
+  .m-diag{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px;font-size:14.5px;line-height:1.9;color:var(--muted);margin-bottom:22px}
+  .m-axis{margin-bottom:16px}
+  .m-axis .arow{display:flex;justify-content:space-between;font-size:14px;margin-bottom:7px}
+  .m-axis .arow b{font-weight:600;color:var(--ink)}
+  .m-axis .arow .p{direction:ltr;font-weight:700}
+  .track{height:9px;background:#EFEDF3;border-radius:999px;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:999px}
+  .m-meta{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center;direction:ltr}
 </style>
 </head>
 <body>
@@ -190,6 +210,42 @@ function renderSales(){
       <td class="num">${esc(o.phone)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
+const RESULT_META = {"abundance-quiz": {"order": ["mindset", "discipline", "resilience", "growth"], "dims": {"mindset": "العقلية المالية", "discipline": "الانضباط السلوكي", "resilience": "المرونة المالية", "growth": "الاستعداد للنمو"}, "B1": 50, "B2": 75, "bands": ["منخفض", "متوسط", "ممتاز"], "diag": {"high": "تشخيصك يبين أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقا.", "mid": "تشخيصك يبين أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبين أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."}}, "riyada-quiz": {"order": ["cash", "pricing", "sales", "product", "ops", "strategy"], "dims": {"cash": "الكاش والمالية", "pricing": "التسعير", "sales": "المبيعات والتسويق", "product": "المنتج أو الخدمة", "ops": "العمليات والتشغيل", "strategy": "الاستراتيجية والنمو"}, "B1": 40, "B2": 70, "bands": ["ضعيف", "متوسط", "جيد"], "diag": {"low": "تشخيص مشروعك يبين إنه في مرحلة تحتاج تدخل سريع: في محاور أساسية فيها تسريبات تأثر على استقرار كاش مشروعك. لا تخاف من الأرقام، الخبر الزين إن معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على محور واحد في كل مرة وابدأ من الكاش.", "mid": "تشخيص مشروعك يبين إنك بنيت أساس لا بأس فيه، بس في محاور تحتاج تشتغل عليها عشان تثبت وتكبر. عندك نقاط قوة واضحة ونقاط فيها تسريبات تأثر على كاش مشروعك. معالجة أهم محورين أو ثلاثة بتنقلك نقلة كبيرة.", "high": "تشخيص مشروعك يبين إنه في وضع صحي وقوي: عندك أساس متين في أغلب المحاور، وتشتغل بأرقام وأنظمة مو بس بالإحساس. الفرصة الحين إنك تنتقل من الاستقرار للنمو المتسارع، وتبني على نقاط قوتك عشان توسع بثقة."}}};
+function bandFor(src, ov){ const m=RESULT_META[src]; if(!m) return ""; return ov>=m.B2?m.bands[2] : ov>=m.B1?m.bands[1] : m.bands[0]; }
+function diagFor(src, ov){ const m=RESULT_META[src]; if(!m) return ""; const lvl = ov>=m.B2?"high" : ov>=m.B1?"mid" : "low"; return (m.diag&&m.diag[lvl])||""; }
+
+function openResult(idx){
+  const l=DATA.quiz.leads[idx]; if(!l) return;
+  const src=l.source, m=RESULT_META[src];
+  const sc=l.scores||{}; const ov = (sc.overall!=null)?sc.overall : (l.score!=null?l.score:0);
+  const bandTxt = l.band || bandFor(src, ov);
+  const diag = l.diagnosis || diagFor(src, ov);
+  const col = bandColor(bandTxt||"");
+  let axes="";
+  if(m){ axes = m.order.map(k=>{
+    const v = sc[k]!=null ? sc[k] : 0;
+    return `<div class="m-axis">
+      <div class="arow"><b>${esc(m.dims[k]||k)}</b><span class="p" style="color:${bandColor(bandFor(src,v))}">${v}%</span></div>
+      <div class="track"><i style="width:${v}%;background:${bandColor(bandFor(src,v))}"></i></div>
+    </div>`; }).join("");
+  }
+  document.getElementById("modalBody").innerHTML=`
+    <button class="m-x" onclick="closeResult()">×</button>
+    <div class="m-hero">
+      <div class="who">${esc(l.name||"—")} · ${esc(l.quizTitle||src)}</div>
+      <div class="big">${ov}%</div>
+      ${bandTxt?`<div class="bnd" style="background:${col}">${esc(bandTxt)}</div>`:""}
+    </div>
+    <div class="m-body">
+      ${diag?`<div class="m-diag">${esc(diag)}</div>`:""}
+      ${axes}
+      <div class="m-meta">${esc(l.phone||"")} ${l.email?" · "+esc(l.email):""}</div>
+    </div>`;
+  document.getElementById("ovl").classList.add("on");
+}
+function closeResult(){ document.getElementById("ovl").classList.remove("on"); }
+window.openResult=openResult; window.closeResult=closeResult;
+
 function renderQuiz(){
   const Q=DATA.quiz;
   $("#quizKpis").innerHTML=`
@@ -198,14 +254,16 @@ function renderQuiz(){
   if(!Q.leads.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بعد</div>`; return; }
   const multi=DATA.scope.length>1;
   $("#quizTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
-    Q.leads.map(l=>`<tr>
+      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th><th></th></tr></thead><tbody>`+
+    Q.leads.map((l,i)=>`<tr>
       <td class="num">${dt(l.when)}</td><td>${esc(l.name)||"—"}</td>
       ${multi?`<td>${esc(l.quizTitle||l.source)}</td>`:""}
       <td class="num">${l.score!=null?l.score+"%":"—"}</td>
       <td>${l.band?`<span class="badge" style="background:${bandColor(l.band)}">${esc(l.band)}</span>`:"—"}</td>
-      <td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+      <td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td>
+      <td><button class="view-btn" onclick="openResult(${i})">عرض النتيجة</button></td></tr>`).join("")+`</tbody></table>`;
 }
 </script>
+<div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
 </body>
 </html>
