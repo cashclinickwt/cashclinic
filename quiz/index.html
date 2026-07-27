@@ -177,6 +177,12 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 .phone-row select:focus{outline:0;border-color:var(--teal);background-color:#fff}
 .phone-row input{flex:1 1 auto;min-width:0;text-align:left}
 .field.bad .phone-row select{border-color:#e07a86}
+.field .pick{display:flex;flex-direction:column;gap:8px}
+.field .pick .opt{border:2px solid #e6e0ef;border-radius:12px;padding:12px 14px;font-size:14.5px;cursor:pointer;color:var(--bg);line-height:1.5;transition:.12s}
+.field .pick .opt.on{border-color:var(--teal);background:#f0fbfb;font-weight:700}
+.field.bad .pick .opt{border-color:#e07a86}
+.field textarea{width:100%;border:2px solid #e6e0ef;border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;line-height:1.6;resize:vertical;min-height:76px;color:var(--bg)}
+.field textarea:focus{outline:0;border-color:var(--teal);background:#fff}
 .sheet .btn{width:100%;margin-top:6px}
 .sheet .note{text-align:center;color:#9a92ad;font-size:12px;margin-top:14px}
 
@@ -280,6 +286,15 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
         <input id="g-phone" type="tel" placeholder="9xxxxxxx" inputmode="tel"/>
       </div>
       <div class="err">دخل رقم صحيح</div></div>
+      <div class="field" id="f-priority"><label>هدفكم من العلاج المالي؟ (اختر الأهم)</label>
+        <div class="pick" id="g-priority">
+          <div class="opt" data-val="سداد القروض والديون">سداد القروض والديون</div>
+          <div class="opt" data-val="تحقيق أهدافك الشخصية بدون معاناة الإفلاس شهري">تحقيق أهدافك الشخصية بدون معاناة الإفلاس شهري</div>
+          <div class="opt" data-val="الاستثمار وزيادة مصادر الدخل">الاستثمار وزيادة مصادر الدخل</div>
+        </div>
+        <div class="err">اختر هدفك</div></div>
+      <div class="field" id="f-notes"><label>تحب تكتب لنا أكثر عن وضعك؟ (اختياري)</label>
+        <textarea id="g-notes" maxlength="600" placeholder="اكتب هنا أي تفاصيل تحب نعرفها…"></textarea></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -434,6 +449,8 @@ function waLink(sc){
   ORDER.forEach(k=>lines.push("• "+DIMS[k].title+": "+toAr(sc[k])+"%"));
   lines.push(""); lines.push(WA_MSG_OUTRO);
   if(L.name) lines.push("", "الاسم: "+L.name);
+  if(L.priority) lines.push("الهدف الأهم: "+L.priority);
+  if(L.notes) lines.push("ملاحظات العميل: "+L.notes);
   return "https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(lines.join("\n"));
 }
 function renderResult(sc, leadId){
@@ -514,7 +531,13 @@ function launchConfetti(){ try{
 
 /* gate */
 const _v={email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), phone:v=>v.replace(/\D/g,"").length>=7, name:v=>v.trim().length>=2};
-let _afterGate=null;
+let _afterGate=null; let GATE_PRIORITY="";
+document.addEventListener("click", function(e){
+  var o=e.target.closest && e.target.closest("#g-priority .opt"); if(!o) return;
+  GATE_PRIORITY=o.getAttribute("data-val")||"";
+  document.querySelectorAll("#g-priority .opt").forEach(function(x){ x.classList.toggle("on", x===o); });
+  var f=document.getElementById("f-priority"); if(f) f.classList.remove("bad");
+});
 function openGate(cb){ _afterGate=cb; document.getElementById("gate").classList.add("on"); }
 function _mark(id,ok){ document.getElementById(id).classList.toggle("bad",!ok); return ok; }
 async function submitGate(){
@@ -523,11 +546,12 @@ async function submitGate(){
   let _local=phone.replace(/\D/g,"").replace(/^0+/,"");
   if(_cc && _local.indexOf(_cc)===0 && _local.length>_cc.length) _local=_local.slice(_cc.length);
   const _fullPhone="+"+_cc+_local;
-  const ok = _mark("f-name",_v.name(name)) & _mark("f-email",_v.email(email)) & _mark("f-phone",_v.phone(phone));
+  const ok = _mark("f-name",_v.name(name)) & _mark("f-email",_v.email(email)) & _mark("f-phone",_v.phone(phone)) & _mark("f-priority",!!GATE_PRIORITY);
   if(!ok) return;
   const btn=document.getElementById("g-btn"); btn.disabled=true; btn.textContent="لحظة…";
   const extra = (typeof leadExtra==='function') ? leadExtra() : {};
-  const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone,
+  const _notes=(document.getElementById("g-notes")||{value:""}).value.trim();
+    const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone, priority:GATE_PRIORITY, notes:_notes,
     source:QUIZ_SOURCE, score:LAST_SCORE?LAST_SCORE.overall:null, createdAt:new Date().toISOString(), ...extra };
   let leadId=null;
   try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }

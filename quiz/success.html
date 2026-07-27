@@ -45,13 +45,26 @@ const getOrderStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"get
 const card=document.getElementById("card");
 const orderId=new URLSearchParams(location.search).get("order");
 let productName="الكتاب";
+  let orderKind="book", orderMode=null;
 const L='<div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>';
-function ok(){card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع بنجاح 🎉</h1>
+function ok(){
+  if(orderKind==="course"){
+    const modeLine = orderMode==="onsite"
+      ? "طريقة حضورك: <b>حضوري</b> — بنتواصل معك بتفاصيل المكان قبل الورشة."
+      : "طريقة حضورك: <b>أونلاين (زوم)</b> — بنرسل لك رابط الزوم قبل الورشة.";
+    card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم تسجيلك 🎉</h1>
+  <p>سجّلناك في <span class="mail">${productName||"الورشة"}</span> ومقعدك محجوز.</p>
+  <p>${modeLine}</p>
+  <p>وصلتك رسالة تأكيد على إيميلك — لو ما لقيتها، تأكد من <b>Spam / المهملات</b>.</p>
+  <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;
+    return;
+  }
+  card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع بنجاح 🎉</h1>
   <p>أرسلنا لك <span class="mail">${productName}</span> على إيميلك مباشرة.</p>
   <p>لو ما وصلتك الرسالة خلال دقائق، تأكد من صندوق <b>Spam / المهملات</b>.</p>
   <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;}
 function pending(){card.innerHTML=L+`<div class="ic wait">⏳</div><h1>استلمنا طلبك</h1>
-  <p>نأكد الدفعة الحين، وبيوصلك الكتاب على إيميلك خلال دقائق.</p>
+  <p>${orderKind==="course"?"نأكد الدفعة الحين، وبتوصلك رسالة تأكيد التسجيل على إيميلك خلال دقائق.":"نأكد الدفعة الحين، وبيوصلك الكتاب على إيميلك خلال دقائق."}</p>
   <div class="wa">ما وصلك شي بعد 10 دقائق؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;}
 function fail(){card.innerHTML=L+`<div class="ic fail">!</div><h1>ما تمت الدفعة</h1>
   <p>يبدو إن العملية ما اكتملت. تقدر ترجع وتحاول مرة ثانية.</p>
@@ -60,6 +73,8 @@ async function poll(t=0){
   if(!orderId){pending();return;}
   try{const r=await getOrderStatus({orderId});const s=r.data.status;
     if(r.data.product) productName=r.data.product;
+      if(r.data.kind) orderKind=r.data.kind;
+      if(r.data.mode) orderMode=r.data.mode;
     if(s==="paid"){ok();return;} if(["failed","declined","cancelled"].includes(s)){fail();return;}
   }catch(e){console.warn(e);}
   if(t<8){setTimeout(()=>poll(t+1),2500);}else{pending();}

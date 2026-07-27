@@ -70,6 +70,10 @@
   .track{height:9px;background:#EFEDF3;border-radius:999px;overflow:hidden}
   .track i{display:block;height:100%;border-radius:999px}
   .m-meta{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center;direction:ltr}
+  .m-intake{margin-bottom:22px;display:flex;flex-direction:column;gap:10px}
+  .m-intake .row{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .m-intake .k{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
+  .m-intake .v{display:block;font-size:14px;line-height:1.7;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -111,6 +115,12 @@
     <h2><span></span> نتائج الاختبارات</h2>
     <div class="kpis" id="quizKpis"></div>
     <div class="tbl" id="quizTbl"></div>
+  </div>
+
+  <div class="sec" id="coursesSec" hidden>
+    <h2><span></span> تسجيلات الدورات</h2>
+    <div class="kpis" id="courseKpis"></div>
+    <div class="tbl" id="courseTbl"></div>
   </div>
 </div></div>
 
@@ -190,7 +200,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
 /* ---------- render ---------- */
-function render(){ renderSales(); renderQuiz(); }
+function render(){ renderSales(); renderQuiz(); renderCourses(); }
 
 function renderSales(){
   const S=DATA.sales;
@@ -208,6 +218,29 @@ function renderSales(){
       <td class="num">${dt(o.when)}</td><td>${esc(o.name)||"—"}</td>
       <td>${esc(o.product)}</td><td class="num">${money(o.amount)}</td>
       <td class="num">${esc(o.phone)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+
+function renderCourses(){
+  const C = DATA.courses;
+  const sec = $("#coursesSec");
+  if(!C || !C.regs || !C.regs.length){ if(sec) sec.hidden=true; return; }
+  sec.hidden=false;
+  const t=C.totals||{};
+  const prog=(C.byProgram&&C.byProgram[0])||null;
+  const seatsLeft = prog && prog.seatsOnsite!=null ? Math.max(0, prog.seatsOnsite - (prog.onsite||0)) : null;
+  $("#courseKpis").innerHTML=`
+    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي التسجيلات</div></div>
+    <div class="kpi"><div class="n">${money(t.revenue||0)}</div><div class="l">إجمالي الإيرادات</div></div>
+    <div class="kpi"><div class="n">${fmt(t.onsite||0)}</div><div class="l">حضوري${seatsLeft!=null?` · باقي ${fmt(seatsLeft)} مقعد`:""}</div></div>
+    <div class="kpi"><div class="n">${fmt(t.online||0)}</div><div class="l">أونلاين</div></div>`;
+  $("#courseTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>الاسم</th><th>الدورة</th><th>الحضور</th><th>المبلغ</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+    C.regs.map(r=>`<tr>
+      <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
+      <td>${esc(r.program)}</td>
+      <td><span class="badge" style="background:${r.mode==="onsite"?"#505632":"#2F8789"}">${r.mode==="onsite"?"حضوري":"أونلاين"}</span></td>
+      <td class="num">${money(r.amount)}</td>
+      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
 const RESULT_META = {"abundance-quiz": {"order": ["mindset", "discipline", "resilience", "growth"], "dims": {"mindset": "العقلية المالية", "discipline": "الانضباط السلوكي", "resilience": "المرونة المالية", "growth": "الاستعداد للنمو"}, "B1": 50, "B2": 75, "bands": ["منخفض", "متوسط", "ممتاز"], "diag": {"high": "تشخيصك يبين أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقا.", "mid": "تشخيصك يبين أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبين أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."}}, "riyada-quiz": {"order": ["cash", "pricing", "sales", "product", "ops", "strategy"], "dims": {"cash": "الكاش والمالية", "pricing": "التسعير", "sales": "المبيعات والتسويق", "product": "المنتج أو الخدمة", "ops": "العمليات والتشغيل", "strategy": "الاستراتيجية والنمو"}, "B1": 40, "B2": 70, "bands": ["ضعيف", "متوسط", "جيد"], "diag": {"low": "تشخيص مشروعك يبين إنه في مرحلة تحتاج تدخل سريع: في محاور أساسية فيها تسريبات تأثر على استقرار كاش مشروعك. لا تخاف من الأرقام، الخبر الزين إن معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على محور واحد في كل مرة وابدأ من الكاش.", "mid": "تشخيص مشروعك يبين إنك بنيت أساس لا بأس فيه، بس في محاور تحتاج تشتغل عليها عشان تثبت وتكبر. عندك نقاط قوة واضحة ونقاط فيها تسريبات تأثر على كاش مشروعك. معالجة أهم محورين أو ثلاثة بتنقلك نقلة كبيرة.", "high": "تشخيص مشروعك يبين إنه في وضع صحي وقوي: عندك أساس متين في أغلب المحاور، وتشتغل بأرقام وأنظمة مو بس بالإحساس. الفرصة الحين إنك تنتقل من الاستقرار للنمو المتسارع، وتبني على نقاط قوتك عشان توسع بثقة."}}};
@@ -239,6 +272,7 @@ function openResult(idx){
     <div class="m-body">
       ${diag?`<div class="m-diag">${esc(diag)}</div>`:""}
       ${axes}
+      ${(l.priority||l.notes)?`<div class="m-intake">${l.priority?`<div class="row"><span class="k">الهدف الأهم من العلاج المالي</span><span class="v">${esc(l.priority)}</span></div>`:""}${l.notes?`<div class="row"><span class="k">ملاحظات العميل</span><span class="v">${esc(l.notes)}</span></div>`:""}</div>`:""}
       <div class="m-meta">${esc(l.phone||"")} ${l.email?" · "+esc(l.email):""}</div>
     </div>`;
   document.getElementById("ovl").classList.add("on");
