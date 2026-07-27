@@ -53,6 +53,17 @@
   .err{background:#FDE5E9;color:#962E37;border-radius:10px;padding:11px 14px;font-size:14px;margin-top:12px;display:none}
   .alt{text-align:center;margin-top:16px;font-size:14px;color:var(--muted)}
   .alt a{color:var(--auber);font-weight:600;text-decoration:none}
+  .promo{margin:0 0 26px;text-align:center}
+  .promo img{width:100%;max-width:460px;border-radius:22px;border:1px solid var(--line);box-shadow:0 12px 34px rgba(47,23,72,.18);cursor:zoom-in;display:inline-block}
+  .flyers-t{font-size:22px;margin:30px 0 14px;text-align:center;color:var(--auber)}
+  .flyers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 30px}
+  .flyers figure{margin:0}
+  .flyers img{width:100%;border-radius:16px;border:1px solid var(--line);cursor:zoom-in;display:block;box-shadow:0 6px 18px rgba(47,23,72,.12)}
+  .flyers figcaption{text-align:center;font-size:13.5px;color:var(--auber);font-weight:700;margin-top:9px}
+  @media(max-width:640px){.flyers{grid-template-columns:1fr;max-width:420px;margin-inline:auto}}
+  .lb{position:fixed;inset:0;background:rgba(20,10,35,.92);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;cursor:zoom-out}
+  .lb.on{display:flex}
+  .lb img{max-width:100%;max-height:92vh;border-radius:14px}
 </style>
 </head>
 <body>
@@ -70,6 +81,8 @@
     </div>
     <div class="who">مع أ. غالية النويف · م. سارة الهندي</div>
   </div>
+
+  <div class="promo"><img src="img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية — التفاصيل والأسعار" loading="lazy" onclick="openLb(this.src)"/></div>
 
   <div class="price-row">
     <div class="pcard early">
@@ -145,6 +158,13 @@
     </ul>
   </div>
 
+  <h2 class="flyers-t">برنامج الأيام</h2>
+  <div class="flyers">
+    <figure><img src="img/raha-day1.jpg" alt="اليوم الأول — الأهداف" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الأول · الاثنين ٢١/٩</figcaption></figure>
+    <figure><img src="img/raha-day2.jpg" alt="اليوم الثاني — السلوكيات المالية" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الثاني · الثلاثاء ٢٢/٩</figcaption></figure>
+    <figure><img src="img/raha-day3.jpg" alt="اليوم الثالث — علاقتنا مع المال" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الثالث · الأربعاء ٢٣/٩</figcaption></figure>
+  </div>
+
   <div class="reg" id="reg">
     <h2>احجز مقعدك</h2>
     <div class="fld"><label>الاسم</label><input id="cName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
@@ -199,5 +219,11 @@ $("#payBtn").addEventListener("click", async ()=>{
 });
 function showErr(m){ const e=$("#regErr"); e.textContent=m; e.style.display="block"; }
 </script>
+  <div class="lb" id="lb" onclick="closeLb()"><img id="lbImg" src="" alt=""/></div>
+  <script>
+  function openLb(src){ var i=document.getElementById("lbImg"), b=document.getElementById("lb"); i.src=src; b.classList.add("on"); document.body.style.overflow="hidden"; }
+  function closeLb(){ document.getElementById("lb").classList.remove("on"); document.body.style.overflow=""; }
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeLb(); });
+  </script>
 </body>
 </html>
