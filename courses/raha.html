@@ -4,184 +4,258 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ورشة كيف تصنع راحتك المالية؟ | كاش كلينك</title>
-<meta name="description" content="ورشة كيف تصنع راحتك المالية؟ — ٣ أيام مع أ. غالية النويف و م. سارة الهندي. اونلاين وحضوري.">
+<meta name="description" content="ورشة ٣ أيام مع أ. غالية النويف و م. سارة الهندي — تبني فيها خطتك المالية خطوة بخطوة. ٢١–٢٣ سبتمبر ٢٠٢٦، اونلاين وحضوري.">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="../assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="../assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="../assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="../assets/ds/tokens/base.css">
+<link rel="stylesheet" href="../assets/css/site.css">
 <style>
-  :root{ --auber:#2F1748; --gold:#D3A146; --olive:#505632; --burg:#962E37; --cream:#FFE7BC;
-         --ink:#2F1748; --muted:#6B6577; --line:#E7E3EE; --bg:#F7F6F9; }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.7}
-  a{color:inherit}
-  .wrap{max-width:960px;margin:0 auto;padding:0 18px}
-  .back{display:inline-block;margin:18px 0;color:var(--muted);font-size:14px;text-decoration:none}
-  /* hero */
-  .hero{background:linear-gradient(150deg,#3A1D5A,#2F1748 60%);color:#fff;border-radius:26px;padding:44px 34px;margin-bottom:26px;position:relative;overflow:hidden}
-  .hero .eq{color:var(--cream);font-size:14px;opacity:.9;margin-bottom:8px}
-  .hero h1{font-size:clamp(26px,5vw,40px);margin:0 0 10px;line-height:1.25}
-  .hero .sum{font-size:clamp(16px,2.4vw,20px);color:#E9E2F5;font-weight:600;margin:0 0 22px}
-  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-  .chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:8px 16px;font-size:14px}
-  .who{margin-top:18px;font-size:15px;color:var(--cream)}
-  /* pricing */
-  .price-row{display:flex;flex-wrap:wrap;gap:14px;margin:26px 0}
-  .pcard{flex:1;min-width:200px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
-  .pcard.early{border:2px solid var(--gold);position:relative}
-  .pcard .tag{font-size:13px;color:var(--muted)}
-  .pcard .amt{font-size:30px;font-weight:800;direction:ltr;text-align:right;margin:4px 0}
-  .pcard .note{font-size:13px;color:var(--muted)}
-  .pcard.early .tag{color:var(--gold);font-weight:700}
-  /* days */
-  .day{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:18px}
-  .day h3{margin:0 0 4px;font-size:20px;color:var(--auber)}
-  .day .date{color:var(--muted);font-size:14px;margin-bottom:16px}
-  .day ul{margin:0;padding-inline-start:22px}
-  .day li{margin-bottom:9px;font-size:15.5px;color:#43405A}
-  .sec-t{font-size:22px;margin:30px 0 14px;text-align:center}
-  /* register */
-  .reg{background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;margin:26px 0 50px;box-shadow:0 14px 40px rgba(47,23,72,.06)}
-  .reg h2{margin:0 0 18px;font-size:22px}
-  .fld{margin-bottom:14px}
-  .fld label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
-  .fld input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;font-family:inherit}
-  .fld input:focus{outline:none;border-color:var(--auber)}
-  .modes{display:flex;gap:12px}
-  .mode{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:16px;text-align:center;cursor:pointer;font-size:15px;transition:.15s}
-  .mode.on{border-color:var(--auber);background:#F4F0FA;font-weight:700}
-  .mode small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px;font-weight:400}
-  .mode.full{opacity:.5;cursor:not-allowed}
-  .pay{width:100%;margin-top:20px;padding:16px;border:0;border-radius:999px;background:var(--auber);color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
-  .pay:disabled{opacity:.6;cursor:default}
-  .err{background:#FDE5E9;color:#962E37;border-radius:10px;padding:11px 14px;font-size:14px;margin-top:12px;display:none}
-  .alt{text-align:center;margin-top:16px;font-size:14px;color:var(--muted)}
-  .alt a{color:var(--auber);font-weight:600;text-decoration:none}
-  .promo{margin:0 0 26px;text-align:center}
-  .promo img{width:100%;max-width:460px;border-radius:22px;border:1px solid var(--line);box-shadow:0 12px 34px rgba(47,23,72,.18);cursor:zoom-in;display:inline-block}
-  .flyers-t{font-size:22px;margin:30px 0 14px;text-align:center;color:var(--auber)}
-  .flyers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 30px}
-  .flyers figure{margin:0}
-  .flyers img{width:100%;border-radius:16px;border:1px solid var(--line);cursor:zoom-in;display:block;box-shadow:0 6px 18px rgba(47,23,72,.12)}
-  .flyers figcaption{text-align:center;font-size:13.5px;color:var(--auber);font-weight:700;margin-top:9px}
-  @media(max-width:640px){.flyers{grid-template-columns:1fr;max-width:420px;margin-inline:auto}}
+  .crs-hero2{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:52px 0 58px}
+  .crs-hero-in{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
+  .crs-hero2 .eyebrow{color:var(--cc-sage);font-weight:700;font-size:14.5px;letter-spacing:.08em}
+  .crs-hero2 .eq{color:var(--cc-cream);opacity:.92;font-size:15px;margin:12px 0 4px}
+  .crs-hero2 h1{font-size:clamp(28px,4.4vw,46px);font-weight:300;line-height:1.22;margin:6px 0 0;color:#fff}
+  .crs-hsum{font-size:17px;line-height:1.7;color:var(--cc-purple-100);margin:16px 0 0;max-width:40ch}
+  .crs-hmeta{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0 0}
+  .crs-hmeta .chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:8px 15px;font-size:14px;color:#fff}
+  .crs-hwho{margin:18px 0 0;font-size:15px;color:var(--cc-cream);font-weight:700}
+  .crs-hbtns{margin:26px 0 0;display:flex;flex-wrap:wrap;gap:12px}
+  .crs-hbtn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:14px 26px;font-size:16px;font-weight:700;text-decoration:none}
+  .crs-hbtn.p{background:var(--cc-cream);color:var(--cc-purple)}
+  .crs-hbtn.g{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+  .crs-hero-img img{width:100%;max-width:420px;border-radius:20px;box-shadow:0 22px 55px rgba(0,0,0,.32);cursor:zoom-in;display:block;margin-inline:auto}
+  @media(max-width:820px){.crs-hero-in{grid-template-columns:1fr;text-align:center}.crs-hsum{margin-inline:auto}.crs-hmeta,.crs-hbtns{justify-content:center}.crs-hero-img{order:-1;margin-bottom:6px}}
+
+  .crs-sec{padding:56px 0}
+  .crs-sec-t{text-align:center;font-size:clamp(25px,3.4vw,34px);font-weight:300;color:var(--cc-ink);margin:0 0 6px}
+  .crs-sec-sub{text-align:center;color:var(--cc-grey-700);margin:0 auto 30px;max-width:46ch}
+
+  .crs-prices{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+  .crs-pcard{flex:1 1 240px;max-width:300px;background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:20px;padding:26px;text-align:center}
+  .crs-pcard.hot{border:2px solid var(--cc-olive);background:#F6F7EE}
+  .crs-pcard .lbl{font-size:13.5px;font-weight:700;color:var(--cc-olive)}
+  .crs-pcard .amt{font-size:34px;font-weight:800;color:var(--cc-ink);margin:6px 0}
+  .crs-pcard .n{font-size:13.5px;color:var(--cc-grey-500)}
+
+  .crs-days{display:grid;grid-template-columns:1fr;gap:16px;max-width:840px;margin:0 auto}
+  .crs-day{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:20px;padding:26px 28px}
+  .crs-day h3{margin:0;font-size:20px;color:var(--cc-olive);font-weight:700}
+  .crs-day .d{font-size:13.5px;color:var(--cc-grey-500);margin:2px 0 15px}
+  .crs-day ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:9px 22px}
+  .crs-day li{position:relative;padding-inline-start:18px;font-size:15px;color:var(--cc-grey-900);line-height:1.6}
+  .crs-day li::before{content:"";position:absolute;inset-inline-start:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--cc-olive)}
+  @media(max-width:640px){.crs-day ul{grid-template-columns:1fr}}
+
+  .crs-flyers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:0 auto}
+  .crs-flyers figure{margin:0}
+  .crs-flyers img{width:100%;border-radius:16px;border:1px solid var(--cc-grey-200);cursor:zoom-in;display:block;box-shadow:0 8px 22px rgba(47,23,72,.12)}
+  .crs-flyers figcaption{text-align:center;font-size:13.5px;color:var(--cc-olive);font-weight:700;margin-top:9px}
+  @media(max-width:640px){.crs-flyers{grid-template-columns:1fr;max-width:420px}}
   .lb{position:fixed;inset:0;background:rgba(20,10,35,.92);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;cursor:zoom-out}
-  .lb.on{display:flex}
-  .lb img{max-width:100%;max-height:92vh;border-radius:14px}
+  .lb.on{display:flex}.lb img{max-width:100%;max-height:92vh;border-radius:14px}
+
+  .crs-reg{background:var(--cc-purple-050);border-top:1px solid var(--cc-grey-200)}
+  .crs-regcard{max-width:560px;margin:0 auto;background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:24px;padding:34px 30px;box-shadow:0 16px 44px rgba(47,23,72,.08)}
+  .crs-fld{margin-bottom:15px}
+  .crs-fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
+  .crs-fld input{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink)}
+  .crs-fld input:focus{outline:0;border-color:var(--cc-purple)}
+  .crs-modes{display:flex;gap:12px}
+  .crs-mode{flex:1;border:2px solid var(--cc-grey-200);border-radius:14px;padding:14px;text-align:center;cursor:pointer;font-weight:700;color:var(--cc-ink);transition:.15s}
+  .crs-mode.on{border-color:var(--cc-olive);background:#F6F7EE}
+  .crs-mode.full{opacity:.5;cursor:not-allowed;text-decoration:line-through}
+  .crs-mode small{display:block;font-weight:500;font-size:12px;color:var(--cc-grey-500);margin-top:3px}
+  .crs-pay{width:100%;margin-top:18px;padding:16px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+  .crs-pay:hover{filter:brightness(1.08)}
+  .crs-err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:11px 14px;font-size:14px;margin-top:12px;text-align:center}
+  .crs-alt{text-align:center;margin-top:16px;font-size:14px;color:var(--cc-grey-700)}
+  .crs-alt a{color:var(--cc-olive);font-weight:700;text-decoration:none}
+  .crs-back{display:inline-block;margin:16px 0;color:var(--cc-grey-500);font-size:14px;text-decoration:none}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <a class="back" href="index.html">← كل الدورات</a>
 
-  <div class="hero">
-    <div class="eq">الراحة المالية = قرارات مدروسة + وعي + سلوك + نظام</div>
-    <h1>ورشة كيف تصنع راحتك المالية؟</h1>
-    <div class="sum">٣ أيام تبني فيها خطتك المالية خطوة بخطوة</div>
-    <div class="meta">
-      <span class="chip">الاثنين ٢١/٩ · الثلاثاء ٢٢/٩ · الأربعاء ٢٣/٩ — ٢٠٢٦</span>
-      <span class="chip">من ٦ إلى ٩ مساءً</span>
-      <span class="chip">اونلاين وحضوري</span>
-    </div>
-    <div class="who">مع أ. غالية النويف · م. سارة الهندي</div>
-  </div>
-
-  <div class="promo"><img src="img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية — التفاصيل والأسعار" loading="lazy" onclick="openLb(this.src)"/></div>
-
-  <div class="price-row">
-    <div class="pcard early">
-      <div class="tag">التسجيل المبكر</div>
-      <div class="amt">115 KD</div>
-      <div class="note">ينتهي ٣١/٨ — بعدها ١٤٨ د.ك</div>
-    </div>
-    <div class="pcard">
-      <div class="tag">سعر الورشة</div>
-      <div class="amt">148 KD</div>
-      <div class="note">السعر الكامل بعد انتهاء المبكر</div>
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="../index.html"><img src="../brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <nav class="cc-nav-links">
+      <a class="cc-navlink" href="../index.html">الرئيسية</a>
+      <a class="cc-navlink" href="../index.html#clinics">عياداتنا</a>
+      <a class="cc-navlink" href="../index.html#consultants">استشاريونا</a>
+      <a class="cc-navlink" href="../quiz/index.html">الاختبارات</a>
+      <a class="cc-navlink" href="index.html" style="color:var(--cc-olive);font-weight:700;">دورات</a>
+      <a class="cc-navlink" href="../team/dashboard.html" style="border:1.5px solid #2F1748;border-radius:999px;padding:6px 16px;">دخول الفريق</a>
+    </nav>
+    <div class="cc-header-cta">
+      <a class="cc-btn cc-btn-wa" href="https://wa.me/96569954849?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D9%88%D8%B1%D8%B4%D8%A9%20%D9%83%D9%8A%D9%81%20%D8%AA%D8%B5%D9%86%D8%B9%20%D8%B1%D8%A7%D8%AD%D8%AA%D9%83%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9" style="font-size:15px;padding:11px 20px;">
+        <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Zm5.05-6.89c-.28-.14-1.64-.81-1.89-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.17-.43-2.22-1.37-.82-.73-1.38-1.63-1.54-1.91-.16-.28-.02-.43.12-.57.13-.13.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.61-1.48-.84-2.02-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.47.07-.72.35-.25.28-.95.93-.95 2.27 0 1.34.97 2.63 1.11 2.81.14.18 1.9 2.9 4.6 4.06.64.28 1.14.44 1.53.57.64.2 1.23.17 1.69.1.52-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33Z"/></svg>
+        <span>استفسار</span>
+      </a>
     </div>
   </div>
+</header>
 
-  <h2 class="sec-t">محاور الورشة</h2>
-
-  <div class="day">
-    <h3>اليوم الأول — الأهداف</h3>
-    <div class="date">الاثنين ٢١/٩/٢٠٢٦</div>
-    <ul>
-      <li>الأهداف</li>
-      <li>معايير وضع الهدف</li>
-      <li>خصائص الأهداف</li>
-      <li>عجلة الحياة</li>
-      <li>استخراج القيم</li>
-      <li>خطة تقسيم الأهداف</li>
-      <li>آلية التتبع</li>
-      <li>المكافآت</li>
-      <li>أهمية لوحة الأهداف</li>
-      <li>التطبيق على الأهداف المالية</li>
-      <li>الفرق بين الطبقة الغنية والمتوسطة والأقل</li>
-      <li>الفرق بين كتابة الأهداف بالأجندة</li>
-    </ul>
-  </div>
-
-  <div class="day">
-    <h3>اليوم الثاني — السلوكيات المالية</h3>
-    <div class="date">الثلاثاء ٢٢/٩/٢٠٢٦</div>
-    <ul>
-      <li>السلوكيات المالية</li>
-      <li>تعريف السلوكيات وأمثلة عليها ومناقشتها</li>
-      <li>المشتريات المبالغ فيها</li>
-      <li>العطاء المبالغ فيه</li>
-      <li>إهداء الخدمات ببلاش</li>
-      <li>التهرب من أي حوار مالي</li>
-      <li>تجاهل الحدود المالية</li>
-      <li>تحديد المعتقدات والأفكار والمشاعر المتعلقة بالمال</li>
-      <li>تمرين الرسالة</li>
-      <li>الفرق بين إدارة الميزانية والمصروفات والأصول والديون</li>
-      <li>الإدارة المالية والاستراتيجيات</li>
-      <li>استراتيجيات إدارة الأصول</li>
-      <li>استراتيجيات إدارة الديون</li>
-      <li>أنواع زيادة مصادر الدخل وتفصيلها</li>
-    </ul>
-  </div>
-
-  <div class="day">
-    <h3>اليوم الثالث — علاقتنا مع المال</h3>
-    <div class="date">الأربعاء ٢٣/٩/٢٠٢٦</div>
-    <ul>
-      <li>علاقتنا مع المال والعادات الداعمة</li>
-      <li>ما الذي يؤثر على علاقتنا مع المال</li>
-      <li>الأزمة الجيلية</li>
-      <li>الأزمة العلائقية</li>
-      <li>الأزمة المجتمعية</li>
-      <li>الأزمة النظامية</li>
-      <li>قوانين الطبيعة</li>
-      <li>التثقيف المالي</li>
-      <li>طرق تكوين العادات المالية</li>
-      <li>تكملة تمرين كتابة الخطة المالية</li>
-      <li>عرض نتائج وحالات وأمثلة حقيقية</li>
-      <li>الخطوات القادمة بعد انتهاء الورشة</li>
-    </ul>
-  </div>
-
-  <h2 class="flyers-t">برنامج الأيام</h2>
-  <div class="flyers">
-    <figure><img src="img/raha-day1.jpg" alt="اليوم الأول — الأهداف" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الأول · الاثنين ٢١/٩</figcaption></figure>
-    <figure><img src="img/raha-day2.jpg" alt="اليوم الثاني — السلوكيات المالية" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الثاني · الثلاثاء ٢٢/٩</figcaption></figure>
-    <figure><img src="img/raha-day3.jpg" alt="اليوم الثالث — علاقتنا مع المال" loading="lazy" onclick="openLb(this.src)"/><figcaption>اليوم الثالث · الأربعاء ٢٣/٩</figcaption></figure>
-  </div>
-
-  <div class="reg" id="reg">
-    <h2>احجز مقعدك</h2>
-    <div class="fld"><label>الاسم</label><input id="cName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
-    <div class="fld"><label>الإيميل</label><input id="cEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
-    <div class="fld"><label>رقم الواتساب</label><input id="cPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right"></div>
-    <div class="fld"><label>طريقة الحضور</label>
-      <div class="modes">
-        <div class="mode on" data-mode="online" id="mOnline">أونلاين<small>عبر زوم</small></div>
-        <div class="mode" data-mode="onsite" id="mOnsite">حضوري<small>مقاعد محدودة</small></div>
+<section class="crs-hero2">
+  <div class="cc-wrap">
+    <div class="crs-hero-in">
+      <div>
+        <span class="eyebrow">كاش ناس · الاستقرار المالي</span>
+        <div class="eq">الراحة المالية = قرارات مدروسة + وعي + سلوك + نظام</div>
+        <h1>ورشة كيف تصنع راحتك المالية؟</h1>
+        <p class="crs-hsum">٣ أيام تبني فيها خطتك المالية خطوة بخطوة — من الهدف إلى السلوك إلى النظام.</p>
+        <div class="crs-hmeta">
+          <span class="chip">الاثنين ٢١/٩ · الثلاثاء ٢٢/٩ · الأربعاء ٢٣/٩ — ٢٠٢٦</span>
+          <span class="chip">من ٦ إلى ٩ مساءً</span>
+          <span class="chip">اونلاين وحضوري</span>
+        </div>
+        <div class="crs-hwho">مع أ. غالية النويف · م. سارة الهندي</div>
+        <div class="crs-hbtns">
+          <a class="crs-hbtn p" href="#reg">احجز مقعدك ↓</a>
+          <a class="crs-hbtn g" href="https://wa.me/96569954849?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D9%88%D8%B1%D8%B4%D8%A9%20%D8%B1%D8%A7%D8%AD%D8%AA%D9%83%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9" target="_blank" rel="noopener">استفسار واتساب</a>
+        </div>
+      </div>
+      <div class="crs-hero-img">
+        <img src="img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية — التفاصيل والأسعار" loading="lazy" onclick="openLb(this.src)">
       </div>
     </div>
-    <button class="pay" id="payBtn">احجز وادفع</button>
-    <div class="err" id="regErr"></div>
-    <div class="alt">أو تواصل معنا للتسجيل: <a href="https://wa.me/96569954849" target="_blank" rel="noopener">69954849</a></div>
   </div>
-</div>
+</section>
 
+<section class="crs-sec">
+  <div class="cc-wrap">
+    <div class="crs-prices">
+      <div class="crs-pcard hot">
+        <div class="lbl">التسجيل المبكر</div>
+        <div class="amt">١١٥ <span style="font-size:18px;">د.ك</span></div>
+        <div class="n">ينتهي ٣١/٨ — بعدها ١٤٨ د.ك</div>
+      </div>
+      <div class="crs-pcard">
+        <div class="lbl">سعر الورشة</div>
+        <div class="amt">١٤٨ <span style="font-size:18px;">د.ك</span></div>
+        <div class="n">السعر الكامل بعد انتهاء المبكر</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="crs-sec" style="background:var(--cc-grey-050);padding-top:52px;">
+  <div class="cc-wrap">
+    <h2 class="crs-sec-t">محاور الورشة</h2>
+    <p class="crs-sec-sub">ثلاثة أيام متكاملة — كل يوم يبني على اللي قبله.</p>
+    <div class="crs-days">
+      <div class="crs-day">
+        <h3>اليوم الأول — الأهداف</h3>
+        <div class="d">الاثنين ٢١/٩/٢٠٢٦</div>
+        <ul>
+          <li>الأهداف</li><li>معايير وضع الهدف</li><li>خصائص الأهداف</li><li>عجلة الحياة</li>
+          <li>استخراج القيم</li><li>خطة تقسيم الأهداف</li><li>آلية التتبع</li><li>المكافآت</li>
+          <li>أهمية لوحة الأهداف</li><li>التطبيق على الأهداف المالية</li>
+          <li>الفرق بين الطبقة الغنية والمتوسطة والأقل</li><li>الفرق بين كتابة الأهداف بالأجندة</li>
+        </ul>
+      </div>
+      <div class="crs-day">
+        <h3>اليوم الثاني — السلوكيات المالية</h3>
+        <div class="d">الثلاثاء ٢٢/٩/٢٠٢٦</div>
+        <ul>
+          <li>السلوكيات المالية</li><li>تعريف السلوكيات وأمثلة عليها ومناقشتها</li>
+          <li>المشتريات المبالغ فيها</li><li>العطاء المبالغ فيه</li><li>إهداء الخدمات ببلاش</li>
+          <li>التهرب من أي حوار مالي</li><li>تجاهل الحدود المالية</li>
+          <li>تحديد المعتقدات والأفكار والمشاعر المتعلقة بالمال</li><li>تمرين الرسالة</li>
+          <li>الفرق بين إدارة الميزانية والمصروفات والأصول والديون</li><li>الإدارة المالية والاستراتيجيات</li>
+          <li>استراتيجيات إدارة الأصول</li><li>استراتيجيات إدارة الديون</li><li>أنواع زيادة مصادر الدخل وتفصيلها</li>
+        </ul>
+      </div>
+      <div class="crs-day">
+        <h3>اليوم الثالث — علاقتنا مع المال</h3>
+        <div class="d">الأربعاء ٢٣/٩/٢٠٢٦</div>
+        <ul>
+          <li>علاقتنا مع المال والعادات الداعمة</li><li>ما الذي يؤثر على علاقتنا مع المال</li>
+          <li>الأزمة الجيلية</li><li>الأزمة العلائقية</li><li>الأزمة المجتمعية</li><li>الأزمة النظامية</li>
+          <li>قوانين الطبيعة</li><li>التثقيف المالي</li><li>طرق تكوين العادات المالية</li>
+          <li>تكملة تمرين كتابة الخطة المالية</li><li>عرض نتائج وحالات وأمثلة حقيقية</li>
+          <li>الخطوات القادمة بعد انتهاء الورشة</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="crs-sec">
+  <div class="cc-wrap">
+    <h2 class="crs-sec-t">برنامج الأيام</h2>
+    <p class="crs-sec-sub">اضغط على أي تصميم عشان تكبره.</p>
+    <div class="crs-flyers">
+      <figure><img src="img/raha-day1.jpg" alt="اليوم الأول — الأهداف" loading="lazy" onclick="openLb(this.src)"><figcaption>اليوم الأول · الاثنين ٢١/٩</figcaption></figure>
+      <figure><img src="img/raha-day2.jpg" alt="اليوم الثاني — السلوكيات المالية" loading="lazy" onclick="openLb(this.src)"><figcaption>اليوم الثاني · الثلاثاء ٢٢/٩</figcaption></figure>
+      <figure><img src="img/raha-day3.jpg" alt="اليوم الثالث — علاقتنا مع المال" loading="lazy" onclick="openLb(this.src)"><figcaption>اليوم الثالث · الأربعاء ٢٣/٩</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="crs-reg crs-sec" id="reg">
+  <div class="cc-wrap">
+    <h2 class="crs-sec-t">احجز مقعدك</h2>
+    <p class="crs-sec-sub">عبّي بياناتك واختر طريقة الحضور — الدفع آمن عبر البوابة.</p>
+    <div class="crs-regcard">
+      <div class="crs-fld"><label>الاسم</label><input id="cName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
+      <div class="crs-fld"><label>الإيميل</label><input id="cEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
+      <div class="crs-fld"><label>رقم الواتساب</label><input id="cPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right"></div>
+      <div class="crs-fld"><label>طريقة الحضور</label>
+        <div class="crs-modes">
+          <div class="crs-mode mode on" id="mOnline" data-mode="online">اونلاين<small>مقاعد غير محدودة</small></div>
+          <div class="crs-mode mode" id="mOnsite" data-mode="onsite">حضوري<small>٢٥ مقعد فقط</small></div>
+        </div>
+      </div>
+      <button class="crs-pay" id="payBtn">احجز وادفع</button>
+      <div class="crs-err" id="regErr"></div>
+      <div class="crs-alt">تحب تسجّل عن طريق واتساب؟ <a href="https://wa.me/96569954849?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%AC%D9%84%20%D8%A8%D9%88%D8%B1%D8%B4%D8%A9%20%D8%B1%D8%A7%D8%AD%D8%AA%D9%83%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9" target="_blank" rel="noopener">راسلنا على 69954849</a></div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--cc-ink);color:var(--cc-purple-100);">
+  <div class="cc-wrap" style="padding-top:56px;padding-bottom:30px;">
+    <div class="cc-footer-grid">
+      <div>
+        <img src="../brand/logo/logo-cream.png" alt="Cash Clinic" style="height:34px;width:auto;display:block;">
+        <p style="font-size:15px;line-height:1.7;color:var(--cc-purple-300);margin:18px 0 0;max-width:34ch;">نشخص، نعالج، ونطور حياتك المالية. عيادة الصحة المالية الأولى في الكويت.</p>
+      </div>
+      <div>
+        <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--cc-cream);margin:0 0 16px;">روابط</h4>
+        <div style="display:flex;flex-direction:column;gap:11px;">
+          <a href="../index.html" style="font-size:15px;color:var(--cc-purple-200);">الرئيسية</a>
+          <a href="index.html" style="font-size:15px;color:var(--cc-purple-200);">الدورات</a>
+          <a href="../quiz/index.html" style="font-size:15px;color:var(--cc-purple-200);">الاختبارات</a>
+          <a href="../policy.html" style="font-size:15px;color:var(--cc-purple-200);">السياسة</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--cc-cream);margin:0 0 16px;">تواصل</h4>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:15px;">
+          <a href="tel:+96569954849" style="color:var(--cc-purple-200);" dir="ltr">+965 69954849</a>
+          <a href="mailto:contact@cashclinic.net" style="color:var(--cc-purple-200);">contact@cashclinic.net</a>
+          <a href="https://cashclinic.net" target="_blank" rel="noopener" style="color:var(--cc-purple-200);">cashclinic.net</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,231,188,.16);margin-top:40px;padding-top:22px;font-size:13.5px;color:var(--cc-purple-300);">
+      © 2026 كاش كلينك. جميع الحقوق محفوظة.
+    </div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" onclick="closeLb()"><img id="lbImg" src="" alt=""></div>
+
+<script src="../assets/js/nav.js"></script>
+<script>
+  function openLb(src){ var i=document.getElementById("lbImg"), b=document.getElementById("lb"); i.src=src; b.classList.add("on"); document.body.style.overflow="hidden"; }
+  function closeLb(){ document.getElementById("lb").classList.remove("on"); document.body.style.overflow=""; }
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeLb(); });
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
@@ -219,11 +293,5 @@ $("#payBtn").addEventListener("click", async ()=>{
 });
 function showErr(m){ const e=$("#regErr"); e.textContent=m; e.style.display="block"; }
 </script>
-  <div class="lb" id="lb" onclick="closeLb()"><img id="lbImg" src="" alt=""/></div>
-  <script>
-  function openLb(src){ var i=document.getElementById("lbImg"), b=document.getElementById("lb"); i.src=src; b.classList.add("on"); document.body.style.overflow="hidden"; }
-  function closeLb(){ document.getElementById("lb").classList.remove("on"); document.body.style.overflow=""; }
-  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeLb(); });
-  </script>
 </body>
 </html>
