@@ -112,6 +112,9 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 .opt.sel .dot::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--teal)}
 .opt .t{flex:1}
 .nav{display:flex;justify-content:center;margin-top:22px}
+  .qtext{width:100%;min-height:120px;background:var(--opt);color:var(--optink);border:2px solid transparent;border-radius:15px;padding:15px 16px;font-family:inherit;font-size:16px;font-weight:500;line-height:1.7;resize:vertical;text-align:right}
+  .qtext:focus{outline:none;border-color:var(--teal)}
+  .qtext::placeholder{color:#9384AD}
 .progress{position:fixed;bottom:0;left:0;right:0;height:9px;background:rgba(255,255,255,.13);z-index:20}
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width .4s ease}
 
@@ -286,15 +289,6 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
         <input id="g-phone" type="tel" placeholder="9xxxxxxx" inputmode="tel"/>
       </div>
       <div class="err">دخل رقم صحيح</div></div>
-      <div class="field" id="f-priority"><label>هدفكم من العلاج المالي؟ (اختر الأهم)</label>
-        <div class="pick" id="g-priority">
-          <div class="opt" data-val="سداد القروض والديون">سداد القروض والديون</div>
-          <div class="opt" data-val="تحقيق أهدافك الشخصية بدون معاناة الإفلاس شهري">تحقيق أهدافك الشخصية بدون معاناة الإفلاس شهري</div>
-          <div class="opt" data-val="الاستثمار وزيادة مصادر الدخل">الاستثمار وزيادة مصادر الدخل</div>
-        </div>
-        <div class="err">اختر هدفك</div></div>
-      <div class="field" id="f-notes"><label>تحب تكتب لنا أكثر عن وضعك؟ (اختياري)</label>
-        <textarea id="g-notes" maxlength="600" placeholder="اكتب هنا أي تفاصيل تحب نعرفها…"></textarea></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -316,7 +310,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
   try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); fns=firebase.functions(); }catch(e){ console.warn("firebase init",e); }
 </script>
 <script>
-const Q = [{"id": "q1", "seg": true, "text": "قبل ما نبدأ، قول لنا .. أنت تتعامل مع الفلوس بأي صفة؟", "opts": [{"t": "مسؤول عن ميزانية بيتي و عائلتي", "seg": "family"}, {"t": "مسؤول عن مالي الشخصي بس", "seg": "personal"}, {"t": "الاثنين مع بعض (شخصية + عائلية)", "seg": "family"}]}, {"id": "q2", "dim": "mindset", "text": "لو وصلتك مكافأة فجأة (500 دك)، شنو أول رد فعل عندك؟", "fb": {"high": "عندك وعي ممتاز بتقسيم المكافآت والتخطيط لها قبل لا توصل.", "low": "ركز على وضع خطة للمبالغ المفاجئة قبل لا تصرفها، عشان تشتغل لصالحك."}, "opts": [{"t": "أصرفها على شي أحتاجه أو نحتاجه من زمان", "s": 0}, {"t": "أحطها بالحساب بدون خطة محددة", "s": 2}, {"t": "أوزعها بين مصاريف وادخار", "s": 3}, {"t": "عندي بالضبط خطة لها قبل لا توصل", "s": 4}]}, {"id": "q3", "dim": "mindset", "text": "لو سألك أحد المقربين \"شلون أنظم فلوسي؟\"، شنو راح تقول له؟", "fb": {"high": "تعرف أهمية الميزانية الشهرية، وهذا يغطي لك جانب كبير من التحكم المالي.", "low": "ابدأ بنظام بسيط لتنظيم فلوسك حتى يكون عندك جواب واضح ومجرب."}, "opts": [{"t": "صراحة ما عندي جواب واضح أعطيه", "s": 1}, {"t": "لا تصرف على اللي ما تحتاجه", "s": 2}, {"t": "سو ميزانية شهرية أو جدول مصاريف", "s": 3}, {"t": "عندي نظام محدد ومجرب أعلمه إياه", "s": 4}]}, {"id": "q4", "text": "بناء الوفرة يبدأ من الوعي الجماعي، الكلام عن الفلوس في بيتكم أو مع شريك حياتك:", "fb": {"high": "عندك مراجعة منتظمة للوضع المالي، وهذا أساس بناء الوفرة.", "low": "الحديث عن الأمور المالية غالبا يكون وقت المشاكل فقط، حاول تفتح الحوار بشكل منتظم."}, "dimByVariant": {"family": "mindset", "personal": null}, "variants": {"family": [{"t": "موضوع حساس نتجنبه", "s": 1}, {"t": "نتكلم فيه بس لما تطلع مشكلة", "s": 2}, {"t": "نتكلم فيه عادي بس بدون خطة منظمة", "s": 3}, {"t": "عندنا مراجعة منتظمة لوضعنا المالي", "s": 4}], "personal": [{"t": "ما أتكلم عن فلوسي مع أحد", "s": 1}, {"t": "أتكلم بس لما يصير عندي مشكلة", "s": 2}, {"t": "أتكلم مع المقربين بشكل عام", "s": 3}, {"t": "أراجع وضعي المالي بشكل منتظم مع نفسي", "s": 4}]}}, {"id": "q5", "dim": "discipline", "text": "آخر مرة عرفت بالضبط وين راحت فلوسك الشهر اللي طاف:", "fb": {"high": "تقدر تحدد فئات مصاريفك، يعني عندك نظرة عامة على وين تروح فلوسك.", "low": "ركز أكثر على تتبع تفاصيل المصاريف الصغيرة عشان تكون عندك صورة أوضح."}, "opts": [{"t": "ما أتذكر أو ما أتابع", "s": 1}, {"t": "أعرف بشكل تقريبي عام", "s": 2}, {"t": "أعرف الفئات الكبيرة (إيجار، أكل، فواتير)", "s": 3}, {"t": "عندي تتبع تفصيلي لكل بند", "s": 4}]}, {"id": "q6", "dim": "resilience", "text": "لو طلعت لك مفاجأة مصروف 300 دك هاليوم (تصليح، علاج، طاري)، شلون تتعامل معاها؟", "fb": {"high": "لديك مرونة بالتعامل مع المفاجآت المالية وعندك مخصص للطوارئ.", "low": "المفاجآت تربكك ماليا، ابدأ ببناء مخصص بسيط للطوارئ يغطيها بدون قلق."}, "opts": [{"t": "أدبر بأي طريقة (تقسيط، أتسلف، تأجيل)", "s": 1}, {"t": "استخدم بطاقة ائتمانية أو حساب جاري", "s": 2}, {"t": "آخذ من حساب التوفير العام", "s": 3}, {"t": "عندي مخصص للطوارئ يغطيها بدون قلق", "s": 4}]}, {"id": "q7", "dim": "discipline", "text": "الالتزامات المالية الشهرية عندك (أقساط، قروض، بطاقات ائتمان):", "fb": {"high": "التزاماتك الشهرية تحت السيطرة وهذا يعطيك مساحة مالية مريحة.", "low": "نسبة الالتزامات الشهرية عالية وتستهلك أكثر من نص الدخل، تحتاج توازن أفضل بين الدخل والمصروفات."}, "opts": [{"t": "تستهلك أكثر من نص الدخل", "s": 1}, {"t": "تستهلك من ربع لنص الدخل", "s": 2}, {"t": "تستهلك أقل من ربع الدخل", "s": 3}, {"t": "ما عندي التزامات", "s": 4}]}, {"id": "q8", "dim": "resilience", "text": "لو وقف الدخل فجأة، إشكثر تقدر تعيش بنفس المستوى؟", "fb": {"high": "احتياطيك المالي قوي ويغطيك فترة كافية لو وقف الدخل.", "low": "احتياطيك المالي ضعيف لو وقف الدخل فجأة، ركز على بناء صندوق طوارئ يغطي 3 أشهر على الأقل."}, "opts": [{"t": "أقل من شهر", "s": 1}, {"t": "شهر إلى 3 أشهر", "s": 2}, {"t": "3 إلى 6 أشهر", "s": 3}, {"t": "أكثر من 6 أشهر", "s": 4}]}, {"id": "q9", "dim": "growth", "text": "شنو أكثر شي يقلقك بالجانب المالي؟ (اختار الأقرب لك)", "fb": {"high": "وضعك تحت السيطرة وما عندك قلق مالي كبير، استثمر هالاستقرار في النمو.", "low": "الشعور بالحصار من الديون يحتاج خطة واضحة للخروج، وهذا أول شي نقدر نشتغل عليه."}, "opts": [{"t": "ما أعرف وين تروح فلوسي بالضبط", "s": 1}, {"t": "محاصر بديون أو التزامات ثقيلة", "s": 1}, {"t": "ما أقدر أحقق أحلامي وأهدافي", "s": 2}, {"t": "خايف من المستقبل وكبر السن", "s": 2}, {"t": "ما عندي قلق حقيقي، الوضع تحت السيطرة", "s": 4}]}, {"id": "q10", "psy": true, "text": "لما توصل للوفرة المالية، شنو راح يتغير في حياتك بشكل ملموس؟ (اختر الأقرب لك)", "opts": [{"t": "نوم مرتاح بدون قلق يومي", "key": "sleep"}, {"t": "وقت أكثر وحضور أعمق مع عائلتي", "key": "family"}, {"t": "راح أقدر أحقق هدف معين (سفر، عقار، تعليم)", "key": "goal"}, {"t": "مساحة للعطاء ومساعدة الأهل والمجتمع", "key": "give"}]}, {"id": "q11", "dim": "growth", "text": "لو قدمت لك خارطة واضحة لحل وضعك المالي، إشكثر استعدادك للتنفيذ؟", "fb": {"high": "عندك رغبة واضحة بالتطوير ومستعد تتلقى توجيه مستمر عشان تحقق هدفك.", "low": "الالتزام بخطط محددة صعب عليك حاليا، نبدأ بخطوات صغيرة جدا تناسب إيقاعك."}, "opts": [{"t": "صعب علي ألتزم بخطط محددة", "s": 1}, {"t": "ممكن أجرب بس عندي تحفظات", "s": 2}, {"t": "مستعد بس أحتاج توجيه مستمر", "s": 3}, {"t": "مستعد الآن، أحتاج بس البداية الصحيحة", "s": 4}]}];
+const Q = [{"id": "q1", "seg": true, "text": "قبل ما نبدأ، قول لنا .. أنت تتعامل مع الفلوس بأي صفة؟", "opts": [{"t": "مسؤول عن ميزانية بيتي و عائلتي", "seg": "family"}, {"t": "مسؤول عن مالي الشخصي بس", "seg": "personal"}, {"t": "الاثنين مع بعض (شخصية + عائلية)", "seg": "family"}]}, {"id": "q2", "dim": "mindset", "text": "لو وصلتك مكافأة فجأة (500 دك)، شنو أول رد فعل عندك؟", "fb": {"high": "عندك وعي ممتاز بتقسيم المكافآت والتخطيط لها قبل لا توصل.", "low": "ركز على وضع خطة للمبالغ المفاجئة قبل لا تصرفها، عشان تشتغل لصالحك."}, "opts": [{"t": "أصرفها على شي أحتاجه أو نحتاجه من زمان", "s": 0}, {"t": "أحطها بالحساب بدون خطة محددة", "s": 2}, {"t": "أوزعها بين مصاريف وادخار", "s": 3}, {"t": "عندي بالضبط خطة لها قبل لا توصل", "s": 4}]}, {"id": "q3", "dim": "mindset", "text": "لو سألك أحد المقربين \"شلون أنظم فلوسي؟\"، شنو راح تقول له؟", "fb": {"high": "تعرف أهمية الميزانية الشهرية، وهذا يغطي لك جانب كبير من التحكم المالي.", "low": "ابدأ بنظام بسيط لتنظيم فلوسك حتى يكون عندك جواب واضح ومجرب."}, "opts": [{"t": "صراحة ما عندي جواب واضح أعطيه", "s": 1}, {"t": "لا تصرف على اللي ما تحتاجه", "s": 2}, {"t": "سو ميزانية شهرية أو جدول مصاريف", "s": 3}, {"t": "عندي نظام محدد ومجرب أعلمه إياه", "s": 4}]}, {"id": "q4", "text": "بناء الوفرة يبدأ من الوعي الجماعي، الكلام عن الفلوس في بيتكم أو مع شريك حياتك:", "fb": {"high": "عندك مراجعة منتظمة للوضع المالي، وهذا أساس بناء الوفرة.", "low": "الحديث عن الأمور المالية غالبا يكون وقت المشاكل فقط، حاول تفتح الحوار بشكل منتظم."}, "dimByVariant": {"family": "mindset", "personal": null}, "variants": {"family": [{"t": "موضوع حساس نتجنبه", "s": 1}, {"t": "نتكلم فيه بس لما تطلع مشكلة", "s": 2}, {"t": "نتكلم فيه عادي بس بدون خطة منظمة", "s": 3}, {"t": "عندنا مراجعة منتظمة لوضعنا المالي", "s": 4}], "personal": [{"t": "ما أتكلم عن فلوسي مع أحد", "s": 1}, {"t": "أتكلم بس لما يصير عندي مشكلة", "s": 2}, {"t": "أتكلم مع المقربين بشكل عام", "s": 3}, {"t": "أراجع وضعي المالي بشكل منتظم مع نفسي", "s": 4}]}}, {"id": "q5", "dim": "discipline", "text": "آخر مرة عرفت بالضبط وين راحت فلوسك الشهر اللي طاف:", "fb": {"high": "تقدر تحدد فئات مصاريفك، يعني عندك نظرة عامة على وين تروح فلوسك.", "low": "ركز أكثر على تتبع تفاصيل المصاريف الصغيرة عشان تكون عندك صورة أوضح."}, "opts": [{"t": "ما أتذكر أو ما أتابع", "s": 1}, {"t": "أعرف بشكل تقريبي عام", "s": 2}, {"t": "أعرف الفئات الكبيرة (إيجار، أكل، فواتير)", "s": 3}, {"t": "عندي تتبع تفصيلي لكل بند", "s": 4}]}, {"id": "q6", "dim": "resilience", "text": "لو طلعت لك مفاجأة مصروف 300 دك هاليوم (تصليح، علاج، طاري)، شلون تتعامل معاها؟", "fb": {"high": "لديك مرونة بالتعامل مع المفاجآت المالية وعندك مخصص للطوارئ.", "low": "المفاجآت تربكك ماليا، ابدأ ببناء مخصص بسيط للطوارئ يغطيها بدون قلق."}, "opts": [{"t": "أدبر بأي طريقة (تقسيط، أتسلف، تأجيل)", "s": 1}, {"t": "استخدم بطاقة ائتمانية أو حساب جاري", "s": 2}, {"t": "آخذ من حساب التوفير العام", "s": 3}, {"t": "عندي مخصص للطوارئ يغطيها بدون قلق", "s": 4}]}, {"id": "q7", "dim": "discipline", "text": "الالتزامات المالية الشهرية عندك (أقساط، قروض، بطاقات ائتمان):", "fb": {"high": "التزاماتك الشهرية تحت السيطرة وهذا يعطيك مساحة مالية مريحة.", "low": "نسبة الالتزامات الشهرية عالية وتستهلك أكثر من نص الدخل، تحتاج توازن أفضل بين الدخل والمصروفات."}, "opts": [{"t": "تستهلك أكثر من نص الدخل", "s": 1}, {"t": "تستهلك من ربع لنص الدخل", "s": 2}, {"t": "تستهلك أقل من ربع الدخل", "s": 3}, {"t": "ما عندي التزامات", "s": 4}]}, {"id": "q8", "dim": "resilience", "text": "لو وقف الدخل فجأة، إشكثر تقدر تعيش بنفس المستوى؟", "fb": {"high": "احتياطيك المالي قوي ويغطيك فترة كافية لو وقف الدخل.", "low": "احتياطيك المالي ضعيف لو وقف الدخل فجأة، ركز على بناء صندوق طوارئ يغطي 3 أشهر على الأقل."}, "opts": [{"t": "أقل من شهر", "s": 1}, {"t": "شهر إلى 3 أشهر", "s": 2}, {"t": "3 إلى 6 أشهر", "s": 3}, {"t": "أكثر من 6 أشهر", "s": 4}]}, {"id": "q9", "dim": "growth", "text": "شنو أكثر شي يقلقك بالجانب المالي؟ (اختار الأقرب لك)", "fb": {"high": "وضعك تحت السيطرة وما عندك قلق مالي كبير، استثمر هالاستقرار في النمو.", "low": "الشعور بالحصار من الديون يحتاج خطة واضحة للخروج، وهذا أول شي نقدر نشتغل عليه."}, "opts": [{"t": "ما أعرف وين تروح فلوسي بالضبط", "s": 1}, {"t": "محاصر بديون أو التزامات ثقيلة", "s": 1}, {"t": "ما أقدر أحقق أحلامي وأهدافي", "s": 2}, {"t": "خايف من المستقبل وكبر السن", "s": 2}, {"t": "ما عندي قلق حقيقي، الوضع تحت السيطرة", "s": 4}]}, {"id": "q10", "psy": true, "text": "لما توصل للوفرة المالية، شنو راح يتغير في حياتك بشكل ملموس؟ (اختر الأقرب لك)", "opts": [{"t": "نوم مرتاح بدون قلق يومي", "key": "sleep"}, {"t": "وقت أكثر وحضور أعمق مع عائلتي", "key": "family"}, {"t": "راح أقدر أحقق هدف معين (سفر، عقار، تعليم)", "key": "goal"}, {"t": "مساحة للعطاء ومساعدة الأهل والمجتمع", "key": "give"}]}, {"id": "q11", "dim": "growth", "text": "لو قدمت لك خارطة واضحة لحل وضعك المالي، إشكثر استعدادك للتنفيذ؟", "fb": {"high": "عندك رغبة واضحة بالتطوير ومستعد تتلقى توجيه مستمر عشان تحقق هدفك.", "low": "الالتزام بخطط محددة صعب عليك حاليا، نبدأ بخطوات صغيرة جدا تناسب إيقاعك."}, "opts": [{"t": "صعب علي ألتزم بخطط محددة", "s": 1}, {"t": "ممكن أجرب بس عندي تحفظات", "s": 2}, {"t": "مستعد بس أحتاج توجيه مستمر", "s": 3}, {"t": "مستعد الآن، أحتاج بس البداية الصحيحة", "s": 4}]}, {"id": "goal", "intake": true, "text": "هدفكم من العلاج المالي؟ (اختر الأهم)", "opts": [{"t": "سداد القروض والديون"}, {"t": "تحقيق أهدافك الشخصية بدون معاناة الإفلاس شهري"}, {"t": "الاستثمار وزيادة مصادر الدخل"}]}, {"id": "notes", "intake": true, "type": "text", "text": "تحب تكتب لنا أكثر عن وضعك؟ (اختياري)", "ph": "اكتب هنا أي تفاصيل تحب نعرفها…"}];
 const DIMS = {"mindset": {"title": "العقلية المالية", "color": "#B79BEA", "icon": "🧠"}, "discipline": {"title": "الانضباط السلوكي", "color": "#F2778A", "icon": "🎯"}, "resilience": {"title": "المرونة المالية", "color": "#E7B84C", "icon": "🛡️"}, "growth": {"title": "الاستعداد للنمو", "color": "#4FD1A0", "icon": "🚀"}};
 const ORDER = ["mindset", "discipline", "resilience", "growth"];
 const DIAG = {"high": "تشخيصك يبين أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقا.", "mid": "تشخيصك يبين أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبين أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."};
@@ -340,24 +334,36 @@ let advancing=false, advTimer=null;
 const stageEl = () => document.getElementById("stage");
 function optionsFor(q){ return q.variants ? (q.variants[state.seg]||q.variants.family) : q.opts; }
 function dimOf(q){ if(q.dimByVariant) return q.dimByVariant[state.seg]; return q.dim||null; }
-function scored(q){ return !(q.seg||q.psy); }
+function scored(q){ return !(q.seg||q.psy||q.intake); }
 
 function render(dir){
   const q=Q[state.i], opts=optionsFor(q), chosen=state.answers[q.id];
   document.getElementById("pbar").style.width=(state.i/Q.length*100)+"%";
   advancing=false;
-  stageEl().innerHTML=`<div class="qwrap">
-    <div class="eyebrow">سؤال ${toAr(state.i+1)} من ${toAr(Q.length)}</div>
-    <h1 class="q">${q.text}</h1>
-    <div class="opts" role="radiogroup">
-      ${opts.map((o,i)=>`<button type="button" class="opt ${chosen===i?'sel':''}" data-i="${i}" role="radio" aria-checked="${chosen===i}"><span class="dot"></span><span class="t">${o.t}</span></button>`).join("")}
-    </div>
-    <div class="nav">
-      ${state.i>0?'<button class="btn ghost" id="qback">‹ السابق</button>':''}
-      ${(chosen!==undefined && state.i===Q.length-1)?'<button class="btn teal" id="qnext">شوف نتيجتي</button>':''}
-    </div>
-  </div>`;
-  stageEl().querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>select(+b.dataset.i)));
+  if(q.type==="text"){
+    stageEl().innerHTML=`<div class="qwrap">
+      <div class="eyebrow">سؤال ${toAr(state.i+1)} من ${toAr(Q.length)}</div>
+      <h1 class="q">${q.text}</h1>
+      <textarea id="qtext" class="qtext" maxlength="600" placeholder="${q.ph||''}">${chosen||''}</textarea>
+      <div class="nav">
+        ${state.i>0?'<button class="btn ghost" id="qback">‹ السابق</button>':''}
+        <button class="btn teal" id="qnext">${state.i===Q.length-1?'شوف نتيجتي':'التالي ›'}</button>
+      </div>
+    </div>`;
+  } else {
+    stageEl().innerHTML=`<div class="qwrap">
+      <div class="eyebrow">سؤال ${toAr(state.i+1)} من ${toAr(Q.length)}</div>
+      <h1 class="q">${q.text}</h1>
+      <div class="opts" role="radiogroup">
+        ${opts.map((o,i)=>`<button type="button" class="opt ${chosen===i?'sel':''}" data-i="${i}" role="radio" aria-checked="${chosen===i}"><span class="dot"></span><span class="t">${o.t}</span></button>`).join("")}
+      </div>
+      <div class="nav">
+        ${state.i>0?'<button class="btn ghost" id="qback">‹ السابق</button>':''}
+        ${(chosen!==undefined && state.i===Q.length-1)?'<button class="btn teal" id="qnext">شوف نتيجتي</button>':''}
+      </div>
+    </div>`;
+    stageEl().querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>select(+b.dataset.i)));
+  }
   const bk=document.getElementById("qback"); if(bk) bk.addEventListener("click",goBack);
   const nx=document.getElementById("qnext"); if(nx) nx.addEventListener("click",next);
 }
@@ -370,7 +376,7 @@ function select(idx){
 }
 function leave(then,back){ const w=document.querySelector("#stage .qwrap"); if(w) w.classList.add("qout"); clearTimeout(advTimer); advTimer=setTimeout(then,180); }
 function next(){
-  if(state.answers[Q[state.i].id]===undefined||advancing) return;
+  if(advancing) return; const cq=Q[state.i]; if(cq.type==="text"){ const ta=document.getElementById("qtext"); state.answers[cq.id]=ta?ta.value.trim():""; } else if(state.answers[cq.id]===undefined){ return; }
   advancing=true;
   if(state.i===Q.length-1){ LAST_SCORE=score(); leave(()=>openGate(leadId=>renderResult(LAST_SCORE,leadId))); }
   else leave(()=>{ state.i++; render(); window.scrollTo({top:0,behavior:'smooth'}); });
@@ -394,7 +400,7 @@ const descFor = (m,p) => p>=B2?m.high : p>=B1?m.mid : m.low;
 
 /* ---------- lead payload for gate ---------- */
 function leadExtra(){
-  const readable={}; Q.forEach(q=>{ const i=state.answers[q.id]; if(i===undefined) return; readable[q.id]=optionsFor(q)[i].t; });
+  const readable={}; Q.forEach(q=>{ const v=state.answers[q.id]; if(v===undefined||v==="") return; readable[q.id]= q.type==="text" ? String(v) : optionsFor(q)[v].t; });
   const _ov = LAST_SCORE ? LAST_SCORE.overall : 0;
   const _lvl = _ov>=B2 ? 'high' : (_ov>=B1 ? 'mid' : 'low');
   return { scores:LAST_SCORE, answers:readable, product:BOOK_NAME, purchased:false,
@@ -531,13 +537,7 @@ function launchConfetti(){ try{
 
 /* gate */
 const _v={email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), phone:v=>v.replace(/\D/g,"").length>=7, name:v=>v.trim().length>=2};
-let _afterGate=null; let GATE_PRIORITY="";
-document.addEventListener("click", function(e){
-  var o=e.target.closest && e.target.closest("#g-priority .opt"); if(!o) return;
-  GATE_PRIORITY=o.getAttribute("data-val")||"";
-  document.querySelectorAll("#g-priority .opt").forEach(function(x){ x.classList.toggle("on", x===o); });
-  var f=document.getElementById("f-priority"); if(f) f.classList.remove("bad");
-});
+let _afterGate=null;
 function openGate(cb){ _afterGate=cb; document.getElementById("gate").classList.add("on"); }
 function _mark(id,ok){ document.getElementById(id).classList.toggle("bad",!ok); return ok; }
 async function submitGate(){
@@ -546,12 +546,12 @@ async function submitGate(){
   let _local=phone.replace(/\D/g,"").replace(/^0+/,"");
   if(_cc && _local.indexOf(_cc)===0 && _local.length>_cc.length) _local=_local.slice(_cc.length);
   const _fullPhone="+"+_cc+_local;
-  const ok = _mark("f-name",_v.name(name)) & _mark("f-email",_v.email(email)) & _mark("f-phone",_v.phone(phone)) & _mark("f-priority",!!GATE_PRIORITY);
+  const ok = _mark("f-name",_v.name(name)) & _mark("f-email",_v.email(email)) & _mark("f-phone",_v.phone(phone));
   if(!ok) return;
   const btn=document.getElementById("g-btn"); btn.disabled=true; btn.textContent="لحظة…";
   const extra = (typeof leadExtra==='function') ? leadExtra() : {};
-  const _notes=(document.getElementById("g-notes")||{value:""}).value.trim();
-    const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone, priority:GATE_PRIORITY, notes:_notes,
+  const _goalQ=Q.find(function(q){return q.id==="goal";}); const _gi=state.answers.goal; const _priority=(_goalQ&&_gi!==undefined&&_gi!=="")?_goalQ.opts[_gi].t:""; const _notes=(state.answers.notes||"").trim();
+    const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone, priority:_priority, notes:_notes,
     source:QUIZ_SOURCE, score:LAST_SCORE?LAST_SCORE.overall:null, createdAt:new Date().toISOString(), ...extra };
   let leadId=null;
   try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }
