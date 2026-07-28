@@ -445,5 +445,43 @@
   });
 })();
 </script>
+
+<!-- ===== NEW-PROGRAM AD POPUP (راحتك المالية) — to remove: delete this whole block ===== -->
+<style>
+.cc-ad-overlay{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(47,23,72,.6);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .25s;overflow:auto;-webkit-overflow-scrolling:touch}
+.cc-ad-overlay[hidden]{display:none}
+.cc-ad-overlay.is-open{opacity:1}
+.cc-ad-modal{position:relative;width:100%;max-width:380px;background:var(--cc-white);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(47,23,72,.4);transform:translateY(16px) scale(.98);transition:transform .25s}
+.cc-ad-overlay.is-open .cc-ad-modal{transform:translateY(0) scale(1)}
+.cc-ad-imgwrap{display:block;line-height:0}
+.cc-ad-imgwrap img{display:block;width:100%;height:auto}
+.cc-ad-cta{display:block;text-align:center;background:var(--cc-purple);color:var(--cc-cream);font-weight:700;font-size:16px;padding:15px 14px;text-decoration:none;font-family:inherit}
+.cc-ad-cta:hover{background:var(--cc-purple-700)}
+.cc-ad-x{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:34px;text-align:center;cursor:pointer;font-family:inherit;padding:0}
+</style>
+<div class="cc-ad-overlay" id="ccAd" hidden aria-hidden="true">
+  <div class="cc-ad-modal" role="dialog" aria-label="ورشة كيف تصنع راحتك المالية">
+    <button class="cc-ad-x" id="ccAdX" aria-label="إغلاق">✕</button>
+    <a class="cc-ad-imgwrap" href="courses/raha.html">
+      <img src="courses/img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية" width="1080" height="1350" loading="eager">
+    </a>
+    <a class="cc-ad-cta" href="courses/raha.html">احجز مقعدك في «راحتك المالية» ←</a>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='cc_ad_raha_seen';
+  try{ if(sessionStorage.getItem(KEY)) return; }catch(e){}
+  var ov=document.getElementById('ccAd'); if(!ov) return;
+  var x=document.getElementById('ccAdX');
+  function seen(){ try{ sessionStorage.setItem(KEY,'1'); }catch(e){} }
+  function open(){ ov.hidden=false; ov.setAttribute('aria-hidden','false'); void ov.offsetWidth; ov.classList.add('is-open'); document.body.style.overflow='hidden'; seen(); }
+  function close(){ ov.classList.remove('is-open'); ov.setAttribute('aria-hidden','true'); document.body.style.overflow=''; setTimeout(function(){ ov.hidden=true; }, 260); }
+  setTimeout(open, 700);
+  x.addEventListener('click', close);
+  ov.addEventListener('click', function(e){ if(e.target===ov) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !ov.hidden) close(); });
+})();
+</script>
 </body>
 </html>
