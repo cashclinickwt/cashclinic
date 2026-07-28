@@ -52,6 +52,9 @@
   .flt button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
   .view-btn{padding:6px 14px;border:1.5px solid var(--auber);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--auber);white-space:nowrap}
   .view-btn:hover{background:var(--auber);color:#fff}
+  .report-links{display:flex;flex-wrap:wrap;gap:12px}
+  .report-btn{display:inline-flex;align-items:center;gap:8px;background:var(--auber);color:#fff;font-weight:700;font-size:15px;padding:14px 24px;border-radius:14px;text-decoration:none;font-family:inherit}
+  .report-btn:hover{filter:brightness(1.12)}
   /* modal */
   .ovl{position:fixed;inset:0;background:rgba(47,23,72,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
   .ovl.on{display:flex}
@@ -99,6 +102,14 @@
   <div class="top">
     <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span></div>
     <button class="lo" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+
+  <div class="sec" id="reportsSec" hidden>
+    <h2><span></span> أنظمة التقارير</h2>
+    <div class="report-links">
+      <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
+      <a class="report-btn" id="rptNas" href="https://cashclinickw.github.io/cashclinicslides/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير اللجنة الخيرية ←</a>
+    </div>
   </div>
 
   <div class="sec">
@@ -181,6 +192,10 @@ onAuthStateChanged(auth, async (user)=>{
   try{
     const r=await getDashboard(); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
+    var _rl=DATA.role;
+    if(_rl==="riyada"||_rl==="all") $("#rptRiyada").hidden=false;
+    if(_rl==="personal"||_rl==="all") $("#rptNas").hidden=false;
+    if(!$("#rptRiyada").hidden||!$("#rptNas").hidden) $("#reportsSec").hidden=false;
     render();
   }catch(e){
     const msg=(e&&e.message)||"تعذّر تحميل البيانات";
