@@ -470,14 +470,11 @@
 </div>
 <script>
 (function(){
-  var KEY='cc_ad_raha_seen';
-  try{ if(sessionStorage.getItem(KEY)) return; }catch(e){}
   var ov=document.getElementById('ccAd'); if(!ov) return;
   var x=document.getElementById('ccAdX');
-  function seen(){ try{ sessionStorage.setItem(KEY,'1'); }catch(e){} }
-  function open(){ ov.hidden=false; ov.setAttribute('aria-hidden','false'); void ov.offsetWidth; ov.classList.add('is-open'); document.body.style.overflow='hidden'; seen(); }
+  function open(){ ov.hidden=false; ov.setAttribute('aria-hidden','false'); void ov.offsetWidth; ov.classList.add('is-open'); document.body.style.overflow='hidden'; }
   function close(){ ov.classList.remove('is-open'); ov.setAttribute('aria-hidden','true'); document.body.style.overflow=''; setTimeout(function(){ ov.hidden=true; }, 260); }
-  setTimeout(open, 700);
+  open();
   x.addEventListener('click', close);
   ov.addEventListener('click', function(e){ if(e.target===ov) close(); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !ov.hidden) close(); });
