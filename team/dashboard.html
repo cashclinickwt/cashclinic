@@ -133,6 +133,12 @@
     <div class="kpis" id="courseKpis"></div>
     <div class="tbl" id="courseTbl"></div>
   </div>
+
+  <div class="sec" id="eventsSec" hidden>
+    <h2><span></span> تسجيلات اللقاء</h2>
+    <div class="kpis" id="eventKpis"></div>
+    <div class="tbl" id="eventTbl"></div>
+  </div>
 </div></div>
 
 <script type="module">
@@ -215,7 +221,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
 /* ---------- render ---------- */
-function render(){ renderSales(); renderQuiz(); renderCourses(); }
+function render(){ renderSales(); renderQuiz(); renderCourses(); renderEvents(); }
 
 function renderSales(){
   const S=DATA.sales;
@@ -255,6 +261,23 @@ function renderCourses(){
       <td>${esc(r.program)}</td>
       <td><span class="badge" style="background:${r.mode==="onsite"?"#505632":"#2F8789"}">${r.mode==="onsite"?"حضوري":"أونلاين"}</span></td>
       <td class="num">${money(r.amount)}</td>
+      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+
+function renderEvents(){
+  const E = DATA.events;
+  const sec = $("#eventsSec");
+  if(!E || !E.regs || !E.regs.length){ if(sec) sec.hidden=true; return; }
+  sec.hidden=false;
+  const t=E.totals||{};
+  $("#eventKpis").innerHTML=`
+    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي المسجّلين</div></div>`;
+  $("#eventTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>الاسم</th><th>هل هو؟</th><th>الهدف من التسجيل</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+    E.regs.map(r=>`<tr>
+      <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
+      <td>${esc(r.audience)||"—"}</td>
+      <td style="white-space:normal;max-width:260px">${esc(r.goal)||"—"}</td>
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
