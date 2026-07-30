@@ -194,3 +194,13 @@ html[data-lang="en"] .cc-arrow-cta:hover .cc-arrow{transform:translateX(6px);}
   .cc-cl-logo{margin-inline:auto;}
   .cc-cl-lede{margin-inline:auto;}
 }
+
+
+/* social icons (IG / TikTok) */
+.cc-social-row{display:inline-flex;align-items:center;gap:8px}
+.cc-social{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--cc-grey-200,#E4E1EA);color:var(--cc-purple,#2F1748);flex:0 0 auto;transition:background .15s,color .15s,border-color .15s}
+.cc-social:hover{background:var(--cc-purple,#2F1748);color:#fff;border-color:var(--cc-purple,#2F1748)}
+.cc-social svg{width:19px;height:19px;display:block}
+.cc-social-f{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,231,188,.28);color:var(--cc-cream,#FFE7BC);transition:background .15s,color .15s}
+.cc-social-f:hover{background:var(--cc-cream,#FFE7BC);color:var(--cc-ink,#2F1748)}
+.cc-social-f svg{width:17px;height:17px;display:block}

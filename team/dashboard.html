@@ -94,6 +94,15 @@
   .cmp-status.info{display:block;background:var(--bg);color:var(--muted)}
   .cmp-send{width:100%;justify-content:center;border:0;cursor:pointer}
   .cmp-send:disabled{opacity:.65;cursor:default}
+  /* section tabs */
+  .tabs{position:sticky;top:0;z-index:30;display:flex;gap:8px;overflow-x:auto;background:var(--bg);padding:12px 0 12px;margin:2px 0 18px;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:9px 17px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+  .tabs button:hover{border-color:var(--auber)}
+  .tabs button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
+  .tabs button[hidden]{display:none}
+  .sec[data-panel]{display:none}
+  .sec[data-panel].pon{display:block}
 </style>
 </head>
 <body>
@@ -121,7 +130,16 @@
     <button class="lo" id="logoutBtn">تسجيل الخروج</button>
   </div>
 
-  <div class="sec" id="reportsSec" hidden>
+  <nav class="tabs" id="dashTabs">
+    <button data-tab="sales" class="on">المبيعات</button>
+    <button data-tab="quiz">الاختبارات</button>
+    <button data-tab="events">تسجيلات اللقاء</button>
+    <button data-tab="courses">الدورات</button>
+    <button data-tab="composer">مراسلة العملاء</button>
+    <button data-tab="reports">التقارير</button>
+  </nav>
+
+  <div class="sec" id="reportsSec" data-panel="reports" hidden>
     <h2><span></span> أنظمة التقارير</h2>
     <div class="report-links">
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
@@ -129,12 +147,12 @@
     </div>
   </div>
 
-  <div class="sec">
+  <div class="sec" id="composerSec" data-panel="composer">
     <h2><span></span> مراسلة العملاء</h2>
     <button class="report-btn" id="openComposer">✉️ إنشاء رسالة جديدة</button>
   </div>
 
-  <div class="sec">
+  <div class="sec" id="salesSec" data-panel="sales">
     <h2><span></span> المبيعات</h2>
     <div class="flt" id="salesFlt">
       <button data-f="all" class="on">الكل</button>
@@ -144,19 +162,19 @@
     <div class="tbl" id="salesTbl"></div>
   </div>
 
-  <div class="sec">
+  <div class="sec" id="quizSec" data-panel="quiz">
     <h2><span></span> نتائج الاختبارات</h2>
     <div class="kpis" id="quizKpis"></div>
     <div class="tbl" id="quizTbl"></div>
   </div>
 
-  <div class="sec" id="coursesSec" hidden>
+  <div class="sec" id="coursesSec" data-panel="courses" hidden>
     <h2><span></span> تسجيلات الدورات</h2>
     <div class="kpis" id="courseKpis"></div>
     <div class="tbl" id="courseTbl"></div>
   </div>
 
-  <div class="sec" id="eventsSec" hidden>
+  <div class="sec" id="eventsSec" data-panel="events" hidden>
     <h2><span></span> تسجيلات اللقاء</h2>
     <div class="kpis" id="eventKpis"></div>
     <div class="tbl" id="eventTbl"></div>
@@ -244,7 +262,33 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
 /* ---------- render ---------- */
-function render(){ renderSales(); renderQuiz(); renderCourses(); renderEvents(); }
+function render(){ renderSales(); renderQuiz(); renderCourses(); renderEvents(); syncTabs(); }
+
+/* ---------- section tabs ---------- */
+const PANEL_ORDER=["sales","quiz","events","courses","composer","reports"];
+let ACTIVE_PANEL=null;
+function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
+function panelAvailable(k){
+  const el=panelEl(k); if(!el) return false;
+  if(k==="reports"||k==="courses"||k==="events") return !el.hidden;
+  return true;
+}
+function showPanel(k){
+  if(!panelAvailable(k)) return;
+  document.querySelectorAll('.sec[data-panel]').forEach(s=>s.classList.remove("pon"));
+  document.querySelectorAll('#dashTabs button').forEach(b=>b.classList.remove("on"));
+  const el=panelEl(k); if(el) el.classList.add("pon");
+  const tab=document.querySelector('#dashTabs button[data-tab="'+k+'"]'); if(tab) tab.classList.add("on");
+  ACTIVE_PANEL=k;
+}
+function syncTabs(){
+  document.querySelectorAll('#dashTabs button').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
+  if(!ACTIVE_PANEL || !panelAvailable(ACTIVE_PANEL)) ACTIVE_PANEL = PANEL_ORDER.find(panelAvailable) || "sales";
+  showPanel(ACTIVE_PANEL);
+}
+document.querySelectorAll('#dashTabs button').forEach(b=>b.addEventListener("click",()=>{
+  showPanel(b.dataset.tab); window.scrollTo({top:0,behavior:"smooth"});
+}));
 
 function renderSales(){
   const S=DATA.sales;
