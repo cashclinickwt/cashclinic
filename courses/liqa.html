@@ -54,9 +54,10 @@
   .crs-fld input,.crs-fld select,.crs-fld textarea{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
   .crs-fld textarea{min-height:92px;resize:vertical;line-height:1.7}
   .crs-fld input:focus,.crs-fld select:focus,.crs-fld textarea:focus{outline:0;border-color:var(--cc-purple)}
-  .crs-phone{display:flex;gap:8px;direction:ltr}
-  .crs-phone select{flex:0 0 auto;max-width:46%;padding:13px 8px;font-size:14px}
-  .crs-phone input{flex:1 1 auto;width:auto}
+  .crs-phone{display:flex;gap:0;direction:ltr;border:2px solid var(--cc-grey-200);border-radius:12px;background:var(--cc-white);overflow:hidden}
+  .crs-phone:focus-within{border-color:var(--cc-purple)}
+  .crs-phone select{flex:0 0 auto;max-width:46%;padding:13px 8px;font-size:14px;border:0;border-radius:0;border-right:2px solid var(--cc-grey-200);background:transparent}
+  .crs-phone input{flex:1 1 auto;width:auto;border:0;border-radius:0;background:transparent}
   .crs-pay{width:100%;margin-top:18px;padding:16px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
   .crs-pay:hover{filter:brightness(1.08)}
   .crs-pay:disabled{opacity:.7;cursor:default}
@@ -125,7 +126,7 @@
     <div class="crs-info">
       <div class="crs-icard">
         <div class="ic">🩺</div>
-        <h3>وش راح ناخذ؟</h3>
+        <h3>شنو راح ناخذ؟</h3>
         <p>أهم عناصر العلاج المالي، وكيف تبدأ خطواتك الأولى بطريقة عملية واضحة تناسب وضعك.</p>
       </div>
       <div class="crs-icard">
@@ -198,7 +199,7 @@
           </select>
         </div>
         <div class="crs-fld"><label>الهدف من التسجيل في اللقاء؟</label>
-          <textarea id="cGoal" placeholder="اكتب لنا باختصار وش تتمنى تطلع فيه من اللقاء…"></textarea>
+          <textarea id="cGoal" placeholder="اكتب لنا باختصار شنو تتمنى تطلع فيه من اللقاء…"></textarea>
         </div>
         <button class="crs-pay" id="regBtn">سجّل مجاناً</button>
         <div class="crs-err" id="regErr"></div>
