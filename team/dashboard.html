@@ -38,7 +38,9 @@
   .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
   .kpi .n{font-size:28px;font-weight:800;direction:ltr;text-align:right}
   .kpi .l{font-size:13px;color:var(--muted);margin-top:2px}
-  .tbl{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .tbl{background:#fff;border:1px solid var(--line);border-radius:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbl table{min-width:600px}
+  .tbl td.num{white-space:nowrap}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{padding:12px 14px;text-align:right;border-bottom:1px solid var(--line)}
   th{background:#FAF9FB;font-weight:600;color:var(--muted);font-size:13px}
@@ -103,6 +105,15 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* event category chart */
+  .echart{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+  .echart .donut{width:150px;height:150px;flex:0 0 auto}
+  .echart .lg{flex:1 1 220px;min-width:190px}
+  .echart .lg-row{display:flex;align-items:center;gap:10px;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .echart .lg-row:last-child{border-bottom:0}
+  .echart .sw{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
+  .echart .lg-row b{margin-inline-start:auto;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .echart .lg-row .pct{color:var(--muted);font-size:12.5px;min-width:40px;text-align:left;direction:ltr}
 </style>
 </head>
 <body>
@@ -177,6 +188,7 @@
   <div class="sec" id="eventsSec" data-panel="events" hidden>
     <h2><span></span> تسجيلات اللقاء</h2>
     <div class="kpis" id="eventKpis"></div>
+    <div id="eventChart"></div>
     <div class="tbl" id="eventTbl"></div>
   </div>
 </div></div>
@@ -339,6 +351,7 @@ function renderEvents(){
   const t=E.totals||{};
   $("#eventKpis").innerHTML=`
     <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي المسجّلين</div></div>`;
+  renderEventChart(E.regs);
   $("#eventTbl").innerHTML=`<table><thead><tr>
       <th>التاريخ</th><th>الاسم</th><th>هل هو؟</th><th>الهدف من التسجيل</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
     E.regs.map(r=>`<tr>
@@ -348,6 +361,26 @@ function renderEvents(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
+const AUD_COLORS={"عميل جديد":"#2A898C","عميل سابق من استشارات":"#614588","عميل سابق من دورات":"#D3A146","عميل سابق حاصل على الكتيّب المالي":"#505632"};
+const AUD_FALLBACK=["#962E37","#7E8455","#3EADAD","#B35661","#515732"];
+function renderEventChart(regs){
+  const box=$("#eventChart"); if(!box) return;
+  const counts={};
+  (regs||[]).forEach(r=>{ const a=((r.audience||"").trim())||"غير محدد"; counts[a]=(counts[a]||0)+1; });
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((n,e)=>n+e[1],0);
+  if(!total){ box.innerHTML=""; return; }
+  let fi=0;
+  const segs=entries.map(([label,n])=>({label,n,pct:n/total*100,color:AUD_COLORS[label]||AUD_FALLBACK[(fi++)%AUD_FALLBACK.length]}));
+  let cum=0;
+  const circles=segs.map(s=>{
+    const dash=s.pct.toFixed(2)+" "+(100-s.pct).toFixed(2);
+    const off=(25-cum).toFixed(2); cum+=s.pct;
+    return `<circle cx="21" cy="21" r="15.915" fill="none" stroke="${s.color}" stroke-width="5.2" stroke-dasharray="${dash}" stroke-dashoffset="${off}"/>`;
+  }).join("");
+  const legend=segs.map(s=>`<div class="lg-row"><span class="sw" style="background:${s.color}"></span><span>${esc(s.label)}</span><b>${fmt(s.n)}</b><span class="pct">${Math.round(s.pct)}%</span></div>`).join("");
+  box.innerHTML=`<div class="echart"><svg class="donut" viewBox="0 0 42 42" role="img" aria-label="توزيع المسجّلين حسب الفئة"><circle cx="21" cy="21" r="15.915" fill="none" stroke="#EFEDF3" stroke-width="5.2"/>${circles}<text x="21" y="20.4" text-anchor="middle" font-size="7" font-weight="700" fill="#2F1748">${fmt(total)}</text><text x="21" y="26" text-anchor="middle" font-size="3.4" fill="#6B6577">مسجّل</text></svg><div class="lg">${legend}</div></div>`;
+}
 const RESULT_META = {"abundance-quiz": {"order": ["mindset", "discipline", "resilience", "growth"], "dims": {"mindset": "العقلية المالية", "discipline": "الانضباط السلوكي", "resilience": "المرونة المالية", "growth": "الاستعداد للنمو"}, "B1": 50, "B2": 75, "bands": ["منخفض", "متوسط", "ممتاز"], "diag": {"high": "تشخيصك يبين أنك بنيت أساس قوي، عندك وعي مالي جيد وتتابع مصروفاتك وتتصرف بحكمة في أغلب المواقف. الفرصة الآن أنك تطور نظام موحد يربط بين أهدافك واحتياجاتك الفعلية، وتنقل نفسك من الاستقرار للوفرة. كل خطوة صغيرة تسويها الآن بتختصر عليك سنوات من التخبط لاحقا.", "mid": "تشخيصك يبين أنك بنيت أساس لا بأس فيه، عندك وعي مالي في جوانب وتحتاج تشتغل على جوانب ثانية. عندك نقاط قوة واضحة ونقاط تحتاج تطوير. معالجة أهم جانبين أو ثلاثة بتنقلك نقلة كبيرة نحو الوفرة.", "low": "تشخيصك يبين أنك في مرحلة تحتاج تبني فيها أساس مالي أوضح. لا تخاف من الأرقام، معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على جانب واحد في كل مرة وابدأ من وعيك بمصاريفك."}}, "riyada-quiz": {"order": ["cash", "pricing", "sales", "product", "ops", "strategy"], "dims": {"cash": "الكاش والمالية", "pricing": "التسعير", "sales": "المبيعات والتسويق", "product": "المنتج أو الخدمة", "ops": "العمليات والتشغيل", "strategy": "الاستراتيجية والنمو"}, "B1": 40, "B2": 70, "bands": ["ضعيف", "متوسط", "جيد"], "diag": {"low": "تشخيص مشروعك يبين إنه في مرحلة تحتاج تدخل سريع: في محاور أساسية فيها تسريبات تأثر على استقرار كاش مشروعك. لا تخاف من الأرقام، الخبر الزين إن معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على محور واحد في كل مرة وابدأ من الكاش.", "mid": "تشخيص مشروعك يبين إنك بنيت أساس لا بأس فيه، بس في محاور تحتاج تشتغل عليها عشان تثبت وتكبر. عندك نقاط قوة واضحة ونقاط فيها تسريبات تأثر على كاش مشروعك. معالجة أهم محورين أو ثلاثة بتنقلك نقلة كبيرة.", "high": "تشخيص مشروعك يبين إنه في وضع صحي وقوي: عندك أساس متين في أغلب المحاور، وتشتغل بأرقام وأنظمة مو بس بالإحساس. الفرصة الحين إنك تنتقل من الاستقرار للنمو المتسارع، وتبني على نقاط قوتك عشان توسع بثقة."}}};
 function bandFor(src, ov){ const m=RESULT_META[src]; if(!m) return ""; return ov>=m.B2?m.bands[2] : ov>=m.B1?m.bands[1] : m.bands[0]; }
 function diagFor(src, ov){ const m=RESULT_META[src]; if(!m) return ""; const lvl = ov>=m.B2?"high" : ov>=m.B1?"mid" : "low"; return (m.diag&&m.diag[lvl])||""; }
@@ -391,7 +424,7 @@ function cClose(){ $("#cOvl").classList.remove("on"); }
 window.cClose=cClose;
 const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",single:"إيميل عميل محدد"};
 $("#openComposer") && $("#openComposer").addEventListener("click", cOpen);
-$("#cmpAud") && $("#cmpAud").addEventListener("change", ()=>{ $("#cmpSingleWrap").style.display = $("#cmpAud").value==="single" ? "block" : "none"; });
+$("#cmpAud") && $("#cmpAud").addEventListener("change", ()=>{ const _sg=$("#cmpAud").value==="single"; $("#cmpSingleWrap").style.display=_sg?"block":"none"; if($("#cmpDateWrap")) $("#cmpDateWrap").style.display=_sg?"none":"block"; });
 function cStat(kind,msg){ const st=$("#cmpStatus"); st.className="cmp-status "+kind; st.textContent=msg; }
 function readB64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=rej; r.readAsDataURL(file); }); }
 $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
@@ -410,7 +443,9 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
   try{
     const attachments=[];
     for(const f of files){ attachments.push({ filename:f.name, contentType:f.type||"application/octet-stream", contentBase64: await readB64(f) }); }
-    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, attachments });
+    const dateFrom=($("#cmpFrom")&&$("#cmpFrom").value)||"";
+    const dateTo=($("#cmpTo")&&$("#cmpTo").value)||"";
+    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, attachments, dateFrom, dateTo });
     const d=(r&&r.data)||{};
     cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":""));
   }catch(e){ cStat("err",(e&&e.message)||"صار خطأ، حاول مرة ثانية"); }
@@ -456,6 +491,13 @@ function renderQuiz(){
       </div>
       <div class="cmp-fld" id="cmpSingleWrap" style="display:none"><label>إيميل العميل</label>
         <input id="cmpSingle" type="email" placeholder="customer@email.com" style="direction:ltr;text-align:right">
+      </div>
+      <div class="cmp-fld" id="cmpDateWrap"><label>الفترة (اختياري)</label>
+        <div style="display:flex;gap:10px">
+          <input id="cmpFrom" type="date" style="flex:1" aria-label="من تاريخ">
+          <input id="cmpTo" type="date" style="flex:1" aria-label="إلى تاريخ">
+        </div>
+        <div class="cmp-hint">مثال: من 2026-07-10 إلى اليوم. اتركها فارغة للكل.</div>
       </div>
       <div class="cmp-fld"><label>عنوان الرسالة</label>
         <input id="cmpSubj" type="text" placeholder="مثال: دعوة خاصة من كاش كلينك">
