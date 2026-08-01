@@ -169,12 +169,14 @@
       <button data-f="all" class="on">الكل</button>
       <button data-f="month">هذا الشهر</button>
     </div>
+    <div class="flt" id="bookFlt" style="display:none"></div>
     <div class="kpis" id="salesKpis"></div>
     <div class="tbl" id="salesTbl"></div>
   </div>
 
   <div class="sec" id="quizSec" data-panel="quiz">
     <h2><span></span> نتائج الاختبارات</h2>
+    <div class="flt" id="quizFlt"></div>
     <div class="kpis" id="quizKpis"></div>
     <div class="tbl" id="quizTbl"></div>
   </div>
@@ -212,7 +214,7 @@ const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendC
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
-let DATA=null, SFILTER="all";
+let DATA=null, SFILTER="all", QFILTER="all", BFILTER="all";
 
 const fmt=n=>Number(n||0).toLocaleString("en-US");
 const money=n=>fmt(n)+" د.ك";
@@ -270,11 +272,37 @@ document.querySelectorAll("#salesFlt button").forEach(b=>b.addEventListener("cli
   document.querySelectorAll("#salesFlt button").forEach(x=>x.classList.toggle("on",x===b));
   renderSales();
 }));
+$("#quizFlt") && $("#quizFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  QFILTER=b.dataset.q; $("#quizFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderQuiz(); });
+$("#bookFlt") && $("#bookFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  BFILTER=b.dataset.b; $("#bookFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderSales(); });
+function buildFilters(){
+  const QUIZ_SHORT={"abundance-quiz":"كاش ناس","riyada-quiz":"كاش ريادة"};
+  const qf=$("#quizFlt");
+  if(qf){ const qs=(DATA.quiz&&DATA.quiz.byQuiz)||[];
+    if(qs.length>1){ qf.style.display="inline-flex";
+      qf.innerHTML=`<button data-q="all" class="${QFILTER==="all"?"on":""}">الكل</button>`+
+        qs.map(q=>`<button data-q="${esc(q.source)}" class="${QFILTER===q.source?"on":""}">${esc(QUIZ_SHORT[q.source]||q.title||q.source)}</button>`).join("");
+    } else { qf.style.display="none"; QFILTER="all"; } }
+  const bf=$("#bookFlt");
+  if(bf){ const bp=(DATA.sales&&DATA.sales.byProduct)||[];
+    if(bp.length>1){ bf.style.display="flex";
+      bf.innerHTML=`<button data-b="all" class="${BFILTER==="all"?"on":""}">الكل</button>`+
+        bp.map(p=>`<button data-b="${esc(p.productKey)}" class="${BFILTER===p.productKey?"on":""}">${esc(p.product)}</button>`).join("");
+    } else { bf.style.display="none"; BFILTER="all"; } }
+  const qsel=$("#cmpQuizSel");
+  if(qsel){ const qs=(DATA.quiz&&DATA.quiz.byQuiz)||[];
+    qsel.innerHTML=`<option value="">كل الاختبارات</option>`+qs.map(q=>`<option value="${esc(q.source)}">${esc(QUIZ_SHORT[q.source]||q.title||q.source)}</option>`).join(""); }
+  const bsel=$("#cmpBookSel");
+  if(bsel){ const bp=(DATA.sales&&DATA.sales.byProduct)||[];
+    bsel.innerHTML=`<option value="">كل الكتب</option>`+bp.map(p=>`<option value="${esc(p.productKey)}">${esc(p.product)}</option>`).join(""); }
+  if(typeof cmpSyncAud==="function") cmpSyncAud();
+}
 function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date();
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
 /* ---------- render ---------- */
-function render(){ renderSales(); renderQuiz(); renderCourses(); renderEvents(); syncTabs(); }
+function render(){ buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); syncTabs(); }
 
 /* ---------- section tabs ---------- */
 const PANEL_ORDER=["sales","quiz","events","courses","composer","reports"];
@@ -306,6 +334,7 @@ function renderSales(){
   const S=DATA.sales;
   let orders=S.orders.slice();
   if(SFILTER==="month") orders=orders.filter(o=>inThisMonth(o.when));
+  if(BFILTER!=="all") orders=orders.filter(o=>o.productKey===BFILTER);
   const rev=orders.reduce((a,o)=>a+Number(o.amount||0),0);
   $("#salesKpis").innerHTML=`
     <div class="kpi"><div class="n">${money(rev)}</div><div class="l">إجمالي الإيرادات</div></div>
@@ -424,7 +453,15 @@ function cClose(){ $("#cOvl").classList.remove("on"); }
 window.cClose=cClose;
 const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",single:"إيميل عميل محدد"};
 $("#openComposer") && $("#openComposer").addEventListener("click", cOpen);
-$("#cmpAud") && $("#cmpAud").addEventListener("change", ()=>{ const _sg=$("#cmpAud").value==="single"; $("#cmpSingleWrap").style.display=_sg?"block":"none"; if($("#cmpDateWrap")) $("#cmpDateWrap").style.display=_sg?"none":"block"; });
+$("#cmpAud") && $("#cmpAud").addEventListener("change", cmpSyncAud);
+function cmpSyncAud(){ const v=($("#cmpAud")&&$("#cmpAud").value)||"quiz"; const _sg=v==="single";
+  if($("#cmpSingleWrap")) $("#cmpSingleWrap").style.display=_sg?"block":"none";
+  if($("#cmpDateWrap")) $("#cmpDateWrap").style.display=_sg?"none":"block";
+  const nQ=(DATA&&DATA.quiz&&DATA.quiz.byQuiz&&DATA.quiz.byQuiz.length)||0;
+  const nB=(DATA&&DATA.sales&&DATA.sales.byProduct&&DATA.sales.byProduct.length)||0;
+  if($("#cmpQuizWrap")) $("#cmpQuizWrap").style.display=(v==="quiz"&&nQ>1)?"block":"none";
+  if($("#cmpBookWrap")) $("#cmpBookWrap").style.display=(v==="book"&&nB>1)?"block":"none";
+}
 function cStat(kind,msg){ const st=$("#cmpStatus"); st.className="cmp-status "+kind; st.textContent=msg; }
 function readB64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=rej; r.readAsDataURL(file); }); }
 $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
@@ -443,9 +480,12 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
   try{
     const attachments=[];
     for(const f of files){ attachments.push({ filename:f.name, contentType:f.type||"application/octet-stream", contentBase64: await readB64(f) }); }
-    const dateFrom=($("#cmpFrom")&&$("#cmpFrom").value)||"";
-    const dateTo=($("#cmpTo")&&$("#cmpTo").value)||"";
-    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, attachments, dateFrom, dateTo });
+    let dateFrom=($("#cmpFrom")&&$("#cmpFrom").value)||"";
+    let dateTo=($("#cmpTo")&&$("#cmpTo").value)||"";
+    if(dateFrom && dateTo && dateFrom>dateTo){ const t=dateFrom; dateFrom=dateTo; dateTo=t; }
+    const quizSource=(audience==="quiz" && $("#cmpQuizSel")) ? $("#cmpQuizSel").value : "";
+    const bookKey=(audience==="book" && $("#cmpBookSel")) ? $("#cmpBookSel").value : "";
+    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, attachments, dateFrom, dateTo, quizSource, bookKey });
     const d=(r&&r.data)||{};
     cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":""));
   }catch(e){ cStat("err",(e&&e.message)||"صار خطأ، حاول مرة ثانية"); }
@@ -459,9 +499,11 @@ function renderQuiz(){
     Q.byQuiz.map(q=>`<div class="kpi"><div class="n">${fmt(q.count)}</div><div class="l">${esc(q.title||q.source)}</div></div>`).join("");
   if(!Q.leads.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بعد</div>`; return; }
   const multi=DATA.scope.length>1;
+  const rows=Q.leads.map((l,i)=>({l,i})).filter(x=>QFILTER==="all"||x.l.source===QFILTER);
+  if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بهذا الاختبار</div>`; return; }
   $("#quizTbl").innerHTML=`<table><thead><tr>
       <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th><th></th></tr></thead><tbody>`+
-    Q.leads.map((l,i)=>`<tr>
+    rows.map(({l,i})=>`<tr>
       <td class="num">${dt(l.when)}</td><td>${esc(l.name)||"—"}</td>
       ${multi?`<td>${esc(l.quizTitle||l.source)}</td>`:""}
       <td class="num">${l.score!=null?l.score+"%":"—"}</td>
@@ -488,6 +530,12 @@ function renderQuiz(){
           <option value="single">إيميل عميل محدد</option>
         </select>
         <div class="cmp-hint">المستلمون يُحدَّدون حسب صلاحيتك تلقائياً.</div>
+      </div>
+      <div class="cmp-fld" id="cmpQuizWrap"><label>نوع الاختبار</label>
+        <select id="cmpQuizSel"><option value="">كل الاختبارات</option></select>
+      </div>
+      <div class="cmp-fld" id="cmpBookWrap" style="display:none"><label>نوع الكتاب</label>
+        <select id="cmpBookSel"><option value="">كل الكتب</option></select>
       </div>
       <div class="cmp-fld" id="cmpSingleWrap" style="display:none"><label>إيميل العميل</label>
         <input id="cmpSingle" type="email" placeholder="customer@email.com" style="direction:ltr;text-align:right">
