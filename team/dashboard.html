@@ -361,11 +361,11 @@ function renderSales(){
     S.byProduct.map(p=>`<div class="kpi"><div class="n">${money(p.revenue)}</div><div class="l">${esc(p.product)} · ${fmt(p.count)} طلب</div></div>`).join("");
   if(!orders.length){ $("#salesTbl").innerHTML=`<div class="empty">لا توجد طلبات بعد</div>`; return; }
   $("#salesTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th><th>الجوال</th></tr></thead><tbody>`+
+      <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
     orders.map(o=>`<tr>
       <td class="num">${dt(o.when)}</td><td>${esc(o.name)||"—"}</td>
       <td>${esc(o.product)}</td><td class="num">${money(o.amount)}</td>
-      <td class="num">${esc(o.phone)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+      <td class="num">${esc(o.phone)||"—"}</td><td class="num">${esc(o.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
 function renderCourses(){
