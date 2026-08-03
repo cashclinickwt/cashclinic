@@ -274,6 +274,22 @@
   </div>
 </section>
 
+<!-- NEWSLETTER -->
+<section id="newsletter" style="background:linear-gradient(140deg,var(--cc-cream),#FFF6E6);border-top:1px solid var(--cc-grey-200);">
+  <div class="cc-wrap" style="padding-top:60px;padding-bottom:60px;">
+    <div style="max-width:620px;margin:0 auto;text-align:center;">
+      <span class="cc-eyebrow" style="color:var(--cc-olive);" data-ar="النشرة المالية" data-en="Newsletter">النشرة المالية</span>
+      <h2 class="cc-h2" style="margin:8px 0 0;color:var(--cc-ink);" data-ar="تبي نصايح مالية توصلك أول بأول؟" data-en="Want financial tips first?">تبي نصايح مالية توصلك أول بأول؟</h2>
+      <p style="font-size:16.5px;line-height:1.8;color:var(--cc-grey-700);margin:14px auto 0;max-width:46ch;" data-ar="اشترك ويوصلك محتوى ونصايح من استشاريينا على بريدك." data-en="Subscribe and get content and tips from our consultants in your inbox.">اشترك ويوصلك محتوى ونصايح من استشاريينا على بريدك.</p>
+      <div id="nlForm" style="display:flex;gap:10px;max-width:470px;margin:26px auto 0;flex-wrap:wrap;">
+        <input id="nlEmail" type="email" inputmode="email" autocomplete="email" placeholder="بريدك الإلكتروني" style="flex:1 1 240px;min-width:0;border:2px solid var(--cc-grey-200);border-radius:999px;padding:14px 20px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);direction:ltr;text-align:right;">
+        <button id="nlBtn" type="button" style="flex:0 0 auto;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:16px;font-weight:700;font-family:inherit;padding:14px 34px;cursor:pointer;" data-ar="اشترك" data-en="Subscribe">اشترك</button>
+      </div>
+      <div id="nlMsg" style="display:none;margin:14px auto 0;font-size:14.5px;border-radius:12px;padding:11px 16px;max-width:470px;line-height:1.7;"></div>
+    </div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
 <section id="how" style="background:var(--cc-purple-050);margin-top:56px;">
   <div class="cc-wrap" style="padding-top:80px;padding-bottom:80px;">
@@ -479,6 +495,27 @@
   ov.addEventListener('click', function(e){ if(e.target===ov) close(); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !ov.hidden) close(); });
 })();
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const _nlFb={apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"};
+const _nlApp=initializeApp(_nlFb);
+const _subscribe=httpsCallable(getFunctions(_nlApp,"us-central1"),"subscribeNewsletter");
+const _nlQ=s=>document.querySelector(s);
+const nlBtn=_nlQ("#nlBtn"), nlEmail=_nlQ("#nlEmail"), nlMsg=_nlQ("#nlMsg");
+function nlShow(m,ok){ if(!nlMsg)return; nlMsg.textContent=m; nlMsg.style.display="block"; nlMsg.style.background=ok?"#E9F7EF":"#FDECEC"; nlMsg.style.color=ok?"#1B7A43":"#B02A37"; nlMsg.style.border="1px solid "+(ok?"#BDE5CB":"#F3C9C9"); }
+if(nlBtn){ nlBtn.addEventListener("click", async ()=>{
+  const email=(nlEmail.value||"").trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ nlShow("اكتب بريد إلكتروني صحيح", false); return; }
+  nlBtn.disabled=true; const t=nlBtn.textContent; nlBtn.textContent="جارٍ…";
+  try{
+    const r=await _subscribe({ email });
+    if(r && r.data && r.data.ok){ _nlQ("#nlForm").style.display="none"; nlShow(r.data.already?"إنت مشترك عندنا من قبل ✅":"تم اشتراكك بنجاح 🎉 بيوصلك كل جديد.", true); }
+    else nlShow("تعذّر الاشتراك، حاول مرة ثانية", false);
+  }catch(e){ nlShow((e&&e.message)||"صار خطأ، حاول مرة ثانية", false); }
+  finally{ nlBtn.disabled=false; nlBtn.textContent=t; }
+}); }
 </script>
 </body>
 </html>

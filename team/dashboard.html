@@ -145,6 +145,8 @@
     <button data-tab="sales" class="on">المبيعات</button>
     <button data-tab="quiz">الاختبارات</button>
     <button data-tab="events">تسجيلات اللقاء</button>
+    <button data-tab="subscribers">المشتركين بالنشرة</button>
+    <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="reports">التقارير</button>
@@ -192,6 +194,18 @@
     <div class="kpis" id="eventKpis"></div>
     <div id="eventChart"></div>
     <div class="tbl" id="eventTbl"></div>
+  </div>
+
+  <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
+    <h2><span></span> المشتركين بالنشرة</h2>
+    <div class="kpis" id="subKpis"></div>
+    <div class="tbl" id="subTbl"></div>
+  </div>
+
+  <div class="sec" id="bookqSec" data-panel="bookq" hidden>
+    <h2><span></span> أسئلة الكتاب</h2>
+    <div class="kpis" id="bqKpis"></div>
+    <div class="tbl" id="bqTbl"></div>
   </div>
 </div></div>
 
@@ -302,15 +316,20 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
 /* ---------- render ---------- */
-function render(){ buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); syncTabs(); }
+function render(){
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ();
+  const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
+  if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
+  syncTabs();
+}
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","quiz","events","courses","composer","reports"];
+const PANEL_ORDER=["sales","quiz","events","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
-  if(k==="reports"||k==="courses"||k==="events") return !el.hidden;
+  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq") return !el.hidden;
   return true;
 }
 function showPanel(k){
@@ -390,6 +409,36 @@ function renderEvents(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
+function renderSubscribers(){
+  const S = DATA.subscribers;
+  const sec = $("#subscribersSec");
+  if(!S || !S.list || !S.list.length){ if(sec) sec.hidden=true; return; }
+  sec.hidden=false;
+  const t=S.totals||{};
+  $("#subKpis").innerHTML=`
+    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي المشتركين</div></div>`;
+  $("#subTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>البريد الإلكتروني</th></tr></thead><tbody>`+
+    S.list.map(r=>`<tr>
+      <td class="num">${dt(r.when)}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+
+function renderBookQ(){
+  const B = DATA.bookQuestions;
+  const sec = $("#bookqSec");
+  if(!B || !B.list || !B.list.length){ if(sec) sec.hidden=true; return; }
+  sec.hidden=false;
+  const t=B.totals||{};
+  $("#bqKpis").innerHTML=`
+    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي الأسئلة</div></div>`;
+  $("#bqTbl").innerHTML=`<table><thead><tr>
+      <th>التاريخ</th><th>الاسم</th><th>الجوال</th><th>البريد</th><th>الأسئلة</th></tr></thead><tbody>`+
+    B.list.map(r=>`<tr>
+      <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
+      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
+      <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+}
+
 const AUD_COLORS={"عميل جديد":"#2A898C","عميل سابق من استشارات":"#614588","عميل سابق من دورات":"#D3A146","عميل سابق حاصل على الكتيّب المالي":"#505632"};
 const AUD_FALLBACK=["#962E37","#7E8455","#3EADAD","#B35661","#515732"];
 function renderEventChart(regs){
@@ -451,7 +500,7 @@ window.openResult=openResult; window.closeResult=closeResult;
 function cOpen(){ $("#cOvl").classList.add("on"); }
 function cClose(){ $("#cOvl").classList.remove("on"); }
 window.cClose=cClose;
-const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",single:"إيميل عميل محدد"};
+const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",subscribers:"المشتركين بالنشرة",single:"إيميل عميل محدد"};
 $("#openComposer") && $("#openComposer").addEventListener("click", cOpen);
 $("#cmpAud") && $("#cmpAud").addEventListener("change", cmpSyncAud);
 function cmpSyncAud(){ const v=($("#cmpAud")&&$("#cmpAud").value)||"quiz"; const _sg=v==="single";
@@ -527,6 +576,7 @@ function renderQuiz(){
           <option value="quiz">كل من سوّى اختبار</option>
           <option value="book">كل من اشترى كتاب</option>
           <option value="event">المسجّلين في اللقاء</option>
+          <option value="subscribers">المشتركين بالنشرة</option>
           <option value="single">إيميل عميل محدد</option>
         </select>
         <div class="cmp-hint">المستلمون يُحدَّدون حسب صلاحيتك تلقائياً.</div>
