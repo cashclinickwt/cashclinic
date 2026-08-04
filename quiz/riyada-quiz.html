@@ -516,7 +516,7 @@ function launchConfetti(){ try{
 }catch(e){} }
 
 /* gate */
-const _v={email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), phone:v=>v.replace(/\D/g,"").length>=7, name:v=>v.trim().length>=2};
+const _v={email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) && !(window.ccEmailSuggest && window.ccEmailSuggest(v)), phone:v=>v.replace(/\D/g,"").length>=7, name:v=>v.trim().length>=2};
 let _afterGate=null;
 function openGate(cb){ _afterGate=cb; document.getElementById("gate").classList.add("on"); }
 function _mark(id,ok){ document.getElementById(id).classList.toggle("bad",!ok); return ok; }
@@ -565,5 +565,6 @@ function startQuiz(){
 window.addEventListener("popstate",function(){ showLanding(); });
 
 </script>
+<script src="../assets/js/email-typo.js"></script>
 </body>
 </html>

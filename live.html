@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>اللقاء المباشر | Cash Clinic</title>
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="assets/ds/tokens/base.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<style>
+  body{background:var(--cc-purple-050);}
+
+  /* ---------- hero ---------- */
+  .lv-hero{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:44px 0 38px;position:relative;overflow:hidden}
+  .lv-hero .cc-wrap{position:relative;z-index:1}
+  .lv-hero .mark{position:absolute;inset-inline-end:-26px;bottom:-30px;width:150px;opacity:.12;z-index:0}
+  .lv-badge{display:inline-flex;align-items:center;gap:8px;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+  .lv-badge.on{background:#E23B3B;color:#fff}
+  .lv-badge .dot{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+  .lv-badge.on .dot{animation:lvpulse 1.4s infinite}
+  @keyframes lvpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .lv-hero h1{font-size:clamp(24px,3.6vw,36px);font-weight:300;line-height:1.35;margin:15px 0 0;color:#fff}
+  .lv-hero p.sub{font-size:16px;line-height:1.9;color:var(--cc-purple-100);margin:12px 0 0;max-width:58ch}
+
+  /* ---------- layout ---------- */
+  .lv-wrap{max-width:1120px;margin:-22px auto 60px;padding:0 18px;position:relative;z-index:2}
+  .lv-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:20px;align-items:start}
+  @media(max-width:900px){ .lv-grid{grid-template-columns:1fr} }
+
+  .lv-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:22px;padding:26px 24px;box-shadow:0 16px 44px rgba(47,23,72,.10)}
+  .lv-card h2{font-size:19px;font-weight:700;color:var(--cc-purple);margin:0 0 6px}
+  .lv-card .hint{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:0 0 18px}
+
+  /* ---------- gate ---------- */
+  #lvGate{max-width:520px;margin:0 auto}
+  .lv-fld{margin-bottom:14px}
+  .lv-fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
+  .lv-fld input{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);direction:ltr;text-align:right}
+  .lv-fld input:focus{outline:0;border-color:var(--cc-purple)}
+  .lv-btn{width:100%;padding:15px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:16.5px;font-weight:700;font-family:inherit;cursor:pointer}
+  .lv-btn:hover{filter:brightness(1.08)}
+  .lv-btn:disabled{opacity:.65;cursor:default}
+  .lv-err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:11px 14px;font-size:14px;margin-top:12px;text-align:center;line-height:1.7}
+  .lv-note{font-size:13px;color:var(--cc-grey-500);line-height:1.8;margin-top:14px;text-align:center}
+  .lv-note a{color:var(--cc-teal-700);font-weight:600}
+
+  /* ---------- stage ---------- */
+  #lvStage{display:none}
+  .lv-frame{position:relative;width:100%;aspect-ratio:16/9;background:#120A1C;border-radius:18px;overflow:hidden;border:1px solid var(--cc-grey-200)}
+  .lv-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .lv-hold{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--cc-purple-100);gap:10px}
+  .lv-hold .big{font-size:clamp(26px,5vw,44px);font-weight:800;color:#fff;direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:0}
+  .lv-hold .lbl{font-size:14.5px;line-height:1.8;max-width:38ch}
+  .lv-meet{text-align:center;padding:30px 20px}
+  .lv-meet .go{display:inline-block;background:var(--cc-teal);color:#fff;text-decoration:none;padding:16px 34px;border-radius:999px;font-size:17px;font-weight:700}
+  .lv-meet .go:hover{filter:brightness(1.08)}
+  .lv-meet p{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:14px auto 0;max-width:40ch}
+  .lv-who{font-size:14px;color:var(--cc-grey-700);margin:14px 0 0;text-align:center}
+  .lv-who b{color:var(--cc-purple)}
+
+  /* ---------- Q&A ---------- */
+  .qa-box{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+  .qa-box textarea{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:12px 13px;font-size:15px;font-family:inherit;color:var(--cc-ink);min-height:86px;resize:vertical;line-height:1.8}
+  .qa-box textarea:focus{outline:0;border-color:var(--cc-purple)}
+  .qa-send{border:0;border-radius:999px;background:var(--cc-teal);color:#fff;padding:12px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+  .qa-send:hover{filter:brightness(1.08)}
+  .qa-send:disabled{opacity:.6;cursor:default}
+  .qa-msg{display:none;font-size:13.5px;border-radius:10px;padding:9px 12px;line-height:1.7;text-align:center}
+  .qa-msg.ok{display:block;background:#E9F7EF;color:#1B7A43;border:1px solid #BDE5CB}
+  .qa-msg.bad{display:block;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9}
+  .qa-list{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow-y:auto;padding-inline-end:4px}
+  .qa-item{background:var(--cc-grey-050);border:1px solid var(--cc-grey-200);border-radius:14px;padding:12px 14px}
+  .qa-item .nm{font-size:12.5px;font-weight:700;color:var(--cc-purple);margin-bottom:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .qa-item .tx{font-size:14.5px;line-height:1.85;color:var(--cc-grey-900);white-space:pre-wrap;word-break:break-word}
+  .qa-tag{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px}
+  .qa-tag.wait{background:var(--cc-gold-100);color:var(--cc-gold-700)}
+  .qa-tag.done{background:var(--cc-teal-100);color:var(--cc-teal-700)}
+  .qa-empty{text-align:center;color:var(--cc-grey-500);font-size:14px;padding:26px 10px;line-height:1.8}
+  .qa-lock{background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:12px;padding:12px 14px;font-size:13.5px;color:var(--cc-grey-700);line-height:1.8;text-align:center;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="index.html"><img src="brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820" style="font-size:15px;padding:11px 20px;">
+      <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+      <span>استفسار</span>
+    </a>
+  </div>
+</header>
+
+<section class="lv-hero">
+  <div class="cc-wrap">
+    <span class="lv-badge" id="lvBadge"><span class="dot"></span><span id="lvBadgeTxt">اللقاء</span></span>
+    <h1 id="lvTitle">لقاء العلاج المالي مع Cash Clinic</h1>
+    <p class="sub" id="lvSub">صفحة اللقاء المباشر. ادخل بنفس الإيميل اللي سجّلت فيه، ويفتح لك البث وخانة الأسئلة.</p>
+  </div>
+  <img class="mark" src="brand/mark/mark-cream.png" alt="">
+</section>
+
+<div class="lv-wrap">
+
+  <!-- ============ GATE ============ -->
+  <div class="lv-card" id="lvGate">
+    <h2>ادخل للّقاء</h2>
+    <p class="hint">اكتب الإيميل اللي سجّلت فيه باللقاء. هذي الصفحة خاصة بالمسجّلين فقط.</p>
+    <div class="lv-fld">
+      <label>الإيميل</label>
+      <input id="lvEmail" type="email" inputmode="email" autocomplete="email" placeholder="example@email.com">
+    </div>
+    <button class="lv-btn" id="lvGo" type="button">ادخل</button>
+    <div class="lv-err" id="lvErr"></div>
+    <p class="lv-note">ما سجّلت باللقاء بعد؟ <a href="courses/liqa.html">سجّل من هنا</a></p>
+  </div>
+
+  <!-- ============ STAGE ============ -->
+  <div id="lvStage">
+    <div class="lv-grid">
+
+      <!-- player -->
+      <div class="lv-card" style="padding:20px">
+        <div class="lv-frame" id="lvFrame">
+          <div class="lv-hold" id="lvHold">
+            <div class="big" id="lvCount">--:--:--</div>
+            <div class="lbl" id="lvHoldTxt">اللقاء ما بدأ بعد. خلّ الصفحة مفتوحة، والبث بيشتغل هني تلقائياً بأول ما نبدأ.</div>
+          </div>
+        </div>
+        <div class="lv-meet" id="lvMeet" style="display:none">
+          <a class="go" id="lvMeetGo" href="#" target="_blank" rel="noopener">ادخل اللقاء الآن</a>
+          <p>البث يفتح بتطبيق Google Meet بنافذة جديدة. خلّ هذي الصفحة مفتوحة عشان ترسل أسئلتك وتشوف الأجوبة.</p>
+        </div>
+        <p class="lv-who">أهلاً <b id="lvName">بك</b> · دخولك مسجّل</p>
+      </div>
+
+      <!-- Q&A -->
+      <div class="lv-card">
+        <h2>أسئلتك</h2>
+        <p class="hint" id="lvQaHint">اكتب سؤالك وبيوصل لغالية مباشرة. الأسئلة تنعرض بعد المراجعة.</p>
+
+        <div class="qa-lock" id="lvQaLock" style="display:none">
+          انتهى اللقاء والأسئلة مقفلة. تقدر تقرأ الأسئلة والأجوبة تحت.
+        </div>
+
+        <div class="qa-box" id="lvQaBox">
+          <textarea id="lvQ" maxlength="700" placeholder="اكتب سؤالك هني…"></textarea>
+          <button class="qa-send" id="lvQBtn" type="button">أرسل السؤال</button>
+          <div class="qa-msg" id="lvQMsg"></div>
+        </div>
+
+        <div class="qa-list" id="lvQaList">
+          <div class="qa-empty">ما في أسئلة معروضة بعد. كن أول من يسأل.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/email-typo.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+
+const app  = initializeApp(CONFIG.firebase);
+const fns  = getFunctions(app, CONFIG.functionsRegion);
+const getLiveAccess   = httpsCallable(fns,"getLiveAccess");
+const livePoll        = httpsCallable(fns,"livePoll");
+const askLiveQuestion = httpsCallable(fns,"askLiveQuestion");
+
+const EVENT_ID = "liqa";
+const KEY      = "cc_live_email_" + EVENT_ID;
+const $ = s => document.querySelector(s);
+const esc = t => String(t||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let ME    = { email:"", name:"" };
+let CFG   = { mode:"youtube", videoId:"", meetUrl:"", state:"soon", startAt:0, title:"" };
+let MINE  = [];               // my own pending questions, shown locally until approved
+let mounted = "";             // what the player is currently showing
+let timer = null, poller = null;
+
+/* ---------------- gate ---------------- */
+$("#lvGo").addEventListener("click", enter);
+$("#lvEmail").addEventListener("keydown", e => { if(e.key==="Enter") enter(); });
+
+async function enter(){
+  const err = $("#lvErr"); err.style.display="none";
+  const email = ($("#lvEmail").value||"").trim();
+  if(!email) return fail("اكتب إيميلك");
+
+  const guess = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
+  if(guess) return fail("تأكد من إيميلك، هل تقصد " + guess + "؟");
+
+  $("#lvGo").disabled=true; $("#lvGo").textContent="لحظة…";
+  try{
+    const r = await getLiveAccess({ eventId:EVENT_ID, email });
+    const d = r.data || {};
+    ME = { email, name: d.name || "" };
+    try{ localStorage.setItem(KEY, email); }catch(e){}
+    applyConfig(d);
+    $("#lvName").textContent = ME.name || "بك";
+    $("#lvGate").style.display="none";
+    $("#lvStage").style.display="block";
+    startLoops();
+  }catch(e){
+    fail((e && e.message) || "تعذّر الدخول، حاول مرة ثانية");
+  }finally{
+    $("#lvGo").disabled=false; $("#lvGo").textContent="ادخل";
+  }
+}
+function fail(m){ const e=$("#lvErr"); e.textContent=m; e.style.display="block"; }
+
+/* remembered from a previous visit: go straight in */
+(function(){
+  let saved=""; try{ saved = localStorage.getItem(KEY) || ""; }catch(e){}
+  if(saved){ $("#lvEmail").value = saved; enter(); }
+})();
+
+/* ---------------- state ---------------- */
+function applyConfig(d){
+  CFG = {
+    mode:    d.mode === "meet" ? "meet" : "youtube",
+    videoId: d.videoId || CFG.videoId,
+    meetUrl: d.meetUrl || CFG.meetUrl,
+    state:   d.state || CFG.state,
+    startAt: Number(d.startAt || CFG.startAt || 0),
+    title:   d.title || CFG.title,
+  };
+  paint();
+}
+
+function paint(){
+  if(CFG.title) $("#lvTitle").textContent = CFG.title;
+
+  const badge=$("#lvBadge"), btxt=$("#lvBadgeTxt");
+  if(CFG.state==="live"){ badge.className="lv-badge on"; btxt.textContent="مباشر الآن"; }
+  else if(CFG.state==="ended"){ badge.className="lv-badge"; btxt.textContent="انتهى اللقاء"; }
+  else { badge.className="lv-badge"; btxt.textContent="يبدأ قريباً"; }
+
+  const meetOn = (CFG.state!=="soon" && CFG.mode==="meet" && CFG.meetUrl);
+  $("#lvMeet").style.display = meetOn ? "block" : "none";
+  $("#lvFrame").style.display = meetOn ? "none" : "block";
+  if(meetOn) $("#lvMeetGo").href = CFG.meetUrl;
+
+  /* the embedded player: same markup for a live stream and for its replay */
+  if(!meetOn){
+    const want = (CFG.state!=="soon" && CFG.mode==="youtube" && CFG.videoId) ? CFG.videoId : "";
+    if(want && mounted!==want){
+      $("#lvFrame").innerHTML =
+        '<iframe src="https://www.youtube.com/embed/'+encodeURIComponent(want)+
+        '?rel=0&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; '+
+        'encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen '+
+        'title="Cash Clinic live"></iframe>';
+      mounted = want;
+    }
+    if(!want && mounted!==""){ rebuildHold(); mounted=""; }
+    if(!want){
+      $("#lvHoldTxt").textContent = CFG.state==="soon"
+        ? "اللقاء ما بدأ بعد. خلّ الصفحة مفتوحة، والبث بيشتغل هني تلقائياً بأول ما نبدأ."
+        : "جارٍ تجهيز البث… لحظات ويظهر هني.";
+    }
+  }
+
+  /* Q&A availability */
+  const ended = CFG.state==="ended";
+  $("#lvQaBox").style.display  = ended ? "none" : "flex";
+  $("#lvQaLock").style.display = ended ? "block" : "none";
+  $("#lvQaHint").style.display = ended ? "none" : "block";
+
+  tick();
+}
+
+function rebuildHold(){
+  $("#lvFrame").innerHTML =
+    '<div class="lv-hold" id="lvHold"><div class="big" id="lvCount">--:--:--</div>'+
+    '<div class="lbl" id="lvHoldTxt"></div></div>';
+}
+
+function tick(){
+  const el=$("#lvCount"); if(!el) return;
+  if(CFG.state!=="soon" || !CFG.startAt){ el.textContent = CFG.state==="soon" ? "قريباً" : ""; return; }
+  let s = Math.floor((CFG.startAt - Date.now())/1000);
+  if(s<=0){ el.textContent="00:00:00"; return; }
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), x=s%60;
+  const p=n=>String(n).padStart(2,"0");
+  el.textContent = p(h)+":"+p(m)+":"+p(x);
+}
+
+/* ---------------- polling ---------------- */
+function startLoops(){
+  if(timer)  clearInterval(timer);
+  if(poller) clearInterval(poller);
+  timer  = setInterval(tick, 1000);
+  poller = setInterval(poll, 8000);
+  poll();
+}
+
+async function poll(){
+  try{
+    const r = await livePoll({ eventId: EVENT_ID });
+    const d = r.data || {};
+    const stateChanged = d.state !== CFG.state;
+    CFG.state   = d.state   || CFG.state;
+    CFG.mode    = d.mode    || CFG.mode;
+    CFG.startAt = Number(d.startAt || CFG.startAt || 0);
+    CFG.title   = d.title   || CFG.title;
+
+    /* the stream id is gated, so re-ask for it the moment one exists */
+    const needStream = (CFG.state!=="soon") &&
+                       (CFG.mode==="meet" ? !CFG.meetUrl : !CFG.videoId);
+    if(d.hasStream && (needStream || stateChanged)) await refreshAccess();
+
+    paint();
+    renderFeed(Array.isArray(d.feed) ? d.feed : []);
+  }catch(e){ /* a dropped poll is harmless, the next one recovers */ }
+}
+
+async function refreshAccess(){
+  try{
+    const r = await getLiveAccess({ eventId:EVENT_ID, email: ME.email });
+    const d = r.data || {};
+    CFG.videoId = d.videoId || CFG.videoId;
+    CFG.meetUrl = d.meetUrl || CFG.meetUrl;
+    CFG.mode    = d.mode    || CFG.mode;
+  }catch(e){}
+}
+
+/* ---------------- questions ---------------- */
+$("#lvQBtn").addEventListener("click", send);
+
+async function send(){
+  const msg=$("#lvQMsg"); msg.className="qa-msg";
+  const text=($("#lvQ").value||"").trim();
+  if(text.length<3){ msg.className="qa-msg bad"; msg.textContent="اكتب سؤالك أول"; return; }
+  $("#lvQBtn").disabled=true; $("#lvQBtn").textContent="جارٍ الإرسال…";
+  try{
+    const r = await askLiveQuestion({ eventId:EVENT_ID, email:ME.email, text });
+    const d = r.data || {};
+    MINE.unshift({ id:d.id||("tmp"+Date.now()), name:ME.name, text, status:"pending", at:Date.now() });
+    $("#lvQ").value="";
+    msg.className="qa-msg ok"; msg.textContent="وصل سؤالك ✅ بيتعرض بعد المراجعة.";
+    renderFeed(LAST_FEED);
+  }catch(e){
+    msg.className="qa-msg bad"; msg.textContent=(e&&e.message)||"تعذّر الإرسال، حاول مرة ثانية";
+  }finally{
+    $("#lvQBtn").disabled=false; $("#lvQBtn").textContent="أرسل السؤال";
+  }
+}
+
+let LAST_FEED=[];
+function renderFeed(feed){
+  LAST_FEED = feed || [];
+  /* once a question is approved it arrives through the feed, so drop the local
+     copy. Match on id first, and fall back to the text so a viewer can never
+     end up staring at their own question twice. */
+  const seenId = {}, seenText = {};
+  LAST_FEED.forEach(x => { seenId[x.id] = 1; seenText[String(x.text||"").trim()] = 1; });
+  MINE = MINE.filter(x => !seenId[x.id] && !seenText[String(x.text||"").trim()]);
+
+  const rows = MINE.map(x => ({ ...x, mine:true })).concat(LAST_FEED.map(x => ({ ...x, mine:false })));
+  const list = $("#lvQaList");
+  if(!rows.length){
+    list.innerHTML = '<div class="qa-empty">'+(CFG.state==="ended"
+      ? "ما في أسئلة معروضة."
+      : "ما في أسئلة معروضة بعد. كن أول من يسأل.")+'</div>';
+    return;
+  }
+  list.innerHTML = rows.map(x => {
+    let tag = "";
+    if(x.mine)                 tag = '<span class="qa-tag wait">قيد المراجعة</span>';
+    else if(x.status==="answered") tag = '<span class="qa-tag done">تمت الإجابة</span>';
+    return '<div class="qa-item"><div class="nm">'+esc(x.name||"مشارك")+tag+'</div>'+
+           '<div class="tx">'+esc(x.text)+'</div></div>';
+  }).join("");
+}
+</script>
+</body>
+</html>

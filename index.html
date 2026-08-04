@@ -432,6 +432,7 @@
   </div>
 </div>
 
+<script src="assets/js/email-typo.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script>
@@ -508,6 +509,8 @@ function nlShow(m,ok){ if(!nlMsg)return; nlMsg.textContent=m; nlMsg.style.displa
 if(nlBtn){ nlBtn.addEventListener("click", async ()=>{
   const email=(nlEmail.value||"").trim();
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ nlShow("اكتب بريد إلكتروني صحيح", false); return; }
+  const _fix=window.ccEmailSuggest?window.ccEmailSuggest(email):""; 
+  if(_fix){ nlShow("تأكد من بريدك، هل تقصد "+_fix+"؟", false); if(window.ccEmailCheck) window.ccEmailCheck(nlEmail); return; }
   nlBtn.disabled=true; const t=nlBtn.textContent; nlBtn.textContent="جارٍ…";
   try{
     const r=await _subscribe({ email });

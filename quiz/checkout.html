@@ -58,6 +58,7 @@
   <div class="secure">🔒 الدفع آمن عبر Tap... ما نحفظ بيانات بطاقتك</div>
 </div>
 
+<script src="../assets/js/email-typo.js"></script>
 <script type="module">
 const CONFIG = {
   firebase: {
@@ -101,6 +102,8 @@ pay.addEventListener("click", async ()=>{
   mErr.textContent="";
   if(name.length<2){ mErr.textContent="اكتب اسمك من فضلك."; return; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ mErr.textContent="تأكد من صيغة الإيميل."; return; }
+  const _fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+  if(_fix){ if(window.ccEmailCheck) window.ccEmailCheck(document.getElementById("bEmail")); mErr.textContent="تأكد من إيميلك، هل تقصد "+_fix+"؟"; return; }
   pay.disabled=true; pay.textContent="جاري التحويل…";
   try{
     const res=await createTapCharge({ leadId:null, name, email, phone, product:productKey });

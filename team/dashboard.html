@@ -105,6 +105,42 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* live control */
+  .lvbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
+  .lvbar .f label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .lvbar .f input,.lvbar .f select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fff}
+  .lvbar .f input:focus,.lvbar .f select:focus{outline:0;border-color:var(--auber)}
+  .lvrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+  .lvsave{border:0;border-radius:999px;background:var(--auber);color:#fff;padding:12px 26px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+  .lvsave:disabled{opacity:.6;cursor:default}
+  .lvlink{flex:1 1 260px;background:#fff;border:1.5px dashed var(--line);border-radius:12px;padding:11px 14px;font-size:13.5px;direction:ltr;text-align:left;color:var(--auber);word-break:break-all}
+  .lvcopy{border:1.5px solid var(--auber);background:#fff;color:var(--auber);border-radius:999px;padding:10px 18px;font-size:13.5px;font-family:inherit;cursor:pointer}
+  .lvstate{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12.5px;font-weight:700;color:#fff}
+  .lvmsg{display:none;font-size:13.5px;border-radius:10px;padding:10px 13px;line-height:1.7;margin-bottom:12px}
+  .lvmsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .lvmsg.err{display:block;background:#FDECEC;color:#962E37}
+  .qcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .qcard.pend{border-color:var(--gold);background:#FFFDF7}
+  .qcard .qh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:7px}
+  .qcard .qh b{color:var(--ink);font-size:14px}
+  .qcard .qt{font-size:14.5px;line-height:1.85;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .qacts{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .qacts button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
+  .qacts button.go{border-color:#2F8789;color:#2F8789}
+  .qacts button.no{border-color:#962E37;color:#962E37}
+  .qacts button:hover{filter:brightness(.97)}
+  /* email repair */
+  .fixbox{background:#FFF7E8;border:1px solid var(--gold);border-radius:16px;padding:16px 18px;margin-bottom:16px}
+  .fixbox h3{margin:0 0 4px;font-size:15.5px;color:var(--auber)}
+  .fixbox p.s{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.7}
+  .fixrow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .fixrow .nm{font-size:14px;font-weight:700;color:var(--ink);flex:0 0 auto}
+  .fixrow .old{font-size:13px;color:#962E37;direction:ltr;text-decoration:line-through;flex:0 0 auto}
+  .fixrow input{flex:1 1 210px;min-width:170px;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13.5px;font-family:inherit;direction:ltr;text-align:left;color:var(--ink)}
+  .fixrow .ok{border:0;border-radius:999px;background:#2F8789;color:#fff;padding:9px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+  .fixrow .wa{border:1.5px solid #25D366;color:#128C4A;background:#fff;border-radius:999px;padding:9px 16px;font-size:13px;font-family:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+  .fixrow .skip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--muted)}
+  .fixrow.done{opacity:.55}
   /* event category chart */
   .echart{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
   .echart .donut{width:150px;height:150px;flex:0 0 auto}
@@ -145,6 +181,7 @@
     <button data-tab="sales" class="on">المبيعات</button>
     <button data-tab="quiz">الاختبارات</button>
     <button data-tab="events">تسجيلات اللقاء</button>
+    <button data-tab="live">البث المباشر</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
@@ -192,8 +229,59 @@
   <div class="sec" id="eventsSec" data-panel="events" hidden>
     <h2><span></span> تسجيلات اللقاء</h2>
     <div class="kpis" id="eventKpis"></div>
+    <div id="eventFix"></div>
     <div id="eventChart"></div>
     <div class="tbl" id="eventTbl"></div>
+  </div>
+
+  <div class="sec" id="liveSec" data-panel="live">
+    <h2><span></span> البث المباشر</h2>
+
+    <div class="lvmsg" id="lvMsg"></div>
+
+    <div class="lvbar">
+      <div class="f"><label>طريقة البث</label>
+        <select id="lvMode">
+          <option value="youtube">يوتيوب (بث مدمج بالصفحة)</option>
+          <option value="meet">جوجل ميت (زر دخول)</option>
+        </select>
+      </div>
+      <div class="f"><label>حالة اللقاء</label>
+        <select id="lvState">
+          <option value="soon">قريباً (عدّاد تنازلي)</option>
+          <option value="live">مباشر الآن</option>
+          <option value="ended">انتهى (إعادة)</option>
+        </select>
+      </div>
+      <div class="f" id="lvVidWrap"><label>رابط يوتيوب أو الـ ID</label>
+        <input id="lvVideo" type="text" placeholder="https://youtube.com/live/xxxx أو xxxx" style="direction:ltr;text-align:left"></div>
+      <div class="f" id="lvMeetWrap"><label>رابط جوجل ميت</label>
+        <input id="lvMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
+      <div class="f"><label>موعد البداية (للعدّاد)</label>
+        <input id="lvStart" type="datetime-local"></div>
+      <div class="f"><label>عنوان اللقاء</label>
+        <input id="lvTitleIn" type="text" placeholder="لقاء العلاج المالي مع Cash Clinic"></div>
+    </div>
+
+    <div class="lvrow">
+      <button class="lvsave" id="lvSave">حفظ وتطبيق</button>
+      <span class="lvstate" id="lvNow">—</span>
+      <span class="lvlink" id="lvUrl">—</span>
+      <button class="lvcopy" id="lvCopy">نسخ الرابط</button>
+    </div>
+
+    <div class="kpis" id="lvKpis"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> أسئلة الحضور</h2>
+    <div class="flt" id="lvQFlt">
+      <button data-lq="pending" class="on">بانتظار الاعتماد</button>
+      <button data-lq="approved">معروضة</button>
+      <button data-lq="all">الكل</button>
+    </div>
+    <div id="lvQList"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> الحضور</h2>
+    <div class="tbl" id="lvAttTbl"></div>
   </div>
 
   <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
@@ -225,6 +313,9 @@ const app=initializeApp(CONFIG.firebase);
 const auth=getAuth(app);
 const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDashboard");
 const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCampaign");
+const setLiveConfig=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLiveConfig");
+const moderateLiveQuestion=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"moderateLiveQuestion");
+const fixRegistrantEmail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"fixRegistrantEmail");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -317,14 +408,14 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","quiz","events","subscribers","bookq","courses","composer","reports"];
+const PANEL_ORDER=["sales","quiz","events","live","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
@@ -339,6 +430,9 @@ function showPanel(k){
   const el=panelEl(k); if(el) el.classList.add("pon");
   const tab=document.querySelector('#dashTabs button[data-tab="'+k+'"]'); if(tab) tab.classList.add("on");
   ACTIVE_PANEL=k;
+  /* keep the moderation queue fresh only while the live tab is the one on screen */
+  if(LIVE_TIMER){ clearInterval(LIVE_TIMER); LIVE_TIMER=null; }
+  if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
 }
 function syncTabs(){
   document.querySelectorAll('#dashTabs button').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
@@ -399,6 +493,7 @@ function renderEvents(){
   const t=E.totals||{};
   $("#eventKpis").innerHTML=`
     <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي المسجّلين</div></div>`;
+  renderEventFix(E.regs);
   renderEventChart(E.regs);
   $("#eventTbl").innerHTML=`<table><thead><tr>
       <th>التاريخ</th><th>الاسم</th><th>هل هو؟</th><th>الهدف من التسجيل</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
@@ -406,7 +501,8 @@ function renderEvents(){
       <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
       <td>${esc(r.audience)||"—"}</td>
       <td style="white-space:normal;max-width:260px">${esc(r.goal)||"—"}</td>
-      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+      <td class="num">${esc(r.phone)||"—"}</td>
+      <td class="num">${esc(r.email)||"—"}${(r.emailBad||r.emailFix)&&!FIXED_LOCAL[r.id]?' <span class="badge" style="background:#962E37">يحتاج مراجعة</span>':""}</td></tr>`).join("")+`</tbody></table>`;
 }
 
 function renderSubscribers(){
@@ -438,6 +534,186 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= LIVE CONTROL ================= */
+let LQFILTER="pending", LIVE_TIMER=null;
+
+const LIVE_STATE_AR={soon:"قريباً",live:"مباشر الآن",ended:"انتهى"};
+const LIVE_STATE_BG={soon:"#D3A146",live:"#962E37",ended:"#6B6577"};
+
+function lvMsg(m,ok){ const e=$("#lvMsg"); if(!e) return; e.textContent=m; e.className="lvmsg "+(ok?"ok":"err");
+  if(ok) setTimeout(()=>{ e.className="lvmsg"; }, 4000); }
+
+function toLocalInput(ms){
+  if(!ms) return "";
+  const d=new Date(ms), p=n=>String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes());
+}
+
+function syncLiveMode(){
+  const m=$("#lvMode").value;
+  $("#lvVidWrap").style.display  = m==="meet" ? "none" : "block";
+  $("#lvMeetWrap").style.display = m==="meet" ? "block" : "none";
+}
+
+function renderLive(){
+  const L=DATA.live; const sec=$("#liveSec"); if(!L||!sec) return;
+  sec.hidden=false;
+  const c=L.config||{};
+
+  if(document.activeElement!==$("#lvMode"))    $("#lvMode").value=c.mode||"youtube";
+  if(document.activeElement!==$("#lvState"))   $("#lvState").value=c.state||"soon";
+  if(document.activeElement!==$("#lvVideo"))   $("#lvVideo").value=c.videoId||"";
+  if(document.activeElement!==$("#lvMeet"))    $("#lvMeet").value=c.meetUrl||"";
+  if(document.activeElement!==$("#lvStart"))   $("#lvStart").value=toLocalInput(c.startAt);
+  if(document.activeElement!==$("#lvTitleIn")) $("#lvTitleIn").value=c.title||"";
+  syncLiveMode();
+
+  const st=c.state||"soon";
+  const now=$("#lvNow"); now.textContent=LIVE_STATE_AR[st]||st; now.style.background=LIVE_STATE_BG[st]||"#6B6577";
+  $("#lvUrl").textContent=L.url||"";
+
+  const t=L.totals||{};
+  $("#lvKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(t.pending||0)}</div><div class="l">بانتظار الاعتماد</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.approved||0)}</div><div class="l">معروضة للحضور</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.attended||0)}</div><div class="l">دخلوا الصفحة</div></div>`;
+
+  renderLiveQs();
+
+  const att=L.attendance||[];
+  $("#lvAttTbl").innerHTML = att.length
+    ? `<table><thead><tr><th>الاسم</th><th>البريد</th><th>أول دخول</th><th>آخر دخول</th><th>مرات</th></tr></thead><tbody>`+
+      att.map(a=>`<tr><td>${esc(a.name)||"—"}</td><td class="num">${esc(a.email)}</td>
+        <td class="num">${dt(a.firstAt)}</td><td class="num">${dt(a.lastAt)}</td>
+        <td class="num">${fmt(a.hits)}</td></tr>`).join("")+`</tbody></table>`
+    : `<div class="empty">ما دخل أحد الصفحة بعد.</div>`;
+}
+
+function renderLiveQs(){
+  const L=DATA.live||{}; const all=L.questions||[];
+  const rows = LQFILTER==="all" ? all
+             : LQFILTER==="pending" ? all.filter(q=>q.status==="pending")
+             : all.filter(q=>q.status==="approved"||q.status==="answered");
+  const box=$("#lvQList");
+  if(!rows.length){ box.innerHTML=`<div class="empty">ما في أسئلة بهذي القائمة.</div>`; return; }
+  const TAG={pending:"بانتظار الاعتماد",approved:"معروضة",answered:"تمت الإجابة",hidden:"مخفية"};
+  box.innerHTML=rows.map(q=>`
+    <div class="qcard ${q.status==="pending"?"pend":""}">
+      <div class="qh"><b>${esc(q.name)||"مشارك"}</b><span class="num">${esc(q.email)}</span>
+        <span class="num">${dt(q.when)}</span><span>· ${TAG[q.status]||q.status}</span></div>
+      <div class="qt">${esc(q.text)}</div>
+      <div class="qacts">
+        ${q.status!=="approved"?`<button class="go" data-lqid="${esc(q.id)}" data-lqact="approve">اعتمد وأظهر</button>`:""}
+        ${q.status!=="answered"?`<button data-lqid="${esc(q.id)}" data-lqact="answered">تمت الإجابة</button>`:""}
+        ${q.status!=="hidden"?`<button data-lqid="${esc(q.id)}" data-lqact="hide">إخفاء</button>`:""}
+        <button class="no" data-lqid="${esc(q.id)}" data-lqact="delete">حذف</button>
+      </div>
+    </div>`).join("");
+}
+
+$("#lvQFlt") && $("#lvQFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  LQFILTER=b.dataset.lq; $("#lvQFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderLiveQs(); });
+
+$("#lvMode") && $("#lvMode").addEventListener("change", syncLiveMode);
+
+$("#lvCopy") && $("#lvCopy").addEventListener("click", async ()=>{
+  const u=($("#lvUrl").textContent||"").trim(); if(!u) return;
+  try{ await navigator.clipboard.writeText(u); lvMsg("انتسخ الرابط ✅", true); }
+  catch(e){ lvMsg("ما قدرنا ننسخ، انسخه يدوياً", false); }
+});
+
+$("#lvSave") && $("#lvSave").addEventListener("click", async ()=>{
+  const btn=$("#lvSave"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الحفظ…";
+  try{
+    const sv=$("#lvStart").value;
+    const r=await setLiveConfig({
+      eventId:"liqa", mode:$("#lvMode").value, state:$("#lvState").value,
+      videoId:$("#lvVideo").value.trim(), meetUrl:$("#lvMeet").value.trim(),
+      startAt: sv ? new Date(sv).getTime() : 0,
+      title:$("#lvTitleIn").value.trim(),
+    });
+    if(r.data&&r.data.ok){
+      DATA.live.config=r.data.config; DATA.live.url=r.data.url||DATA.live.url;
+      renderLive();
+      const st=r.data.config.state;
+      lvMsg(st==="live"?"انحفظ ✅ اللقاء صار مباشر، الصفحة عند الحضور بتفتح البث خلال ثواني."
+           :st==="ended"?"انحفظ ✅ اللقاء انتهى، الصفحة صارت تعرض الإعادة والأسئلة مقفلة."
+           :"انحفظ ✅ الصفحة تعرض العدّاد التنازلي للحضور.", true);
+    } else lvMsg("تعذّر الحفظ", false);
+  }catch(e){ lvMsg((e&&e.message)||"صار خطأ بالحفظ", false); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+});
+
+$("#lvQList") && $("#lvQList").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-lqid]"); if(!b) return;
+  const id=b.dataset.lqid, action=b.dataset.lqact;
+  if(action==="delete" && !confirm("متأكد تبي تحذف السؤال؟")) return;
+  b.disabled=true;
+  try{
+    await moderateLiveQuestion({ eventId:"liqa", id, action });
+    const q=(DATA.live.questions||[]).find(x=>x.id===id);
+    if(action==="delete"){ DATA.live.questions=(DATA.live.questions||[]).filter(x=>x.id!==id); }
+    else if(q){ q.status = action==="approve"?"approved" : action==="hide"?"hidden" : "answered"; }
+    const all=DATA.live.questions||[];
+    DATA.live.totals={ ...(DATA.live.totals||{}),
+      pending: all.filter(x=>x.status==="pending").length,
+      approved: all.filter(x=>x.status==="approved"||x.status==="answered").length };
+    renderLive();
+  }catch(err){ lvMsg((err&&err.message)||"تعذّر تنفيذ الإجراء", false); b.disabled=false; }
+});
+
+async function refreshLive(){
+  try{ const r=await getDashboard(); if(r&&r.data){ DATA=r.data; renderLive(); renderEvents(); } }
+  catch(e){}
+}
+
+/* ================= EVENT EMAIL REPAIR ================= */
+const FIXED_LOCAL={};
+
+function renderEventFix(regs){
+  const box=$("#eventFix"); if(!box) return;
+  const bad=(regs||[]).filter(r=>!FIXED_LOCAL[r.id] && (r.emailBad || r.emailFix));
+  if(!bad.length){ box.innerHTML=""; return; }
+  box.innerHTML=`<div class="fixbox">
+    <h3>بريد يحتاج مراجعة (${fmt(bad.length)})</h3>
+    <p class="s">هذي إيميلات مكتوبة غلط، ما وصلتهم رسالة التأكيد ولا رابط اللقاء. صحّح الإيميل واضغط اعتمد، والرسالة تنرسل لهم على طول. اللي ما ينفع يتصحّح راسله واتساب.</p>
+    ${bad.map(r=>{
+      const guess=r.emailFix||"";
+      const wa=String(r.phone||"").replace(/\D/g,"");
+      return `<div class="fixrow" data-fixid="${esc(r.id)}">
+        <span class="nm">${esc(r.name)||"—"}</span>
+        <span class="old">${esc(r.email)||"بدون إيميل"}</span>
+        <input type="email" value="${esc(guess)}" placeholder="اكتب الإيميل الصحيح">
+        <button class="ok">اعتمد وأرسل</button>
+        ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button class="skip">تجاهل</button>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+$("#eventFix") && $("#eventFix").addEventListener("click", async e=>{
+  const row=e.target.closest(".fixrow"); if(!row) return;
+  const id=row.dataset.fixid;
+  if(e.target.classList.contains("skip")){ FIXED_LOCAL[id]=true; row.remove(); return; }
+  if(!e.target.classList.contains("ok")) return;
+  const input=row.querySelector("input");
+  const email=(input.value||"").trim().toLowerCase();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ input.style.borderColor="#962E37"; input.focus(); return; }
+  const btn=e.target; btn.disabled=true; btn.textContent="جارٍ…";
+  try{
+    const r=await fixRegistrantEmail({ id, email, resend:true });
+    if(r.data&&r.data.ok){
+      FIXED_LOCAL[id]=true;
+      const reg=((DATA.events&&DATA.events.regs)||[]).find(x=>x.id===id);
+      if(reg){ reg.email=email; reg.emailFix=""; reg.emailBad=false; }
+      row.classList.add("done");
+      btn.textContent=r.data.sent?"انرسل ✅":"انحفظ (الإيميل ما انرسل)";
+      setTimeout(()=>{ row.remove(); renderEvents(); }, 1400);
+    } else { btn.disabled=false; btn.textContent="اعتمد وأرسل"; }
+  }catch(err){ alert((err&&err.message)||"تعذّر التصحيح"); btn.disabled=false; btn.textContent="اعتمد وأرسل"; }
+});
 
 const AUD_COLORS={"عميل جديد":"#2A898C","عميل سابق من استشارات":"#614588","عميل سابق من دورات":"#D3A146","عميل سابق حاصل على الكتيّب المالي":"#505632"};
 const AUD_FALLBACK=["#962E37","#7E8455","#3EADAD","#B35661","#515732"];

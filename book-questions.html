@@ -140,6 +140,7 @@
   </div>
 </div>
 
+<script src="assets/js/email-typo.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
@@ -155,6 +156,8 @@ $("#bqBtn").addEventListener("click", async ()=>{
   if(name.length<2) return showErr("اكتب اسمك");
   if(phone.replace(/\D/g,"").length<7) return showErr("رقم واتساب غير صحيح");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("إيميل غير صحيح");
+  const _fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+  if(_fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#bqEmail")); return showErr("تأكد من إيميلك، هل تقصد "+_fix+"؟"); }
   if(questions.length<2) return showErr("اكتب أسئلتك بالمربع");
   const cc=($("#bqCC")||{value:"965"}).value;
   let local=phone.replace(/\D/g,"").replace(/^0+/,"");

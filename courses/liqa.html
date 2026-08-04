@@ -253,6 +253,7 @@
   function closeLb(){ document.getElementById("lb").classList.remove("on"); document.body.style.overflow=""; }
   document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeLb(); });
 </script>
+<script src="../assets/js/email-typo.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
@@ -269,6 +270,8 @@ $("#regBtn").addEventListener("click", async ()=>{
   const audience=$("#cAudience").value, goal=$("#cGoal").value.trim();
   if(name.length<2) return showErr("اكتب اسمك");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("إيميل غير صحيح");
+  const _fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+  if(_fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#cEmail")); return showErr("تأكد من إيميلك، هل تقصد "+_fix+"؟"); }
   if(phone.replace(/\D/g,"").length<7) return showErr("رقم واتساب غير صحيح");
   if(!audience) return showErr("اختر أي وصف يناسبك");
   const cc=($("#cCC")||{value:"965"}).value;
