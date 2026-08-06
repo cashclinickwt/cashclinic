@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>قيّم اللقاء المجاني | Cash Clinic</title>
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="assets/ds/tokens/base.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<style>
+  body{background:var(--cc-purple-050);}
+  .rt-hero{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:52px 0 46px;position:relative;overflow:hidden}
+  .rt-hero .cc-wrap{position:relative;z-index:1}
+  .rt-hero .mark{position:absolute;inset-inline-end:-26px;bottom:-26px;width:150px;opacity:.12;z-index:0}
+  .rt-badge{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+  .rt-hero h1{font-size:clamp(26px,4vw,40px);font-weight:300;line-height:1.3;margin:16px 0 0;color:#fff}
+  .rt-hero p{font-size:16.5px;line-height:1.9;color:var(--cc-purple-100);margin:14px 0 0;max-width:56ch}
+
+  .rt-wrap{max-width:680px;margin:-26px auto 64px;padding:0 18px;position:relative;z-index:2}
+  .rt-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:24px;padding:30px 26px;box-shadow:0 18px 50px rgba(47,23,72,.10)}
+
+  .rt-q{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--cc-grey-100)}
+  .rt-q:last-of-type{border-bottom:0;padding-bottom:0;margin-bottom:0}
+  .rt-q > label.q{display:block;font-size:16px;font-weight:700;color:var(--cc-purple);margin-bottom:12px;line-height:1.6}
+  .rt-q .req{color:var(--cc-burgundy);font-weight:400}
+
+  .rt-opts{display:flex;flex-wrap:wrap;gap:9px}
+  .rt-opt{flex:1 1 auto;min-width:120px}
+  .rt-opt input{position:absolute;opacity:0;pointer-events:none}
+  .rt-opt span{display:block;text-align:center;border:2px solid var(--cc-grey-200);border-radius:14px;padding:13px 14px;font-size:15px;color:var(--cc-ink);cursor:pointer;transition:.15s;background:var(--cc-white);line-height:1.5}
+  .rt-opt input:checked + span{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream);font-weight:700}
+  .rt-opt input:focus-visible + span{outline:2px solid var(--cc-gold);outline-offset:2px}
+
+  .rt-fld{margin-bottom:15px}
+  .rt-fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
+  .rt-fld input,.rt-fld textarea,.rt-fld select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);box-sizing:border-box}
+  .rt-fld textarea{min-height:96px;resize:vertical;line-height:1.85}
+  .rt-fld input:focus,.rt-fld textarea:focus,.rt-fld select:focus{outline:0;border-color:var(--cc-purple)}
+  .rt-phone{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:9px}
+  .rt-phone select{font-size:14.5px}
+
+  .rt-sub{margin-top:12px}
+  .rt-sub textarea{min-height:80px}
+  .rt-hide{display:none}
+
+  .rt-send{width:100%;padding:17px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px}
+  .rt-send:hover{filter:brightness(1.08)}
+  .rt-send:disabled{opacity:.62;cursor:default}
+  .rt-err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:12px 15px;font-size:14.5px;margin-top:14px;text-align:center;line-height:1.75}
+
+  .rt-ok{display:none;text-align:center;padding:14px 4px}
+  .rt-ok .ico{font-size:52px;margin-bottom:14px}
+  .rt-ok h2{font-size:24px;color:var(--cc-purple);margin:0 0 12px;font-weight:700}
+  .rt-ok p{font-size:15.5px;line-height:1.95;color:var(--cc-grey-700);margin:0 auto 22px;max-width:44ch}
+  .rt-ok .buy{display:inline-block;background:var(--cc-teal);color:#fff;text-decoration:none;padding:15px 32px;border-radius:999px;font-size:16px;font-weight:700}
+  .rt-ok .buy:hover{filter:brightness(1.08)}
+</style>
+</head>
+<body>
+
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="index.html"><img src="brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820" style="font-size:15px;padding:11px 20px;">
+      <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+      <span>استفسار</span>
+    </a>
+  </div>
+</header>
+
+<section class="rt-hero">
+  <div class="cc-wrap">
+    <span class="rt-badge">رأيك يهمنا</span>
+    <h1>قيّم اللقاء المجاني</h1>
+    <p>دقيقتين من وقتك تساعدنا نطوّر لقاءاتنا الجاية. كل إجابة نقراها بأنفسنا.</p>
+  </div>
+  <img class="mark" src="brand/mark/mark-cream.png" alt="">
+</section>
+
+<div class="rt-wrap">
+  <div class="rt-card">
+    <div id="rtForm">
+
+      <!-- contact -->
+      <div class="rt-q">
+        <label class="q">بياناتك</label>
+        <div class="rt-fld"><label>الاسم</label>
+          <input id="rName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
+        <div class="rt-fld"><label>الإيميل</label>
+          <input id="rEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
+        <div class="rt-fld"><label>رقم الواتساب</label>
+          <div class="rt-phone">
+            <select id="rCC" aria-label="مفتاح الدولة">
+              <option value="965" selected>🇰🇼 +965 الكويت</option>
+              <option value="966">🇸🇦 +966 السعودية</option>
+              <option value="971">🇦🇪 +971 الإمارات</option>
+              <option value="974">🇶🇦 +974 قطر</option>
+              <option value="973">🇧🇭 +973 البحرين</option>
+              <option value="968">🇴🇲 +968 عُمان</option>
+              <option value="20">🇪🇬 +20 مصر</option>
+              <option value="962">🇯🇴 +962 الأردن</option>
+              <option value="961">🇱🇧 +961 لبنان</option>
+              <option value="964">🇮🇶 +964 العراق</option>
+              <option value="963">🇸🇾 +963 سوريا</option>
+              <option value="967">🇾🇪 +967 اليمن</option>
+              <option value="970">🇵🇸 +970 فلسطين</option>
+              <option value="249">🇸🇩 +249 السودان</option>
+              <option value="218">🇱🇾 +218 ليبيا</option>
+              <option value="216">🇹🇳 +216 تونس</option>
+              <option value="213">🇩🇿 +213 الجزائر</option>
+              <option value="212">🇲🇦 +212 المغرب</option>
+              <option value="91">🇮🇳 +91 الهند</option>
+              <option value="92">🇵🇰 +92 باكستان</option>
+              <option value="880">🇧🇩 +880 بنغلاديش</option>
+              <option value="63">🇵🇭 +63 الفلبين</option>
+              <option value="94">🇱🇰 +94 سريلانكا</option>
+              <option value="977">🇳🇵 +977 نيبال</option>
+              <option value="90">🇹🇷 +90 تركيا</option>
+              <option value="98">🇮🇷 +98 إيران</option>
+              <option value="44">🇬🇧 +44 بريطانيا</option>
+              <option value="1">🇺🇸 +1 أمريكا / كندا</option>
+              <option value="49">🇩🇪 +49 ألمانيا</option>
+              <option value="33">🇫🇷 +33 فرنسا</option>
+              <option value="61">🇦🇺 +61 أستراليا</option>
+            </select>
+            <input id="rPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right">
+          </div>
+        </div>
+      </div>
+
+      <!-- attended -->
+      <div class="rt-q">
+        <label class="q">هل حضرت اللقاء؟</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="att" value="نعم"><span>نعم</span></label>
+          <label class="rt-opt"><input type="radio" name="att" value="لا"><span>لا</span></label>
+        </div>
+        <div class="rt-sub rt-hide" id="qAbsence">
+          <div class="rt-fld"><label>شنو السبب؟</label>
+            <textarea id="rAbsence" placeholder="وش اللي منعك من الحضور؟"></textarea></div>
+        </div>
+      </div>
+
+      <!-- rating -->
+      <div class="rt-q rt-hide" id="qRating">
+        <label class="q">تقييمك للقاء</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="rate" value="مفيد وممتاز"><span>مفيد وممتاز</span></label>
+          <label class="rt-opt"><input type="radio" name="rate" value="متوسط"><span>متوسط</span></label>
+          <label class="rt-opt"><input type="radio" name="rate" value="ضعيف"><span>ضعيف</span></label>
+        </div>
+        <div class="rt-sub rt-hide" id="qRateWhy">
+          <div class="rt-fld"><label>شنو السبب؟</label>
+            <textarea id="rRateWhy" placeholder="وش اللي ناقص أو ممكن نحسنه؟"></textarea></div>
+        </div>
+      </div>
+
+      <!-- source -->
+      <div class="rt-q">
+        <label class="q">من وين سمعت عن اللقاء؟</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="src" value="الأهل والأصدقاء"><span>الأهل والأصدقاء</span></label>
+          <label class="rt-opt"><input type="radio" name="src" value="الانستقرام"><span>الانستقرام</span></label>
+          <label class="rt-opt"><input type="radio" name="src" value="التيك توك"><span>التيك توك</span></label>
+          <label class="rt-opt"><input type="radio" name="src" value="قروب الواتساب"><span>قروب الواتساب</span></label>
+          <label class="rt-opt"><input type="radio" name="src" value="أخرى"><span>أخرى</span></label>
+        </div>
+        <div class="rt-sub rt-hide" id="qSrcOther">
+          <div class="rt-fld"><label>اذكرها</label>
+            <input id="rSrcOther" type="text" placeholder="من وين بالضبط؟"></div>
+        </div>
+      </div>
+
+      <!-- booklet -->
+      <div class="rt-q">
+        <label class="q">اشتريت كتيّب الوفرة المالية؟</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="book" value="نعم"><span>نعم</span></label>
+          <label class="rt-opt"><input type="radio" name="book" value="لا"><span>لا</span></label>
+          <label class="rt-opt"><input type="radio" name="book" value="أبي أشتريه"><span>أبي أشتريه</span></label>
+        </div>
+      </div>
+
+      <!-- vip -->
+      <div class="rt-q">
+        <label class="q">حضرت لقاء الـVIP؟</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="vip" value="نعم"><span>نعم</span></label>
+          <label class="rt-opt"><input type="radio" name="vip" value="لا"><span>لا</span></label>
+        </div>
+      </div>
+
+      <div class="rt-q rt-hide" id="qVipRating">
+        <label class="q">تقييمك للقاء الـVIP</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="vrate" value="مفيد وممتاز"><span>مفيد وممتاز</span></label>
+          <label class="rt-opt"><input type="radio" name="vrate" value="متوسط"><span>متوسط</span></label>
+          <label class="rt-opt"><input type="radio" name="vrate" value="ضعيف"><span>ضعيف</span></label>
+        </div>
+        <div class="rt-sub rt-hide" id="qVipWhy">
+          <div class="rt-fld"><label>شنو السبب؟</label>
+            <textarea id="rVipWhy" placeholder="وش اللي ناقص أو ممكن نحسنه؟"></textarea></div>
+        </div>
+      </div>
+
+      <!-- open text -->
+      <div class="rt-q rt-hide" id="qBenefit">
+        <label class="q">شنو اللي استفدته من اللقاء؟</label>
+        <div class="rt-fld"><textarea id="rBenefit" placeholder="أي فكرة أو خطوة طلعت فيها من اللقاء…"></textarea></div>
+      </div>
+
+      <div class="rt-q">
+        <label class="q">مقترحات أخرى</label>
+        <div class="rt-fld"><textarea id="rSuggest" placeholder="أي شي تتمنى نضيفه أو نغيّره باللقاءات الجاية…"></textarea></div>
+      </div>
+
+      <button class="rt-send" id="rtBtn" type="button">أرسل التقييم</button>
+      <div class="rt-err" id="rtErr"></div>
+    </div>
+
+    <div class="rt-ok" id="rtOk">
+      <div class="ico">🤍</div>
+      <h2>وصلنا تقييمك</h2>
+      <p id="rtOkMsg">شكراً لوقتك. رأيك يوصل لفريق كاش كلينك ويساعدنا نطوّر لقاءاتنا الجاية.</p>
+      <a class="buy rt-hide" id="rtBuy" href="quiz/checkout.html?product=dalil">احجز كتيّب الوفرة المالية ←</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/email-typo.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+
+const app = initializeApp(CONFIG.firebase);
+const submitEventRating = httpsCallable(getFunctions(app, CONFIG.functionsRegion), "submitEventRating");
+
+const $  = s => document.querySelector(s);
+const pick = n => { const el=document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; };
+const show = (sel, on) => $(sel).classList.toggle("rt-hide", !on);
+
+/* questions appear only when they apply, so the form stays short on a phone */
+function sync(){
+  const att = pick("att");
+  show("#qAbsence",  att === "لا");
+  show("#qRating",   att === "نعم");
+  show("#qBenefit",  att === "نعم");
+  show("#qRateWhy",  att === "نعم" && (pick("rate") === "متوسط" || pick("rate") === "ضعيف"));
+  show("#qSrcOther", pick("src") === "أخرى");
+  const vip = pick("vip") === "نعم";
+  show("#qVipRating", vip);
+  show("#qVipWhy",    vip && (pick("vrate") === "متوسط" || pick("vrate") === "ضعيف"));
+}
+document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", sync));
+sync();
+
+function showErr(m){ const e=$("#rtErr"); e.textContent=m; e.style.display="block";
+  e.scrollIntoView({behavior:"smooth",block:"center"}); }
+
+$("#rtBtn").addEventListener("click", async () => {
+  $("#rtErr").style.display="none";
+  const name  = $("#rName").value.trim();
+  const email = $("#rEmail").value.trim();
+  const phone = $("#rPhone").value.trim();
+  const att   = pick("att");
+
+  if(name.length < 2) return showErr("اكتب اسمك");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("إيميل غير صحيح");
+  const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
+  if(fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#rEmail")); return showErr("تأكد من إيميلك، هل تقصد "+fix+"؟"); }
+  if(phone.replace(/\D/g,"").length < 7) return showErr("رقم واتساب غير صحيح");
+  if(!att) return showErr("قل لنا إذا حضرت اللقاء");
+  if(att === "نعم" && !pick("rate")) return showErr("اختر تقييمك للقاء");
+  if(!pick("src")) return showErr("اختر من وين سمعت عن اللقاء");
+
+  const cc = ($("#rCC")||{value:"965"}).value;
+  let local = phone.replace(/\D/g,"").replace(/^0+/,"");
+  if(cc && local.indexOf(cc) === 0 && local.length > cc.length) local = local.slice(cc.length);
+
+  $("#rtBtn").disabled = true; $("#rtBtn").textContent = "جارٍ الإرسال…";
+  try{
+    const r = await submitEventRating({
+      eventId:"liqa", name, email, phone:"+"+cc+local,
+      attended: att === "نعم",
+      absenceReason: $("#rAbsence").value.trim(),
+      rating: pick("rate"), ratingReason: $("#rRateWhy").value.trim(),
+      source: pick("src"), sourceOther: $("#rSrcOther").value.trim(),
+      booklet: pick("book"),
+      vipAttended: pick("vip") === "نعم",
+      vipRating: pick("vrate"), vipRatingReason: $("#rVipWhy").value.trim(),
+      benefit: $("#rBenefit").value.trim(),
+      suggestions: $("#rSuggest").value.trim(),
+    });
+    if(r.data && r.data.ok){
+      if(r.data.updated) $("#rtOkMsg").textContent = "حدّثنا تقييمك السابق بالإجابات الجديدة. شكراً لوقتك.";
+      /* a raised hand for the booklet is a warm lead: give them the button now */
+      if(pick("book") === "أبي أشتريه") $("#rtBuy").classList.remove("rt-hide");
+      $("#rtForm").style.display = "none";
+      $("#rtOk").style.display = "block";
+      window.scrollTo({ top:0, behavior:"smooth" });
+      return;
+    }
+    showErr("تعذّر الإرسال، حاول مرة ثانية");
+  }catch(e){
+    showErr((e && e.message) || "صار خطأ، حاول مرة ثانية");
+  }finally{
+    $("#rtBtn").disabled = false; $("#rtBtn").textContent = "أرسل التقييم";
+  }
+});
+</script>
+</body>
+</html>

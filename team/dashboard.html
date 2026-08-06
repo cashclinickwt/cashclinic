@@ -105,6 +105,24 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* event ratings */
+  .rtbars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:18px}
+  .rtbar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .rtbar h4{margin:0 0 10px;font-size:13.5px;color:var(--muted);font-weight:700}
+  .rtline{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:13px}
+  .rtline .lb{flex:0 0 auto;color:var(--ink);min-width:78px}
+  .rtline .tr{flex:1 1 auto;height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+  .rtline .fl{height:100%;border-radius:999px;background:var(--auber)}
+  .rtline .vl{flex:0 0 auto;color:var(--muted);font-size:12.5px;min-width:34px;text-align:left}
+  .rt-good .fl{background:#2F8789} .rt-mid .fl{background:#D3A146} .rt-bad .fl{background:#962E37}
+  .rtcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .rtcard.no{border-color:#E6C9CD;background:#FFF9F9}
+  .rth{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:9px}
+  .rth b{color:var(--ink);font-size:14.5px}
+  .rtpill{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
+  .rtq{margin-top:9px;font-size:13.5px;line-height:1.85;color:var(--ink)}
+  .rtq .k{color:var(--muted);font-size:12.5px;display:block;margin-bottom:2px}
+  .rtq .v{white-space:pre-wrap;word-break:break-word}
   /* live control */
   .lvbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
   .lvbar .f label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
@@ -180,7 +198,7 @@
   <nav class="tabs" id="dashTabs">
     <button data-tab="sales" class="on">المبيعات</button>
     <button data-tab="quiz">الاختبارات</button>
-    <button data-tab="events">تسجيلات اللقاء</button>
+    <button data-tab="events">معلومات اللقاء</button>
     <button data-tab="live">البث المباشر</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <button data-tab="bookq">أسئلة الكتاب</button>
@@ -230,6 +248,20 @@
     <h2><span></span> تسجيلات اللقاء</h2>
     <div class="kpis" id="eventKpis"></div>
     <div id="eventFix"></div>
+
+    <h2 style="font-size:17px;margin-top:24px"><span></span> تقييم اللقاء</h2>
+    <div class="kpis" id="rtKpis"></div>
+    <div class="rtbars" id="rtBars"></div>
+    <div class="flt" id="rtFlt">
+      <button data-rt="all" class="on">الكل</button>
+      <button data-rt="yes">حضروا</button>
+      <button data-rt="no">ما حضروا</button>
+      <button data-rt="buy">يبون الكتيّب</button>
+      <button data-rt="low">تقييم متوسط أو ضعيف</button>
+    </div>
+    <div id="rtList"></div>
+
+    <h2 style="font-size:17px;margin-top:26px"><span></span> المسجّلين</h2>
     <div id="eventChart"></div>
     <div class="tbl" id="eventTbl"></div>
   </div>
@@ -408,7 +440,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
@@ -534,6 +566,82 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= EVENT RATINGS ================= */
+let RTFILTER="all";
+const RT_TONE={"مفيد وممتاز":"#2F8789","متوسط":"#D3A146","ضعيف":"#962E37"};
+
+function rtRows(list){
+  if(RTFILTER==="yes") return list.filter(r=>r.attended);
+  if(RTFILTER==="no")  return list.filter(r=>!r.attended);
+  if(RTFILTER==="buy") return list.filter(r=>r.booklet==="أبي أشتريه");
+  if(RTFILTER==="low") return list.filter(r=>r.rating==="متوسط"||r.rating==="ضعيف"||r.vipRating==="متوسط"||r.vipRating==="ضعيف");
+  return list;
+}
+
+function bars(title,obj,total,toneClass){
+  const keys=Object.keys(obj||{});
+  if(!keys.length) return "";
+  keys.sort((a,b)=>obj[b]-obj[a]);
+  return `<div class="rtbar"><h4>${esc(title)}</h4>`+keys.map(k=>{
+    const n=obj[k], pct=total?Math.round(n*100/total):0;
+    const cls=toneClass?(k==="مفيد وممتاز"?"rt-good":k==="متوسط"?"rt-mid":k==="ضعيف"?"rt-bad":""):"";
+    return `<div class="rtline ${cls}"><span class="lb">${esc(k)}</span>
+      <span class="tr"><span class="fl" style="width:${pct}%"></span></span>
+      <span class="vl">${fmt(n)}</span></div>`;
+  }).join("")+`</div>`;
+}
+
+function renderRatings(){
+  const R=DATA.ratings; if(!R||!$("#rtKpis")) return;
+  const t=R.totals||{}, list=R.list||[];
+
+  $("#rtKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">تقييم وصلنا</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.attended||0)}</div><div class="l">حضروا اللقاء</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.absent||0)}</div><div class="l">ما حضروا</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.vipAttended||0)}</div><div class="l">حضروا الـVIP</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.wantsBooklet||0)}</div><div class="l">يبون الكتيّب</div></div>`;
+
+  $("#rtBars").innerHTML =
+    bars("تقييم اللقاء", t.rating, t.attended||t.count, true)+
+    bars("تقييم الـVIP", t.vipRating, t.vipAttended||t.count, true)+
+    bars("من وين سمعوا", t.source, t.count)+
+    bars("كتيّب الوفرة", t.booklet, t.count);
+
+  const rows=rtRows(list);
+  const box=$("#rtList");
+  if(!rows.length){ box.innerHTML=`<div class="empty">ما في تقييمات بهذي القائمة.</div>`; return; }
+
+  box.innerHTML=rows.map(r=>{
+    const bits=[];
+    const add=(k,v)=>{ if(v) bits.push(`<div class="rtq"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`); };
+    if(!r.attended) add("سبب عدم الحضور", r.absenceReason);
+    add("سبب التقييم", r.ratingReason);
+    if(r.vipAttended) add("سبب تقييم الـVIP", r.vipRatingReason);
+    add("اللي استفاده", r.benefit);
+    add("مقترحات", r.suggestions);
+    const wa=String(r.phone||"").replace(/\D/g,"");
+    return `<div class="rtcard ${r.attended?"":"no"}">
+      <div class="rth">
+        <b>${esc(r.name)||"—"}</b>
+        <span class="num">${esc(r.email)}</span>
+        ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(r.phone)}</a>`:""}
+        <span class="num">${dt(r.when)}</span>
+        <span class="rtpill" style="background:${r.attended?"#2F8789":"#962E37"}">${r.attended?"حضر":"ما حضر"}</span>
+        ${r.rating?`<span class="rtpill" style="background:${RT_TONE[r.rating]||"#6B6577"}">${esc(r.rating)}</span>`:""}
+        ${r.vipAttended?`<span class="rtpill" style="background:${RT_TONE[r.vipRating]||"#614588"}">VIP: ${esc(r.vipRating)||"—"}</span>`:""}
+        ${r.booklet==="أبي أشتريه"?`<span class="rtpill" style="background:#D3A146">يبي الكتيّب</span>`:""}
+        ${r.isRegistered?"":`<span class="rtpill" style="background:#6B6577">غير مسجّل</span>`}
+        <span>· ${esc(r.sourceLabel)||"—"}</span>
+      </div>
+      ${bits.join("")||`<div class="rtq"><span class="v" style="color:var(--muted)">ما كتب ملاحظات.</span></div>`}
+    </div>`;
+  }).join("");
+}
+
+$("#rtFlt") && $("#rtFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  RTFILTER=b.dataset.rt; $("#rtFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderRatings(); });
 
 /* ================= LIVE CONTROL ================= */
 let LQFILTER="pending", LIVE_TIMER=null;
