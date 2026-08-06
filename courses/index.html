@@ -16,7 +16,22 @@
 <style>
   .crs-hero{background:var(--cc-purple-050);border-bottom:1px solid var(--cc-grey-200);padding:54px 0 48px;text-align:center}
   .crs-hero .cc-eyebrow{color:var(--cc-olive)}
-  .crs-grid{display:grid;grid-template-columns:1fr;gap:26px;padding:48px 0 72px;max-width:940px;margin:0 auto}
+  .crs-grid{display:grid;grid-template-columns:1fr;gap:26px;padding:0 0 72px;max-width:940px;margin:0 auto}
+  .crs-grid[hidden]{display:none}
+  /* current / past switch */
+  .crs-tabs{display:flex;justify-content:center;gap:10px;padding:40px 18px 34px;flex-wrap:wrap}
+  .crs-tab{border:2px solid var(--cc-grey-200);background:var(--cc-white);color:var(--cc-grey-700);
+    border-radius:999px;padding:12px 30px;font-size:16px;font-family:inherit;font-weight:700;cursor:pointer;transition:.16s}
+  .crs-tab:hover{border-color:var(--cc-purple-200)}
+  .crs-tab.on{background:var(--cc-purple);border-color:var(--cc-purple);color:var(--cc-cream)}
+  .crs-tab .n{display:inline-block;margin-inline-start:7px;font-size:13px;opacity:.72;font-weight:400}
+  /* a finished programme reads differently from a live one */
+  .crs-card.past .crs-card-media img{filter:grayscale(.34)}
+  .crs-card.past:hover .crs-card-media img{filter:grayscale(0)}
+  .crs-donechip{position:absolute;top:16px;inset-inline-start:16px;background:var(--cc-burgundy);color:#fff;
+    font-size:12.5px;font-weight:700;border-radius:999px;padding:6px 14px;z-index:2}
+  .crs-watch{display:inline-flex;align-items:center;gap:8px;color:var(--cc-teal-700);font-weight:700;font-size:16px;margin-top:auto}
+  .crs-watch svg{width:19px;height:19px;flex:0 0 auto}
   .crs-card{display:grid;grid-template-columns:1.05fr 1fr;background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:var(--radius-xl,24px);overflow:hidden;box-shadow:0 16px 44px rgba(47,23,72,.07);text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
   .crs-card:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(47,23,72,.13)}
   .crs-card-media{position:relative;min-height:100%}
@@ -67,7 +82,12 @@
 </section>
 
 <div class="cc-wrap">
-  <div class="crs-grid">
+  <div class="crs-tabs" id="crsTabs" role="tablist">
+    <button class="crs-tab on" type="button" data-grid="now" role="tab" aria-selected="true">الحالية<span class="n">1</span></button>
+    <button class="crs-tab" type="button" data-grid="past" role="tab" aria-selected="false">السابقة<span class="n">1</span></button>
+  </div>
+
+  <div class="crs-grid" id="gridNow">
     <a class="crs-card" href="raha.html">
       <div class="crs-card-media">
         <img src="img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية">
@@ -88,6 +108,30 @@
           <span class="was">148 د.ك</span>
         </div>
         <span class="crs-go">التفاصيل والتسجيل ←</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="crs-grid" id="gridPast" hidden>
+    <a class="crs-card past" href="liqa.html">
+      <div class="crs-card-media">
+        <img src="img/liqa-promo.jpg" alt="لقاء العلاج المالي مع كاش كلينك">
+        <span class="crs-donechip">انتهى</span>
+        <span class="crs-brandchip"><img src="../brand/nas-logo.png" alt="">كاش ناس</span>
+      </div>
+      <div class="crs-card-body">
+        <div class="crs-eq">الوعي المالي = تشخيص + علاج + وقاية</div>
+        <h2>لقاء العلاج المالي مع Cash Clinic</h2>
+        <div class="crs-chips">
+          <span class="crs-chip">الأربعاء 5/8/2026</span>
+          <span class="crs-chip">مجاني</span>
+          <span class="crs-chip">أونلاين</span>
+          <span class="crs-chip">التسجيل الكامل متاح</span>
+        </div>
+        <span class="crs-watch">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.6 14.2V7.8L16.6 12l-6.2 4.2Z"/></svg>
+          شاهد التسجيل الكامل ←
+        </span>
       </div>
     </a>
   </div>
@@ -124,6 +168,34 @@
   </div>
 </footer>
 
+<script>
+/* current / past switch. The chosen tab lives in the URL hash so a link like
+   courses/index.html#past opens straight on the finished programmes. */
+(function(){
+  var tabs = document.getElementById("crsTabs");
+  if(!tabs) return;
+  var grids = { now: document.getElementById("gridNow"), past: document.getElementById("gridPast") };
+
+  function show(key, push){
+    if(!grids[key]) key = "now";
+    Object.keys(grids).forEach(function(k){ grids[k].hidden = (k !== key); });
+    Array.prototype.forEach.call(tabs.querySelectorAll(".crs-tab"), function(b){
+      var on = b.dataset.grid === key;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if(push && history.replaceState) history.replaceState(null, "", key === "past" ? "#past" : location.pathname);
+  }
+
+  tabs.addEventListener("click", function(e){
+    var b = e.target.closest(".crs-tab");
+    if(b) show(b.dataset.grid, true);
+  });
+
+  show(location.hash === "#past" ? "past" : "now", false);
+  window.addEventListener("hashchange", function(){ show(location.hash === "#past" ? "past" : "now", false); });
+})();
+</script>
 <script src="../assets/js/nav.js"></script>
 </body>
 </html>
