@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>احجز استشارتك | Cash Clinic</title>
+<meta name="description" content="احجز استشارتك المالية مع استشاريي كاش كلينك، أونلاين أو حضوري.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="assets/ds/tokens/base.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<style>
+  body{background:var(--cc-purple-050)}
+  .bk-hero{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:46px 0 40px;position:relative;overflow:hidden}
+  .bk-hero .cc-wrap{position:relative;z-index:1;text-align:center}
+  .bk-hero .mark{position:absolute;inset-inline-end:-26px;bottom:-30px;width:150px;opacity:.12}
+  .bk-hero h1{font-size:clamp(25px,3.8vw,38px);font-weight:300;line-height:1.3;margin:14px 0 0;color:#fff}
+  .bk-hero p{font-size:16px;line-height:1.9;color:var(--cc-purple-100);margin:12px auto 0;max-width:52ch}
+  .bk-badge{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+
+  .bk-wrap{max-width:860px;margin:-24px auto 64px;padding:0 18px;position:relative;z-index:2}
+  .bk-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:22px;padding:26px 24px;box-shadow:0 16px 44px rgba(47,23,72,.10);margin-bottom:18px}
+  .bk-card h2{font-size:18px;font-weight:700;color:var(--cc-purple);margin:0 0 4px}
+  .bk-card .hint{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:0 0 18px}
+  .bk-step{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--cc-purple);color:var(--cc-cream);font-size:14px;font-weight:700;margin-inline-end:9px}
+
+  /* packages */
+  .pk{display:grid;gap:12px}
+  .pk label{display:block;cursor:pointer}
+  .pk input{position:absolute;opacity:0;pointer-events:none}
+  .pk .box{border:2px solid var(--cc-grey-200);border-radius:16px;padding:16px 18px;transition:.15s;display:flex;gap:14px;align-items:flex-start}
+  .pk input:checked + .box{border-color:var(--cc-purple);background:var(--cc-purple-050)}
+  .pk .box .t{flex:1 1 auto}
+  .pk .box .nm{font-size:16.5px;font-weight:700;color:var(--cc-purple);margin-bottom:4px}
+  .pk .box .tg{font-size:14px;color:var(--cc-grey-700);line-height:1.75}
+  .pk .box .pr{flex:0 0 auto;text-align:center;background:var(--cc-cream);border-radius:12px;padding:9px 13px;font-weight:700;color:var(--cc-purple);font-size:15px;white-space:nowrap}
+  .pk .box .du{display:block;font-size:11.5px;font-weight:400;color:var(--cc-grey-700);margin-top:2px}
+
+  /* mode */
+  .md{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.md{grid-template-columns:1fr}}
+  .md label{cursor:pointer}
+  .md input{position:absolute;opacity:0;pointer-events:none}
+  .md .box{border:2px solid var(--cc-grey-200);border-radius:16px;padding:15px 16px;text-align:center;transition:.15s}
+  .md input:checked + .box{border-color:var(--cc-teal);background:var(--cc-teal-050,#EAF5F5)}
+  .md .box b{display:block;font-size:16px;color:var(--cc-purple);margin-bottom:4px}
+  .md .box span{font-size:13px;color:var(--cc-grey-700);line-height:1.7}
+  .md input:disabled + .box{opacity:.45;cursor:not-allowed}
+
+  /* days + slots */
+  .days{display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+  .day{flex:0 0 auto;border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:14px;padding:11px 15px;text-align:center;cursor:pointer;font-family:inherit;min-width:82px;transition:.15s}
+  .day.on{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream)}
+  .day .dw{display:block;font-size:12.5px;opacity:.8}
+  .day .dd{display:block;font-size:17px;font-weight:700;margin-top:2px}
+  .day .dm{display:block;font-size:11.5px;opacity:.75}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px;margin-top:16px}
+  .slot{border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:12px;padding:12px 8px;font-size:15px;font-family:inherit;color:var(--cc-ink);cursor:pointer;transition:.15s;direction:ltr}
+  .slot:hover{border-color:var(--cc-purple-200)}
+  .slot.on{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream);font-weight:700}
+  .bk-empty{text-align:center;color:var(--cc-grey-500);font-size:14.5px;padding:26px 10px;line-height:1.9}
+
+  /* form */
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
+  .fld input,.fld textarea,.fld select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);box-sizing:border-box}
+  .fld textarea{min-height:84px;resize:vertical;line-height:1.8}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:0;border-color:var(--cc-purple)}
+  .phone{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:9px}
+
+  .sum{background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:14px;padding:15px 17px;margin-bottom:16px;font-size:14.5px;line-height:2;color:var(--cc-purple)}
+  .sum b{color:var(--cc-ink)}
+  .pay{width:100%;padding:17px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+  .pay:hover{filter:brightness(1.08)}
+  .pay:disabled{opacity:.55;cursor:not-allowed}
+  .err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:12px 15px;font-size:14.5px;margin-top:13px;text-align:center;line-height:1.75}
+  .ok{display:none;background:#E9F7EF;color:#1B7A43;border:1px solid #BDE5CB;border-radius:12px;padding:14px 16px;font-size:15px;text-align:center;line-height:1.9}
+  .muted{font-size:13px;color:var(--cc-grey-500);line-height:1.85;text-align:center;margin-top:14px}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="index.html"><img src="brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820" style="font-size:15px;padding:11px 20px;">
+      <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+      <span>استفسار</span>
+    </a>
+  </div>
+</header>
+
+<section class="bk-hero">
+  <div class="cc-wrap">
+    <span class="bk-badge" id="bkBadge">حجز استشارة</span>
+    <h1 id="bkTitle">احجز استشارتك</h1>
+    <p id="bkSub">اختر الباقة والموعد اللي يناسبك، وادفع أونلاين. بيوصلك تأكيد على إيميلك مع ملف تقويم.</p>
+  </div>
+  <img class="mark" src="brand/mark/mark-cream.png" alt="">
+</section>
+
+<div class="bk-wrap">
+
+  <div class="bk-card hide" id="bkPreview" style="background:#FFF7E8;border-color:var(--cc-gold);padding:14px 18px">
+    <p class="hint" style="margin:0;text-align:center;color:var(--cc-purple);font-weight:700">
+      وضع المعاينة · الصفحة لسه مو منشورة للعملاء
+    </p>
+  </div>
+
+  <div class="bk-card" id="bkLoading">
+    <p class="hint" style="margin:0;text-align:center">جارٍ تحميل المواعيد…</p>
+  </div>
+
+  <div class="bk-card hide" id="bkSoon" style="text-align:center">
+    <div style="font-size:46px;margin-bottom:12px">🗓️</div>
+    <h2 style="justify-content:center">الحجز يفتح قريباً</h2>
+    <p class="hint" style="margin:0 auto 20px;max-width:44ch">
+      نجهّز مواعيد الاستشارات الحين. خلّك متابعنا وبنعلن عن فتح الحجز أول ما يجهز.
+    </p>
+    <a class="pay" href="index.html#newsletter" style="display:inline-block;width:auto;padding:15px 32px;text-decoration:none">اشترك بالنشرة ونخبرك أول ما نفتح</a>
+    <p class="muted">أو راسلنا واتساب ونرتب لك موعد بشكل خاص.</p>
+  </div>
+
+  <!-- 1 · package -->
+  <div class="bk-card hide" id="cardPkg">
+    <h2><span class="bk-step">١</span> اختر الاستشارة</h2>
+    <p class="hint" id="pkgHint">كل استشارة ساعة كاملة مع الاستشاري مباشرة.</p>
+    <div class="pk" id="pkgList"></div>
+  </div>
+
+  <!-- 2 · mode -->
+  <div class="bk-card hide" id="cardMode">
+    <h2><span class="bk-step">٢</span> أونلاين ولا حضوري؟</h2>
+    <p class="hint" id="modeHint"></p>
+    <div class="md">
+      <label><input type="radio" name="mode" value="online" checked>
+        <div class="box"><b>أونلاين</b><span id="mOnline">جوجل ميت</span></div></label>
+      <label><input type="radio" name="mode" value="present">
+        <div class="box"><b>حضوري</b><span id="mPresent">بالمقر</span></div></label>
+    </div>
+  </div>
+
+  <!-- 3 · date + slot -->
+  <div class="bk-card hide" id="cardSlot">
+    <h2><span class="bk-step">٣</span> اختر الموعد</h2>
+    <p class="hint">التوقيت بتوقيت الكويت.</p>
+    <div class="days" id="dayList"></div>
+    <div class="slots" id="slotList"></div>
+    <div class="bk-empty hide" id="slotEmpty">ما في مواعيد متاحة بهذي الفترة. جرب الطريقة الثانية أو راسلنا واتساب.</div>
+  </div>
+
+  <!-- 4 · details -->
+  <div class="bk-card hide" id="cardForm">
+    <h2><span class="bk-step">٤</span> بياناتك</h2>
+    <div class="sum" id="sum"></div>
+    <div class="fld"><label>الاسم</label><input id="bName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
+    <div class="fld"><label>الإيميل</label><input id="bEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
+    <div class="fld"><label>رقم الواتساب</label>
+      <div class="phone">
+        <select id="bCC" aria-label="مفتاح الدولة">
+          <option value="965" selected>🇰🇼 +965 الكويت</option>
+          <option value="966">🇸🇦 +966 السعودية</option>
+          <option value="971">🇦🇪 +971 الإمارات</option>
+          <option value="974">🇶🇦 +974 قطر</option>
+          <option value="973">🇧🇭 +973 البحرين</option>
+          <option value="968">🇴🇲 +968 عُمان</option>
+          <option value="20">🇪🇬 +20 مصر</option>
+          <option value="962">🇯🇴 +962 الأردن</option>
+          <option value="961">🇱🇧 +961 لبنان</option>
+          <option value="964">🇮🇶 +964 العراق</option>
+          <option value="90">🇹🇷 +90 تركيا</option>
+          <option value="44">🇬🇧 +44 بريطانيا</option>
+          <option value="1">🇺🇸 +1 أمريكا / كندا</option>
+        </select>
+        <input id="bPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right">
+      </div>
+    </div>
+    <div class="fld"><label>تحب تذكر شي قبل الاستشارة؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
+      <textarea id="bNotes" placeholder="أي معلومة تساعد الاستشاري يجهّز لك…"></textarea></div>
+    <button class="pay" id="payBtn" type="button">ادفع واحجز</button>
+    <div class="err" id="bErr"></div>
+    <p class="muted">الدفع آمن عبر Tap. الحجز يتأكد فور نجاح الدفع.</p>
+  </div>
+
+  <!-- reschedule mode -->
+  <div class="bk-card hide" id="cardResched">
+    <h2>تغيير موعدك</h2>
+    <div class="sum" id="reschedSum"></div>
+    <button class="pay hide" id="reschedBtn" type="button">أكّد الموعد الجديد</button>
+    <div class="ok" id="reschedOk"></div>
+    <div class="err" id="reschedErr"></div>
+  </div>
+
+</div>
+
+<script src="assets/js/email-typo.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+
+const app = initializeApp(CONFIG.firebase);
+const fns = getFunctions(app, CONFIG.functionsRegion);
+const getBookingOptions   = httpsCallable(fns,"getBookingOptions");
+const getAvailableSlots   = httpsCallable(fns,"getAvailableSlots");
+const createBookingCharge = httpsCallable(fns,"createBookingCharge");
+const getBookingByToken   = httpsCallable(fns,"getBookingByToken");
+const rescheduleBooking   = httpsCallable(fns,"rescheduleBooking");
+
+const $  = s => document.querySelector(s);
+const esc = t => String(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const show = (sel,on) => $(sel).classList.toggle("hide", !on);
+
+const AR_DAY = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const AR_MON = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+/* the page always speaks Kuwait time, whatever the visitor's device is set to */
+const KW_OFFSET = 180;
+function kwParts(iso){
+  const k = new Date(Date.parse(iso) + KW_OFFSET*60000);
+  return { y:k.getUTCFullYear(), m:k.getUTCMonth(), d:k.getUTCDate(),
+           w:k.getUTCDay(), hh:k.getUTCHours(), mm:k.getUTCMinutes() };
+}
+function human12(iso){
+  const p = kwParts(iso);
+  const ap = p.hh >= 12 ? "م" : "ص";
+  const h  = p.hh % 12 === 0 ? 12 : p.hh % 12;
+  return h + (p.mm ? ":"+String(p.mm).padStart(2,"0") : "") + " " + ap;
+}
+function humanFull(iso){
+  const p = kwParts(iso);
+  return `${AR_DAY[p.w]} ${p.d} ${AR_MON[p.m]} · ${human12(iso)}`;
+}
+
+const QS = new URLSearchParams(location.search);
+const PREVIEW = QS.get("preview") || "";
+const CONSULTANT_ID = QS.get("c") || "ghalia";
+const RESCHED = { id:QS.get("r"), token:QS.get("t") };
+
+let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO = "";
+
+/* ---------------- boot ---------------- */
+(async function boot(){
+  try{
+    const r = await getBookingOptions({ preview: PREVIEW });
+    const data = r.data || {};
+    if(data.preview) show("#bkPreview",true);
+    /* not launched yet: show the holding page and stop */
+    if(data.live === false && !data.preview){
+      show("#bkLoading",false); show("#bkSoon",true);
+      $("#bkBadge").textContent = "قريباً";
+      $("#bkTitle").textContent = "حجز الاستشارات";
+      $("#bkSub").textContent   = "نجهّز المواعيد الحين.";
+      return;
+    }
+    const list = data.consultants || [];
+    C = list.find(x => x.id === CONSULTANT_ID) || list[0];
+    if(!C){ $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">الحجز مقفل حالياً. راسلنا واتساب ونرتب لك موعد.</p>'; return; }
+
+    $("#bkTitle").textContent = "احجز استشارتك مع " + C.name;
+    $("#bkSub").textContent = C.title;
+    $("#mOnline").textContent  = "جوجل ميت · " + dayRange(C.modes.online);
+    $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
+    $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك.";
+
+    if(!C.modes.present.enabled) document.querySelector('input[name="mode"][value="present"]').disabled = true;
+    if(!C.modes.online.enabled){
+      document.querySelector('input[name="mode"][value="online"]').disabled = true;
+      document.querySelector('input[name="mode"][value="present"]').checked = true; MODE = "present";
+    }
+
+    if(RESCHED.id && RESCHED.token){ await bootReschedule(); return; }
+
+    $("#pkgList").innerHTML = C.packages.map((p,i) => `
+      <label><input type="radio" name="pkg" value="${esc(p.id)}"${i===0?" checked":""}>
+        <div class="box">
+          <div class="t"><div class="nm">${esc(p.name)}</div><div class="tg">${esc(p.tagline||"")}</div></div>
+          <div class="pr">${p.amount} د.ك<span class="du">${p.minutes} دقيقة</span></div>
+        </div></label>`).join("");
+    PKG = C.packages[0];
+
+    show("#bkLoading",false); show("#cardPkg",true); show("#cardMode",true); show("#cardSlot",true);
+    document.querySelectorAll('input[name="pkg"]').forEach(el =>
+      el.addEventListener("change", () => { PKG = C.packages.find(p=>p.id===el.value); loadSlots(); }));
+    document.querySelectorAll('input[name="mode"]').forEach(el =>
+      el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
+    loadSlots();
+  }catch(e){
+    $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">تعذّر تحميل المواعيد. حدّث الصفحة أو راسلنا واتساب.</p>';
+  }
+})();
+
+function dayRange(m){
+  if(!m || !m.enabled || !m.days || !m.days.length) return "مغلق";
+  const d = m.days.slice().sort((a,b)=>a-b);
+  const cont = d.every((v,i)=> i===0 || v === d[i-1]+1);
+  const span = cont && d.length>1 ? `${AR_DAY[d[0]]} إلى ${AR_DAY[d[d.length-1]]}` : d.map(x=>AR_DAY[x]).join(" · ");
+  return `${span} · ${to12(m.start)} إلى ${to12(m.end)}`;
+}
+function to12(hhmm){
+  const [h,m] = String(hhmm).split(":").map(Number);
+  const ap = h>=12 ? "م" : "ص"; const h12 = h%12===0?12:h%12;
+  return h12 + (m?":"+String(m).padStart(2,"0"):"") + ap;
+}
+
+/* ---------------- slots ---------------- */
+async function loadSlots(){
+  PICK_ISO = "";
+  $("#slotList").innerHTML = "";
+  $("#dayList").innerHTML = '<div class="bk-empty" style="padding:12px">جارٍ التحميل…</div>';
+  show("#cardForm",false); show("#slotEmpty",false);
+  try{
+    const r = await getAvailableSlots({ consultantId:C.id, mode:MODE, packageId: PKG && PKG.id, preview: PREVIEW });
+    DAYS = (r.data && r.data.days) || [];
+    if(!DAYS.length){ $("#dayList").innerHTML = ""; show("#slotEmpty",true); return; }
+    PICK_DATE = DAYS[0].date;
+    renderDays(); renderSlots();
+  }catch(e){
+    $("#dayList").innerHTML = "";
+    show("#slotEmpty",true);
+  }
+}
+
+function renderDays(){
+  $("#dayList").innerHTML = DAYS.map(d => {
+    const p = kwParts(d.slots[0].iso);
+    return `<button class="day${d.date===PICK_DATE?" on":""}" type="button" data-date="${esc(d.date)}">
+      <span class="dw">${AR_DAY[p.w]}</span><span class="dd">${p.d}</span><span class="dm">${AR_MON[p.m]}</span></button>`;
+  }).join("");
+}
+function renderSlots(){
+  const day = DAYS.find(d => d.date === PICK_DATE);
+  if(!day){ $("#slotList").innerHTML = ""; return; }
+  $("#slotList").innerHTML = day.slots.map(s =>
+    `<button class="slot${s.iso===PICK_ISO?" on":""}" type="button" data-iso="${esc(s.iso)}">${human12(s.iso)}</button>`).join("");
+}
+
+$("#dayList").addEventListener("click", e => {
+  const b = e.target.closest(".day"); if(!b) return;
+  PICK_DATE = b.dataset.date; PICK_ISO = "";
+  renderDays(); renderSlots(); show("#cardForm",false);
+});
+$("#slotList").addEventListener("click", e => {
+  const b = e.target.closest(".slot"); if(!b) return;
+  PICK_ISO = b.dataset.iso;
+  renderSlots();
+  if(RESCHED.id) return showReschedConfirm();
+  $("#sum").innerHTML =
+    `<b>${esc(PKG.name)}</b> مع ${esc(C.name)}<br>` +
+    `${humanFull(PICK_ISO)}<br>` +
+    `${MODE==="present" ? "حضوري · " + esc(C.location||"بالمقر") : "أونلاين · جوجل ميت"}<br>` +
+    `<b>${PKG.amount} د.ك</b> · ${PKG.minutes} دقيقة`;
+  show("#cardForm",true);
+  $("#cardForm").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+/* ---------------- pay ---------------- */
+function fail(m){ const e=$("#bErr"); e.textContent=m; e.style.display="block"; }
+
+$("#payBtn").addEventListener("click", async () => {
+  $("#bErr").style.display="none";
+  const name=$("#bName").value.trim(), email=$("#bEmail").value.trim(), phone=$("#bPhone").value.trim();
+  if(name.length<2) return fail("اكتب اسمك");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("إيميل غير صحيح");
+  const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
+  if(fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#bEmail")); return fail("تأكد من إيميلك، هل تقصد "+fix+"؟"); }
+  if(phone.replace(/\D/g,"").length<7) return fail("رقم واتساب غير صحيح");
+  if(!PICK_ISO) return fail("اختر موعد أول");
+
+  const cc = $("#bCC").value;
+  let local = phone.replace(/\D/g,"").replace(/^0+/,"");
+  if(cc && local.indexOf(cc)===0 && local.length>cc.length) local = local.slice(cc.length);
+
+  $("#payBtn").disabled=true; $("#payBtn").textContent="جارٍ التحويل للدفع…";
+  try{
+    const r = await createBookingCharge({
+      consultantId:C.id, packageId:PKG.id, mode:MODE, startIso:PICK_ISO,
+      name, email, phone:"+"+cc+local, notes:$("#bNotes").value.trim(), preview: PREVIEW,
+    });
+    const url = r.data && r.data.url;
+    if(!url) throw new Error("no url");
+    location.href = url;
+  }catch(e){
+    fail((e && e.message) || "تعذّر إنشاء الدفعة، حاول مرة ثانية");
+    /* somebody may have taken the slot while this form was open */
+    loadSlots();
+    $("#payBtn").disabled=false; $("#payBtn").textContent="ادفع واحجز";
+  }
+});
+
+/* ---------------- reschedule ---------------- */
+async function bootReschedule(){
+  show("#cardResched",true); show("#bkLoading",false);
+  $("#bkBadge").textContent = "تغيير موعد";
+  $("#bkTitle").textContent = "غيّر موعد استشارتك";
+  $("#bkSub").textContent = "اختر الموعد الجديد اللي يناسبك.";
+  try{
+    const r = await getBookingByToken({ orderId:RESCHED.id, token:RESCHED.token });
+    const b = r.data || {};
+    PKG = (C.packages.find(p=>p.id===b.packageId)) || { id:b.packageId, name:b.packageName, minutes:b.minutes, amount:0 };
+    MODE = b.mode;
+    $("#reschedSum").innerHTML = `<b>${esc(b.packageName)}</b> مع ${esc(b.consultantName)}<br>موعدك الحالي: ${humanFull(b.startIso)}`;
+    if(!b.canReschedule){
+      $("#reschedErr").textContent = b.rescheduled
+        ? "تم تغيير هذا الموعد مرة وحدة. لأي تغيير ثاني راسلنا واتساب."
+        : "ما يمكن تغيير الموعد قبل أقل من 24 ساعة. راسلنا واتساب ونساعدك.";
+      $("#reschedErr").style.display = "block";
+      return;
+    }
+    show("#cardSlot",true);
+    loadSlots();
+  }catch(e){
+    $("#reschedErr").textContent = (e && e.message) || "الرابط غير صحيح";
+    $("#reschedErr").style.display = "block";
+  }
+}
+function showReschedConfirm(){
+  $("#reschedErr").style.display="none";
+  $("#reschedSum").innerHTML += `<br><br>الموعد الجديد: <b>${humanFull(PICK_ISO)}</b>`;
+  show("#reschedBtn",true);
+  $("#cardResched").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("#reschedBtn").addEventListener("click", async () => {
+  $("#reschedErr").style.display="none";
+  $("#reschedBtn").disabled=true; $("#reschedBtn").textContent="جارٍ الحفظ…";
+  try{
+    await rescheduleBooking({ orderId:RESCHED.id, token:RESCHED.token, startIso:PICK_ISO });
+    show("#cardSlot",false); show("#reschedBtn",false);
+    $("#reschedOk").textContent = "تم تغيير موعدك ✅ بيوصلك تأكيد جديد على إيميلك.";
+    $("#reschedOk").style.display="block";
+  }catch(e){
+    $("#reschedErr").textContent = (e && e.message) || "تعذّر التغيير";
+    $("#reschedErr").style.display="block";
+    $("#reschedBtn").disabled=false; $("#reschedBtn").textContent="أكّد الموعد الجديد";
+  }
+});
+</script>
+</body>
+</html>

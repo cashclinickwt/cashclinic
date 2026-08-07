@@ -105,6 +105,49 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* bookings */
+  .bklaunch{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+    border-radius:16px;padding:16px 18px;margin-bottom:16px;border:1px solid var(--line);background:#fff}
+  .bklaunch.off{background:#FFF7E8;border-color:var(--gold)}
+  .bklaunch.on{background:#E8F5E9;border-color:#2E7D32}
+  .bklaunch .t{flex:1 1 260px}
+  .bklaunch .t b{display:block;font-size:15.5px;color:var(--ink);margin-bottom:3px}
+  .bklaunch .t span{font-size:13px;color:var(--muted);line-height:1.75}
+  .bklaunch button{border:0;border-radius:999px;padding:12px 26px;font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;color:#fff}
+  .bklaunch .go{background:#2E7D32}
+  .bklaunch .stop{background:#962E37}
+  .bkprev{font-size:12.5px;color:var(--muted);direction:ltr;text-align:left;word-break:break-all;flex:1 1 100%}
+  .bkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:14px}
+  .bkbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .bkbox h4{margin:0 0 10px;font-size:13.5px;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .bkdays{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .bkday{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
+  .bkday.on{background:var(--auber);border-color:var(--auber);color:#fff;font-weight:700}
+  .bktime{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .bkf label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .bkf input,.bkf select,.bkf textarea{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;box-sizing:border-box}
+  .bkf{margin-bottom:11px}
+  .bksave{border:0;border-radius:999px;background:var(--auber);color:#fff;padding:12px 26px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+  .bksave:disabled{opacity:.6;cursor:default}
+  .bkmsg{display:none;font-size:13.5px;border-radius:10px;padding:10px 13px;line-height:1.7;margin-bottom:12px}
+  .bkmsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .bkmsg.err{display:block;background:#FDECEC;color:#962E37}
+  .bkcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .bkcard.soon{border-inline-start:4px solid #2F8789}
+  .bkcard.gone{opacity:.6}
+  .bkcard.cx{border-inline-start:4px solid #962E37;opacity:.7}
+  .bkh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:7px}
+  .bkh b{color:var(--ink);font-size:14.5px}
+  .bkpill{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
+  .bkwhen{font-size:15px;font-weight:700;color:var(--auber);margin-bottom:5px}
+  .bknote{font-size:13.5px;line-height:1.8;color:var(--ink);margin-top:7px;white-space:pre-wrap;word-break:break-word}
+  .bkacts{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .bkacts button,.bkacts a{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
+  .bkacts .no{border-color:#962E37;color:#962E37}
+  .bkacts .wa{border-color:#25D366;color:#128C4A}
+  .bkchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .bkchip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink);display:inline-flex;align-items:center;gap:7px}
+  .bkchip button{border:0;background:none;color:#962E37;cursor:pointer;font-size:15px;line-height:1;padding:0}
   /* event ratings */
   .rtbars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:18px}
   .rtbar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
@@ -200,6 +243,7 @@
     <button data-tab="quiz">الاختبارات</button>
     <button data-tab="events">معلومات اللقاء</button>
     <button data-tab="live">البث المباشر</button>
+    <button data-tab="bookings">المواعيد</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
@@ -316,6 +360,84 @@
     <div class="tbl" id="lvAttTbl"></div>
   </div>
 
+  <div class="sec" id="bookingsSec" data-panel="bookings">
+    <h2><span></span> المواعيد</h2>
+    <div class="bkmsg" id="bkMsg"></div>
+    <div class="bklaunch" id="bkLaunch" hidden></div>
+    <div class="kpis" id="bkKpis"></div>
+
+    <div class="flt" id="bkWho"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل</h2>
+    <div class="bkgrid">
+      <div class="bkbox">
+        <h4>أونلاين <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="onEn" checked> مفعّل</label></h4>
+        <div class="bkdays" id="onDays"></div>
+        <div class="bktime">
+          <div class="bkf"><label>من</label><input id="onStart" type="time" step="1800"></div>
+          <div class="bkf"><label>إلى</label><input id="onEnd" type="time" step="1800"></div>
+        </div>
+        <div class="bkf"><label>رابط جوجل ميت</label><input id="onMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
+      </div>
+      <div class="bkbox">
+        <h4>حضوري <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="prEn" checked> مفعّل</label></h4>
+        <div class="bkdays" id="prDays"></div>
+        <div class="bktime">
+          <div class="bkf"><label>من</label><input id="prStart" type="time" step="1800"></div>
+          <div class="bkf"><label>إلى</label><input id="prEnd" type="time" step="1800"></div>
+        </div>
+        <div class="bkf"><label>العنوان</label><input id="prLoc" type="text" placeholder="برج التجارية، الدور ..، مكتب .."></div>
+      </div>
+      <div class="bkbox">
+        <h4>أيام مقفلة</h4>
+        <div class="bkf"><label>أضف يوم إجازة</label><input id="blkDate" type="date"></div>
+        <div class="bkchips" id="blkList"></div>
+        <h4 style="margin-top:14px">موعد خارج الجدول</h4>
+        <div class="bktime">
+          <div class="bkf"><label>التاريخ</label><input id="exDate" type="date"></div>
+          <div class="bkf"><label>الساعة</label><input id="exTime" type="time" step="1800"></div>
+        </div>
+        <div class="bkf"><label>الطريقة</label><select id="exMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <button class="bkday" id="exAdd" type="button" style="border-color:var(--auber);color:var(--auber)">أضف الموعد</button>
+        <div class="bkchips" id="exList" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <button class="bksave" id="bkSave">احفظ الجدول</button>
+
+    <h2 style="font-size:17px;margin-top:26px"><span></span> الحجوزات</h2>
+    <div class="flt" id="bkFlt">
+      <button data-bk="upcoming" class="on">القادمة</button>
+      <button data-bk="past">السابقة</button>
+      <button data-bk="cancelled">الملغية</button>
+      <button data-bk="all">الكل</button>
+    </div>
+    <div id="bkList"></div>
+
+    <h2 style="font-size:17px;margin-top:26px"><span></span> أضف موعد يدوي</h2>
+    <p class="muted" style="font-size:13px;margin:0 0 12px">للمواعيد اللي تنحجز واتساب أو تليفون. ينحجز على طول بدون دفع أونلاين، وتقدر تحطه خارج أوقات الجدول.</p>
+    <div class="bkgrid">
+      <div class="bkbox">
+        <div class="bkf"><label>الاسم</label><input id="mbName" type="text"></div>
+        <div class="bkf"><label>الإيميل</label><input id="mbEmail" type="email" style="direction:ltr;text-align:left"></div>
+        <div class="bkf"><label>الجوال</label><input id="mbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
+      </div>
+      <div class="bkbox">
+        <div class="bkf"><label>الباقة</label><select id="mbPkg"></select></div>
+        <div class="bkf"><label>الطريقة</label><select id="mbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <div class="bktime">
+          <div class="bkf"><label>التاريخ</label><input id="mbDate" type="date"></div>
+          <div class="bkf"><label>الساعة</label><input id="mbTime" type="time" step="1800"></div>
+        </div>
+      </div>
+      <div class="bkbox">
+        <div class="bkf"><label>المبلغ المدفوع (د.ك)</label><input id="mbAmount" type="number" min="0" step="1" value="0"></div>
+        <div class="bkf"><label>ملاحظات</label><textarea id="mbNotes" rows="3"></textarea></div>
+        <label style="font-size:13px;color:var(--ink)"><input type="checkbox" id="mbNotify" checked> أرسل تأكيد بالإيميل</label>
+      </div>
+    </div>
+    <button class="bksave" id="mbAdd">أضف الموعد</button>
+  </div>
+
   <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
     <h2><span></span> المشتركين بالنشرة</h2>
     <div class="kpis" id="subKpis"></div>
@@ -348,6 +470,10 @@ const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendC
 const setLiveConfig=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLiveConfig");
 const moderateLiveQuestion=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"moderateLiveQuestion");
 const fixRegistrantEmail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"fixRegistrantEmail");
+const setConsultantSchedule=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setConsultantSchedule");
+const addManualBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualBooking");
+const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelBooking");
+const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -440,14 +566,14 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","quiz","events","live","subscribers","bookq","courses","composer","reports"];
+const PANEL_ORDER=["sales","quiz","events","live","bookings","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
@@ -566,6 +692,209 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= BOOKINGS ================= */
+let BKWHO="", BKFILTER="upcoming", BKSCHED=null;
+const BK_DAYS=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const BK_MON=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const KWOFF=180;
+
+function bkParts(iso){
+  const k=new Date(Date.parse(iso)+KWOFF*60000);
+  return {y:k.getUTCFullYear(),m:k.getUTCMonth(),d:k.getUTCDate(),w:k.getUTCDay(),hh:k.getUTCHours(),mm:k.getUTCMinutes()};
+}
+function bkWhen(iso){
+  if(!iso) return "—";
+  const p=bkParts(iso), ap=p.hh>=12?"م":"ص", h=p.hh%12===0?12:p.hh%12;
+  return `${BK_DAYS[p.w]} ${p.d} ${BK_MON[p.m]} · ${h}${p.mm?":"+String(p.mm).padStart(2,"0"):""} ${ap}`;
+}
+function bkMsg(m,ok){ const e=$("#bkMsg"); if(!e) return; e.textContent=m; e.className="bkmsg "+(ok?"ok":"err");
+  if(ok) setTimeout(()=>{ e.className="bkmsg"; },4000); }
+
+function renderBookings(){
+  const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;
+  const cons=B.consultants||[];
+  if(!cons.length){ sec.hidden=true; return; }
+  sec.hidden=false;
+
+  if(!BKWHO || !cons.some(c=>c.id===BKWHO)) BKWHO=cons[0].id;
+  $("#bkWho").innerHTML = cons.length>1
+    ? cons.map(c=>`<button data-who="${esc(c.id)}"${c.id===BKWHO?' class="on"':''}>${esc(c.name)}</button>`).join("")
+    : "";
+
+  paintLaunch(B);
+
+  const t=B.totals||{};
+  $("#bkKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(t.upcoming||0)}</div><div class="l">مواعيد قادمة</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.past||0)}</div><div class="l">مواعيد سابقة</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.cancelled||0)}</div><div class="l">ملغية</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(t.revenue||0)} <span style="font-size:14px">د.ك</span></div><div class="l">إيراد الاستشارات</div></div>`;
+
+  BKSCHED = (B.schedules||{})[BKWHO] || null;
+  paintSchedule();
+
+  const pkgs=(cons.find(c=>c.id===BKWHO)||{}).packages||[];
+  $("#mbPkg").innerHTML = pkgs.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${p.amount} د.ك</option>`).join("")
+    + `<option value="custom">موعد خاص</option>`;
+
+  renderBkList();
+}
+
+function paintLaunch(B){
+  const box=$("#bkLaunch"); if(!box) return;
+  /* only the admin role gets the switch; a consultant just sees the state */
+  const canLaunch = !!B.previewKey;
+  box.hidden=false;
+  box.className = "bklaunch " + (B.live ? "on" : "off");
+  const prev = B.previewKey
+    ? `<div class="bkprev">رابط المعاينة: ${location.origin}/book.html?preview=${encodeURIComponent(B.previewKey)}</div>` : "";
+  box.innerHTML = B.live
+    ? `<div class="t"><b>الحجز مفتوح للعملاء ✅</b><span>صفحة book.html شغّالة والعملاء يقدرون يحجزون ويدفعون.</span></div>
+       ${canLaunch?'<button class="stop" id="bkToggle" data-live="0">أوقف الحجز</button>':""}${prev}`
+    : `<div class="t"><b>الحجز مقفل · وضع التجهيز</b><span>العملاء يشوفون صفحة «قريباً» وما يقدرون يدفعون. جهّز جدولك ورابط الميت والعنوان، وبعدين افتح الحجز.</span></div>
+       ${canLaunch?'<button class="go" id="bkToggle" data-live="1">افتح الحجز للعملاء</button>':""}${prev}`;
+}
+
+$("#bkLaunch") && $("#bkLaunch").addEventListener("click", async e=>{
+  const b=e.target.closest("#bkToggle"); if(!b) return;
+  const goLive = b.dataset.live === "1";
+  if(goLive && !confirm("بتفتح الحجز لكل العملاء. متأكد إن الجدول ورابط الميت والعنوان جاهزين؟")) return;
+  if(!goLive && !confirm("بتوقف الحجز. العملاء بيشوفون صفحة «قريباً». الحجوزات الحالية ما تتأثر.")) return;
+  b.disabled=true; const t=b.textContent; b.textContent="لحظة…";
+  try{
+    const r=await setBookingLive({ live: goLive });
+    DATA.bookings.live = !!(r.data && r.data.live);
+    paintLaunch(DATA.bookings);
+    bkMsg(DATA.bookings.live ? "انفتح الحجز ✅ صفحة book.html صارت شغّالة للعملاء."
+                             : "انقفل الحجز. العملاء بيشوفون صفحة «قريباً».", true);
+  }catch(err){ bkMsg((err&&err.message)||"تعذّر التغيير",false); b.disabled=false; b.textContent=t; }
+});
+
+function paintSchedule(){
+  const sc=BKSCHED; if(!sc) return;
+  const dayBtns=(host,sel)=>{ $(host).innerHTML=BK_DAYS.map((d,i)=>
+    `<button class="bkday${sel.indexOf(i)!==-1?" on":""}" type="button" data-d="${i}">${d}</button>`).join(""); };
+  dayBtns("#onDays", sc.online.days||[]); dayBtns("#prDays", sc.present.days||[]);
+  $("#onEn").checked = sc.online.enabled!==false;  $("#prEn").checked = sc.present.enabled!==false;
+  $("#onStart").value=sc.online.start;  $("#onEnd").value=sc.online.end;
+  $("#prStart").value=sc.present.start; $("#prEnd").value=sc.present.end;
+  $("#onMeet").value=sc.meetUrl||"";    $("#prLoc").value=sc.location||"";
+  $("#blkList").innerHTML=(sc.blocked||[]).map(d=>
+    `<span class="bkchip">${esc(d)}<button type="button" data-blk="${esc(d)}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
+  $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
+    `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${x.mode==="present"?"حضوري":"أونلاين"}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
+}
+
+function pickedDays(host){ return Array.from(document.querySelectorAll(host+" .bkday.on")).map(b=>Number(b.dataset.d)); }
+
+$("#bkWho") && $("#bkWho").addEventListener("click",e=>{ const b=e.target.closest("button[data-who]"); if(!b)return;
+  BKWHO=b.dataset.who; renderBookings(); });
+$("#onDays") && $("#onDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
+$("#prDays") && $("#prDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
+
+$("#blkDate") && $("#blkDate").addEventListener("change",()=>{
+  const v=$("#blkDate").value; if(!v||!BKSCHED) return;
+  if(BKSCHED.blocked.indexOf(v)===-1) BKSCHED.blocked.push(v);
+  BKSCHED.blocked.sort(); $("#blkDate").value=""; paintSchedule();
+});
+$("#blkList") && $("#blkList").addEventListener("click",e=>{ const b=e.target.closest("button[data-blk]"); if(!b||!BKSCHED)return;
+  BKSCHED.blocked=BKSCHED.blocked.filter(x=>x!==b.dataset.blk); paintSchedule(); });
+$("#exAdd") && $("#exAdd").addEventListener("click",()=>{
+  if(!BKSCHED) return;
+  const date=$("#exDate").value, time=$("#exTime").value, mode=$("#exMode").value;
+  if(!date||!time) return bkMsg("اختر التاريخ والساعة",false);
+  BKSCHED.extra.push({date,time,mode}); $("#exDate").value=""; $("#exTime").value=""; paintSchedule();
+});
+$("#exList") && $("#exList").addEventListener("click",e=>{ const b=e.target.closest("button[data-ex]"); if(!b||!BKSCHED)return;
+  BKSCHED.extra.splice(Number(b.dataset.ex),1); paintSchedule(); });
+
+$("#bkSave") && $("#bkSave").addEventListener("click",async()=>{
+  const btn=$("#bkSave"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الحفظ…";
+  try{
+    const r=await setConsultantSchedule({
+      consultantId:BKWHO,
+      online:{enabled:$("#onEn").checked,days:pickedDays("#onDays"),start:$("#onStart").value,end:$("#onEnd").value},
+      present:{enabled:$("#prEn").checked,days:pickedDays("#prDays"),start:$("#prStart").value,end:$("#prEnd").value},
+      meetUrl:$("#onMeet").value.trim(), location:$("#prLoc").value.trim(),
+      blocked:(BKSCHED&&BKSCHED.blocked)||[], extra:(BKSCHED&&BKSCHED.extra)||[],
+    });
+    if(r.data&&r.data.ok){ DATA.bookings.schedules[BKWHO]=r.data.schedule; BKSCHED=r.data.schedule; paintSchedule();
+      bkMsg("انحفظ الجدول ✅ صفحة الحجز تحدثت على طول.",true); }
+  }catch(e){ bkMsg((e&&e.message)||"تعذّر الحفظ",false); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+});
+
+function renderBkList(){
+  const B=DATA.bookings||{}; const all=(B.list||[]).filter(x=>x.consultantId===BKWHO);
+  const now=Date.now();
+  const rows = BKFILTER==="all" ? all
+    : BKFILTER==="upcoming" ? all.filter(x=>x.status!=="cancelled"&&x.startMs>=now)
+    : BKFILTER==="past"     ? all.filter(x=>x.status!=="cancelled"&&x.startMs<now)
+    : all.filter(x=>x.status==="cancelled");
+  const box=$("#bkList");
+  if(!rows.length){ box.innerHTML='<div class="empty">ما في مواعيد بهذي القائمة.</div>'; return; }
+  box.innerHTML=rows.map(b=>{
+    const upcoming=b.status!=="cancelled"&&b.startMs>=now;
+    const cls=b.status==="cancelled"?"cx":(upcoming?"soon":"gone");
+    const wa=String(b.phone||"").replace(/\D/g,"");
+    return `<div class="bkcard ${cls}">
+      <div class="bkwhen">${bkWhen(b.startIso)}</div>
+      <div class="bkh">
+        <b>${esc(b.name)||"—"}</b>
+        <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
+        <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
+        ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
+        ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
+        ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
+        <span class="num">${esc(b.email)}</span>
+        ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(b.phone)}</a>`:""}
+        <span>· ${fmt(b.amount)} د.ك</span>
+      </div>
+      ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
+      ${b.status!=="cancelled"?`<div class="bkacts">
+        ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>
+      </div>`:""}
+    </div>`;
+  }).join("");
+}
+
+$("#bkFlt") && $("#bkFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  BKFILTER=b.dataset.bk; $("#bkFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderBkList(); });
+
+$("#bkList") && $("#bkList").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-cx]"); if(!b) return;
+  if(!confirm("متأكد تبي تلغي هذا الموعد؟ الوقت بيرجع متاح للحجز.")) return;
+  b.disabled=true;
+  try{
+    await cancelBooking({orderId:b.dataset.cx});
+    const row=(DATA.bookings.list||[]).find(x=>x.id===b.dataset.cx);
+    if(row){ row.status="cancelled";
+      DATA.bookings.totals.cancelled=(DATA.bookings.totals.cancelled||0)+1;
+      if(row.startMs>=Date.now()) DATA.bookings.totals.upcoming=Math.max(0,(DATA.bookings.totals.upcoming||1)-1); }
+    renderBookings(); bkMsg("انلغى الموعد، والوقت رجع متاح.",true);
+  }catch(err){ bkMsg((err&&err.message)||"تعذّر الإلغاء",false); b.disabled=false; }
+});
+
+$("#mbAdd") && $("#mbAdd").addEventListener("click",async()=>{
+  const date=$("#mbDate").value, time=$("#mbTime").value;
+  if(!date||!time) return bkMsg("اختر تاريخ وساعة الموعد",false);
+  const btn=$("#mbAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
+  try{
+    /* the inputs are Kuwait wall-clock, so shift to a real instant */
+    const startIso=new Date(Date.parse(date+"T"+time+":00Z")-KWOFF*60000).toISOString();
+    await addManualBooking({
+      consultantId:BKWHO, packageId:$("#mbPkg").value, mode:$("#mbMode").value, startIso,
+      name:$("#mbName").value.trim(), email:$("#mbEmail").value.trim(), phone:$("#mbPhone").value.trim(),
+      notes:$("#mbNotes").value.trim(), amount:Number($("#mbAmount").value)||0, notify:$("#mbNotify").checked,
+    });
+    ["#mbName","#mbEmail","#mbPhone","#mbNotes","#mbDate","#mbTime"].forEach(id=>{ $(id).value=""; });
+    bkMsg("انضاف الموعد ✅",true);
+    const r=await getDashboard(); if(r&&r.data){ DATA=r.data; renderBookings(); }
+  }catch(e){ bkMsg((e&&e.message)||"تعذّر إضافة الموعد",false); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+});
 
 /* ================= EVENT RATINGS ================= */
 let RTFILTER="all";
