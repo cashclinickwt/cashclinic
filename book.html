@@ -54,6 +54,18 @@
   .pk .box .tg{font-size:14px;color:var(--cc-grey-700);line-height:1.75}
   .pk .box .pr{flex:0 0 auto;text-align:center;background:var(--cc-cream);border-radius:12px;padding:9px 13px;font-weight:700;color:var(--cc-purple);font-size:15px;white-space:nowrap}
   .pk .box .du{display:block;font-size:11.5px;font-weight:400;color:var(--cc-grey-700);margin-top:2px}
+  /* the chosen package opens up in full so nobody books blind */
+  .pk-detail{display:none;margin-top:14px;background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:16px;padding:20px 20px 18px}
+  .pk-detail.on{display:block}
+  .pk-detail h3{font-size:17px;font-weight:700;color:var(--cc-purple);margin:0 0 4px}
+  .pk-detail .who{font-size:13.5px;color:var(--cc-teal-700);font-weight:700;margin-bottom:12px}
+  .pk-detail p{font-size:14.5px;line-height:1.95;color:var(--cc-grey-900);margin:0 0 16px}
+  .pk-detail h4{font-size:14px;font-weight:700;color:var(--cc-purple);margin:0 0 10px}
+  .pk-detail ul{list-style:none;margin:0;padding:0}
+  .pk-detail li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.85;color:var(--cc-ink);padding:6px 0}
+  .pk-detail li::before{content:"✓";flex:0 0 auto;color:var(--cc-teal);font-weight:700}
+  .pk-detail .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--cc-purple-100)}
+  .pk-detail .meta span{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--cc-purple);font-weight:700}
 
   /* mode */
   .md{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -73,8 +85,8 @@
   .day .dw{display:block;font-size:12.5px;opacity:.8}
   .day .dd{display:block;font-size:17px;font-weight:700;margin-top:2px}
   .day .dm{display:block;font-size:11.5px;opacity:.75}
-  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px;margin-top:16px}
-  .slot{border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:12px;padding:12px 8px;font-size:15px;font-family:inherit;color:var(--cc-ink);cursor:pointer;transition:.15s;direction:ltr}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:9px;margin-top:16px}
+  .slot{border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:12px;padding:12px 6px;font-size:14px;font-family:inherit;color:var(--cc-ink);cursor:pointer;transition:.15s;direction:ltr;white-space:nowrap}
   .slot:hover{border-color:var(--cc-purple-200)}
   .slot.on{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream);font-weight:700}
   .bk-empty{text-align:center;color:var(--cc-grey-500);font-size:14.5px;padding:26px 10px;line-height:1.9}
@@ -134,7 +146,7 @@
 
   <div class="bk-card hide" id="bkPreview" style="background:#FFF7E8;border-color:var(--cc-gold);padding:14px 18px">
     <p class="hint" style="margin:0;text-align:center;color:var(--cc-purple);font-weight:700">
-      وضع المعاينة · الصفحة لسه مو منشورة للعملاء
+      وضع المعاينة · الصفحة ليست منشورة للعملاء
     </p>
   </div>
 
@@ -157,6 +169,7 @@
     <h2><span class="bk-step">١</span> اختر الاستشارة</h2>
     <p class="hint" id="pkgHint">كل استشارة ساعة كاملة مع الاستشاري مباشرة.</p>
     <div class="pk" id="pkgList"></div>
+    <div class="pk-detail" id="pkgDetail"></div>
   </div>
 
   <!-- 2 · mode -->
@@ -165,7 +178,7 @@
     <p class="hint" id="modeHint"></p>
     <div class="md">
       <label><input type="radio" name="mode" value="online" checked>
-        <div class="box"><b>أونلاين</b><span id="mOnline">جوجل ميت</span></div></label>
+        <div class="box"><b>أونلاين</b><span id="mOnline">Google Meet</span></div></label>
       <label><input type="radio" name="mode" value="present">
         <div class="box"><b>حضوري</b><span id="mPresent">بالمقر</span></div></label>
     </div>
@@ -255,15 +268,20 @@ function kwParts(iso){
   return { y:k.getUTCFullYear(), m:k.getUTCMonth(), d:k.getUTCDate(),
            w:k.getUTCDay(), hh:k.getUTCHours(), mm:k.getUTCMinutes() };
 }
-function human12(iso){
+/* times read in English on purpose: "7pm to 8pm" is unambiguous either way round */
+function clock(iso){
   const p = kwParts(iso);
-  const ap = p.hh >= 12 ? "م" : "ص";
+  const ap = p.hh >= 12 ? "pm" : "am";
   const h  = p.hh % 12 === 0 ? 12 : p.hh % 12;
-  return h + (p.mm ? ":"+String(p.mm).padStart(2,"0") : "") + " " + ap;
+  return h + (p.mm ? ":"+String(p.mm).padStart(2,"0") : "") + ap;
 }
-function humanFull(iso){
+function slotRange(iso, minutes){
+  const end = new Date(Date.parse(iso) + (Number(minutes)||60)*60000).toISOString();
+  return clock(iso) + " to " + clock(end);
+}
+function humanFull(iso, minutes){
   const p = kwParts(iso);
-  return `${AR_DAY[p.w]} ${p.d} ${AR_MON[p.m]} · ${human12(iso)}`;
+  return `${AR_DAY[p.w]} ${p.d} ${AR_MON[p.m]} · ${slotRange(iso, minutes)}`;
 }
 
 const QS = new URLSearchParams(location.search);
@@ -294,7 +312,7 @@ let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO =
     $("#bkTitle").textContent = "احجز استشارتك مع " + C.name;
     $("#bkSub").textContent = C.title;
     paintWho(C);
-    $("#mOnline").textContent  = "جوجل ميت · " + dayRange(C.modes.online);
+    $("#mOnline").textContent  = "Google Meet · " + dayRange(C.modes.online);
     $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
     $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك.";
 
@@ -306,20 +324,18 @@ let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO =
 
     if(RESCHED.id && RESCHED.token){ await bootReschedule(); return; }
 
-    $("#pkgList").innerHTML = C.packages.map((p,i) => `
-      <label><input type="radio" name="pkg" value="${esc(p.id)}"${i===0?" checked":""}>
+    $("#pkgList").innerHTML = C.packages.map((p) => `
+      <label><input type="radio" name="pkg" value="${esc(p.id)}">
         <div class="box">
           <div class="t"><div class="nm">${esc(p.name)}</div><div class="tg">${esc(p.tagline||"")}</div></div>
           <div class="pr">${p.amount} د.ك<span class="du">${p.minutes} دقيقة</span></div>
         </div></label>`).join("");
-    PKG = C.packages[0];
 
-    show("#bkLoading",false); show("#cardPkg",true); show("#cardMode",true); show("#cardSlot",true);
+    show("#bkLoading",false); show("#cardPkg",true);
     document.querySelectorAll('input[name="pkg"]').forEach(el =>
-      el.addEventListener("change", () => { PKG = C.packages.find(p=>p.id===el.value); loadSlots(); }));
+      el.addEventListener("change", () => { if(el.checked) choosePackage(el.value); }));
     document.querySelectorAll('input[name="mode"]').forEach(el =>
       el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
-    loadSlots();
   }catch(e){
     $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">تعذّر تحميل المواعيد. حدّث الصفحة أو راسلنا واتساب.</p>';
   }
@@ -355,6 +371,29 @@ function paintWho(c){
   show("#bkWho", true);
 }
 
+/* picking a package opens its full description, then unlocks the rest of the page */
+function choosePackage(id){
+  PKG = C.packages.find(p => p.id === id);
+  if(!PKG) return;
+  const d = $("#pkgDetail");
+  d.innerHTML =
+    `<h3>${esc(PKG.name)}</h3>` +
+    (PKG.forWho ? `<div class="who">${esc(PKG.forWho)}</div>` : "") +
+    (PKG.desc ? `<p>${esc(PKG.desc)}</p>` : "") +
+    ((PKG.benefits && PKG.benefits.length)
+      ? `<h4>شنو راح تستفيد من هذي الباقة؟</h4><ul>${
+          PKG.benefits.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : "") +
+    `<div class="meta"><span>${PKG.amount} د.ك</span><span>${PKG.minutes} دقيقة</span>` +
+    `<span>أونلاين أو حضوري</span></div>`;
+  d.classList.add("on");
+
+  show("#cardMode", true);
+  show("#cardSlot", true);
+  show("#cardForm", false);
+  loadSlots();
+  d.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+
 function dayRange(m){
   if(!m || !m.enabled || !m.days || !m.days.length) return "مغلق";
   const d = m.days.slice().sort((a,b)=>a-b);
@@ -364,7 +403,7 @@ function dayRange(m){
 }
 function to12(hhmm){
   const [h,m] = String(hhmm).split(":").map(Number);
-  const ap = h>=12 ? "م" : "ص"; const h12 = h%12===0?12:h%12;
+  const ap = h>=12 ? "pm" : "am"; const h12 = h%12===0?12:h%12;
   return h12 + (m?":"+String(m).padStart(2,"0"):"") + ap;
 }
 
@@ -396,8 +435,9 @@ function renderDays(){
 function renderSlots(){
   const day = DAYS.find(d => d.date === PICK_DATE);
   if(!day){ $("#slotList").innerHTML = ""; return; }
+  const mins = (PKG && PKG.minutes) || 60;
   $("#slotList").innerHTML = day.slots.map(s =>
-    `<button class="slot${s.iso===PICK_ISO?" on":""}" type="button" data-iso="${esc(s.iso)}">${human12(s.iso)}</button>`).join("");
+    `<button class="slot${s.iso===PICK_ISO?" on":""}" type="button" data-iso="${esc(s.iso)}">${slotRange(s.iso, mins)}</button>`).join("");
 }
 
 $("#dayList").addEventListener("click", e => {
@@ -412,8 +452,8 @@ $("#slotList").addEventListener("click", e => {
   if(RESCHED.id) return showReschedConfirm();
   $("#sum").innerHTML =
     `<b>${esc(PKG.name)}</b> مع ${esc(C.name)}<br>` +
-    `${humanFull(PICK_ISO)}<br>` +
-    `${MODE==="present" ? "حضوري · " + esc(C.location||"بالمقر") : "أونلاين · جوجل ميت"}<br>` +
+    `${humanFull(PICK_ISO, PKG.minutes)}<br>` +
+    `${MODE==="present" ? "حضوري · " + esc(C.location||"بالمقر") : "أونلاين · Google Meet"}<br>` +
     `<b>${PKG.amount} د.ك</b> · ${PKG.minutes} دقيقة`;
   show("#cardForm",true);
   $("#cardForm").scrollIntoView({behavior:"smooth",block:"start"});
@@ -464,7 +504,7 @@ async function bootReschedule(){
     const b = r.data || {};
     PKG = (C.packages.find(p=>p.id===b.packageId)) || { id:b.packageId, name:b.packageName, minutes:b.minutes, amount:0 };
     MODE = b.mode;
-    $("#reschedSum").innerHTML = `<b>${esc(b.packageName)}</b> مع ${esc(b.consultantName)}<br>موعدك الحالي: ${humanFull(b.startIso)}`;
+    $("#reschedSum").innerHTML = `<b>${esc(b.packageName)}</b> مع ${esc(b.consultantName)}<br>موعدك الحالي: ${humanFull(b.startIso, b.minutes)}`;
     if(!b.canReschedule){
       $("#reschedErr").textContent = b.rescheduled
         ? "تم تغيير هذا الموعد مرة وحدة. لأي تغيير ثاني راسلنا واتساب."
@@ -481,7 +521,7 @@ async function bootReschedule(){
 }
 function showReschedConfirm(){
   $("#reschedErr").style.display="none";
-  $("#reschedSum").innerHTML += `<br><br>الموعد الجديد: <b>${humanFull(PICK_ISO)}</b>`;
+  $("#reschedSum").innerHTML += `<br><br>الموعد الجديد: <b>${humanFull(PICK_ISO, PKG && PKG.minutes)}</b>`;
   show("#reschedBtn",true);
   $("#cardResched").scrollIntoView({behavior:"smooth",block:"start"});
 }
