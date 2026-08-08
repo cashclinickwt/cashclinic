@@ -110,6 +110,9 @@
   .fixcard.typo{border-inline-start:4px solid var(--gold)}
   .fixcard.undelivered{border-inline-start:4px solid #962E37}
   .fixh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .fixx{margin-inline-start:auto;border:0;background:none;color:var(--muted);font-size:20px;line-height:1;
+    cursor:pointer;padding:0 4px;border-radius:8px}
+  .fixx:hover{color:#962E37;background:#FDECEC}
   .fixh b{color:var(--ink);font-size:14.5px}
   .fixpill{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
   .fixwhy{font-size:13.5px;line-height:1.8;color:var(--ink);background:var(--bg);border-radius:10px;padding:10px 13px;margin-bottom:10px}
@@ -765,6 +768,7 @@ function renderSalesFix(){
         <span class="num">${esc(r.email)}</span>
         ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(r.phone)}</a>`:""}
         <span class="num">${dt(r.when)}</span>
+        <button class="fixx" data-dismiss="${esc(r.id)}" title="شيله من القائمة" aria-label="شيله من القائمة">×</button>
       </div>
       <div class="fixwhy">${why}</div>
       <div class="fixrow">
@@ -779,6 +783,21 @@ function renderSalesFix(){
 }
 
 $("#fixList") && $("#fixList").addEventListener("click", async e=>{
+  /* the X: hide the row for good, without touching the order itself */
+  const x = e.target.closest("button[data-dismiss]");
+  if(x){
+    const row = (DATA.salesFix||[]).find(r=>r.id===x.dataset.dismiss) || {};
+    if(!confirm(`شيل «${row.name||"هذا الطلب"}» من قائمة المتابعة؟\n\nالطلب نفسه ما ينحذف، بس ما راح يبين هني مرة ثانية.`)) return;
+    x.disabled=true;
+    try{
+      await repairOrder({ orderId:x.dataset.dismiss, action:"dismiss" });
+      DATA.salesFix = (DATA.salesFix||[]).filter(r=>r.id!==x.dataset.dismiss);
+      renderSalesFix();
+      fixMsg("انشال من القائمة. الطلب موجود بقاعدة البيانات زي ما هو.", true);
+    }catch(err){ fixMsg((err&&err.message)||"تعذّر الحذف", false); x.disabled=false; }
+    return;
+  }
+
   const btn = e.target.closest("button[data-fix],button[data-verify],button[data-resend]"); if(!btn) return;
   const id = btn.dataset.fix || btn.dataset.verify || btn.dataset.resend;
   const action = btn.dataset.fix ? "fix" : (btn.dataset.verify ? "verify" : "resend");
@@ -806,7 +825,8 @@ $("#fixList") && $("#fixList").addEventListener("click", async e=>{
       renderSalesFix();
       const rr = await getDashboard(); if(rr && rr.data){ DATA = rr.data; render(); }
     }else{
-      fixMsg(d.message || "ما تم الدفع فعلياً، فما في نسخة تنرسل.", false);
+      fixMsg((d.message || "ما تم الدفع فعلياً، فما في نسخة تنرسل.") +
+             " تقدر تشيله من القائمة بعلامة × فوق.", false);
     }
   }catch(err){
     fixMsg((err && err.message) || "تعذّر التنفيذ", false);
