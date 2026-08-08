@@ -22,6 +22,20 @@
   .bk-hero h1{font-size:clamp(25px,3.8vw,38px);font-weight:300;line-height:1.3;margin:14px 0 0;color:#fff}
   .bk-hero p{font-size:16px;line-height:1.9;color:var(--cc-purple-100);margin:12px auto 0;max-width:52ch}
   .bk-badge{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+  /* consultant identity */
+  .bk-who{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:26px;text-align:start}
+  .bk-photo{flex:0 0 auto;width:104px;height:104px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,231,188,.34);background:var(--cc-purple-700)}
+  .bk-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .bk-id{flex:0 1 380px;min-width:0}
+  .bk-clinic{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 13px;font-size:13px;color:#fff;margin-bottom:9px}
+  .bk-clinic img{width:20px;height:20px;border-radius:50%;object-fit:contain;background:#fff}
+  .bk-name{font-size:21px;font-weight:700;color:#fff;line-height:1.4}
+  .bk-role{font-size:14.5px;color:var(--cc-gold);margin-top:3px}
+  .bk-bio{font-size:14.5px;line-height:1.9;color:var(--cc-purple-100);margin-top:9px}
+  .bk-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+  .bk-stat{background:rgba(255,255,255,.10);border-radius:10px;padding:7px 13px;font-size:13px;color:#fff}
+  .bk-stat b{color:var(--cc-gold)}
+  @media(max-width:560px){ .bk-who{flex-direction:column;text-align:center} .bk-id{flex:1 1 auto} .bk-stats{justify-content:center} }
 
   .bk-wrap{max-width:860px;margin:-24px auto 64px;padding:0 18px;position:relative;z-index:2}
   .bk-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:22px;padding:26px 24px;box-shadow:0 16px 44px rgba(47,23,72,.10);margin-bottom:18px}
@@ -101,6 +115,17 @@
     <span class="bk-badge" id="bkBadge">حجز استشارة</span>
     <h1 id="bkTitle">احجز استشارتك</h1>
     <p id="bkSub">اختر الباقة والموعد اللي يناسبك، وادفع أونلاين. بيوصلك تأكيد على إيميلك مع ملف تقويم.</p>
+
+    <div class="bk-who hide" id="bkWho">
+      <div class="bk-photo"><img id="bkPhoto" src="" alt=""></div>
+      <div class="bk-id">
+        <span class="bk-clinic" id="bkClinic"><img id="bkClinicLogo" src="" alt="">‌</span>
+        <div class="bk-name" id="bkName"></div>
+        <div class="bk-role" id="bkRole"></div>
+        <div class="bk-bio" id="bkBio"></div>
+        <div class="bk-stats" id="bkStats"></div>
+      </div>
+    </div>
   </div>
   <img class="mark" src="brand/mark/mark-cream.png" alt="">
 </section>
@@ -268,6 +293,7 @@ let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO =
 
     $("#bkTitle").textContent = "احجز استشارتك مع " + C.name;
     $("#bkSub").textContent = C.title;
+    paintWho(C);
     $("#mOnline").textContent  = "جوجل ميت · " + dayRange(C.modes.online);
     $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
     $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك.";
@@ -298,6 +324,36 @@ let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO =
     $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">تعذّر تحميل المواعيد. حدّث الصفحة أو راسلنا واتساب.</p>';
   }
 })();
+
+/* the clinic logo, photo and short bio that sit under the title */
+const CLINIC_ART = {
+  "كاش ناس":   { logo:"brand/nas-logo.png",    photo:"assets/img/ghaliya-blob.jpg" },
+  "كاش إنفست": { logo:"brand/invest-logo.png", photo:"assets/img/sara-blob.jpg" },
+  "كاش ريادة": { logo:"brand/riyada-logo.png", photo:"assets/img/hasan-blob.jpg" },
+};
+const BIOS = {
+  ghalia: { role:"مؤسِسة كاش كلينك · مستشارة مالية",
+            bio:"غالية النويف، مؤسِسة كاش كلينك وصاحبة فكرة العلاج المالي. تشتغل معك على وضعك المالي كما هو، بشخصيتك وظروفك، بدون ما تطلب منك تقلب حياتك أو تقصّر على نفسك وعائلتك.",
+            stats:[["+11","سنة خبرة"],["1:1","استشارة خاصة"],["60","دقيقة"]] },
+  sara:   { role:"استشارية استثمار", bio:"", stats:[] },
+  hasan:  { role:"استشاري أعمال",   bio:"", stats:[] },
+};
+
+function paintWho(c){
+  const art = CLINIC_ART[c.clinic] || {};
+  const b = BIOS[c.id] || {};
+  const photo = c.photo || art.photo || "";
+  if(photo){ $("#bkPhoto").src = photo; $("#bkPhoto").alt = c.name; }
+  else { $("#bkPhoto").parentElement.style.display = "none"; }
+  if(art.logo){ $("#bkClinicLogo").src = art.logo; $("#bkClinic").lastChild.textContent = c.clinic || ""; }
+  else { $("#bkClinic").style.display = "none"; }
+  $("#bkName").textContent = c.name || "";
+  $("#bkRole").textContent = b.role || c.title || "";
+  $("#bkBio").textContent  = b.bio || "";
+  $("#bkStats").innerHTML  = (b.stats||[]).map(x =>
+    `<span class="bk-stat"><b>${esc(x[0])}</b> ${esc(x[1])}</span>`).join("");
+  show("#bkWho", true);
+}
 
 function dayRange(m){
   if(!m || !m.enabled || !m.days || !m.days.length) return "مغلق";

@@ -105,6 +105,16 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* careers */
+  .cvcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .cvh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:7px;font-size:13px;color:var(--muted)}
+  .cvh b{color:var(--ink);font-size:15px}
+  .cvrole{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 11px;background:var(--auber);color:#fff}
+  .cvnote{font-size:13.5px;line-height:1.8;color:var(--ink);margin-top:7px;white-space:pre-wrap;word-break:break-word}
+  .cvacts{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .cvacts button,.cvacts a{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
+  .cvacts .dl{border-color:var(--auber);color:var(--auber);font-weight:700}
+  .cvacts .wa{border-color:#25D366;color:#128C4A}
   /* bookings */
   .bklaunch{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
     border-radius:16px;padding:16px 18px;margin-bottom:16px;border:1px solid var(--line);background:#fff}
@@ -244,6 +254,7 @@
     <button data-tab="events">معلومات اللقاء</button>
     <button data-tab="live">البث المباشر</button>
     <button data-tab="bookings">المواعيد</button>
+    <button data-tab="careers">التوظيف</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
@@ -438,6 +449,13 @@
     <button class="bksave" id="mbAdd">أضف الموعد</button>
   </div>
 
+  <div class="sec" id="careersSec" data-panel="careers">
+    <h2><span></span> طلبات التوظيف</h2>
+    <div class="kpis" id="cvKpis"></div>
+    <div class="flt" id="cvFlt"></div>
+    <div id="cvList"></div>
+  </div>
+
   <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
     <h2><span></span> المشتركين بالنشرة</h2>
     <div class="kpis" id="subKpis"></div>
@@ -474,6 +492,7 @@ const setConsultantSchedule=httpsCallable(getFunctions(app,CONFIG.functionsRegio
 const addManualBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualBooking");
 const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelBooking");
 const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
+const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -566,14 +585,14 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","quiz","events","live","bookings","subscribers","bookq","courses","composer","reports"];
+const PANEL_ORDER=["sales","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
@@ -692,6 +711,66 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= CAREERS ================= */
+let CVROLE="all";
+
+function renderCareers(){
+  const C=DATA.careers; const sec=$("#careersSec"); if(!C||!sec) return;
+  sec.hidden=false;
+  const t=C.totals||{}, roles=Object.keys(t.byRole||{});
+
+  $("#cvKpis").innerHTML =
+    `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">طلب توظيف</div></div>`+
+    roles.map(r=>`<div class="kpi"><div class="n">${fmt(t.byRole[r])}</div><div class="l">${esc(r)}</div></div>`).join("");
+
+  $("#cvFlt").innerHTML = [`<button data-cv="all"${CVROLE==="all"?' class="on"':''}>الكل</button>`]
+    .concat(roles.map(r=>`<button data-cv="${esc(r)}"${CVROLE===r?' class="on"':''}>${esc(r)}</button>`)).join("");
+
+  const rows=(C.list||[]).filter(x=>CVROLE==="all"||x.role===CVROLE);
+  const box=$("#cvList");
+  if(!rows.length){ box.innerHTML='<div class="empty">ما في طلبات بهذي القائمة.</div>'; return; }
+  box.innerHTML=rows.map(a=>{
+    const wa=String(a.phone||"").replace(/\D/g,"");
+    return `<div class="cvcard">
+      <div class="cvh">
+        <b>${esc(a.name)||"—"}</b>
+        <span class="cvrole">${esc(a.role)}</span>
+        <span>${esc(a.nationality)||"—"}</span>
+        ${a.years?`<span>· ${esc(a.years)}</span>`:""}
+        <span class="num">${esc(a.email)}</span>
+        ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(a.phone)}</a>`:""}
+        <span class="num">${dt(a.when)}</span>
+      </div>
+      ${a.note?`<div class="cvnote">${esc(a.note)}</div>`:""}
+      <div class="cvacts">
+        <button class="dl" data-cv-id="${esc(a.id)}">حمّل السيرة الذاتية (${(a.cvSize/1048576).toFixed(1)} م.ب)</button>
+        ${a.portfolio?`<a href="${esc(a.portfolio)}" target="_blank" rel="noopener">شوف أعماله</a>`:""}
+        ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+$("#cvFlt") && $("#cvFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  CVROLE=b.dataset.cv; renderCareers(); });
+
+$("#cvList") && $("#cvList").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-cv-id]"); if(!b) return;
+  b.disabled=true; const t=b.textContent; b.textContent="جارٍ التحميل…";
+  try{
+    const r=await getCvFile({ id:b.dataset.cvId });
+    const d=r.data||{};
+    /* the pdf comes back base64 through the callable, so build the download here */
+    const bin=atob(d.base64||""); const buf=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([buf],{type:"application/pdf"}));
+    const a=document.createElement("a"); a.href=url; a.download=d.name||"cv.pdf";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }catch(err){ alert((err&&err.message)||"تعذّر تحميل الملف"); }
+  finally{ b.disabled=false; b.textContent=t; }
+});
 
 /* ================= BOOKINGS ================= */
 let BKWHO="", BKFILTER="upcoming", BKSCHED=null;

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>التوظيف | Cash Clinic</title>
+<meta name="description" content="انضم لفريق كاش كلينك. وظائف في خدمة العملاء، المبيعات، السوشل ميديا، التصميم والتصوير.">
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="assets/ds/tokens/base.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<style>
+  body{background:var(--cc-purple-050)}
+  .jb-hero{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:52px 0 46px;position:relative;overflow:hidden}
+  .jb-hero .cc-wrap{position:relative;z-index:1;text-align:center}
+  .jb-hero .mark{position:absolute;inset-inline-end:-26px;bottom:-30px;width:150px;opacity:.12}
+  .jb-badge{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+  .jb-hero h1{font-size:clamp(26px,4vw,40px);font-weight:300;line-height:1.3;margin:16px 0 0;color:#fff}
+  .jb-hero p{font-size:16.5px;line-height:1.9;color:var(--cc-purple-100);margin:14px auto 0;max-width:54ch}
+
+  .jb-wrap{max-width:760px;margin:-26px auto 64px;padding:0 18px;position:relative;z-index:2}
+  .jb-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:24px;padding:30px 26px;box-shadow:0 18px 50px rgba(47,23,72,.10)}
+  .jb-card h2{font-size:19px;font-weight:700;color:var(--cc-purple);margin:0 0 6px}
+  .jb-card .hint{font-size:14.5px;color:var(--cc-grey-700);line-height:1.85;margin:0 0 20px}
+
+  .roles{display:grid;gap:10px;margin-bottom:24px}
+  .roles label{cursor:pointer}
+  .roles input{position:absolute;opacity:0;pointer-events:none}
+  .roles .box{border:2px solid var(--cc-grey-200);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:.15s}
+  .roles input:checked + .box{border-color:var(--cc-purple);background:var(--cc-purple-050)}
+  .roles .box .ic{flex:0 0 auto;width:38px;height:38px;border-radius:10px;background:var(--cc-cream);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .roles .box .nm{font-size:16px;font-weight:700;color:var(--cc-purple)}
+
+  .fld{margin-bottom:15px}
+  .fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
+  .fld .opt{font-weight:400;color:var(--cc-grey-500)}
+  .fld input,.fld textarea,.fld select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);box-sizing:border-box}
+  .fld textarea{min-height:88px;resize:vertical;line-height:1.85}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:0;border-color:var(--cc-purple)}
+  .phone{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:9px}
+
+  .drop{border:2px dashed var(--cc-grey-300,#C9C6D4);border-radius:14px;padding:24px 18px;text-align:center;cursor:pointer;transition:.15s;background:var(--cc-grey-050,#FAF9FB)}
+  .drop:hover,.drop.hot{border-color:var(--cc-purple);background:var(--cc-purple-050)}
+  .drop .big{font-size:30px;margin-bottom:8px}
+  .drop .t{font-size:15px;font-weight:700;color:var(--cc-purple);margin-bottom:4px}
+  .drop .s{font-size:13px;color:var(--cc-grey-700);line-height:1.7}
+  .drop input{display:none}
+  .picked{display:none;align-items:center;gap:11px;background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:12px;padding:12px 14px;margin-top:11px}
+  .picked.on{display:flex}
+  .picked .nm{flex:1 1 auto;font-size:14px;color:var(--cc-ink);word-break:break-all}
+  .picked .sz{flex:0 0 auto;font-size:12.5px;color:var(--cc-grey-700)}
+  .picked button{flex:0 0 auto;border:0;background:none;color:var(--cc-danger);font-size:19px;cursor:pointer;line-height:1;padding:0}
+
+  .send{width:100%;padding:17px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px}
+  .send:hover{filter:brightness(1.08)}
+  .send:disabled{opacity:.6;cursor:default}
+  .err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:12px 15px;font-size:14.5px;margin-top:13px;text-align:center;line-height:1.75}
+  .ok{display:none;text-align:center;padding:16px 4px}
+  .ok .ico{font-size:52px;margin-bottom:14px}
+  .ok h2{font-size:24px;color:var(--cc-purple);margin:0 0 12px}
+  .ok p{font-size:15.5px;line-height:1.95;color:var(--cc-grey-700);margin:0 auto;max-width:44ch}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="index.html"><img src="brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820" style="font-size:15px;padding:11px 20px;">
+      <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+      <span>استفسار</span>
+    </a>
+  </div>
+</header>
+
+<section class="jb-hero">
+  <div class="cc-wrap">
+    <span class="jb-badge">التوظيف</span>
+    <h1>انضم لفريق كاش كلينك</h1>
+    <p>نبني عيادة الصحة المالية الأولى بالكويت، وندوّر على ناس يحبون الشغل المتقن. إذا شفت نفسك بوحدة من الوظائف تحت، رسّل لنا سيرتك.</p>
+  </div>
+  <img class="mark" src="brand/mark/mark-cream.png" alt="">
+</section>
+
+<div class="jb-wrap">
+  <div class="jb-card">
+    <div id="jbForm">
+      <h2>الوظيفة اللي تناسبك</h2>
+      <p class="hint">اختر وحدة، وعبّي بياناتك تحت.</p>
+      <div class="roles">
+        <label><input type="radio" name="role" value="خدمة عملاء">
+          <div class="box"><span class="ic">🎧</span><span class="nm">خدمة عملاء</span></div></label>
+        <label><input type="radio" name="role" value="فريق مبيعات">
+          <div class="box"><span class="ic">📈</span><span class="nm">فريق مبيعات</span></div></label>
+        <label><input type="radio" name="role" value="إدارة حسابات سوشل ميديا وكتابة محتوى">
+          <div class="box"><span class="ic">✍️</span><span class="nm">إدارة حسابات سوشل ميديا وكتابة محتوى</span></div></label>
+        <label><input type="radio" name="role" value="تصميم">
+          <div class="box"><span class="ic">🎨</span><span class="nm">تصميم</span></div></label>
+        <label><input type="radio" name="role" value="تصوير فوتوغرافي أو فيديو">
+          <div class="box"><span class="ic">📷</span><span class="nm">تصوير فوتوغرافي أو فيديو</span></div></label>
+      </div>
+
+      <h2>بياناتك</h2>
+      <p class="hint">كل معلوماتك تبقى عندنا وما تنشارك مع أي جهة.</p>
+
+      <div class="fld"><label>الاسم الكامل</label><input id="jName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
+      <div class="fld"><label>الإيميل</label><input id="jEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
+      <div class="fld"><label>رقم الواتساب</label>
+        <div class="phone">
+          <select id="jCC" aria-label="مفتاح الدولة">
+            <option value="965" selected>🇰🇼 +965 الكويت</option>
+            <option value="966">🇸🇦 +966 السعودية</option>
+            <option value="971">🇦🇪 +971 الإمارات</option>
+            <option value="974">🇶🇦 +974 قطر</option>
+            <option value="973">🇧🇭 +973 البحرين</option>
+            <option value="968">🇴🇲 +968 عُمان</option>
+            <option value="20">🇪🇬 +20 مصر</option>
+            <option value="962">🇯🇴 +962 الأردن</option>
+            <option value="961">🇱🇧 +961 لبنان</option>
+            <option value="964">🇮🇶 +964 العراق</option>
+            <option value="963">🇸🇾 +963 سوريا</option>
+            <option value="212">🇲🇦 +212 المغرب</option>
+            <option value="216">🇹🇳 +216 تونس</option>
+            <option value="91">🇮🇳 +91 الهند</option>
+            <option value="92">🇵🇰 +92 باكستان</option>
+            <option value="63">🇵🇭 +63 الفلبين</option>
+            <option value="90">🇹🇷 +90 تركيا</option>
+          </select>
+          <input id="jPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right">
+        </div>
+      </div>
+      <div class="fld"><label>الجنسية</label><input id="jNat" type="text" placeholder="مثال: كويتي"></div>
+      <div class="fld"><label>سنوات الخبرة <span class="opt">(اختياري)</span></label>
+        <select id="jYears">
+          <option value="">اختر</option>
+          <option value="بدون خبرة">بدون خبرة</option>
+          <option value="أقل من سنة">أقل من سنة</option>
+          <option value="1 إلى 3 سنوات">1 إلى 3 سنوات</option>
+          <option value="3 إلى 5 سنوات">3 إلى 5 سنوات</option>
+          <option value="أكثر من 5 سنوات">أكثر من 5 سنوات</option>
+        </select>
+      </div>
+      <div class="fld"><label>رابط أعمالك <span class="opt">(اختياري · مهم للتصميم والتصوير)</span></label>
+        <input id="jPort" type="text" placeholder="بيهانس، إنستغرام، درايف…" style="direction:ltr;text-align:right"></div>
+
+      <div class="fld"><label>السيرة الذاتية · PDF</label>
+        <label class="drop" id="jDrop">
+          <div class="big">📄</div>
+          <div class="t">اضغط لاختيار الملف</div>
+          <div class="s">PDF فقط · الحد الأعلى 4 ميجا</div>
+          <input id="jCv" type="file" accept="application/pdf,.pdf">
+        </label>
+        <div class="picked" id="jPicked">
+          <span class="nm" id="jCvName"></span><span class="sz" id="jCvSize"></span>
+          <button type="button" id="jCvX" aria-label="احذف الملف">×</button>
+        </div>
+      </div>
+
+      <div class="fld"><label>تحب تضيف شي؟ <span class="opt">(اختياري)</span></label>
+        <textarea id="jNote" placeholder="أي شي تبي نعرفه عنك…"></textarea></div>
+
+      <button class="send" id="jBtn" type="button">أرسل طلبك</button>
+      <div class="err" id="jErr"></div>
+    </div>
+
+    <div class="ok" id="jOk">
+      <div class="ico">🤍</div>
+      <h2>وصلنا طلبك</h2>
+      <p>شكراً لاهتمامك بالانضمام لكاش كلينك. بنراجع سيرتك، وإذا كان في فرصة تناسبك بنتواصل معك على نفس الرقم أو الإيميل.</p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/email-typo.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+
+const app = initializeApp(CONFIG.firebase);
+const submitJobApplication = httpsCallable(getFunctions(app, CONFIG.functionsRegion), "submitJobApplication");
+
+const $ = s => document.querySelector(s);
+const MAX = 4 * 1024 * 1024;
+let CV = null;
+
+const drop = $("#jDrop"), input = $("#jCv");
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("hot"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("hot"); }));
+drop.addEventListener("drop", e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f) take(f); });
+input.addEventListener("change", () => { const f = input.files && input.files[0]; if(f) take(f); });
+$("#jCvX").addEventListener("click", e => { e.preventDefault(); CV=null; input.value=""; $("#jPicked").classList.remove("on"); });
+
+function take(f){
+  $("#jErr").style.display="none";
+  const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+  if(!isPdf) return fail("لازم يكون الملف PDF");
+  if(f.size > MAX) return fail("حجم الملف أكبر من 4 ميجا، صغّره وحاول مرة ثانية");
+  CV = f;
+  $("#jCvName").textContent = f.name;
+  $("#jCvSize").textContent = (f.size/1048576).toFixed(1) + " ميجا";
+  $("#jPicked").classList.add("on");
+}
+function fail(m){ const e=$("#jErr"); e.textContent=m; e.style.display="block"; e.scrollIntoView({behavior:"smooth",block:"center"}); }
+const pick = n => { const el=document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; };
+
+/* read the PDF as base64 so it can travel inside the callable */
+function toBase64(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => { const s=String(r.result||""); res(s.slice(s.indexOf(",")+1)); };
+    r.onerror = () => rej(new Error("تعذّر قراءة الملف"));
+    r.readAsDataURL(file);
+  });
+}
+
+$("#jBtn").addEventListener("click", async () => {
+  $("#jErr").style.display="none";
+  const role=pick("role"), name=$("#jName").value.trim(), email=$("#jEmail").value.trim();
+  const phone=$("#jPhone").value.trim(), nat=$("#jNat").value.trim();
+
+  if(!role) return fail("اختر الوظيفة اللي تناسبك");
+  if(name.length<2) return fail("اكتب اسمك الكامل");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("إيميل غير صحيح");
+  const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
+  if(fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#jEmail")); return fail("تأكد من إيميلك، هل تقصد "+fix+"؟"); }
+  if(phone.replace(/\D/g,"").length<7) return fail("رقم واتساب غير صحيح");
+  if(!nat) return fail("اكتب جنسيتك");
+  if(!CV) return fail("أرفق سيرتك الذاتية بصيغة PDF");
+
+  const cc=$("#jCC").value;
+  let local=phone.replace(/\D/g,"").replace(/^0+/,"");
+  if(cc && local.indexOf(cc)===0 && local.length>cc.length) local=local.slice(cc.length);
+
+  $("#jBtn").disabled=true; $("#jBtn").textContent="جارٍ الإرسال…";
+  try{
+    const cvBase64 = await toBase64(CV);
+    const r = await submitJobApplication({
+      role, name, email, phone:"+"+cc+local, nationality:nat,
+      years:$("#jYears").value, portfolio:$("#jPort").value.trim(), note:$("#jNote").value.trim(),
+      cvBase64, cvName: CV.name,
+    });
+    if(r.data && r.data.ok){
+      $("#jbForm").style.display="none";
+      $("#jOk").style.display="block";
+      window.scrollTo({top:0,behavior:"smooth"});
+      return;
+    }
+    fail("تعذّر الإرسال، حاول مرة ثانية");
+  }catch(e){
+    fail((e && e.message) || "صار خطأ، حاول مرة ثانية");
+  }finally{
+    $("#jBtn").disabled=false; $("#jBtn").textContent="أرسل طلبك";
+  }
+});
+</script>
+</body>
+</html>
