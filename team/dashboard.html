@@ -105,6 +105,23 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* order repair */
+  .fixcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .fixcard.typo{border-inline-start:4px solid var(--gold)}
+  .fixcard.undelivered{border-inline-start:4px solid #962E37}
+  .fixh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .fixh b{color:var(--ink);font-size:14.5px}
+  .fixpill{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
+  .fixwhy{font-size:13.5px;line-height:1.8;color:var(--ink);background:var(--bg);border-radius:10px;padding:10px 13px;margin-bottom:10px}
+  .fixrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .fixrow input{flex:1 1 220px;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;font-size:14px;font-family:inherit;color:var(--ink);direction:ltr;text-align:left}
+  .fixrow button{border:0;border-radius:999px;padding:10px 18px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;color:#fff}
+  .fixrow .go{background:var(--auber)}
+  .fixrow .alt{background:#fff;color:var(--ink);border:1.5px solid var(--line);font-weight:600}
+  .fixrow button:disabled{opacity:.55;cursor:default}
+  .fixmsg{display:none;font-size:13.5px;border-radius:10px;padding:10px 13px;line-height:1.7;margin-bottom:12px}
+  .fixmsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .fixmsg.err{display:block;background:#FDECEC;color:#962E37}
   /* careers */
   .cvcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
   .cvh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:7px;font-size:13px;color:var(--muted)}
@@ -283,6 +300,14 @@
     </div>
     <div class="flt" id="bookFlt" style="display:none"></div>
     <div class="kpis" id="salesKpis"></div>
+    <div id="fixWrap" hidden>
+      <h2 style="font-size:17px;margin-top:22px"><span></span> مشترين يحتاجون متابعة</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 12px">
+        هذولا دفعوا بس يحتمل ما وصلتهم نسختهم .. إما الإيميل فيه غلط إملائي، أو الإرسال فشل وقتها.
+      </p>
+      <div class="fixmsg" id="fixMsg"></div>
+      <div id="fixList"></div>
+    </div>
     <div class="tbl" id="salesTbl"></div>
   </div>
 
@@ -493,6 +518,7 @@ const addManualBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"a
 const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelBooking");
 const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
 const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
+const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -585,7 +611,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
@@ -711,6 +737,83 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= ORDER REPAIR (book buyers) ================= */
+function fixMsg(m, ok){
+  const e=$("#fixMsg"); if(!e) return;
+  e.textContent=m; e.className="fixmsg "+(ok?"ok":"err");
+  if(ok) setTimeout(()=>{ e.className="fixmsg"; }, 6000);
+}
+
+function renderSalesFix(){
+  const rows = DATA.salesFix || [];
+  const wrap = $("#fixWrap"); if(!wrap) return;
+  if(!rows.length){ wrap.hidden = true; return; }
+  wrap.hidden = false;
+
+  $("#fixList").innerHTML = rows.map(r=>{
+    const wa = String(r.phone||"").replace(/\D/g,"");
+    const why = r.kind==="typo"
+      ? `الإيميل يبين فيه غلط إملائي. الأرجح المقصود <b>${esc(r.suggested||"")}</b> .. صححه وأعد الإرسال.`
+      : `الطلب ما وصل مرحلة "مدفوع"، يعني الإرسال فشل وقتها. اضغط «تحقق من الدفع» عشان نسأل Tap إذا الفلوس انسحبت فعلاً، و إذا انسحبت بنرسل النسخة على طول.`;
+    return `<div class="fixcard ${esc(r.kind)}">
+      <div class="fixh">
+        <b>${esc(r.name)||"—"}</b>
+        <span class="fixpill" style="background:${r.kind==="typo"?"#D3A146":"#962E37"}">${r.kind==="typo"?"غلط إملائي":"ما انرسل"}</span>
+        <span>${esc(r.product)}</span>
+        <span>${fmt(r.amount)} ${esc(r.currency)}</span>
+        <span class="num">${esc(r.email)}</span>
+        ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(r.phone)}</a>`:""}
+        <span class="num">${dt(r.when)}</span>
+      </div>
+      <div class="fixwhy">${why}</div>
+      <div class="fixrow">
+        <input type="email" data-fix-email="${esc(r.id)}" value="${esc(r.suggested || r.email)}" placeholder="الإيميل الصحيح">
+        ${r.kind==="undelivered"
+          ? `<button class="go" data-verify="${esc(r.id)}">تحقق من الدفع وأرسل</button>`
+          : `<button class="go" data-fix="${esc(r.id)}">صحّح وأعد الإرسال</button>`}
+        <button class="alt" data-resend="${esc(r.id)}">أعد الإرسال بدون تغيير</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+$("#fixList") && $("#fixList").addEventListener("click", async e=>{
+  const btn = e.target.closest("button[data-fix],button[data-verify],button[data-resend]"); if(!btn) return;
+  const id = btn.dataset.fix || btn.dataset.verify || btn.dataset.resend;
+  const action = btn.dataset.fix ? "fix" : (btn.dataset.verify ? "verify" : "resend");
+  const input = $(`input[data-fix-email="${id}"]`);
+  const email = input ? input.value.trim() : "";
+
+  if(action==="fix" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fixMsg("اكتب إيميل صحيح", false);
+  if(action==="verify" && email && input && email !== input.defaultValue){
+    /* they edited the address before verifying, so fix it in the same step */
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fixMsg("اكتب إيميل صحيح", false);
+  }
+
+  const all = $("#fixList").querySelectorAll("button");
+  all.forEach(b=>b.disabled=true);
+  const label = btn.textContent; btn.textContent = "جارٍ…";
+  try{
+    if(action==="verify" && email && email !== (DATA.salesFix.find(x=>x.id===id)||{}).email){
+      await repairOrder({ orderId:id, action:"fix", email });
+    }
+    const r = await repairOrder({ orderId:id, action, email });
+    const d = r.data || {};
+    if(d.sent){
+      fixMsg("انرسلت النسخة ✅ والطلب صار يبين بالمبيعات.", true);
+      DATA.salesFix = (DATA.salesFix||[]).filter(x=>x.id!==id);
+      renderSalesFix();
+      const rr = await getDashboard(); if(rr && rr.data){ DATA = rr.data; render(); }
+    }else{
+      fixMsg(d.message || "ما تم الدفع فعلياً، فما في نسخة تنرسل.", false);
+    }
+  }catch(err){
+    fixMsg((err && err.message) || "تعذّر التنفيذ", false);
+  }finally{
+    all.forEach(b=>b.disabled=false); btn.textContent = label;
+  }
+});
 
 /* ================= CAREERS ================= */
 let CVROLE="all";
