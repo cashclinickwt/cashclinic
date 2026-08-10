@@ -105,6 +105,8 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* customer groups */
+  .grpbadge{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff;white-space:nowrap}
   /* order repair */
   .fixcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
   .fixcard.typo{border-inline-start:4px solid var(--gold)}
@@ -317,6 +319,7 @@
   <div class="sec" id="quizSec" data-panel="quiz">
     <h2><span></span> نتائج الاختبارات</h2>
     <div class="flt" id="quizFlt"></div>
+    <div class="flt" id="grpFlt" style="display:none"></div>
     <div class="kpis" id="quizKpis"></div>
     <div class="tbl" id="quizTbl"></div>
   </div>
@@ -1456,25 +1459,53 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
   finally{ $("#cmpSend").disabled=false; }
 });
 
+const GROUP_COLOR={ "مشروع جديد":"#2F8789", "مشروع منزلي":"#505632", "مشروع صغير أو متوسط":"#962E37" };
+let GFILTER="all";
+
 function renderQuiz(){
   const Q=DATA.quiz;
+  const gt=Q.groupTotals||{};
+  const gkeys=Object.keys(gt);
+
   $("#quizKpis").innerHTML=`
     <div class="kpi"><div class="n">${fmt(Q.totals.count)}</div><div class="l">عدد من أنهوا الاختبار</div></div>`+
-    Q.byQuiz.map(q=>`<div class="kpi"><div class="n">${fmt(q.count)}</div><div class="l">${esc(q.title||q.source)}</div></div>`).join("");
+    Q.byQuiz.map(q=>`<div class="kpi"><div class="n">${fmt(q.count)}</div><div class="l">${esc(q.title||q.source)}</div></div>`).join("")+
+    gkeys.map(g=>`<div class="kpi"><div class="n">${fmt(gt[g])}</div><div class="l">${esc(g)}</div></div>`).join("");
+
+  /* group filter only makes sense when there are groups to filter by */
+  const gf=$("#grpFlt");
+  if(gf){
+    if(gkeys.length){
+      gf.style.display="";
+      gf.innerHTML=[`<button data-g="all"${GFILTER==="all"?' class="on"':''}>كل الفئات</button>`]
+        .concat(gkeys.map(g=>`<button data-g="${esc(g)}"${GFILTER===g?' class="on"':''}>${esc(g)} (${fmt(gt[g])})</button>`))
+        .concat([`<button data-g="none"${GFILTER==="none"?' class="on"':''}>بدون فئة</button>`]).join("");
+    } else { gf.style.display="none"; GFILTER="all"; }
+  }
+
   if(!Q.leads.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بعد</div>`; return; }
   const multi=DATA.scope.length>1;
-  const rows=Q.leads.map((l,i)=>({l,i})).filter(x=>QFILTER==="all"||x.l.source===QFILTER);
-  if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بهذا الاختبار</div>`; return; }
+  const rows=Q.leads.map((l,i)=>({l,i}))
+    .filter(x=>QFILTER==="all"||x.l.source===QFILTER)
+    .filter(x=>GFILTER==="all" ? true : (GFILTER==="none" ? !x.l.customerGroup : x.l.customerGroup===GFILTER));
+  if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بهذا التصنيف</div>`; return; }
+  const anyGroup=gkeys.length>0;
   $("#quizTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th><th></th></tr></thead><tbody>`+
+      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}${anyGroup?"<th>الفئة</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th><th></th></tr></thead><tbody>`+
     rows.map(({l,i})=>`<tr>
       <td class="num">${dt(l.when)}</td><td>${esc(l.name)||"—"}</td>
       ${multi?`<td>${esc(l.quizTitle||l.source)}</td>`:""}
+      ${anyGroup?`<td>${l.customerGroup?`<span class="grpbadge" style="background:${GROUP_COLOR[l.customerGroup]||"#6B6577"}">${esc(l.customerGroup)}</span>`:"—"}</td>`:""}
       <td class="num">${l.score!=null?l.score+"%":"—"}</td>
       <td>${l.band?`<span class="badge" style="background:${bandColor(l.band)}">${esc(l.band)}</span>`:"—"}</td>
       <td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td>
       <td><button class="view-btn" onclick="openResult(${i})">عرض النتيجة</button></td></tr>`).join("")+`</tbody></table>`;
 }
+
+$("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  GFILTER=b.dataset.g; renderQuiz();
+});
 </script>
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
 
