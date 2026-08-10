@@ -12,7 +12,12 @@ img{max-width:100%;}
 .cc-header-in{max-width:1200px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
 .cc-logo{display:inline-flex;align-items:center;gap:13px;}
 .cc-logo span{font-size:24px;font-weight:300;letter-spacing:-.01em;color:var(--cc-purple);}
-.cc-nav-links{display:flex;align-items:center;gap:34px;}
+.cc-nav-links{display:flex;align-items:center;gap:34px;min-width:0;}
+/* the nav gained an item (الكتب), which tipped the header 2px over the
+   viewport around 1024px. Tightening the gap just below the desktop
+   breakpoint keeps every link on one line without a horizontal scrollbar. */
+@media (max-width:1120px){ .cc-nav-links{gap:22px;} .cc-navlink{font-size:14.5px;} }
+@media (max-width:1040px){ .cc-nav-links{gap:16px;} }
 .cc-navlink{font-size:15px;font-weight:500;color:var(--cc-grey-700);transition:color .18s;}
 .cc-navlink:hover{color:var(--cc-purple);}
 .cc-header-cta{display:flex;align-items:center;gap:12px;}

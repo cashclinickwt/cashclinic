@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الكتب والأدلة | كاش كلينك</title>
+<meta name="description" content="أدلة وكتيّبات كاش كلينك المالية — نسخ رقمية تصلك على إيميلك فوراً، مكتوبة للواقع الخليجي بالأرقام والتمارين.">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="../assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="../assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="../assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="../assets/ds/tokens/base.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+<style>
+  .bks-hero{background:var(--cc-purple-050);border-bottom:1px solid var(--cc-grey-200);padding:54px 0 48px;text-align:center}
+  .bks-hero .cc-eyebrow{color:var(--cc-gold)}
+
+  .bks-grid{display:grid;grid-template-columns:1fr;gap:26px;padding:40px 0 20px;max-width:940px;margin:0 auto}
+
+  .bk-card{display:grid;grid-template-columns:1.05fr 1fr;background:var(--cc-white);
+    border:1px solid var(--cc-grey-200);border-radius:var(--radius-xl,24px);overflow:hidden;
+    box-shadow:0 16px 44px rgba(47,23,72,.07);text-decoration:none;color:inherit;
+    transition:transform .18s,box-shadow .18s}
+  .bk-card:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(47,23,72,.14)}
+  @media(max-width:760px){.bk-card{grid-template-columns:1fr}}
+
+  /* the cover is drawn, not photographed: each book carries its clinic colour */
+  .bk-cover{position:relative;min-height:300px;padding:30px 26px;display:flex;flex-direction:column;
+    justify-content:center;overflow:hidden;background:var(--bk-a)}
+  .bk-cover::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 15% 0%,rgba(255,255,255,.16),transparent 60%);pointer-events:none}
+  .bk-cover .mark{position:absolute;inset-inline-end:-24px;bottom:-28px;width:150px;opacity:.14}
+  .bk-chip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);border-radius:999px;
+    padding:5px 13px;font-size:12.5px;color:#fff;margin-bottom:16px}
+  .bk-chip img{width:19px;height:19px;border-radius:50%;object-fit:contain;background:#fff}
+  .bk-cover h3{position:relative;z-index:1;font-size:clamp(24px,3.4vw,31px);font-weight:300;line-height:1.32;
+    color:#fff;margin:0 0 10px}
+  .bk-cover h3 b{font-weight:700;color:var(--cc-cream)}
+  .bk-cover .sub{position:relative;z-index:1;font-size:14px;line-height:1.8;color:rgba(255,255,255,.82);margin:0}
+  .bk-cover .by{position:relative;z-index:1;margin-top:18px;padding-top:14px;
+    border-top:1px solid rgba(255,255,255,.2);font-size:13px;color:rgba(255,255,255,.78)}
+
+  .bk-body{padding:32px 30px;display:flex;flex-direction:column}
+  .bk-body p{font-size:15px;line-height:1.95;color:var(--cc-grey-700);margin:0 0 18px}
+  .bk-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+  .bk-tag{background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:999px;
+    padding:6px 14px;font-size:13px;color:var(--cc-purple)}
+  .bk-price{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:auto;margin-bottom:18px}
+  .bk-price .now{font-size:26px;font-weight:700;color:var(--bk-a)}
+  .bk-price .was{display:inline-block;background:var(--cc-cream);color:var(--cc-purple);
+    font-size:17px;font-weight:700;padding:3px 11px;border-radius:9px;
+    text-decoration:line-through;text-decoration-thickness:2px}
+  .bk-price .fmt{font-size:13px;color:var(--cc-grey-500)}
+  .bk-go{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;background:var(--bk-a);color:#fff;
+    border-radius:999px;padding:14px 30px;font-size:16px;font-weight:700;transition:.16s}
+  .bk-card:hover .bk-go{filter:brightness(1.1)}
+
+  .bks-note{max-width:940px;margin:0 auto;padding:6px 0 72px}
+  .bks-note .box{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:20px;
+    padding:26px 28px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between}
+  .bks-note .t{flex:1 1 300px}
+  .bks-note .t b{display:block;font-size:17px;color:var(--cc-purple);margin-bottom:6px}
+  .bks-note .t span{font-size:14.5px;line-height:1.85;color:var(--cc-grey-700)}
+  .bks-note .items{display:flex;flex-wrap:wrap;gap:10px}
+  .bks-note .items span{background:var(--cc-purple-050);border-radius:12px;padding:10px 16px;
+    font-size:13.5px;color:var(--cc-purple)}
+</style>
+</head>
+<body>
+
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="../index.html"><img src="../brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <nav class="cc-nav-links">
+      <a class="cc-navlink" href="../index.html">الرئيسية</a>
+      <a class="cc-navlink" href="../index.html#clinics">عياداتنا</a>
+      <a class="cc-navlink" href="../index.html#consultants">استشاريونا</a>
+      <a class="cc-navlink" href="../index.html#quiz">الاختبارات</a>
+      <a class="cc-navlink" href="../courses/index.html">دورات</a>
+      <a class="cc-navlink" href="index.html" style="color:var(--cc-gold);font-weight:700;">الكتب</a>
+      <a class="cc-navlink" href="../careers.html">التوظيف</a>
+      <a class="cc-navlink" href="../team/dashboard.html" style="border:1.5px solid #2F1748;border-radius:999px;padding:6px 16px;">دخول الفريق</a>
+    </nav>
+    <div class="cc-header-cta">
+      <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820">
+        <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+        <span>تواصل معنا</span>
+      </a>
+      <span class="cc-social-row">
+        <a class="cc-social" href="https://www.instagram.com/cash.clinic" target="_blank" rel="noopener" aria-label="إنستغرام">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 5.3a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm0 7.4a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8Zm5.7-7.6a1.05 1.05 0 1 1-2.1 0 1.05 1.05 0 0 1 2.1 0Z"/></svg>
+        </a>
+      </span>
+    </div>
+  </div>
+</header>
+
+<section class="bks-hero">
+  <div class="cc-wrap">
+    <span class="cc-eyebrow">الكتب والأدلة</span>
+    <h1 class="cc-h2">اقرأ، عبّي، وطلّع خطتك بيدك</h1>
+    <p class="cc-lede" style="max-width:54ch;margin-inline:auto;">
+      إصداراتنا الرقمية مكتوبة للواقع الخليجي بالأرقام والتمارين — تصلك على إيميلك فوراً بعد الدفع.
+    </p>
+  </div>
+</section>
+
+<div class="cc-wrap">
+  <div class="bks-grid">
+
+    <!-- كتيّب أهدافي المالية -->
+    <a class="bk-card" href="../quiz/ahdafi.html" style="--bk-a:#962E37;">
+      <div class="bk-cover">
+        <span class="bk-chip"><img src="../brand/mark/mark-purple.png" alt="">كاش كلينك</span>
+        <h3>أهدافي <b>المالية</b></h3>
+        <p class="sub">كتيّب تفاعلي · 45 صفحة · 16 محور</p>
+        <div class="by">أ/ غالية مبارك النويف &nbsp;·&nbsp; م. سارة الهندي</div>
+        <img class="mark" src="../brand/mark/mark-cream.png" alt="">
+      </div>
+      <div class="bk-body">
+        <p>مو كتيّب تقراه وتخلّصه. كل محور فيه صفحة شرح وبعدها تمرين تعبّيه بيدك — تبدأ من قصتك مع المال، وتطلع بخطة مالية مكتوبة بالأرقام والمواعيد ومصادر التمويل.</p>
+        <div class="bk-tags">
+          <span class="bk-tag">تمارين تعبّيها بيدك</span>
+          <span class="bk-tag">سلوك + أرقام</span>
+          <span class="bk-tag">خطة لسنة كاملة</span>
+        </div>
+        <div class="bk-price">
+          <span class="was">35 د.ك</span>
+          <span class="now">25 د.ك</span>
+          <span class="fmt">نسخة رقمية PDF</span>
+        </div>
+        <span class="bk-go">التفاصيل والشراء ←</span>
+      </div>
+    </a>
+
+    <!-- دليل الوفرة المالية -->
+    <a class="bk-card" href="../quiz/book.html" style="--bk-a:#505632;">
+      <div class="bk-cover">
+        <span class="bk-chip"><img src="../brand/nas-logo.png" alt="">كاش ناس</span>
+        <h3>دليل <b>الوفرة المالية</b></h3>
+        <p class="sub">من الصدمة المالية إلى بناء الثروة الحقيقية</p>
+        <div class="by">أ/ غالية مبارك النويف &nbsp;·&nbsp; م. سارة الهندي</div>
+        <img class="mark" src="../brand/mark/mark-cream.png" alt="">
+      </div>
+      <div class="bk-body">
+        <p>دليل عملي بالأرقام يجمع بين علم السلوكيات المالية وأدوات المحاسبة الشخصية. يعالج جذور علاقتك بالفلوس أول، وبعدها يبني معك الخطة — بنماذج مصمّمة للأسرة الخليجية.</p>
+        <div class="bk-tags">
+          <span class="bk-tag">السلوكيات المالية</span>
+          <span class="bk-tag">الميزانية الصفرية</span>
+          <span class="bk-tag">إدارة الديون</span>
+        </div>
+        <div class="bk-price">
+          <span class="was">15 د.ك</span>
+          <span class="now">10 د.ك</span>
+          <span class="fmt">نسخة رقمية PDF</span>
+        </div>
+        <span class="bk-go">التفاصيل والشراء ←</span>
+      </div>
+    </a>
+
+    <!-- سحر إدارة الكاش -->
+    <a class="bk-card" href="../quiz/riyada.html" style="--bk-a:#2F8789;">
+      <div class="bk-cover">
+        <span class="bk-chip"><img src="../brand/riyada-logo.png" alt="">كاش ريادة</span>
+        <h3>سحر إدارة <b>الكاش</b></h3>
+        <p class="sub">وتأثيره على نمو الشركات</p>
+        <div class="by">حسن أكبر</div>
+        <img class="mark" src="../brand/mark/mark-cream.png" alt="">
+      </div>
+      <div class="bk-body">
+        <p>لأصحاب المشاريع اللي يبون يعرفون وين يتسرّب الكاش وكيف يوقفونه. نظام عملي خطوة بخطوة لإدارة السيولة والتسعير والنمو، بدون تعقيد محاسبي.</p>
+        <div class="bk-tags">
+          <span class="bk-tag">السيولة النقدية</span>
+          <span class="bk-tag">التسعير الصحيح</span>
+          <span class="bk-tag">نمو المشروع</span>
+        </div>
+        <div class="bk-price">
+          <span class="now">25 د.ك</span>
+          <span class="fmt">نسخة رقمية PDF</span>
+        </div>
+        <span class="bk-go">التفاصيل والشراء ←</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="bks-note">
+    <div class="box">
+      <div class="t">
+        <b>كل نسخة تصلك فوراً</b>
+        <span>بعد ما تدفع، النسخة توصل على إيميلك مباشرة. تقدر تطبعها أو تعبّيها من جوالك، وتفتحها على أي جهاز وقت ما تبي.</span>
+      </div>
+      <div class="items">
+        <span>📩 توصلك فوراً</span>
+        <span>🔒 دفع آمن عبر Tap</span>
+        <span>📱 على أي جهاز</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--cc-ink);color:var(--cc-purple-100);">
+  <div class="cc-wrap" style="padding-top:52px;padding-bottom:28px;">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;">
+      <img src="../brand/logo/logo-cream.png" alt="Cash Clinic" style="height:32px;width:auto;display:block;">
+      <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:14.5px;">
+        <a href="../index.html" style="color:var(--cc-purple-200);">الرئيسية</a>
+        <a href="../courses/index.html" style="color:var(--cc-purple-200);">دورات</a>
+        <a href="../index.html#newsletter" style="color:var(--cc-purple-200);">النشرة البريدية</a>
+        <a href="../careers.html" style="color:var(--cc-purple-200);">التوظيف</a>
+        <a href="../policy.html" style="color:var(--cc-purple-200);">السياسة</a>
+      </div>
+      <span class="cc-social-row">
+        <a class="cc-social-f" href="https://whatsapp.com/channel/0029VbD0DfVGk1G0UgQ6Qm2S" target="_blank" rel="noopener" aria-label="قناة واتساب كاش كلينك">
+          <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg>
+        </a>
+        <a class="cc-social-f" href="https://www.instagram.com/cash.clinic" target="_blank" rel="noopener" aria-label="إنستغرام">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 5.3a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm0 7.4a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8Zm5.7-7.6a1.05 1.05 0 1 1-2.1 0 1.05 1.05 0 0 1 2.1 0Z"/></svg>
+        </a>
+      </span>
+    </div>
+    <div style="border-top:1px solid rgba(255,231,188,.16);margin-top:26px;padding-top:20px;font-size:13.5px;color:var(--cc-purple-300);">
+      © 2026 كاش كلينك. جميع الحقوق محفوظة.
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/nav.js"></script>
+</body>
+</html>
