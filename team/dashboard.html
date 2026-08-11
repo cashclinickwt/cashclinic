@@ -105,6 +105,26 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* manual sale */
+  .addbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  .addbox > h3{margin:0 0 4px;font-size:16px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .addbox > p{margin:0 0 16px;font-size:13px;color:var(--muted);line-height:1.75}
+  .addgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .addf label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .addf label span{font-weight:400}
+  .addf input,.addf select,.addf textarea{width:100%;border:1.5px solid var(--line);border-radius:11px;
+    padding:10px 12px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;box-sizing:border-box}
+  .addf input:focus,.addf select:focus{outline:0;border-color:var(--auber)}
+  .addrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px}
+  .addrow label{font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:7px}
+  .addbtn{border:0;border-radius:999px;background:var(--auber);color:#fff;padding:12px 28px;
+    font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer}
+  .addbtn:disabled{opacity:.55;cursor:default}
+  .addmsg{display:none;font-size:13.5px;border-radius:10px;padding:10px 13px;line-height:1.75;margin-top:12px}
+  .addmsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .addmsg.err{display:block;background:#FDECEC;color:#962E37}
+  .addmsg.warn{display:block;background:#FFF7E8;color:#8A6410}
+  .manualpill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#6B6577;color:#fff;margin-inline-start:6px}
   /* customer groups */
   .grpbadge{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff;white-space:nowrap}
   /* order repair */
@@ -305,6 +325,26 @@
     </div>
     <div class="flt" id="bookFlt" style="display:none"></div>
     <div class="kpis" id="salesKpis"></div>
+
+    <div class="addbox" id="addBox" hidden>
+      <h3>➕ أضف عملية بيع</h3>
+      <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر. تنضاف للمبيعات مثل أي عملية ثانية، وتقدر ترسل الكتاب للعميل على طول.</p>
+      <div class="addgrid">
+        <div class="addf"><label>الكتاب</label><select id="asProduct"></select></div>
+        <div class="addf"><label>اسم العميل</label><input id="asName" type="text" placeholder="الاسم الكامل"></div>
+        <div class="addf"><label>الإيميل <span>(للإرسال)</span></label><input id="asEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
+        <div class="addf"><label>الجوال <span>(اختياري)</span></label><input id="asPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
+        <div class="addf"><label>المبلغ المدفوع</label><input id="asAmount" type="number" min="0" step="0.5"></div>
+        <div class="addf"><label>تاريخ البيع <span>(اختياري)</span></label><input id="asDate" type="date"></div>
+      </div>
+      <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="asNote" type="text" placeholder="مثال: بيع عبر واتساب"></div>
+      <div class="addrow">
+        <label><input type="checkbox" id="asDeliver" checked> أرسل الكتاب على إيميله</label>
+        <button class="addbtn" id="asAdd">أضف العملية</button>
+      </div>
+      <div class="addmsg" id="asMsg"></div>
+    </div>
+
     <div id="fixWrap" hidden>
       <h2 style="font-size:17px;margin-top:22px"><span></span> مشترين يحتاجون متابعة</h2>
       <p class="muted" style="font-size:13px;margin:0 0 12px">
@@ -499,6 +539,7 @@
     <div class="tbl" id="bqTbl"></div>
   </div>
 </div></div>
+<script src="../assets/js/email-typo.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -525,6 +566,7 @@ const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"canc
 const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
 const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
+const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -617,7 +659,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
@@ -667,7 +709,7 @@ function renderSales(){
       <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
     orders.map(o=>`<tr>
       <td class="num">${dt(o.when)}</td><td>${esc(o.name)||"—"}</td>
-      <td>${esc(o.product)}</td><td class="num">${money(o.amount)}</td>
+      <td>${esc(o.product)}${o.manual?'<span class="manualpill" title="'+esc(o.note||"أضيفت يدوياً")+'">يدوي</span>':""}</td><td class="num">${money(o.amount)}</td>
       <td class="num">${esc(o.phone)||"—"}</td><td class="num">${esc(o.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
@@ -743,6 +785,62 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= ADD A SALE MANUALLY ================= */
+function asMsg(m, kind){
+  const e=$("#asMsg"); if(!e) return;
+  e.textContent=m; e.className="addmsg "+(kind||"ok");
+  if(kind==="ok") setTimeout(()=>{ e.className="addmsg"; }, 7000);
+}
+
+function renderAddSale(){
+  const cat=DATA.catalog||[]; const box=$("#addBox"); if(!box) return;
+  if(!cat.length){ box.hidden=true; return; }
+  box.hidden=false;
+  const sel=$("#asProduct");
+  if(sel && sel.options.length!==cat.length){
+    sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("");
+    syncPrice();
+  }
+}
+function syncPrice(){
+  const sel=$("#asProduct"), amt=$("#asAmount"); if(!sel||!amt) return;
+  const o=sel.options[sel.selectedIndex];
+  /* prefill the list price, but leave it editable for a WhatsApp discount */
+  if(o) amt.value=o.dataset.price;
+}
+$("#asProduct") && $("#asProduct").addEventListener("change", syncPrice);
+
+$("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
+  const name=$("#asName").value.trim(), email=$("#asEmail").value.trim();
+  const productKey=$("#asProduct").value;
+  if(!productKey) return asMsg("اختر الكتاب","err");
+  if(name.length<2) return asMsg("اكتب اسم العميل","err");
+  if(email){
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return asMsg("الإيميل غير صحيح","err");
+    const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+    if(fix) return asMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
+  }
+  const deliver=$("#asDeliver").checked;
+  if(!email && deliver && !confirm("ما كتبت إيميل، فما راح ينرسل الكتاب.\n\nتبي تضيف العملية بدون إرسال؟")) return;
+
+  const btn=$("#asAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
+  try{
+    const r=await addManualSale({
+      productKey, name, email,
+      phone:$("#asPhone").value.trim(), note:$("#asNote").value.trim(),
+      amount:$("#asAmount").value, soldOn:$("#asDate").value, deliver,
+    });
+    const d=r.data||{};
+    if(d.delivered)          asMsg(`انضافت العملية وانرسل «${d.product}» على ${email} ✅`,"ok");
+    else if(d.noEmail)       asMsg("انضافت العملية ✅ بدون إيميل، فما انرسل الكتاب.","warn");
+    else if(d.deliverError)  asMsg("انضافت العملية، بس تعذّر إرسال الكتاب: "+d.deliverError,"warn");
+    else                     asMsg("انضافت العملية ✅ بدون إرسال.","ok");
+    ["#asName","#asEmail","#asPhone","#asNote","#asDate"].forEach(id=>{ $(id).value=""; });
+    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+  }catch(e){ asMsg((e&&e.message)||"تعذّر إضافة العملية","err"); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+});
 
 /* ================= ORDER REPAIR (book buyers) ================= */
 function fixMsg(m, ok){
