@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تأكيد الحجز | كاش كلينك</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<style>
+  :root{
+    --auber:#2F1748; --purple:#614588; --gold:#D3A146; --cream:#FFE7BC;
+    --teal:#2F8789; --ink:#1B1226; --muted:#6B6577; --line:#E4E1EA; --bg:#F7F6FA;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:560px;margin:0 auto;padding:34px 18px 60px}
+  .logo{display:block;height:38px;margin:0 auto 26px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    box-shadow:0 18px 48px rgba(47,23,72,.09)}
+  .head{background:var(--auber);color:#fff;padding:26px 24px;text-align:center}
+  .head .eyebrow{font-size:12.5px;color:var(--cream);letter-spacing:.02em}
+  .head h1{margin:6px 0 0;font-size:22px;font-weight:700}
+  .head .who{margin-top:6px;font-size:14px;color:#D9D2E4}
+  .body{padding:24px}
+  .row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .row:last-of-type{border-bottom:0}
+  .row .k{color:var(--muted);flex:0 0 96px}
+  .row .v{font-weight:700;flex:1}
+  .sess{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .sess .n{font-size:12px;color:var(--purple);font-weight:700;margin-bottom:4px}
+  .sess .t{font-size:15px;font-weight:700}
+  .sess .w{font-size:13.5px;color:var(--muted);margin-top:3px;direction:ltr;text-align:right}
+  .total{display:flex;align-items:center;justify-content:space-between;
+    background:var(--cream);border-radius:14px;padding:15px 18px;margin-top:6px}
+  .total .l{font-size:14.5px;color:var(--auber)}
+  .total .a{font-size:23px;font-weight:700;color:var(--auber)}
+  .pay{display:block;width:100%;border:0;border-radius:999px;background:var(--auber);color:#fff;
+    padding:16px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
+  .pay:disabled{opacity:.55;cursor:default}
+  .note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.9}
+  .msg{display:none;font-size:14px;border-radius:12px;padding:13px 16px;margin-top:16px;line-height:1.8}
+  .msg.err{display:block;background:#FDECEC;color:#962E37}
+  .msg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .load{text-align:center;color:var(--muted);padding:50px 0;font-size:15px}
+  .paidbox{text-align:center;padding:10px 0 4px}
+  .paidbox .tick{font-size:44px}
+  .paidbox h2{margin:8px 0 6px;font-size:20px;color:var(--teal)}
+  .paidbox p{margin:0;font-size:14.5px;color:var(--muted)}
+  .wa{display:inline-block;margin-top:16px;border:1.5px solid var(--teal);color:var(--teal);
+    border-radius:999px;padding:9px 20px;font-size:14px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" src="brand/logo/logo-primary.png" alt="Cash Clinic">
+  <div class="card">
+    <div id="load" class="load">جارٍ تحميل الحجز…</div>
+    <div id="main" hidden>
+      <div class="head">
+        <div class="eyebrow">كاش ناس · عيادة الصحة المالية</div>
+        <h1 id="pkgName">—</h1>
+        <div class="who" id="who"></div>
+      </div>
+      <div class="body">
+        <div id="paidBox" class="paidbox" hidden>
+          <div class="tick">✅</div>
+          <h2>حجزك مؤكد</h2>
+          <p>وصلك إيميل فيه كل التفاصيل. نشوفك بالموعد.</p>
+        </div>
+
+        <div id="details">
+          <div id="sessions"></div>
+          <div class="row"><span class="k">الطريقة</span><span class="v" id="mode">—</span></div>
+          <div class="total">
+            <span class="l">المبلغ المطلوب</span>
+            <span class="a" id="amount">—</span>
+          </div>
+          <button class="pay" id="payBtn">ادفع وأكّد الحجز</button>
+          <div class="note">
+            الدفع آمن عبر Tap. موعدك محجوز لك، وما يتأكد إلا بعد الدفع.
+          </div>
+        </div>
+        <div class="msg" id="msg"></div>
+        <div style="text-align:center">
+          <a class="wa" id="waLink" href="https://wa.me/96522260820" target="_blank" rel="noopener">عندك سؤال؟ راسلنا</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG = {
+  firebase: {
+    apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",
+    authDomain:"cash-quiz-906a6.firebaseapp.com",
+    projectId:"cash-quiz-906a6",
+    storageBucket:"cash-quiz-906a6.firebasestorage.app",
+    messagingSenderId:"547780714224",
+    appId:"1:547780714224:web:0e97107045a803623dec35"
+  },
+  functionsRegion:"us-central1"
+};
+const app = initializeApp(CONFIG.firebase);
+const fns = getFunctions(app, CONFIG.functionsRegion);
+const getBookingOffer = httpsCallable(fns, "getBookingOffer");
+const payBookingOffer = httpsCallable(fns, "payBookingOffer");
+
+const $ = s => document.querySelector(s);
+const esc = t => String(t||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TOKEN = new URLSearchParams(location.search).get("t") || "";
+
+const AR_DAY = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const AR_MON = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+/* Kuwait is UTC+3 all year, so the offset is fixed */
+function kwParts(iso){
+  const d = new Date(Date.parse(iso) + 180*60000);
+  return { w:d.getUTCDay(), d:d.getUTCDate(), m:d.getUTCMonth(), hh:d.getUTCHours(), mm:d.getUTCMinutes() };
+}
+function clock(iso){
+  const p = kwParts(iso);
+  const ap = p.hh >= 12 ? "pm" : "am";
+  const h = p.hh % 12 === 0 ? 12 : p.hh % 12;
+  return h + (p.mm ? ":"+String(p.mm).padStart(2,"0") : "") + ap;
+}
+function slotRange(iso, minutes){
+  const end = new Date(Date.parse(iso) + (Number(minutes)||60)*60000).toISOString();
+  return clock(iso) + " to " + clock(end);
+}
+function fullWhen(iso, minutes){
+  const p = kwParts(iso);
+  return `${AR_DAY[p.w]} ${p.d} ${AR_MON[p.m]} · ${slotRange(iso, minutes)}`;
+}
+
+function msg(text, kind){
+  const m = $("#msg");
+  m.textContent = text; m.className = "msg " + (kind||"err");
+}
+
+async function load(){
+  if(!TOKEN){ $("#load").textContent = "الرابط غير صحيح."; return; }
+  try{
+    const r = await getBookingOffer({ token: TOKEN });
+    const o = (r.data||{}).offer;
+    if(!o){ $("#load").textContent = "الحجز غير موجود."; return; }
+
+    $("#pkgName").textContent = o.packageName || "استشارة";
+    $("#who").textContent = o.name ? "باسم " + o.name : "";
+    $("#mode").textContent = o.mode === "present" ? "حضوري" : "أونلاين · Google Meet";
+    $("#amount").textContent = `${o.amount} ${o.currency||"KWD"}` .replace("KWD","د.ك");
+
+    $("#sessions").innerHTML = (o.sessions||[]).map((s,i)=>`
+      <div class="sess">
+        <div class="n">الجلسة ${i+1}</div>
+        <div class="t">${esc(s.label||"")}${s.consultantName?" · "+esc(s.consultantName):""}</div>
+        <div class="w">${esc(fullWhen(s.startIso, s.minutes))}</div>
+      </div>`).join("") || "";
+
+    if(o.status === "cancelled"){
+      $("#details").hidden = true;
+      msg("هذا الحجز ملغي. راسلنا لو تبي تحجز من جديد.", "err");
+    } else if(o.paid){
+      $("#details").hidden = true;
+      $("#paidBox").hidden = false;
+    }
+    $("#load").hidden = true; $("#main").hidden = false;
+  }catch(e){
+    $("#load").textContent = (e && e.message) || "تعذّر تحميل الحجز.";
+  }
+}
+
+$("#payBtn").addEventListener("click", async () => {
+  const b = $("#payBtn"); b.disabled = true; const t = b.textContent; b.textContent = "جارٍ التحويل للدفع…";
+  try{
+    const r = await payBookingOffer({ token: TOKEN });
+    const url = (r.data||{}).url;
+    if(!url) throw new Error("تعذّر إنشاء الدفعة");
+    location.href = url;
+  }catch(e){
+    b.disabled = false; b.textContent = t;
+    msg((e && e.message) || "تعذّر إنشاء الدفعة، حاول مرة ثانية.", "err");
+  }
+});
+
+load();
+</script>
+</body>
+</html>

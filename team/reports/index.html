@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقارير كاش ناس · كاش كلينيك</title>
+<link rel="stylesheet" href="assets/css/fonts.css?v=2">
+<link rel="stylesheet" href="assets/css/cc-doc.css?v=2">
+<style>
+.rep{display:flex;align-items:flex-start;gap:18px;padding:22px 0;border-top:1px solid var(--line)}
+.rep:last-of-type{border-bottom:1px solid var(--line)}
+.rep .ic{width:46px;height:46px;object-fit:contain;flex:0 0 auto;margin-top:2px}
+.rep .nm{font-size:17px;font-weight:600;color:var(--purple);line-height:1.4}
+.rep .ds{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.85;max-width:44em}
+.rep .sp{margin-right:auto}
+.rep .go{color:var(--teal7);font-weight:600;font-size:13px;text-decoration:none;white-space:nowrap;
+  align-self:center}
+.rep .go:hover{color:var(--teal)}
+.rep.soon{opacity:.55}
+.rep.soon .go{color:var(--grey400);cursor:default}
+.linkbtn{background:transparent;border:0;font-family:inherit;font-weight:600;font-size:13px;
+  cursor:pointer;padding:0}
+@media(max-width:760px){.rep{gap:12px}.rep .ic{width:36px;height:36px}}
+</style>
+<style>@media print{.backbtn{display:none !important}}</style>
+</head>
+<body>
+
+<a class="backbtn" href="../dashboard.html" style="position:fixed;top:14px;inset-inline-start:14px;z-index:999;
+   background:#2F1748;color:#FFE7BC;border-radius:999px;padding:9px 18px;font-size:13.5px;
+   text-decoration:none;font-family:inherit;box-shadow:0 6px 18px rgba(47,23,72,.22)">← لوحة التحكم</a>
+
+<div class="paper">
+
+  <section class="cover">
+    <img class="tangle" src="assets/img/tangle-journey-2.svg" alt="">
+    <div class="col">
+      <div class="top">
+        <img class="lock" src="assets/img/logo-cream-2.png" alt="كاش كلينيك">
+        <span class="track"><img src="assets/img/nas-icon-light-2.png" alt=""> كاش ناس</span>
+      </div>
+
+      <div class="eyebrow">كاش كلينيك · عيادة الصحة المالية الأولى في دولة الكويت ودول الخليج</div>
+
+      <div class="mid">
+        <h1>تقارير<br>كاش ناس</h1>
+        <p class="lede">مركز تقارير قسم كاش ناس · من هنا يفتح تقرير جديد لأي باقة،
+          أو يعاد فتح ملف عميل محفوظ لاستكماله. تضاف التقارير الجديدة إلى نفس القائمة.</p>
+
+        <div class="figs">
+          <div class="fig"><div class="v" id="mReports">1</div><div class="k">تقرير متاح</div></div>
+          <div class="fig"><div class="v" id="mCount">0</div><div class="k">ملفات محفوظة</div></div>
+          <div class="fig"><div class="v tl" style="font-size:22px;line-height:1.9" id="mLast">—</div><div class="k">آخر تحديث</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="rule"></div>
+        <div class="meta">
+          <div><i>القسم</i>&nbsp;&nbsp;كاش ناس · الاستشارة المالية الشخصية</div>
+          <div><i>النطاق</i>&nbsp;&nbsp;تقارير داخلية · وثائق سرية</div>
+        </div>
+      </div>
+
+      <div class="base">
+        <span>نشخص · نعالج · نطور حياتك المالية</span>
+        <span>كاش كلينيك · المرجع الداخلي المعتمد</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <div class="sec">
+      <div class="sec-head"><div class="sec-num">01</div>
+        <div><h2>التقارير المتاحة</h2>
+          <div class="sub">اختاري التقرير لفتح نموذج جديد فارغ.</div></div>
+      </div>
+
+      <div class="rep">
+        <img class="ic" src="assets/img/nas-icon-2.png" alt="">
+        <div>
+          <div class="nm">باقة أساس الحرية المالية</div>
+          <div class="ds">البيانات الشخصية · المشكلة · الأهداف بالتواريخ والمبالغ ·
+            الملاحظات السلوكية · الأفكار · الشعور · خطتي للقادم · التوقيعات.</div>
+        </div>
+        <div class="sp"></div>
+        <a class="go" href="reports/asas-alhurriya.html">فتح تقرير جديد ←</a>
+      </div>
+
+      <div class="rep soon">
+        <img class="ic" src="assets/img/mark-teal-2.png" alt="">
+        <div>
+          <div class="nm">تقارير قادمة</div>
+          <div class="ds">تضاف باقات كاش ناس الأخرى هنا بنفس التصميم وبنفس قائمة العملاء ..
+            بدون أي تغيير في طريقة العمل.</div>
+        </div>
+        <div class="sp"></div>
+        <span class="go">قريبا</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><div class="sec-num">02</div>
+        <div><h2>ملفات العملاء</h2>
+          <div class="sub">اضغطي على الملف لفتحه واستكماله في تقريره.</div></div>
+      </div>
+      <input type="text" class="srch" id="q" placeholder="ابحث بالاسم أو رقم الملف .." oninput="render()"
+        style="width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;
+        padding:8px 2px;font-family:inherit;font-size:14px;margin-bottom:6px">
+      <div id="list"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><div class="sec-num">03</div>
+        <div><h2>النسخ الاحتياطية</h2>
+          <div class="sub">الملفات محفوظة على هذا الجهاز · خذي نسخة بشكل دوري.</div></div>
+      </div>
+      <div class="ice keep">
+        <strong>تصدير:</strong> يجمع كل ملفات العملاء في ملف واحد لنقله لجهاز آخر ·
+        <strong>استيراد:</strong> يدمج نسخة سابقة مع الموجود ولا يمسح شيئا.
+        <div style="margin-top:14px;display:flex;gap:24px;flex-wrap:wrap">
+          <button class="linkbtn" style="color:var(--teal7)" onclick="exportAll()">تصدير كل الملفات ←</button>
+          <button class="linkbtn" style="color:var(--purple)" onclick="document.getElementById('impAll').click()">استيراد نسخة ←</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="docfoot">
+    <span>تقارير كاش ناس · نظام داخلي · وثائق سرية</span>
+    <span>عيادة الصحة المالية · كاش كلينيك <img src="assets/img/mark-purple-2.png" alt=""></span>
+  </div>
+</div>
+
+<input type="file" id="impAll" accept=".json,application/json" style="display:none" onchange="importAll(this)">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+<script src="assets/js/store.js"></script>
+<script>
+"use strict";
+var S = window.NasStore;
+
+function render() {
+  var all = S.all();
+  var q = ((document.getElementById('q') || {}).value || '').trim().toLowerCase();
+  var list = all.filter(function (c) {
+    return !q || ((c.name || '') + ' ' + (c.caseNo || '')).toLowerCase().indexOf(q) > -1;
+  });
+
+  document.getElementById('mCount').textContent = all.length;
+  document.getElementById('mLast').textContent = all.length ? S.fmtDate(all[0].updatedAt) : '—';
+
+  var box = document.getElementById('list');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">' +
+      (all.length ? 'لا توجد نتائج مطابقة للبحث.' : 'ما فيه ملفات محفوظة بعد .. ابدئي من «فتح تقرير جديد».') +
+      '</div>';
+    return;
+  }
+  box.innerHTML = list.map(function (c, i) {
+    return '<div class="row">' +
+      '<div class="n">' + (i + 1) + '</div>' +
+      '<div><div class="nm">' + S.esc(c.name || '(بدون اسم)') + '</div>' +
+      '<div class="mt">' + (c.caseNo ? '# ' + S.esc(c.caseNo) + ' · ' : '') +
+      S.esc(c.pkg || '') + ' · آخر تعديل ' + S.esc(S.fmtDate(c.updatedAt)) + '</div></div>' +
+      '<div class="sp"></div>' +
+      '<a class="go" href="reports/asas-alhurriya.html?id=' + encodeURIComponent(c.id) + '">فتح الملف ←</a>' +
+      '<button class="rm" onclick="delOne(\'' + c.id + '\')">حذف</button>' +
+      '</div>';
+  }).join('');
+}
+
+function delOne(id) {
+  var c = null, all = S.all();
+  for (var i = 0; i < all.length; i++) if (all[i].id === id) { c = all[i]; break; }
+  if (!c) return;
+  if (!confirm('حذف ملف « ' + (c.name || '') + ' » نهائيا من قاعدة البيانات؟\n\nما ينرجع بعد الحذف.')) return;
+  S.remove(id).then(render).catch(function (e) {
+    alert('تعذّر الحذف: ' + ((e && e.message) || 'خطأ'));
+  });
+}
+function exportAll() {
+  if (!S.count()) { alert('ما فيه ملفات لتصديرها.'); return; }
+  S.toast('جارٍ تجهيز النسخة…');
+  S.exportAll().then(function (text) {
+    var d = new Date(), p = function (n) { return n < 10 ? '0' + n : n; };
+    S.download('cashnas-backup-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '.json', text);
+    S.toast('تم تنزيل النسخة الاحتياطية');
+  }).catch(function (e) { S.toast('تعذّر التصدير: ' + ((e && e.message) || ''), true); });
+}
+function importAll(input) {
+  var f = input.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function (e) {
+    S.toast('جارٍ الاستيراد…');
+    S.importAll(e.target.result).then(function (added) {
+      alert('تم الاستيراد. الملفات المضافة: ' + added);
+      return S.refresh().then(render);
+    }).catch(function () {
+      alert('تعذر قراءة الملف. تأكدي أنه نسخة احتياطية صحيحة.');
+    });
+    input.value = '';
+  };
+  r.readAsText(f);
+}
+
+/* لا نعرض شي قبل ما نتأكد إن المستخدم من الفريق */
+document.getElementById('list').innerHTML = '<div class="empty">جارٍ التحميل…</div>';
+S.init().then(render).catch(function () {
+  document.getElementById('list').innerHTML =
+    '<div class="empty">لازم تسجّلين دخول الفريق أول عشان تشوفين الملفات.</div>';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقارير كاش ناس · باقة أساس الحرية المالية</title>
+<link rel="stylesheet" href="../assets/css/fonts.css?v=2">
+<link rel="stylesheet" href="../assets/css/cc-doc.css?v=2">
+</head>
+<body>
+
+<div class="bar no-print">
+  <a class="b quiet" href="../index.html">الرئيسية</a>
+  <button class="b" onclick="openClients()">العملاء</button>
+  <button class="b quiet" onclick="newClient()">ملف جديد</button>
+  <button class="b quiet" onclick="resetAll()">مسح</button>
+  <button class="b" onclick="exportOne()">نسخة الملف</button>
+  <button class="b solid" onclick="saveClient(this)">حفظ العميل</button>
+  <button class="b" onclick="printDoc()">طباعة · PDF</button>
+  <span class="pill" id="savePill"></span>
+  <span class="ttl">تقارير كاش ناس · باقة أساس الحرية المالية</span>
+</div>
+
+<nav class="jn no-print" id="jn">
+  <a class="all on" href="#" data-sec="all">الوثيقة كاملة</a>
+  <a href="#" data-sec="s1"><span class="n">01</span> بيانات العميل</a>
+  <a href="#" data-sec="s2"><span class="n">02</span> البيانات الشخصية</a>
+  <a href="#" data-sec="s3"><span class="n">03</span> المشكلة</a>
+  <a href="#" data-sec="s4"><span class="n">04</span> الأهداف</a>
+  <a href="#" data-sec="s5"><span class="n">05</span> الملاحظات السلوكية</a>
+  <a href="#" data-sec="s6"><span class="n">06</span> الأفكار</a>
+  <a href="#" data-sec="s7"><span class="n">07</span> الشعور</a>
+  <a href="#" data-sec="s8"><span class="n">08</span> خطتي للقادم</a>
+  <a href="#" data-sec="s9"><span class="n">09</span> التوقيعات</a>
+</nav>
+
+<div class="fbar no-print" id="fbar">
+  <span class="lbl">تعرض الآن</span>
+  <span class="cur" id="fbarCur"><b>—</b> —</span>
+  <span class="sp"></span>
+  <button id="fPrev" onclick="stepSection(-1)">← القسم السابق</button>
+  <button id="fNext" onclick="stepSection(1)">القسم التالي →</button>
+  <button class="back" onclick="showSection('all')">عرض الوثيقة كاملة</button>
+</div>
+
+<div class="paper" id="doc">
+
+  <!-- ================= الغلاف ================= -->
+  <section class="cover">
+    <img class="tangle" src="../assets/img/tangle-journey-2.svg" alt="">
+    <div class="col">
+      <div class="top">
+        <img class="lock" src="../assets/img/logo-cream-2.png" alt="كاش كلينيك">
+        <span class="track"><img src="../assets/img/nas-icon-light-2.png" alt=""> كاش ناس</span>
+      </div>
+
+      <div class="eyebrow">كاش كلينيك · عيادة الصحة المالية الأولى في دولة الكويت ودول الخليج</div>
+
+      <div class="mid">
+        <h1>باقة أساس<br>الحرية المالية</h1>
+        <p class="lede">قراءة كاملة للدخل والالتزامات والحالة الشخصية، وتحديد الأهداف بالتواريخ والمبالغ،
+          ورسم خطة تنقل الحالة من العشوائية إلى الوضوح والالتزام.</p>
+
+        <div class="figs">
+          <div class="fig"><div class="v" id="mSalary">—</div><div class="k">الراتب الشهري · د.ك</div></div>
+          <div class="fig"><div class="v" id="mTotal">—</div><div class="k">إجمالي مبالغ الأهداف · د.ك</div></div>
+          <div class="fig"><div class="v tl" id="mMonthly">—</div><div class="k">الاستقطاع الشهري المقترح · د.ك</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="rule"></div>
+        <div class="meta">
+          <div><i>العميل</i>&nbsp;&nbsp;<span id="mName">—</span></div>
+          <div><i>الباقة</i>&nbsp;&nbsp;<span id="mPkg">باقة أساس الحرية المالية</span> · <span id="mConsult">—</span></div>
+          <div><i>الإصدار</i>&nbsp;&nbsp;<span id="mDate">—</span> · وثيقة سرية · مرجع داخلي معتمد</div>
+        </div>
+      </div>
+
+      <div class="base">
+        <span id="mYear">—</span>
+        <span>كاش كلينيك · المرجع الداخلي المعتمد</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= المحتوى ================= -->
+  <div class="content">
+
+    <!-- 01 -->
+    <div class="sec" id="s1">
+      <div class="sec-head"><div class="sec-num">01</div>
+        <div><h2>بيانات العميل والباقة</h2></div>
+      </div>
+      <div class="grid3">
+        <div class="f"><label>اسم العميل</label><input type="text" id="f_name" placeholder="الاسم الكامل"></div>
+        <div class="f"><label>رقم الملف <em>· مرجع كاش كلينيك</em></label><input type="text" id="f_caseNo" placeholder="01"></div>
+        <div class="f"><label>نوع الباقة</label>
+          <select id="f_pkg"><option>باقة أساس الحرية المالية</option><option>باقة أخرى</option></select>
+        </div>
+        <div class="f"><label>تاريخ الجلسة</label><input type="date" id="f_date"></div>
+        <div class="f"><label>المستشار المنفذ</label><input type="text" id="f_consultant" placeholder="اسم المستشار"></div>
+        <div class="f"><label>رقم الجلسة</label><input type="text" id="f_sessionNo" placeholder="1"></div>
+      </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="sec" id="s2">
+      <div class="sec-head"><div class="sec-num">02</div>
+        <div><h2>البيانات الشخصية</h2>
+          <div class="sub">الحالة الاجتماعية والأبناء والدخل .. الأساس الذي تُبنى عليه الخطة.</div></div>
+      </div>
+      <div class="grid3">
+        <div class="f"><label>الحالة الاجتماعية</label>
+          <select id="f_marital"><option value="">—</option><option>أعزب · عزباء</option>
+            <option>متزوج · متزوجة</option><option>مطلق · مطلقة</option><option>أرمل · أرملة</option></select>
+        </div>
+        <div class="f"><label>تاريخ الميلاد</label><input type="date" id="f_dob" onchange="calcAge()"></div>
+        <div class="f"><label>العمر <em>· يحتسب تلقائيا</em></label><input type="text" id="f_age" placeholder="—" readonly></div>
+
+        <div class="f"><label>الراتب <em>· د.ك شهريا</em></label><input type="number" id="f_salary" placeholder="0" min="0" step="1"></div>
+        <div class="f"><label>ينزل بأي يوم من الشهر</label><input type="number" id="f_payday" placeholder="25" min="1" max="31"></div>
+        <div class="f"><label>جهة العمل</label><input type="text" id="f_employer" placeholder="اسم الجهة"></div>
+
+        <div class="f"><label>الحالة الوظيفية</label>
+          <select id="f_job"><option value="">—</option><option>موظف حكومي</option><option>موظف قطاع خاص</option>
+            <option>أعمال حرة</option><option>متقاعد</option><option>عاطل عن العمل</option>
+            <option>طالب</option><option>ربة منزل</option></select>
+        </div>
+        <div class="f"><label>عدد الأبناء</label><input type="number" id="f_kids" placeholder="0" min="0"></div>
+        <div class="f"><label>دخل إضافي <em>· اختياري · د.ك</em></label><input type="number" id="f_otherIncome" placeholder="0" min="0"></div>
+      </div>
+
+      <div class="label" style="margin:30px 0 6px">الأبناء · العمر والحالة الوظيفية والاجتماعية</div>
+      <table class="led" id="tChildren">
+        <thead><tr><th style="width:38px"></th><th style="width:14%">العمر</th><th style="width:26%">الحالة الاجتماعية</th>
+          <th style="width:26%">الحالة الوظيفية</th><th>ملاحظة</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('child')">+ إضافة ابن · ابنة</button>
+    </div>
+
+    <!-- 03 -->
+    <div class="sec" id="s3">
+      <div class="sec-head"><div class="sec-num">03</div>
+        <div><h2>المشكلة</h2>
+          <div class="sub">كل نقطة في سطر .. كما وصفها العميل وكما تظهر في الأرقام.</div></div>
+      </div>
+      <table class="led" id="tProblem">
+        <thead><tr><th style="width:38px"></th><th>وصف المشكلة</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('problem')">+ إضافة نقطة</button>
+    </div>
+
+    <!-- 04 -->
+    <div class="sec" id="s4">
+      <div class="sec-head"><div class="sec-num">04</div>
+        <div><h2>الأهداف</h2>
+          <div class="sub">لكل هدف تاريخ مستهدف ومبلغ وملاحظة تشرح كيف نصل إليه.</div></div>
+      </div>
+
+      <div class="stats keep">
+        <div class="stat"><div class="k">أهداف قصيرة المدى</div><div class="v" id="sumShort">0<small> د.ك</small></div></div>
+        <div class="stat"><div class="k">أهداف متوسطة المدى</div><div class="v" id="sumMid">0<small> د.ك</small></div></div>
+        <div class="stat dark"><div class="k">أهداف كبيرة المدى</div><div class="v" id="sumLong">0<small> د.ك</small></div></div>
+      </div>
+
+      <div class="gblock">
+      <div class="goal-head"><span class="t">أهداف قصيرة المدى</span><span class="h">حتى 6 أشهر</span></div>
+      <table class="led" id="tGoalShort">
+        <thead><tr><th style="width:38px"></th><th style="width:28%">الهدف</th><th style="width:16%">التاريخ</th>
+          <th style="width:14%">المبلغ · د.ك</th><th>ملاحظة</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('goalShort')">+ إضافة هدف قصير المدى</button>
+      </div>
+
+      <div class="gblock">
+      <div class="goal-head"><span class="t">أهداف متوسطة المدى</span><span class="h">من 6 أشهر إلى سنتين</span></div>
+      <table class="led" id="tGoalMid">
+        <thead><tr><th style="width:38px"></th><th style="width:28%">الهدف</th><th style="width:16%">التاريخ</th>
+          <th style="width:14%">المبلغ · د.ك</th><th>ملاحظة</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('goalMid')">+ إضافة هدف متوسط المدى</button>
+      </div>
+
+      <div class="gblock">
+      <div class="goal-head"><span class="t">أهداف كبيرة المدى</span><span class="h">أكثر من سنتين</span></div>
+      <table class="led" id="tGoalLong">
+        <thead><tr><th style="width:38px"></th><th style="width:28%">الهدف</th><th style="width:16%">التاريخ</th>
+          <th style="width:14%">المبلغ · د.ك</th><th>ملاحظة</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('goalLong')">+ إضافة هدف كبير المدى</button>
+      </div>
+
+      <div class="ice keep" style="margin-top:20px">
+        <strong>إجمالي مبالغ الأهداف:</strong> <span id="liveTotal">0</span> د.ك ·
+        عدد الأهداف: <span id="liveCount">0</span> ·
+        <strong>الاستقطاع الشهري المقترح:</strong> <span id="liveMonthly">—</span> د.ك
+        <div class="tiny">يحتسب تلقائيا من التواريخ والمبالغ المدخلة .. رقم إرشادي يراجع مع العميل قبل الاعتماد.</div>
+      </div>
+    </div>
+
+    <!-- 05 -->
+    <div class="sec" id="s5">
+      <div class="sec-head"><div class="sec-num">05</div>
+        <div><h2>الملاحظات السلوكية</h2>
+          <div class="sub">أنماط الصرف والقرارات وردود الفعل تجاه الأرقام.</div></div>
+      </div>
+      <textarea id="f_behavior" placeholder="اكتب الملاحظات السلوكية هنا .."></textarea>
+    </div>
+
+    <!-- 06 -->
+    <div class="sec" id="s6">
+      <div class="sec-head"><div class="sec-num">06</div>
+        <div><h2>الأفكار</h2>
+          <div class="sub">ما طُرح في الجلسة من العميل أو من المستشار.</div></div>
+      </div>
+      <textarea id="f_ideas" placeholder="اكتب الأفكار هنا .."></textarea>
+    </div>
+
+    <!-- 07 -->
+    <div class="sec" id="s7">
+      <div class="sec-head"><div class="sec-num">07</div>
+        <div><h2>الشعور</h2>
+          <div class="sub">كيف يشعر العميل اليوم .. وكيف يريد أن يشعر بعد تحقيق أهدافه.</div></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>شعوري اليوم</label><textarea id="f_feelNow" placeholder="اكتب هنا .."></textarea></div>
+        <div class="f"><label>الشعور الذي أريده</label><textarea id="f_feelWant" placeholder="اكتب هنا .."></textarea></div>
+      </div>
+    </div>
+
+    <!-- 08 -->
+    <div class="sec" id="s8">
+      <div class="sec-head"><div class="sec-num">08</div>
+        <div><h2>خطتي للقادم ولتحقيق الأهداف</h2></div>
+      </div>
+
+      <div class="hero keep">
+        <img class="wm" src="../assets/img/mark-cream-2.png" alt="">
+        <div class="in">
+          <h3>الخطوات التي سألتزم فيها من اليوم</h3>
+          <p>هدف الخطة أن ينتقل العميل من <span class="k">العشوائية</span> إلى
+            <span class="k">التزام واضح ومقاس</span>، بخطوات صغيرة قابلة للتنفيذ تبدأ من اليوم.</p>
+          <label>الخطة</label>
+          <textarea id="f_plan" placeholder="الخطوة .. متى تبدأ .. وكيف تقاس"></textarea>
+        </div>
+      </div>
+
+      <div class="label" style="margin:30px 0 6px">التزامات حتى الجلسة القادمة</div>
+      <table class="led" id="tTasks">
+        <thead><tr><th style="width:38px"></th><th style="width:60%">الالتزام</th>
+          <th style="width:20%">موعد التنفيذ</th><th class="act no-print"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="add no-print" onclick="addRow('task')">+ إضافة التزام</button>
+
+      <div class="grid2" style="margin-top:22px">
+        <div class="f"><label>موعد الجلسة القادمة</label><input type="date" id="f_next"></div>
+        <div class="f"><label>ملاحظة ختامية للمستشار</label><input type="text" id="f_closing" placeholder="اختياري"></div>
+      </div>
+    </div>
+
+    <!-- 09 -->
+    <div class="sec" id="s9">
+      <div class="sec-head"><div class="sec-num">09</div>
+        <div><h2>التوقيعات</h2></div>
+      </div>
+      <div class="sigs">
+        <div class="sig">
+          <div class="role">العميل</div>
+          <div class="grid2" style="gap:12px 20px">
+            <div class="f"><label>الاسم</label><input type="text" id="f_sigName1"></div>
+            <div class="f"><label>التاريخ</label><input type="date" id="f_sigDate1"></div>
+          </div>
+          <div class="pad">
+            <canvas id="sigPad1" width="440" height="140"></canvas>
+            <img class="ink" id="sigImg1" alt="">
+          </div>
+          <div class="cap">التوقيع · ارسمي بالإصبع أو الماوس</div>
+          <input type="hidden" id="sigData1">
+          <button class="clr no-print" onclick="clearSig(1)">مسح التوقيع</button>
+        </div>
+        <div class="sig">
+          <div class="role">المستشار · كاش كلينيك</div>
+          <div class="grid2" style="gap:12px 20px">
+            <div class="f"><label>الاسم</label><input type="text" id="f_sigName2"></div>
+            <div class="f"><label>التاريخ</label><input type="date" id="f_sigDate2"></div>
+          </div>
+          <div class="pad">
+            <canvas id="sigPad2" width="440" height="140"></canvas>
+            <img class="ink" id="sigImg2" alt="">
+          </div>
+          <div class="cap">التوقيع · ارسمي بالإصبع أو الماوس</div>
+          <input type="hidden" id="sigData2">
+          <button class="clr no-print" onclick="clearSig(2)">مسح التوقيع</button>
+        </div>
+      </div>
+      <p class="tiny" style="margin-top:22px">الأرقام الواردة مستخلصة من الجلسة وتخضع للتأكيد بالمستندات
+        الرسمية قبل اعتماد الخطة النهائية.</p>
+    </div>
+
+  </div>
+
+  <div class="docfoot">
+    <span>تقرير استشارة مالية شخصية · وثيقة سرية</span>
+    <span>عيادة الصحة المالية · كاش كلينيك <img src="../assets/img/mark-purple-2.png" alt=""></span>
+  </div>
+</div>
+
+<!-- تنبيه ما قبل الطباعة -->
+<div class="ov tip no-print" id="printTip">
+  <div class="box">
+    <div class="hd"><h3>قبل الطباعة</h3><button class="x" onclick="closeTip()">✕</button></div>
+    <div class="bd">
+      <p>متصفح كروم يضيف سطر التاريخ وعنوان الموقع أعلى وأسفل كل صفحة.
+        إلغاؤه مرة واحدة يكفي · كروم يحفظ الإعداد للمرات القادمة.</p>
+      <div class="steps">
+        <div class="step"><span class="n">1</span>
+          <span class="t">في نافذة الطباعة افتحي <b>المزيد من الإعدادات · More settings</b></span></div>
+        <div class="step"><span class="n">2</span>
+          <span class="t">ألغي علامة الصح من <b>الرؤوس والتذييلات · Headers and footers</b></span></div>
+        <div class="step"><span class="n">3</span>
+          <span class="t">تأكدي أن <b>الرسومات الخلفية · Background graphics</b> مفعّلة حتى يطبع الغلاف بألوانه</span></div>
+      </div>
+      <div class="foot">
+        <label><input type="checkbox" id="tipHide"> لا تظهر هذه الرسالة مرة أخرى</label>
+        <span class="sp"></span>
+        <button class="skip" onclick="closeTip()">إلغاء</button>
+        <button class="go" onclick="goPrint()">متابعة للطباعة</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة العملاء -->
+<div class="ov no-print" id="clientsModal">
+  <div class="box">
+    <div class="hd"><h3>العملاء المحفوظون</h3><button class="x" onclick="closeClients()">✕</button></div>
+    <div class="bd">
+      <input type="text" class="srch" id="clientsSearch" placeholder="ابحث بالاسم أو رقم الملف .." oninput="filterClients()">
+      <div id="clientsBody"></div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importOne(this)">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+<script src="../assets/js/store.js"></script>
+<script>
+"use strict";
+var $ = function (id) { return document.getElementById(id); };
+var currentId = null;
+
+/* ---------------- جداول ديناميكية ---------------- */
+var MARITAL = ['', 'أعزب · عزباء', 'متزوج · متزوجة', 'مطلق · مطلقة', 'أرمل · أرملة'];
+var JOBS = ['', 'طالب', 'موظف', 'أعمال حرة', 'لا يعمل', 'طفل'];
+function opts(list) {
+  return list.map(function (o) { return '<option value="' + o + '">' + (o || '—') + '</option>'; }).join('');
+}
+function delCell() {
+  return '<td class="act no-print"><button class="del" onclick="this.closest(\'tr\').remove();recalc();queueDraft()">حذف</button></td>';
+}
+var goalRow =
+  '<td class="n"></td>' +
+  '<td class="first"><input type="text" data-c="title" placeholder="اسم الهدف"></td>' +
+  '<td><input type="date" data-c="date"></td>' +
+  '<td class="num"><input type="number" class="gamt" data-c="amount" min="0" step="1" placeholder="0"></td>' +
+  '<td><textarea rows="2" data-c="note" placeholder="ملاحظة تحت الهدف .."></textarea></td>' + delCell();
+
+var ROWS = {
+  child: '<td class="n"></td>' +
+         '<td class="num"><input type="number" data-c="age" min="0" placeholder="—"></td>' +
+         '<td><select data-c="marital">' + opts(MARITAL) + '</select></td>' +
+         '<td><select data-c="job">' + opts(JOBS) + '</select></td>' +
+         '<td><input type="text" data-c="note" placeholder="اختياري"></td>' + delCell(),
+  problem: '<td class="n"></td>' +
+           '<td><textarea rows="2" data-c="text" placeholder="اكتب المشكلة .."></textarea></td>' + delCell(),
+  goalShort: goalRow, goalMid: goalRow, goalLong: goalRow,
+  task: '<td class="n"></td>' +
+        '<td><textarea rows="2" data-c="text" placeholder="اكتب الالتزام .."></textarea></td>' +
+        '<td><input type="date" data-c="due"></td>' + delCell()
+};
+var TBL = { child: 'tChildren', problem: 'tProblem', goalShort: 'tGoalShort', goalMid: 'tGoalMid', goalLong: 'tGoalLong', task: 'tTasks' };
+
+function addRow(kind, values) {
+  var tb = document.querySelector('#' + TBL[kind] + ' tbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = ROWS[kind];
+  tb.appendChild(tr);
+  if (values) {
+    tr.querySelectorAll('[data-c]').forEach(function (el) {
+      var k = el.getAttribute('data-c');
+      if (values[k] !== undefined) el.value = values[k];
+    });
+  }
+  tr.querySelectorAll('textarea').forEach(grow);
+  recalc(); markBlanks();
+  return tr;
+}
+function clearTable(kind) {
+  var tb = document.querySelector('#' + TBL[kind] + ' tbody');
+  if (tb) tb.innerHTML = '';
+}
+
+/* ---------------- حسابات ---------------- */
+function calcAge() {
+  var d = $('f_dob'), a = $('f_age');
+  if (!d || !a) return;
+  if (!d.value) { a.value = ''; return; }
+  var b = new Date(d.value), t = new Date();
+  if (isNaN(b.getTime())) { a.value = ''; return; }
+  var age = t.getFullYear() - b.getFullYear();
+  var m = t.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
+  a.value = (age >= 0 && age < 130) ? (age + ' سنة') : '';
+}
+function kd(n) { return isFinite(n) ? Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }) : '—'; }
+
+function tableGoals(kind) {
+  var rows = document.querySelectorAll('#' + TBL[kind] + ' tbody tr');
+  var total = 0, count = 0, monthly = 0, now = new Date();
+  Array.prototype.forEach.call(rows, function (tr) {
+    var amt = parseFloat((tr.querySelector('[data-c="amount"]') || {}).value || 0) || 0;
+    var title = ((tr.querySelector('[data-c="title"]') || {}).value || '').trim();
+    var dt = (tr.querySelector('[data-c="date"]') || {}).value || '';
+    if (amt > 0 || title) count++;
+    total += amt;
+    if (amt > 0 && dt) {
+      var target = new Date(dt);
+      var months = (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+      if (months < 1) months = 1;
+      monthly += amt / months;
+    }
+  });
+  return { total: total, count: count, monthly: monthly };
+}
+
+var AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function arDate(v) {
+  if (!v) return '—';
+  var d = new Date(v);
+  if (isNaN(d.getTime())) return '—';
+  return d.getDate() + ' ' + AR_MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function recalc() {
+  var s = tableGoals('goalShort'), m = tableGoals('goalMid'), l = tableGoals('goalLong');
+  $('sumShort').innerHTML = kd(s.total) + '<small> د.ك</small>';
+  $('sumMid').innerHTML = kd(m.total) + '<small> د.ك</small>';
+  $('sumLong').innerHTML = kd(l.total) + '<small> د.ك</small>';
+
+  var total = s.total + m.total + l.total;
+  var count = s.count + m.count + l.count;
+  var monthly = s.monthly + m.monthly + l.monthly;
+
+  $('liveTotal').textContent = kd(total);
+  $('liveCount').textContent = count;
+  $('liveMonthly').textContent = monthly > 0 ? kd(Math.round(monthly)) : '—';
+
+  var sal = parseFloat(($('f_salary') || {}).value || 0) || 0;
+  $('mSalary').textContent = sal > 0 ? kd(sal) : '—';
+  $('mTotal').textContent = total > 0 ? kd(total) : '—';
+  $('mMonthly').textContent = monthly > 0 ? kd(Math.round(monthly)) : '—';
+
+  /* بيانات الغلاف */
+  $('mName').textContent = ($('f_name').value || '').trim() || '—';
+  $('mPkg').textContent = $('f_pkg').value || '—';
+  $('mConsult').textContent = ($('f_consultant').value || '').trim() || 'كاش ناس';
+  var dv = $('f_date').value;
+  $('mDate').textContent = arDate(dv);
+  $('mYear').textContent = dv ? (AR_MONTHS[new Date(dv).getMonth()] + ' ' + new Date(dv).getFullYear()) : '—';
+  if (typeof syncDates === 'function') syncDates();
+}
+
+/* ---------------- لقطة واسترجاع ---------------- */
+function statics() {
+  var out = {};
+  document.querySelectorAll('#doc [id^="f_"]').forEach(function (el) { out[el.id] = el.value; });
+  return out;
+}
+function tableSnap(kind) {
+  var rows = document.querySelectorAll('#' + TBL[kind] + ' tbody tr');
+  return Array.prototype.map.call(rows, function (tr) {
+    var o = {};
+    tr.querySelectorAll('[data-c]').forEach(function (el) { o[el.getAttribute('data-c')] = el.value; });
+    return o;
+  });
+}
+function snapshot() {
+  var t = {};
+  Object.keys(TBL).forEach(function (k) { t[k] = tableSnap(k); });
+  return { statics: statics(), tables: t,
+    sigs: { s1: ($('sigData1') || {}).value || '', s2: ($('sigData2') || {}).value || '' } };
+}
+function restore(data) {
+  if (!data) return;
+  if (data.statics) {
+    Object.keys(data.statics).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = data.statics[id];
+    });
+  }
+  Object.keys(TBL).forEach(function (k) {
+    clearTable(k);
+    ((data.tables && data.tables[k]) || []).forEach(function (r) { addRow(k, r); });
+  });
+  if (data.sigs) {
+    if ($('sigData1')) $('sigData1').value = data.sigs.s1 || '';
+    if ($('sigData2')) $('sigData2').value = data.sigs.s2 || '';
+    restoreSig(1); restoreSig(2);
+  }
+  calcAge(); recalc();
+  setTimeout(function () { growAll(); markBlanks(); }, 0);
+}
+
+/* ---------------- الحفظ والعملاء ---------------- */
+function pill(msg, ms) {
+  var p = $('savePill'); p.textContent = msg || '';
+  if (ms) setTimeout(function () { if (p.textContent === msg) p.textContent = ''; }, ms);
+}
+function saveClient(btn) {
+  var name = ($('f_name').value || '').trim();
+  if (!name) { alert('اكتبي اسم العميل أولا حتى نقدر نحفظ الملف.'); $('f_name').focus(); return; }
+  var rec = { id: currentId, name: name, caseNo: ($('f_caseNo').value || '').trim(),
+    pkg: $('f_pkg').value, date: $('f_date').value,
+    consultant: ($('f_consultant').value || '').trim(), data: snapshot() };
+  var old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الحفظ…'; }
+  pill('جارٍ الحفظ…');
+  window.NasStore.upsert(rec).then(function (saved) {
+    currentId = saved.id;
+    try { history.replaceState(null, '', 'asas-alhurriya.html?id=' + encodeURIComponent(currentId)); } catch (e) {}
+    clearDraft();
+    if (btn) { btn.textContent = 'تم الحفظ'; setTimeout(function () { btn.textContent = old; btn.disabled = false; }, 2200); }
+    pill('محفوظ بقاعدة البيانات · ' + window.NasStore.fmtDate(saved.updatedAt), 6000);
+  }).catch(function (e) {
+    if (btn) { btn.textContent = old; btn.disabled = false; }
+    pill('');
+    /* the draft is deliberately NOT cleared here, so a failed save
+       cannot take the consultant's work with it */
+    alert('ما انحفظ الملف: ' + ((e && e.message) || 'خطأ') + '\n\nشغلك محفوظ بالمسودة، جرّبي مرة ثانية.');
+  });
+}
+function newClient() {
+  if (!confirm('فتح ملف عميل جديد فارغ؟ تأكدي أنك حفظتِ الملف الحالي.')) return;
+  clearDraft(); location.href = 'asas-alhurriya.html';
+}
+function resetAll() {
+  if (!confirm('سيتم مسح كل ما في الصفحة بدون حذف العميل من القائمة. متابعة؟')) return;
+  clearDraft(); location.href = 'asas-alhurriya.html';
+}
+function openClients() {
+  var modal = $('clientsModal'), body = $('clientsBody');
+  modal.style.display = 'flex';
+  body.innerHTML = '<div class="empty">جارٍ التحميل…</div>';
+  window.NasStore.refresh().then(drawClients).catch(function (e) {
+    body.innerHTML = '<div class="empty">تعذّر تحميل العملاء: ' +
+      window.NasStore.esc((e && e.message) || '') + '</div>';
+  });
+}
+function drawClients() {
+  var body = $('clientsBody');
+  var list = window.NasStore.all(), esc = window.NasStore.esc;
+  if (!list.length) { body.innerHTML = '<div class="empty">لا يوجد عملاء محفوظون بعد.</div>'; return; }
+  body.innerHTML = list.map(function (c, i) {
+    var hay = ((c.name || '') + ' ' + (c.caseNo || '')).toLowerCase();
+    return '<div class="row" data-find="' + esc(hay) + '">' +
+      '<div class="n">' + (i + 1) + '</div>' +
+      '<div><div class="nm">' + esc(c.name || '(بدون اسم)') + '</div>' +
+      '<div class="mt">' + (c.caseNo ? '# ' + esc(c.caseNo) + ' · ' : '') + 'آخر تعديل ' + esc(window.NasStore.fmtDate(c.updatedAt)) + '</div></div>' +
+      '<div class="sp"></div>' +
+      '<button class="go" onclick="loadClient(\'' + c.id + '\')">فتح الملف</button></div>';
+  }).join('');
+  var sb = $('clientsSearch'); if (sb) { sb.value = ''; sb.focus(); }
+}
+function filterClients() {
+  var q = (($('clientsSearch') || {}).value || '').trim().toLowerCase();
+  document.querySelectorAll('#clientsBody .row').forEach(function (r) {
+    r.style.display = (!q || (r.getAttribute('data-find') || '').indexOf(q) > -1) ? '' : 'none';
+  });
+}
+function closeClients() { $('clientsModal').style.display = 'none'; }
+function loadClient(id) {
+  pill('جارٍ فتح الملف…');
+  window.NasStore.get(id).then(function (rec) {
+    if (!rec) { alert('تعذر العثور على العميل.'); pill(''); return; }
+    currentId = rec.id; clearDraft(); restore(rec.data);
+    try { history.replaceState(null, '', 'asas-alhurriya.html?id=' + encodeURIComponent(currentId)); } catch (e) {}
+    closeClients();
+    if (typeof showSection === 'function') showSection('all');
+    pill('تم فتح ملف · ' + rec.name, 5000);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }).catch(function (e) {
+    pill('');
+    alert('تعذّر فتح الملف: ' + ((e && e.message) || 'خطأ'));
+  });
+}
+function exportOne() {
+  var name = ($('f_name').value || 'client').trim().replace(/[^\u0600-\u06FF\w\s-]/g, '').replace(/\s+/g, '-');
+  var rec = { schema: 'cashnas-client', version: 1,
+    client: { id: currentId, name: $('f_name').value, caseNo: $('f_caseNo').value, pkg: $('f_pkg').value,
+      date: $('f_date').value, consultant: $('f_consultant').value, data: snapshot() } };
+  window.NasStore.download('cashnas-' + (name || 'client') + '.json', JSON.stringify(rec, null, 2));
+}
+function importOne(input) {
+  var file = input.files[0]; if (!file) return;
+  var r = new FileReader();
+  r.onload = function (e) {
+    try { var obj = JSON.parse(e.target.result); restore((obj.client || obj).data);
+      pill('تم استيراد الملف · لا تنسي الحفظ', 8000);
+    } catch (err) { alert('تعذر قراءة الملف. تأكدي أنه ملف عميل صحيح.'); }
+    input.value = '';
+  };
+  r.readAsText(file);
+}
+
+/* ---------------- مسودة تلقائية ---------------- */
+var DRAFT = 'cashnas_draft_v1', draftTimer = null;
+function queueDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(function () {
+    try { localStorage.setItem(DRAFT, JSON.stringify({ id: currentId, at: Date.now(), data: snapshot() })); } catch (e) {}
+  }, 1200);
+}
+function clearDraft() { try { localStorage.removeItem(DRAFT); } catch (e) {} }
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.tagName === 'TEXTAREA') grow(e.target);
+  recalc(); markBlanks(); queueDraft();
+});
+document.addEventListener('change', function () { recalc(); markBlanks(); queueDraft(); });
+
+/* ---------------- التوقيع ---------------- */
+function initSigPad(n) {
+  var canvas = $('sigPad' + n); if (!canvas) return;
+  var ctx = canvas.getContext('2d'), drawing = false, dirty = false;
+  function resize() {
+    var rect = canvas.getBoundingClientRect(), ratio = window.devicePixelRatio || 1;
+    var data = dirty ? canvas.toDataURL() : null;
+    canvas.width = rect.width * ratio; canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1B1226';
+    if (data) { var img = new Image(); img.onload = function () { ctx.drawImage(img, 0, 0, rect.width, rect.height); }; img.src = data; }
+  }
+  setTimeout(resize, 60);
+  window.addEventListener('resize', resize);
+  function pos(e) { var r = canvas.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return { x: t.clientX - r.left, y: t.clientY - r.top }; }
+  function start(e) { drawing = true; dirty = true; var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+  function move(e) { if (!drawing) return; var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+  function end() {
+    if (!drawing) return; drawing = false;
+    if (dirty) {
+      var url = canvas.toDataURL('image/png');
+      if ($('sigData' + n)) $('sigData' + n).value = url;
+      var img = $('sigImg' + n); if (img) img.src = url;
+      queueDraft();
+    }
+  }
+  canvas._setDirty = function (v) { dirty = v; };
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+}
+function clearSig(n) {
+  var canvas = $('sigPad' + n), hidden = $('sigData' + n), img = $('sigImg' + n);
+  if (canvas) { var ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); if (canvas._setDirty) canvas._setDirty(false); }
+  if (hidden) hidden.value = '';
+  if (img) { img.removeAttribute('src'); }
+  queueDraft();
+}
+function restoreSig(n) {
+  var hidden = $('sigData' + n), img = $('sigImg' + n), canvas = $('sigPad' + n);
+  if (hidden && hidden.value) {
+    if (img) img.src = hidden.value;
+    if (canvas) {
+      var ctx = canvas.getContext('2d'), im = new Image();
+      im.onload = function () {
+        var r = canvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(im, 0, 0, r.width, r.height);
+        if (canvas._setDirty) canvas._setDirty(true);
+      };
+      im.src = hidden.value;
+    }
+  }
+}
+
+/* ---------------- الطباعة: توسيع النصوص ---------------- */
+function syncDates() {
+  document.querySelectorAll('input[type=date]').forEach(function (inp) {
+    var sp = inp.nextElementSibling;
+    if (!sp || !sp.classList || !sp.classList.contains('pd')) {
+      sp = document.createElement('span'); sp.className = 'pd';
+      inp.parentNode.insertBefore(sp, inp.nextSibling);
+    }
+    sp.textContent = inp.value ? arDate(inp.value) : '—';
+  });
+}
+
+window.addEventListener('beforeprint', function () { syncDates(); growAll(); markBlanks(); });
+
+/* ---------------- الطباعة ---------------- */
+var TIP_KEY = 'cashnas_printtip_v1';
+
+function printDoc() {
+  var skip = null;
+  try { skip = localStorage.getItem(TIP_KEY); } catch (e) {}
+  if (skip === 'off') { window.print(); return; }
+  var t = document.getElementById('printTip');
+  if (!t) { window.print(); return; }
+  var cb = document.getElementById('tipHide');
+  if (cb) cb.checked = false;
+  t.style.display = 'flex';
+}
+function closeTip() {
+  var t = document.getElementById('printTip');
+  if (t) t.style.display = 'none';
+}
+function goPrint() {
+  var cb = document.getElementById('tipHide');
+  if (cb && cb.checked) { try { localStorage.setItem(TIP_KEY, 'off'); } catch (e) {} }
+  closeTip();
+  setTimeout(function () { window.print(); }, 120);
+}
+
+/* ---------------- تمدد صناديق الكتابة + تنظيف الصفوف الفارغة ---------------- */
+function grow(t) {
+  if (!t) return;
+  t.style.height = 'auto';
+  t.style.height = (t.scrollHeight + 2) + 'px';
+}
+function growAll() {
+  document.querySelectorAll('textarea').forEach(grow);
+}
+/* الصفوف الفارغة تختفي في الطباعة .. بشرط أن يكون في الجدول صف واحد مكتوب على الأقل */
+function markBlanks() {
+  Object.keys(TBL).forEach(function (k) {
+    var rows = document.querySelectorAll('#' + TBL[k] + ' tbody tr');
+    var filled = 0;
+    var state = Array.prototype.map.call(rows, function (tr) {
+      var any = false;
+      tr.querySelectorAll('[data-c]').forEach(function (el) { if ((el.value || '').trim()) any = true; });
+      if (any) filled++;
+      return any;
+    });
+    Array.prototype.forEach.call(rows, function (tr, i) {
+      tr.classList.toggle('blank', filled > 0 && !state[i]);
+    });
+  });
+}
+
+/* ---------------- عرض قسم واحد ---------------- */
+var FOCUS_KEY = 'cashnas_focus_v1';
+
+var SEC_IDS = ['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+
+function secLabel(id) {
+  var a = document.querySelector('#jn a[data-sec="' + id + '"]');
+  if (!a) return '';
+  var n = a.querySelector('.n');
+  return { num: n ? n.textContent.trim() : '', name: a.textContent.replace(/^\s*\d+\s*/, '').trim() };
+}
+
+function showSection(id, remember) {
+  var secs = document.querySelectorAll('.sec');
+  var tabs = document.querySelectorAll('#jn a');
+  var focused = !!id && id !== 'all';
+
+  Array.prototype.forEach.call(secs, function (x) {
+    x.classList.toggle('hide', focused && x.id !== id);
+  });
+  document.body.classList.toggle('focus', focused);
+
+  Array.prototype.forEach.call(tabs, function (a) {
+    a.classList.toggle('on', a.getAttribute('data-sec') === (focused ? id : 'all'));
+  });
+
+  if (focused) {
+    var L = secLabel(id);
+    var cur = document.getElementById('fbarCur');
+    if (cur) cur.innerHTML = '<b>' + (L.num || '') + '</b> ' + (L.name || '');
+    var i = SEC_IDS.indexOf(id);
+    var pv = document.getElementById('fPrev'), nx = document.getElementById('fNext');
+    if (pv) pv.disabled = (i <= 0);
+    if (nx) nx.disabled = (i < 0 || i >= SEC_IDS.length - 1);
+  }
+
+  if (remember !== false) { try { sessionStorage.setItem(FOCUS_KEY, focused ? id : 'all'); } catch (e) {} }
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function stepSection(dir) {
+  var cur = null;
+  try { cur = sessionStorage.getItem(FOCUS_KEY); } catch (e) {}
+  var i = SEC_IDS.indexOf(cur);
+  if (i < 0) return;
+  var j = i + dir;
+  if (j < 0 || j >= SEC_IDS.length) return;
+  showSection(SEC_IDS[j]);
+}
+
+(function initNav() {
+  var nav = document.getElementById('jn');
+  if (!nav) return;
+  nav.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-sec]');
+    if (!a) return;
+    e.preventDefault();
+    showSection(a.getAttribute('data-sec'));
+  });
+  var saved = null;
+  try { saved = sessionStorage.getItem(FOCUS_KEY); } catch (e) {}
+  showSection(saved || 'all', false);
+})();
+
+/* الطباعة تخرج الوثيقة كاملة دائما */
+window.addEventListener('beforeprint', function () { document.body.classList.remove('focus'); });
+window.addEventListener('afterprint', function () {
+  var saved = null;
+  try { saved = sessionStorage.getItem(FOCUS_KEY); } catch (e) {}
+  if (saved && saved !== 'all') showSection(saved, false);
+});
+
+/* ---------------- الإقلاع ---------------- */
+(function boot() {
+  initSigPad(1); initSigPad(2);
+  var q = new URLSearchParams(location.search), id = q.get('id');
+
+  if (id) {
+    pill('جارٍ التحميل…');
+    window.NasStore.init().then(function () {
+      return window.NasStore.get(id);
+    }).then(function (rec) {
+      if (!rec) { alert('تعذر العثور على هذا الملف.'); pill(''); return; }
+      currentId = rec.id; restore(rec.data);
+      if (typeof showSection === 'function') showSection('all');
+      pill('ملف · ' + rec.name + ' · آخر تعديل ' + window.NasStore.fmtDate(rec.updatedAt), 7000);
+    }).catch(function () { pill(''); });
+  } else {
+    var raw = null;
+    try { raw = localStorage.getItem(DRAFT); } catch (e) {}
+    if (raw) {
+      try {
+        var d = JSON.parse(raw);
+        if (d && d.data && confirm('فيه مسودة غير محفوظة من آخر مرة. تحبين نسترجعها؟')) {
+          currentId = d.id || null; restore(d.data);
+          pill('تم استرجاع المسودة · اضغطي حفظ العميل', 8000);
+        } else if (d) { clearDraft(); }
+      } catch (e) {}
+    }
+  }
+
+  if (!currentId && !document.querySelector('#tProblem tbody tr')) {
+    addRow('problem'); addRow('problem');
+    addRow('goalShort'); addRow('goalMid'); addRow('goalLong');
+    addRow('task');
+    if (!$('f_date').value) $('f_date').value = new Date().toISOString().slice(0, 10);
+  }
+  calcAge(); recalc();
+  growAll(); markBlanks();
+})();
+</script>
+</body>
+</html>
