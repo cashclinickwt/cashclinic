@@ -348,6 +348,27 @@
   <div class="sec" id="composerSec" data-panel="composer">
     <h2><span></span> مراسلة العملاء</h2>
     <button class="report-btn" id="openComposer">✉️ إنشاء رسالة جديدة</button>
+
+    <div class="addbox" id="nlBox" hidden style="margin-top:18px">
+      <h3>📰 نشراتنا · الأرشيف العام</h3>
+      <p>كل نشرة ترسلها للمشتركين تنضاف تلقائياً لصفحة <a href="../newsletters/index.html" target="_blank" rel="noopener" style="color:var(--auber);font-weight:700">نشراتنا</a>. وهني تقدر تضيف النشرات القديمة اللي أرسلتوها قبل، أو تخفي أي وحدة.</p>
+
+      <div class="addgrid">
+        <div class="addf"><label>عنوان النشرة</label><input id="nlSubject" type="text" placeholder="عنوان النشرة كما أُرسلت"></div>
+        <div class="addf"><label>تاريخ الإرسال</label><input id="nlDate" type="date"></div>
+      </div>
+      <div class="addf" style="margin-top:12px">
+        <label>نص النشرة</label>
+        <textarea id="nlBody" rows="7" placeholder="الصق نص النشرة هني كما أُرسل"></textarea>
+      </div>
+      <div class="addrow">
+        <button class="addbtn" id="nlAdd">أضفها للأرشيف</button>
+      </div>
+      <div class="addmsg" id="nlMsg"></div>
+
+      <h3 style="margin-top:22px;font-size:15px">النشرات المنشورة</h3>
+      <div id="nlList"></div>
+    </div>
   </div>
 
   <div class="sec" id="salesSec" data-panel="sales">
@@ -405,6 +426,7 @@
 
   <div class="sec" id="eventsSec" data-panel="events" hidden>
     <h2><span></span> تسجيلات اللقاء</h2>
+    <div class="flt" id="evPick"></div>
     <div class="kpis" id="eventKpis"></div>
     <div id="eventFix"></div>
 
@@ -649,6 +671,9 @@ const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFil
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
 const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
 const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
+const listNewsletters=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listNewsletters");
+const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastNewsletter");
+const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -743,7 +768,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
@@ -829,15 +854,29 @@ function renderEvents(){
   const sec = $("#eventsSec");
   if(!E || !E.regs || !E.regs.length){ if(sec) sec.hidden=true; return; }
   sec.hidden=false;
-  const t=E.totals||{};
-  $("#eventKpis").innerHTML=`
-    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي المسجّلين</div></div>`;
-  renderEventFix(E.regs);
-  renderEventChart(E.regs);
+
+  renderEventPicker();
+  /* one event at a time keeps the numbers honest: mixing two events into
+     a single total would tell nobody how either one actually did */
+  const regs = (EVFILTER && EVFILTER!=="__all")
+    ? E.regs.filter(r=>r.eventId===EVFILTER)
+    : E.regs;
+
+  const vip = regs.filter(r=>r.vip).length;
+  $("#eventKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(regs.length)}</div><div class="l">المسجّلين</div></div>` +
+    (vip?`<div class="kpi"><div class="n">${fmt(vip)}</div><div class="l">عملاء VIP · ساعة إضافية</div></div>`:"") +
+    ((EVFILTER==="__all"||!EVFILTER)&&E.totals?`<div class="kpi"><div class="n">${fmt(E.totals.count||0)}</div><div class="l">إجمالي كل اللقاءات</div></div>`:"");
+
+  renderEventFix(regs);
+  renderEventChart(regs);
+  const showEv = (EVFILTER==="__all");
   $("#eventTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th><th>هل هو؟</th><th>الهدف من التسجيل</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
-    E.regs.map(r=>`<tr>
-      <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
+      <th>التاريخ</th>${showEv?"<th>اللقاء</th>":""}<th>الاسم</th><th>هل هو؟</th><th>الهدف من التسجيل</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+    regs.map(r=>`<tr>
+      <td class="num">${dt(r.when)}</td>
+      ${showEv?`<td>${esc(r.eventName)||"—"}</td>`:""}
+      <td>${esc(r.name)||"—"}${r.vip?' <span class="badge" style="background:#D3A146;color:#2F1749">VIP</span>':""}</td>
       <td>${esc(r.audience)||"—"}</td>
       <td style="white-space:normal;max-width:260px">${esc(r.goal)||"—"}</td>
       <td class="num">${esc(r.phone)||"—"}</td>
@@ -873,6 +912,97 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= WHICH EVENT AM I LOOKING AT ================= */
+/* the newest event is the one staff care about day to day, so it opens
+   selected; the older ones stay one click away for their numbers */
+let EVFILTER = "";
+
+function eventList(){
+  const seen = {}, out = [];
+  (DATA.events.regs||[]).forEach(r=>{
+    const id = r.eventId||"";
+    if(!id || seen[id]) return;
+    seen[id] = 1;
+    out.push({ id, name: r.eventName||id, when: r.when||0 });
+  });
+  /* newest registration first, so a fresh event leads */
+  out.sort((a,b)=>b.when-a.when);
+  return out;
+}
+
+function renderEventPicker(){
+  const box=$("#evPick"); if(!box) return;
+  const evs=eventList();
+  if(evs.length<2){ box.style.display="none"; EVFILTER=""; return; }
+  box.style.display="";
+  /* "__all" is a real choice, not a stale event id — only fall back to the
+     newest event when the current selection genuinely no longer exists */
+  if(EVFILTER!=="__all" && (!EVFILTER || !evs.some(e=>e.id===EVFILTER))) EVFILTER = evs[0].id;
+  box.innerHTML = evs.map(e=>{
+    const n=(DATA.events.regs||[]).filter(r=>r.eventId===e.id).length;
+    return `<button data-ev="${esc(e.id)}"${EVFILTER===e.id?' class="on"':''}>${esc(e.name)} (${fmt(n)})</button>`;
+  }).join("") + `<button data-ev="__all"${EVFILTER==="__all"?' class="on"':''}>الكل</button>`;
+}
+
+$("#evPick") && $("#evPick").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  EVFILTER=b.dataset.ev; renderEvents();
+});
+
+/* ================= NEWSLETTER ARCHIVE ================= */
+function nlMsg(m,kind){
+  const e=$("#nlMsg"); if(!e) return;
+  e.textContent=m; e.className="addmsg "+(kind||"ok");
+  if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },6000);
+}
+
+async function renderNewsletters(){
+  const box=$("#nlBox"); if(!box) return;
+  if(DATA.role!=="all"){ box.hidden=true; return; }
+  box.hidden=false;
+  try{
+    const r=await listNewsletters({});
+    const list=(r.data||{}).list||[];
+    $("#nlList").innerHTML = list.length
+      ? list.map(n=>`<div class="fixcard" style="border-inline-start:4px solid var(--auber)">
+          <div class="fixh">
+            <b>${esc(n.subject)}</b>
+            <span class="num">${dt(n.sentAt)}</span>
+            <button class="fixx" data-nl-hide="${esc(n.id)}" title="اخفيها من الصفحة العامة">×</button>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8">${esc(n.excerpt||"")}…</div>
+          <a href="../newsletters/index.html?id=${encodeURIComponent(n.id)}" target="_blank" rel="noopener"
+             style="font-size:13px;color:var(--auber);font-weight:700">افتحها بالموقع ←</a>
+        </div>`).join("")
+      : `<div class="empty">ما في نشرات بالأرشيف بعد.</div>`;
+  }catch(e){ $("#nlList").innerHTML=`<div class="empty">تعذّر تحميل النشرات</div>`; }
+}
+
+$("#nlAdd") && $("#nlAdd").addEventListener("click", async ()=>{
+  const subject=$("#nlSubject").value.trim(), body=$("#nlBody").value.trim();
+  if(subject.length<2) return nlMsg("اكتب عنوان النشرة","err");
+  if(!body)            return nlMsg("الصق نص النشرة","err");
+  const btn=$("#nlAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
+  try{
+    await addPastNewsletter({ subject, body, sentOn:$("#nlDate").value });
+    nlMsg("انضافت للأرشيف ✅ صارت تبين بصفحة نشراتنا.","ok");
+    ["#nlSubject","#nlBody","#nlDate"].forEach(id=>{ $(id).value=""; });
+    renderNewsletters();
+  }catch(e){ nlMsg((e&&e.message)||"تعذّر الإضافة","err"); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+});
+
+$("#nlList") && $("#nlList").addEventListener("click", async e=>{
+  const b=e.target.closest("[data-nl-hide]"); if(!b) return;
+  if(!confirm("تخفي هذي النشرة من صفحة نشراتنا؟\n\nما تنحذف، بس ما تبين للزوار.")) return;
+  b.disabled=true;
+  try{
+    await updateNewsletter({ id:b.dataset.nlHide, published:false });
+    nlMsg("انخفت من الصفحة العامة.","ok");
+    renderNewsletters();
+  }catch(err){ nlMsg((err&&err.message)||"تعذّر التنفيذ","err"); b.disabled=false; }
+});
 
 /* ================= STAFF BOOKING (Cash Nas) ================= */
 function nbMsg(m,kind){
