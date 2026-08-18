@@ -105,6 +105,37 @@
   .tabs button[hidden]{display:none}
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* all clients */
+  .clbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+  .clbar input{flex:1 1 260px;border:1.5px solid var(--line);border-radius:999px;padding:11px 18px;
+    font-size:14.5px;font-family:inherit;color:var(--ink);background:#fff}
+  .clbar input:focus{outline:0;border-color:var(--auber)}
+  .clcount{font-size:13px;color:var(--muted)}
+  .clcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:9px;
+    cursor:pointer;transition:.14s}
+  .clcard:hover{border-color:var(--auber);box-shadow:0 6px 18px rgba(47,23,72,.07)}
+  .clh{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .clh b{font-size:15.5px;color:var(--ink)}
+  .clh .num{font-size:12.5px}
+  .clspent{margin-inline-start:auto;font-size:14px;font-weight:700;color:var(--auber);white-space:nowrap}
+  .clchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .clchip{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
+  .clempty{text-align:center;color:var(--muted);font-size:14px;padding:28px 10px}
+  /* profile */
+  .clprof h3{margin:0 0 4px;font-size:20px;color:var(--ink)}
+  .clprof .sub{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:14px;word-break:break-all}
+  .clstats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .clstat{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:8px 13px;font-size:13px;color:var(--ink)}
+  .clstat b{color:var(--auber)}
+  .cltl{position:relative;padding-inline-start:18px}
+  .cltl::before{content:"";position:absolute;inset-inline-start:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .cltli{position:relative;padding:0 0 16px}
+  .cltli::before{content:"";position:absolute;inset-inline-start:-17px;top:5px;width:10px;height:10px;
+    border-radius:50%;background:var(--dot,#6B6577);border:2px solid #fff}
+  .cltli .t{font-size:14.5px;color:var(--ink);font-weight:700}
+  .cltli .d{font-size:13px;color:var(--muted);line-height:1.8;margin-top:2px}
+  .cltli .w{font-size:12px;color:var(--muted);margin-top:2px}
+  .cltli .a{font-size:13px;font-weight:700;color:var(--auber)}
   /* manual sale */
   .addbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
   .addbox > h3{margin:0 0 4px;font-size:16px;color:var(--ink);display:flex;align-items:center;gap:8px}
@@ -292,6 +323,7 @@
 
   <nav class="tabs" id="dashTabs">
     <button data-tab="sales" class="on">المبيعات</button>
+    <button data-tab="clients">كل العملاء</button>
     <button data-tab="quiz">الاختبارات</button>
     <button data-tab="events">معلومات اللقاء</button>
     <button data-tab="live">البث المباشر</button>
@@ -309,6 +341,7 @@
     <div class="report-links">
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
       <a class="report-btn" id="rptNas" href="https://cashclinickw.github.io/cashclinicslides/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير اللجنة الخيرية ←</a>
+      <a class="report-btn" id="rptNasReports" href="reports/index.html" hidden>تقارير كاش ناس ←</a>
     </div>
   </div>
 
@@ -450,6 +483,33 @@
 
     <div class="flt" id="bkWho"></div>
 
+    <div class="addbox" id="nasBox" hidden>
+      <h3>📅 احجز لعميل · كاش ناس</h3>
+      <p>اتفقتوا على الموعد بالواتساب؟ رتّبه هني، وبيوصل العميل رابط يشوف فيه التفاصيل ويدفع. الموعد محجوز له من الحين، وما يتأكد إلا بعد الدفع.</p>
+      <div class="addgrid">
+        <div class="addf"><label>الباقة</label><select id="nbPkg"></select></div>
+        <div class="addf"><label>اسم العميل</label><input id="nbName" type="text" placeholder="الاسم الكامل"></div>
+        <div class="addf"><label>الإيميل</label><input id="nbEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
+        <div class="addf"><label>الجوال</label><input id="nbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
+        <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <div class="addf"><label>المبلغ</label><input id="nbAmount" type="number" min="0" step="1"></div>
+      </div>
+      <div id="nbSessions" style="margin-top:14px"></div>
+      <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="nbNotes" type="text" placeholder="أي شي لازم الاستشاري يعرفه"></div>
+      <div class="addrow">
+        <button class="addbtn" id="nbCreate">جهّز الحجز وأطلع الرابط</button>
+      </div>
+      <div class="addmsg" id="nbMsg"></div>
+      <div id="nbLink" hidden style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">أرسل هذا الرابط للعميل:</div>
+        <input id="nbUrl" type="text" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;direction:ltr;text-align:left;font-family:inherit;background:#fff">
+        <div class="addrow" style="margin-top:10px">
+          <button class="addbtn" id="nbCopy" style="background:var(--auber)">انسخ الرابط</button>
+          <a class="addbtn" id="nbWa" style="background:#128C4A;text-decoration:none;display:inline-block" target="_blank" rel="noopener">أرسله واتساب</a>
+        </div>
+      </div>
+    </div>
+
     <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل</h2>
     <div class="bkgrid">
       <div class="bkbox">
@@ -520,6 +580,27 @@
     <button class="bksave" id="mbAdd">أضف الموعد</button>
   </div>
 
+  <div class="sec" id="clientsSec" data-panel="clients" hidden>
+    <h2><span></span> كل العملاء</h2>
+    <p class="muted" style="font-size:13px;margin:0 0 14px">
+      كل شخص تعامل معنا، وكل شي سواه بمكان واحد. نجمع سجلاته بالإيميل والجوال، فلو استخدم أكثر من إيميل أو رقم يطلع لك كشخص واحد.
+    </p>
+    <div class="kpis" id="clKpis"></div>
+    <div class="clbar">
+      <input id="clSearch" type="search" placeholder="دوّر باسم، إيميل، أو رقم…">
+      <span class="clcount" id="clCount"></span>
+    </div>
+    <div class="flt" id="clFlt">
+      <button data-c="all" class="on">الكل</button>
+      <button data-c="book">اشتروا كتاب</button>
+      <button data-c="booking">حجزوا استشارة</button>
+      <button data-c="quiz">سوّوا اختبار</button>
+      <button data-c="course">دورات</button>
+      <button data-c="paid">دفعوا لنا</button>
+    </div>
+    <div id="clList"></div>
+  </div>
+
   <div class="sec" id="careersSec" data-panel="careers">
     <h2><span></span> طلبات التوظيف</h2>
     <div class="kpis" id="cvKpis"></div>
@@ -567,6 +648,7 @@ const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"set
 const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
 const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
+const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
@@ -612,7 +694,9 @@ onAuthStateChanged(auth, async (user)=>{
     var _rl=DATA.role;
     if(_rl==="riyada"||_rl==="all") $("#rptRiyada").hidden=false;
     if(_rl==="personal"||_rl==="all") $("#rptNas").hidden=false;
-    if(!$("#rptRiyada").hidden||!$("#rptNas").hidden) $("#reportsSec").hidden=false;
+    /* Cash Nas reports live on this site now, behind the same staff login */
+    if(_rl==="personal"||_rl==="all") $("#rptNasReports").hidden=false;
+    if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden) $("#reportsSec").hidden=false;
     render();
   }catch(e){
     const msg=(e&&e.message)||"تعذّر تحميل البيانات";
@@ -659,19 +743,19 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 
 /* ---------- render ---------- */
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
   syncTabs();
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","reports"];
+const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
-  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq") return !el.hidden;
+  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq"||k==="clients") return !el.hidden;
   return true;
 }
 function showPanel(k){
@@ -694,6 +778,10 @@ document.querySelectorAll('#dashTabs button').forEach(b=>b.addEventListener("cli
   showPanel(b.dataset.tab); window.scrollTo({top:0,behavior:"smooth"});
 }));
 
+/* the server strips contacts for restricted roles; the page just stops
+   drawing the empty columns so the table doesn't fill with dashes */
+const seesContacts = () => DATA.seesContacts !== false;
+
 function renderSales(){
   const S=DATA.sales;
   let orders=S.orders.slice();
@@ -706,11 +794,11 @@ function renderSales(){
     S.byProduct.map(p=>`<div class="kpi"><div class="n">${money(p.revenue)}</div><div class="l">${esc(p.product)} · ${fmt(p.count)} طلب</div></div>`).join("");
   if(!orders.length){ $("#salesTbl").innerHTML=`<div class="empty">لا توجد طلبات بعد</div>`; return; }
   $("#salesTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+      <th>التاريخ</th><th>الاسم</th><th>الكتاب</th><th>المبلغ</th>${seesContacts()?"<th>الجوال</th><th>البريد</th>":""}</tr></thead><tbody>`+
     orders.map(o=>`<tr>
       <td class="num">${dt(o.when)}</td><td>${esc(o.name)||"—"}</td>
       <td>${esc(o.product)}${o.manual?'<span class="manualpill" title="'+esc(o.note||"أضيفت يدوياً")+'">يدوي</span>':""}</td><td class="num">${money(o.amount)}</td>
-      <td class="num">${esc(o.phone)||"—"}</td><td class="num">${esc(o.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+      ${seesContacts()?`<td class="num">${esc(o.phone)||"—"}</td><td class="num">${esc(o.email)||"—"}</td>`:""}</tr>`).join("")+`</tbody></table>`;
 }
 
 function renderCourses(){
@@ -785,6 +873,220 @@ function renderBookQ(){
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
       <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
+
+/* ================= STAFF BOOKING (Cash Nas) ================= */
+function nbMsg(m,kind){
+  const e=$("#nbMsg"); if(!e) return;
+  e.textContent=m; e.className="addmsg "+(kind||"ok");
+  if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },8000);
+}
+function nbPkgs(){ return DATA.nasPackages||[]; }
+function nbCurrent(){ return nbPkgs().find(p=>p.key===($("#nbPkg")||{}).value); }
+
+function renderNasBooking(){
+  const box=$("#nasBox"); if(!box) return;
+  const pkgs=nbPkgs();
+  if(!pkgs.length){ box.hidden=true; return; }
+  box.hidden=false;
+  const sel=$("#nbPkg");
+  if(sel && sel.options.length!==pkgs.length){
+    sel.innerHTML=pkgs.map(p=>`<option value="${esc(p.key)}">${esc(p.name)} · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}</option>`).join("");
+    nbSyncPkg();
+  }
+}
+
+function nbSyncPkg(){
+  const p=nbCurrent(); if(!p) return;
+  $("#nbAmount").value=p.amount;
+  /* one time-picker per session, each showing who runs it */
+  $("#nbSessions").innerHTML = (p.sessions||[]).length
+    ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">${esc(p.tagline||"")}</div>` +
+      p.sessions.map((s,i)=>`
+        <div class="addbox" style="margin-bottom:10px;background:var(--bg)">
+          <div style="font-size:13.5px;font-weight:700;margin-bottom:9px">
+            الجلسة ${i+1} · ${esc(s.label)}${s.consultantName?` <span style="font-weight:400;color:var(--muted)">مع ${esc(s.consultantName)}</span>`:""}
+          </div>
+          <div class="addgrid">
+            <div class="addf"><label>الاستشاري</label>
+              <select data-nb-consultant="${i}">
+                <option value="ghalia"${s.consultantId==="ghalia"?" selected":""}>غالية النويف</option>
+                <option value="sara"${s.consultantId==="sara"?" selected":""}>سارة الهندي</option>
+              </select></div>
+            <div class="addf"><label>التاريخ</label><input type="date" data-nb-date="${i}"></div>
+            <div class="addf"><label>الوقت</label><input type="time" step="900" data-nb-time="${i}"></div>
+          </div>
+        </div>`).join("")
+    : `<div style="font-size:13.5px;color:var(--muted)">هذي الباقة بدون جلسات مجدولة .. متابعة عبر الواتساب فقط.</div>`;
+}
+$("#nbPkg") && $("#nbPkg").addEventListener("change", nbSyncPkg);
+
+/* Kuwait is UTC+3, so a local date+time maps straight onto an ISO instant */
+function nbIso(dateStr, timeStr){
+  if(!dateStr || !timeStr) return "";
+  return new Date(`${dateStr}T${timeStr}:00+03:00`).toISOString();
+}
+
+$("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
+  const p=nbCurrent(); if(!p) return nbMsg("اختر الباقة","err");
+  const name=$("#nbName").value.trim(), email=$("#nbEmail").value.trim(), phone=$("#nbPhone").value.trim();
+  if(name.length<2) return nbMsg("اكتب اسم العميل","err");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return nbMsg("الإيميل غير صحيح","err");
+  const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+  if(fix) return nbMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
+  if(phone.replace(/\D/g,"").length<7) return nbMsg("رقم الجوال غير صحيح","err");
+
+  const sessions=[];
+  for(let i=0;i<(p.sessions||[]).length;i++){
+    const cid=($(`[data-nb-consultant="${i}"]`)||{}).value;
+    const dt=($(`[data-nb-date="${i}"]`)||{}).value;
+    const tm=($(`[data-nb-time="${i}"]`)||{}).value;
+    if(!dt||!tm) return nbMsg(`حدد تاريخ ووقت الجلسة ${i+1}`,"err");
+    sessions.push({ consultantId:cid, startIso:nbIso(dt,tm) });
+  }
+
+  const btn=$("#nbCreate"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ التجهيز…";
+  try{
+    const r=await createStaffBooking({
+      packageId:p.key, name, email, phone,
+      mode:$("#nbMode").value, amount:$("#nbAmount").value,
+      notes:$("#nbNotes").value.trim(), sessions
+    });
+    const d=r.data||{};
+    const url=location.origin + d.payPath;
+    $("#nbUrl").value=url;
+    $("#nbWa").href="https://wa.me/"+phone.replace(/\D/g,"")+"?text="+encodeURIComponent(
+      `هلا ${name} 👋\nجهزنا لك حجز «${d.packageName}».\nتقدر تشوف التفاصيل وتأكد الحجز من هني:\n${url}`);
+    $("#nbLink").hidden=false;
+    nbMsg("انحجزت المواعيد للعميل ✅ أرسل له الرابط عشان يدفع ويتأكد الحجز.","ok");
+    ["#nbName","#nbEmail","#nbPhone","#nbNotes"].forEach(id=>{ $(id).value=""; });
+    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+  }catch(e){
+    nbMsg((e&&e.message)||"تعذّر تجهيز الحجز","err");
+  }finally{ btn.disabled=false; btn.textContent=t; }
+});
+
+$("#nbCopy") && $("#nbCopy").addEventListener("click", ()=>{
+  const i=$("#nbUrl"); i.select(); i.setSelectionRange(0,99999);
+  try{ document.execCommand("copy"); nbMsg("انتسخ الرابط ✅","ok"); }
+  catch(e){ nbMsg("انسخه يدوياً","err"); }
+});
+
+/* ================= ALL CLIENTS ================= */
+const CL_TYPE = {
+  quiz:      { label:"اختبار",   color:"#614588" },
+  book:      { label:"كتاب",     color:"#505632" },
+  booking:   { label:"استشارة",  color:"#962E37" },
+  event:     { label:"لقاء",     color:"#2F8789" },
+  course:    { label:"دورة",     color:"#D3A146" },
+  question:  { label:"سؤال",     color:"#6B6577" },
+  newsletter:{ label:"النشرة",   color:"#8E8899" },
+  rating:    { label:"تقييم",    color:"#B35661" },
+};
+let CLQ="", CLFILTER="all";
+
+function clMatches(c){
+  if(CLFILTER!=="all"){
+    if(CLFILTER==="paid"){ if(!(c.spent>0)) return false; }
+    else if(!(c.counts && c.counts[CLFILTER])) return false;
+  }
+  if(!CLQ) return true;
+  const q=CLQ.toLowerCase();
+  const digits=q.replace(/\D/g,"");
+  if((c.name||"").toLowerCase().indexOf(q)!==-1) return true;
+  if((c.emails||[]).some(e=>e.toLowerCase().indexOf(q)!==-1)) return true;
+  /* match a number however it was typed, with or without country code */
+  if(digits && (c.phones||[]).some(p=>p.replace(/\D/g,"").indexOf(digits)!==-1)) return true;
+  return false;
+}
+
+function renderClients(){
+  const sec=$("#clientsSec"); if(!sec) return;
+  const all=DATA.clients||[];
+  if(!all.length && DATA.role!=="all"){ sec.hidden=true; return; }
+  sec.hidden=false;
+
+  const paid=all.filter(c=>c.spent>0);
+  const revenue=all.reduce((a,c)=>a+Number(c.spent||0),0);
+  $("#clKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(all.length)}</div><div class="l">عميل</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(paid.length)}</div><div class="l">دفعوا لنا</div></div>`+
+    `<div class="kpi"><div class="n">${money(revenue)}</div><div class="l">إجمالي ما صرفوه</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(all.filter(c=>(c.counts&&c.counts.booking)||0).length)}</div><div class="l">حجزوا استشارة</div></div>`;
+
+  const rows=all.filter(clMatches);
+  $("#clCount").textContent = rows.length===all.length ? "" : `${fmt(rows.length)} من ${fmt(all.length)}`;
+
+  const box=$("#clList");
+  if(!rows.length){ box.innerHTML='<div class="clempty">ما في عميل بهذي المواصفات.</div>'; return; }
+  box.innerHTML=rows.slice(0,400).map(c=>{
+    const chips=Object.keys(c.counts||{}).map(k=>{
+      const t=CL_TYPE[k]||{label:k,color:"#6B6577"};
+      return `<span class="clchip" style="background:${t.color}">${esc(t.label)}${c.counts[k]>1?" ×"+c.counts[k]:""}</span>`;
+    }).join("");
+    return `<div class="clcard" data-cl="${esc(c.id)}">
+      <div class="clh">
+        <b>${esc(c.name)||"(بدون اسم)"}</b>
+        <span class="num">${esc((c.emails||[])[0]||"")}</span>
+        <span class="num">${esc((c.phones||[])[0]||"")}</span>
+        ${c.spent>0?`<span class="clspent">${money(c.spent)}</span>`:""}
+      </div>
+      <div class="clchips">${chips}<span class="clchip" style="background:#EDEAF2;color:var(--muted)">آخر نشاط ${dt(c.lastSeen)}</span></div>
+    </div>`;
+  }).join("") + (rows.length>400?`<div class="clempty">تظهر أول 400 .. ضيّق البحث للباقي.</div>`:"");
+}
+
+$("#clSearch") && $("#clSearch").addEventListener("input", e=>{ CLQ=e.target.value.trim(); renderClients(); });
+$("#clFlt") && $("#clFlt").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  CLFILTER=b.dataset.c;
+  $("#clFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  renderClients();
+});
+
+$("#clList") && $("#clList").addEventListener("click", e=>{
+  const card=e.target.closest("[data-cl]"); if(!card) return;
+  const c=(DATA.clients||[]).find(x=>x.id===card.dataset.cl); if(!c) return;
+  openClient(c);
+});
+
+function openClient(c){
+  const counts=c.counts||{};
+  const stat=(k,l)=>counts[k]?`<span class="clstat"><b>${fmt(counts[k])}</b> ${l}</span>`:"";
+  const wa=String((c.phones||[])[0]||"").replace(/\D/g,"");
+  $("#clModalBody").innerHTML=`
+    <div class="clprof">
+      <h3>${esc(c.name)||"(بدون اسم)"}</h3>
+      <div class="sub">
+        ${(c.emails||[]).map(x=>esc(x)).join("<br>")}
+        ${(c.phones||[]).length?"<br>"+(c.phones||[]).map(x=>esc(x)).join(" · "):""}
+      </div>
+      <div class="clstats">
+        ${c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
+        ${stat("book","كتاب")}${stat("booking","استشارة")}${stat("quiz","اختبار")}
+        ${stat("course","دورة")}${stat("event","لقاء")}${stat("question","سؤال")}
+        ${stat("rating","تقييم")}${stat("newsletter","نشرة")}
+        <span class="clstat">أول تعامل <b>${dt(c.firstSeen)}</b></span>
+        <span class="clstat">آخر نشاط <b>${dt(c.lastSeen)}</b></span>
+      </div>
+      ${wa?`<a class="wa-btn" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener"
+            style="display:inline-block;border:1.5px solid #25D366;color:#128C4A;border-radius:999px;
+                   padding:8px 18px;font-size:13.5px;text-decoration:none;margin-bottom:16px">راسله واتساب</a>`:""}
+      <div class="cltl">
+        ${(c.timeline||[]).map(t=>{
+          const ty=CL_TYPE[t.type]||{label:t.type,color:"#6B6577"};
+          return `<div class="cltli" style="--dot:${ty.color}">
+            <div class="t">${esc(ty.label)} · ${esc(t.title)}</div>
+            ${t.detail?`<div class="d">${esc(t.detail)}</div>`:""}
+            <div class="w">${dt(t.when)}${t.amount?` · <span class="a">${money(t.amount)}</span>`:""}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <p class="muted" style="font-size:12.5px;margin-top:6px">تقارير الاستشارات بتنضاف هني لاحقاً.</p>
+    </div>`;
+  document.getElementById("clOvl").classList.add("on");
+}
+function clClose(){ document.getElementById("clOvl").classList.remove("on"); }
+window.clClose=clClose;
 
 /* ================= ADD A SALE MANUALLY ================= */
 function asMsg(m, kind){
@@ -1505,7 +1807,7 @@ function openResult(idx){
       ${diag?`<div class="m-diag">${esc(diag)}</div>`:""}
       ${axes}
       ${(l.priority||l.notes)?`<div class="m-intake">${l.priority?`<div class="row"><span class="k">الهدف الأهم من العلاج المالي</span><span class="v">${esc(l.priority)}</span></div>`:""}${l.notes?`<div class="row"><span class="k">ملاحظات العميل</span><span class="v">${esc(l.notes)}</span></div>`:""}</div>`:""}
-      <div class="m-meta">${esc(l.phone||"")} ${l.email?" · "+esc(l.email):""}</div>
+      ${seesContacts()?`<div class="m-meta">${esc(l.phone||"")} ${l.email?" · "+esc(l.email):""}</div>`:""}
     </div>`;
   document.getElementById("ovl").classList.add("on");
 }
@@ -1589,14 +1891,14 @@ function renderQuiz(){
   if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بهذا التصنيف</div>`; return; }
   const anyGroup=gkeys.length>0;
   $("#quizTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}${anyGroup?"<th>الفئة</th>":""}<th>النتيجة</th><th>التقييم</th><th>الجوال</th><th>البريد</th><th></th></tr></thead><tbody>`+
+      <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}${anyGroup?"<th>الفئة</th>":""}<th>النتيجة</th><th>التقييم</th>${seesContacts()?"<th>الجوال</th><th>البريد</th>":""}<th></th></tr></thead><tbody>`+
     rows.map(({l,i})=>`<tr>
       <td class="num">${dt(l.when)}</td><td>${esc(l.name)||"—"}</td>
       ${multi?`<td>${esc(l.quizTitle||l.source)}</td>`:""}
       ${anyGroup?`<td>${l.customerGroup?`<span class="grpbadge" style="background:${GROUP_COLOR[l.customerGroup]||"#6B6577"}">${esc(l.customerGroup)}</span>`:"—"}</td>`:""}
       <td class="num">${l.score!=null?l.score+"%":"—"}</td>
       <td>${l.band?`<span class="badge" style="background:${bandColor(l.band)}">${esc(l.band)}</span>`:"—"}</td>
-      <td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td>
+      ${seesContacts()?`<td class="num">${esc(l.phone)||"—"}</td><td class="num">${esc(l.email)||"—"}</td>`:""}
       <td><button class="view-btn" onclick="openResult(${i})">عرض النتيجة</button></td></tr>`).join("")+`</tbody></table>`;
 }
 
@@ -1606,6 +1908,13 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
 });
 </script>
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
+
+<div class="ovl" id="clOvl" onclick="if(event.target===this)clClose()">
+  <div class="modal" style="max-width:640px;position:relative">
+    <button class="m-x" onclick="clClose()">×</button>
+    <div id="clModalBody"></div>
+  </div>
+</div>
 
 <div class="ovl" id="cOvl" onclick="if(event.target===this)cClose()">
   <div class="modal" style="max-width:600px;position:relative">
