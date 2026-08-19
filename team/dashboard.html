@@ -507,19 +507,31 @@
 
     <div class="addbox" id="nasBox" hidden>
       <h3>📅 احجز لعميل · كاش ناس</h3>
-      <p>اتفقتوا على الموعد بالواتساب؟ رتّبه هني، وبيوصل العميل رابط يشوف فيه التفاصيل ويدفع. الموعد محجوز له من الحين، وما يتأكد إلا بعد الدفع.</p>
+      <p>جلسة وحدة بكل حجز. احجز الجلسة الأولى الحين، وجلسة الثانية بعدين لما تتفقون على موعدها. لو العميل دفع بالواتساب اختر «مدفوع مسبقاً» ويتأكد حجزه على طول.</p>
       <div class="addgrid">
         <div class="addf"><label>الباقة</label><select id="nbPkg"></select></div>
+        <div class="addf"><label>الجلسة</label><select id="nbSession"></select></div>
+        <div class="addf"><label>الاستشاري</label>
+          <select id="nbConsultant">
+            <option value="ghalia">غالية النويف</option>
+            <option value="sara">سارة الهندي</option>
+          </select></div>
+        <div class="addf"><label>التاريخ</label><input id="nbDate" type="date"></div>
+        <div class="addf"><label>الوقت</label><input id="nbTime" type="time" step="900"></div>
+        <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
         <div class="addf"><label>اسم العميل</label><input id="nbName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل</label><input id="nbEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
         <div class="addf"><label>الجوال</label><input id="nbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
-        <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
         <div class="addf"><label>المبلغ</label><input id="nbAmount" type="number" min="0" step="1"></div>
       </div>
-      <div id="nbSessions" style="margin-top:14px"></div>
+      <div class="addrow" style="margin-top:4px">
+        <label><input type="radio" name="nbPay" value="link" checked> أرسل له رابط دفع</label>
+        <label><input type="radio" name="nbPay" value="paid"> مدفوع مسبقاً · أكّد الحجز على طول</label>
+      </div>
+      <div id="nbHint" style="font-size:12.5px;color:var(--muted);line-height:1.8;margin-top:6px"></div>
       <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="nbNotes" type="text" placeholder="أي شي لازم الاستشاري يعرفه"></div>
       <div class="addrow">
-        <button class="addbtn" id="nbCreate">جهّز الحجز وأطلع الرابط</button>
+        <button class="addbtn" id="nbCreate">جهّز الحجز</button>
       </div>
       <div class="addmsg" id="nbMsg"></div>
       <div id="nbLink" hidden style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
@@ -1008,10 +1020,11 @@ $("#nlList") && $("#nlList").addEventListener("click", async e=>{
 function nbMsg(m,kind){
   const e=$("#nbMsg"); if(!e) return;
   e.textContent=m; e.className="addmsg "+(kind||"ok");
-  if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },8000);
+  if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },10000);
 }
 function nbPkgs(){ return DATA.nasPackages||[]; }
 function nbCurrent(){ return nbPkgs().find(p=>p.key===($("#nbPkg")||{}).value); }
+function nbPayMode(){ const el=document.querySelector('input[name="nbPay"]:checked'); return el?el.value:"link"; }
 
 function renderNasBooking(){
   const box=$("#nasBox"); if(!box) return;
@@ -1025,30 +1038,48 @@ function renderNasBooking(){
   }
 }
 
+/* the session list, and the defaults that follow from it */
 function nbSyncPkg(){
   const p=nbCurrent(); if(!p) return;
-  $("#nbAmount").value=p.amount;
-  /* one time-picker per session, each showing who runs it */
-  $("#nbSessions").innerHTML = (p.sessions||[]).length
-    ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">${esc(p.tagline||"")}</div>` +
-      p.sessions.map((s,i)=>`
-        <div class="addbox" style="margin-bottom:10px;background:var(--bg)">
-          <div style="font-size:13.5px;font-weight:700;margin-bottom:9px">
-            الجلسة ${i+1} · ${esc(s.label)}${s.consultantName?` <span style="font-weight:400;color:var(--muted)">مع ${esc(s.consultantName)}</span>`:""}
-          </div>
-          <div class="addgrid">
-            <div class="addf"><label>الاستشاري</label>
-              <select data-nb-consultant="${i}">
-                <option value="ghalia"${s.consultantId==="ghalia"?" selected":""}>غالية النويف</option>
-                <option value="sara"${s.consultantId==="sara"?" selected":""}>سارة الهندي</option>
-              </select></div>
-            <div class="addf"><label>التاريخ</label><input type="date" data-nb-date="${i}"></div>
-            <div class="addf"><label>الوقت</label><input type="time" step="900" data-nb-time="${i}"></div>
-          </div>
-        </div>`).join("")
-    : `<div style="font-size:13.5px;color:var(--muted)">هذي الباقة بدون جلسات مجدولة .. متابعة عبر الواتساب فقط.</div>`;
+  const ss=p.sessions||[];
+  const sel=$("#nbSession");
+  sel.innerHTML = ss.length
+    ? ss.map((x,i)=>`<option value="${i}">الجلسة ${i+1} · ${esc(x.label)}</option>`).join("")
+    : `<option value="0">بدون جلسة مجدولة</option>`;
+  sel.disabled = !ss.length;
+  nbSyncSession();
+}
+
+function nbSyncSession(){
+  const p=nbCurrent(); if(!p) return;
+  const ss=p.sessions||[];
+  const i=Number($("#nbSession").value||0);
+  const cur=ss[i];
+  /* the consultant the package expects for this session, still overridable */
+  if(cur && cur.consultantId) $("#nbConsultant").value=cur.consultantId;
+
+  /* the package price is charged once. Session 1 carries it; a later session
+     is already covered, so it defaults to zero and to "already paid" —
+     otherwise staff would accidentally charge the client twice. */
+  const later = i>0;
+  $("#nbAmount").value = later ? 0 : p.amount;
+  if(later){ const r=document.querySelector('input[name="nbPay"][value="paid"]'); if(r) r.checked=true; }
+  nbHint();
+}
+
+function nbHint(){
+  const p=nbCurrent(); if(!p) return;
+  const i=Number($("#nbSession").value||0);
+  const paid=nbPayMode()==="paid";
+  const el=$("#nbHint"); if(!el) return;
+  el.textContent = paid
+    ? (i>0 ? "جلسة ثانية من باقة مدفوعة .. بيتأكد الحجز على طول وبيوصل العميل إيميل التأكيد."
+           : "بيتأكد الحجز على طول بدون دفع، وبيوصل العميل إيميل التأكيد.")
+    : "بيطلع لك رابط ترسله للعميل، والموعد محجوز له لين يدفع.";
 }
 $("#nbPkg") && $("#nbPkg").addEventListener("change", nbSyncPkg);
+$("#nbSession") && $("#nbSession").addEventListener("change", nbSyncSession);
+document.querySelectorAll('input[name="nbPay"]').forEach(r=>r.addEventListener("change", nbHint));
 
 /* Kuwait is UTC+3, so a local date+time maps straight onto an ISO instant */
 function nbIso(dateStr, timeStr){
@@ -1064,30 +1095,36 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
   const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
   if(fix) return nbMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
   if(phone.replace(/\D/g,"").length<7) return nbMsg("رقم الجوال غير صحيح","err");
+  const dt=$("#nbDate").value, tm=$("#nbTime").value;
+  if(!dt||!tm) return nbMsg("حدد تاريخ ووقت الجلسة","err");
 
-  const sessions=[];
-  for(let i=0;i<(p.sessions||[]).length;i++){
-    const cid=($(`[data-nb-consultant="${i}"]`)||{}).value;
-    const dt=($(`[data-nb-date="${i}"]`)||{}).value;
-    const tm=($(`[data-nb-time="${i}"]`)||{}).value;
-    if(!dt||!tm) return nbMsg(`حدد تاريخ ووقت الجلسة ${i+1}`,"err");
-    sessions.push({ consultantId:cid, startIso:nbIso(dt,tm) });
-  }
+  const paid = nbPayMode()==="paid";
+  if(paid && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك مسبقاً؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
 
   const btn=$("#nbCreate"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ التجهيز…";
   try{
     const r=await createStaffBooking({
-      packageId:p.key, name, email, phone,
-      mode:$("#nbMode").value, amount:$("#nbAmount").value,
-      notes:$("#nbNotes").value.trim(), sessions
+      packageId:p.key, sessionIndex:Number($("#nbSession").value||0),
+      consultantId:$("#nbConsultant").value,
+      startIso:nbIso(dt,tm), mode:$("#nbMode").value,
+      name, email, phone, amount:$("#nbAmount").value,
+      notes:$("#nbNotes").value.trim(), paid
     });
     const d=r.data||{};
-    const url=location.origin + d.payPath;
-    $("#nbUrl").value=url;
-    $("#nbWa").href="https://wa.me/"+phone.replace(/\D/g,"")+"?text="+encodeURIComponent(
-      `هلا ${name} 👋\nجهزنا لك حجز «${d.packageName}».\nتقدر تشوف التفاصيل وتأكد الحجز من هني:\n${url}`);
-    $("#nbLink").hidden=false;
-    nbMsg("انحجزت المواعيد للعميل ✅ أرسل له الرابط عشان يدفع ويتأكد الحجز.","ok");
+    if(d.paid){
+      $("#nbLink").hidden=true;
+      nbMsg(d.confirmed
+        ? `تأكد الحجز ✅ ${d.sessionLabel} مع ${d.consultantName} · وانرسل للعميل إيميل التأكيد.`
+        : `تأكد الحجز ✅ بس ما انرسل الإيميل: ${d.mailError||"خطأ"} .. راسل العميل يدوياً.`,
+        d.confirmed?"ok":"warn");
+    }else{
+      const url=location.origin + d.payPath;
+      $("#nbUrl").value=url;
+      $("#nbWa").href="https://wa.me/"+phone.replace(/\D/g,"")+"?text="+encodeURIComponent(
+        `هلا ${name} 👋\nجهزنا لك حجز «${d.packageName}» — ${d.sessionLabel} مع ${d.consultantName}.\nتقدر تشوف التفاصيل وتأكد الحجز من هني:\n${url}`);
+      $("#nbLink").hidden=false;
+      nbMsg("انحجز الموعد للعميل ✅ أرسل له الرابط عشان يدفع ويتأكد الحجز.","ok");
+    }
     ["#nbName","#nbEmail","#nbPhone","#nbNotes"].forEach(id=>{ $(id).value=""; });
     const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
   }catch(e){
