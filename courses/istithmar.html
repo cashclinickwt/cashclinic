@@ -82,13 +82,20 @@
   .crs-back{display:inline-block;margin:16px 0;color:var(--cc-grey-500);font-size:14px;text-decoration:none}
 
   /* free event: no price cards, so the VIP block carries that weight */
-  .ev-vip{background:var(--cc-cream);border:1px solid #E8D6A8;border-radius:20px;
-    padding:26px 28px;max-width:720px;margin:0 auto}
-  .ev-vip .t{font-size:12.5px;font-weight:700;color:#8A6410;letter-spacing:.02em;margin-bottom:6px}
-  .ev-vip h3{margin:0 0 8px;font-size:20px;color:var(--cc-purple)}
-  .ev-vip p{margin:0 0 14px;font-size:15px;line-height:1.95;color:#5B4A2A}
-  .ev-vip a{display:inline-block;background:var(--cc-purple);color:#fff;border-radius:999px;
-    padding:12px 26px;font-size:14.5px;font-weight:700;text-decoration:none}
+  .ev-vip{position:relative;background:linear-gradient(160deg,#962E37,#6B1F27);border-radius:20px;
+    padding:28px 30px;max-width:720px;margin:0 auto;overflow:hidden;
+    box-shadow:0 16px 40px rgba(150,46,55,.24)}
+  .ev-vip::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.14),transparent 60%);pointer-events:none}
+  .ev-vip .t{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;
+    background:var(--cc-gold);color:#4A1A1F;border-radius:999px;padding:5px 14px;
+    font-size:12.5px;font-weight:700;letter-spacing:.06em;margin-bottom:12px}
+  .ev-vip h3{position:relative;z-index:1;margin:0 0 8px;font-size:21px;color:#fff}
+  .ev-vip h3 b{color:var(--cc-cream)}
+  .ev-vip p{position:relative;z-index:1;margin:0 0 16px;font-size:15px;line-height:1.95;color:#F3E4E6}
+  .ev-vip p b{color:#fff}
+  .ev-vip a{position:relative;z-index:1;display:inline-block;background:var(--cc-cream);color:#6B1F27;
+    border-radius:999px;padding:12px 26px;font-size:14.5px;font-weight:700;text-decoration:none}
   .ev-points{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
   .ev-pt{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:16px;padding:20px 22px}
   .ev-pt b{display:block;font-size:15.5px;color:var(--cc-purple);margin-bottom:6px}
@@ -103,8 +110,11 @@
   .ev-done2 .tick{font-size:52px}
   .ev-done2 h3{margin:10px 0 8px;font-size:23px;color:var(--cc-teal)}
   .ev-done2 p{margin:0 0 10px;font-size:15px;line-height:1.95;color:var(--cc-grey-700)}
-  .ev-vipbox{background:var(--cc-cream);border:1px solid #E8D6A8;border-radius:16px;
-    padding:18px 20px;margin:16px auto;max-width:520px;text-align:right;font-size:14.5px;line-height:1.95;color:#5B4A2A}
+  .ev-vipbox{background:linear-gradient(160deg,#962E37,#6B1F27);border-radius:16px;
+    padding:18px 20px;margin:16px auto;max-width:520px;text-align:right;
+    font-size:14.5px;line-height:1.95;color:#F3E4E6}
+  .ev-vipbox b{color:#fff}
+  .ev-vipbox a{color:var(--cc-cream);font-weight:700}
 </style>
 </head>
 <body>
@@ -179,8 +189,8 @@
 <section class="crs-sec">
   <div class="cc-wrap">
     <div class="ev-vip">
-      <div class="t">مفاجأة حصرية</div>
-      <h3>ساعة إضافية خاصة لعملائنا</h3>
+      <div class="t">VIP · مفاجأة حصرية</div>
+      <h3>ساعة <b>VIP</b> إضافية خاصة لعملائنا</h3>
       <p>
         اللي عنده <b>كتيّب أهدافي المالية</b> يبقى معنا ساعة إضافية بعد اللقاء، نجاوب فيها على
         أسئلته هو تحديداً. سجّل بنفس الإيميل اللي اشتريت فيه وبنعرفك تلقائياً.
@@ -213,13 +223,13 @@
             <input id="evPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right">
           </div>
         </div>
-        <div class="crs-fld"><label>شنو يوصفك أكثر؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
+        <div class="crs-fld"><label>هل أنت؟</label>
           <select id="evAudience">
             <option value="">اختر…</option>
-            <option value="ما بدأت بالاستثمار">ما بدأت بالاستثمار</option>
-            <option value="بديت بس بدون خطة">بديت بس بدون خطة</option>
-            <option value="مستثمر وأبي أطور">مستثمر وأبي أطور</option>
-            <option value="صاحب مشروع">صاحب مشروع</option>
+            <option value="عميل جديد">عميل جديد</option>
+            <option value="عميل سابق من استشارات">عميل سابق من استشارات</option>
+            <option value="عميل سابق حاصل على الكتيّب المالي">عميل سابق حاصل على الكتيّب المالي</option>
+            <option value="عميل سابق من دورات">عميل سابق من دورات</option>
           </select>
         </div>
         <div class="crs-fld"><label>شنو تبي تطلع فيه من اللقاء؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
@@ -318,6 +328,7 @@ $("#evBtn").addEventListener("click", async () => {
   const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
   if(fix) return msg("تأكد من إيميلك، هل تقصد " + fix + "؟");
   if(local.length < 7) return msg("رقم الجوال غير صحيح");
+  if(!$("#evAudience").value) return msg("اختر وش يوصفك من القائمة");
 
   const b = $("#evBtn"); b.disabled = true; const t = b.textContent; b.textContent = "جارٍ التسجيل…";
   try{
@@ -335,7 +346,7 @@ $("#evBtn").addEventListener("click", async () => {
          نجاوب فيها على أسئلتك أنت تحديداً. بنرسل لك تفاصيلها قبل الموعد.`
       : `<b>تعرف عن الساعة الإضافية؟</b><br>عملاؤنا اللي عندهم <b>كتيّب أهدافي المالية</b>
          يبقون معنا ساعة إضافية بعد اللقاء نجاوب فيها على أسئلتهم.
-         <a href="../quiz/ahdafi.html" style="color:#8A6410;font-weight:700">احصل على الكتيّب ←</a>`;
+         <a href="../quiz/ahdafi.html">احصل على الكتيّب ←</a>`;
     $("#reg").scrollIntoView({ behavior:"smooth", block:"start" });
   }catch(e){
     b.disabled = false; b.textContent = t;
