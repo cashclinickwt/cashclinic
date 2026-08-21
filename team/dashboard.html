@@ -61,6 +61,9 @@
   .ovl{position:fixed;inset:0;background:rgba(47,23,72,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
   .ovl.on{display:flex}
   .modal{background:#fff;border-radius:22px;max-width:560px;width:100%;box-shadow:0 24px 70px rgba(0,0,0,.25);overflow:hidden}
+  /* modals whose body is plain content, not a full-bleed hero, need their own gutter */
+  .modal.m-pad{padding:26px}
+  @media(max-width:520px){ .modal.m-pad{padding:20px 18px} }
   .m-x{position:absolute;top:20px;left:20px;width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:var(--auber);font-size:22px;cursor:pointer;line-height:1}
   .m-hero{background:var(--auber);color:#fff;text-align:center;padding:34px 26px 28px;position:relative}
   .m-hero .who{font-size:15px;opacity:.85;margin-bottom:14px}
@@ -538,7 +541,7 @@
             <option value="sara">سارة الهندي</option>
           </select></div>
         <div class="addf"><label>التاريخ</label><input id="nbDate" type="date"></div>
-        <div class="addf"><label>الوقت</label><input id="nbTime" type="time" step="900"></div>
+        <div class="addf"><label>الوقت</label><select id="nbTime" class="timesel" data-step="15"></select></div>
         <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
         <div class="addf"><label>اسم العميل</label><input id="nbName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل</label><input id="nbEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
@@ -572,8 +575,8 @@
         <h4>أونلاين <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="onEn" checked> مفعّل</label></h4>
         <div class="bkdays" id="onDays"></div>
         <div class="bktime">
-          <div class="bkf"><label>من</label><input id="onStart" type="time" step="1800"></div>
-          <div class="bkf"><label>إلى</label><input id="onEnd" type="time" step="1800"></div>
+          <div class="bkf"><label>من</label><select id="onStart" class="timesel" data-step="30"></select></div>
+          <div class="bkf"><label>إلى</label><select id="onEnd" class="timesel" data-step="30"></select></div>
         </div>
         <div class="bkf"><label>رابط Google Meet</label><input id="onMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
       </div>
@@ -581,8 +584,8 @@
         <h4>حضوري <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="prEn" checked> مفعّل</label></h4>
         <div class="bkdays" id="prDays"></div>
         <div class="bktime">
-          <div class="bkf"><label>من</label><input id="prStart" type="time" step="1800"></div>
-          <div class="bkf"><label>إلى</label><input id="prEnd" type="time" step="1800"></div>
+          <div class="bkf"><label>من</label><select id="prStart" class="timesel" data-step="30"></select></div>
+          <div class="bkf"><label>إلى</label><select id="prEnd" class="timesel" data-step="30"></select></div>
         </div>
         <div class="bkf"><label>العنوان</label><input id="prLoc" type="text" placeholder="برج التجارية، الدور ..، مكتب .."></div>
       </div>
@@ -599,7 +602,7 @@
         <h4 style="margin-top:14px">موعد خارج الجدول</h4>
         <div class="bktime">
           <div class="bkf"><label>التاريخ</label><input id="exDate" type="date"></div>
-          <div class="bkf"><label>الساعة</label><input id="exTime" type="time" step="1800"></div>
+          <div class="bkf"><label>الساعة</label><select id="exTime" class="timesel" data-step="30"></select></div>
         </div>
         <div class="bkf"><label>الطريقة</label><select id="exMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
         <button class="bkday" id="exAdd" type="button" style="border-color:var(--auber);color:var(--auber)">أضف الموعد</button>
@@ -2264,7 +2267,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
 
 <div class="ovl" id="bkEditOvl" onclick="if(event.target===this)bkEditClose()">
-  <div class="modal" style="max-width:560px;position:relative">
+  <div class="modal m-pad" style="max-width:560px;position:relative">
     <button class="m-x" onclick="bkEditClose()">×</button>
     <h3 style="margin:0 0 4px;font-size:19px" id="bkEditTitle">تعديل الحجز</h3>
     <p class="muted" style="font-size:13px;margin:0 0 16px" id="bkEditSub"></p>
@@ -2277,7 +2280,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
       <div class="addf"><label>الطريقة</label>
         <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
       <div class="addf"><label>التاريخ</label><input id="beDate" type="date"></div>
-      <div class="addf"><label>الوقت</label><input id="beTime" type="time" step="900"></div>
+      <div class="addf"><label>الوقت</label><select id="beTime" class="timesel" data-step="15"></select></div>
       <div class="addf"><label>اسم العميل</label><input id="beName" type="text"></div>
       <div class="addf"><label>الإيميل</label><input id="beEmail" type="email" style="direction:ltr;text-align:left"></div>
       <div class="addf"><label>الجوال</label><input id="bePhone" type="text" style="direction:ltr;text-align:left"></div>
@@ -2292,7 +2295,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
 </div>
 
 <div class="ovl" id="clOvl" onclick="if(event.target===this)clClose()">
-  <div class="modal" style="max-width:640px;position:relative">
+  <div class="modal m-pad" style="max-width:640px;position:relative">
     <button class="m-x" onclick="clClose()">×</button>
     <div id="clModalBody"></div>
   </div>
@@ -2347,5 +2350,62 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
     </div>
   </div>
 </div>
+<script>
+/* ============================================================
+   24-HOUR TIME PICKERS
+   A native <input type="time"> is formatted by the *browser*
+   locale, not by the page lang, so an English-locale Chrome
+   showed 03:00 PM for a 15:00 booking. Verified: the lang
+   attribute does not override it. Every time field is a plain
+   24h dropdown instead, so the team always reads the same clock
+   the schedule is stored in.
+   The value stays "HH:MM", so nothing else had to change.
+   ============================================================ */
+(function(){
+  var proto = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function addOpt(sel, v){
+    var o = document.createElement("option");
+    o.value = v; o.textContent = v;
+    var list = Array.prototype.slice.call(sel.options);
+    var at = -1;
+    for (var i = 0; i < list.length; i++){
+      if (list[i].value && list[i].value > v){ at = i; break; }
+    }
+    if (at < 0) sel.appendChild(o); else sel.insertBefore(o, list[at]);
+    return o;
+  }
+  function build(sel){
+    if (sel.dataset.built) return;
+    sel.dataset.built = "1";
+    var step = parseInt(sel.dataset.step, 10) || 30;
+    if (step < 1) step = 30;
+    var ph = document.createElement("option");
+    ph.value = ""; ph.textContent = "--:--";
+    sel.appendChild(ph);
+    for (var m = 0; m < 24 * 60; m += step){
+      addOpt(sel, pad(Math.floor(m / 60)) + ":" + pad(m % 60));
+    }
+    /* a legacy booking saved off-grid (say 15:05) still shows its own
+       time instead of silently snapping to the nearest slot */
+    Object.defineProperty(sel, "value", {
+      configurable: true,
+      get: function(){ return proto.get.call(sel); },
+      set: function(v){
+        v = (v === null || v === undefined) ? "" : String(v);
+        if (v){
+          var has = false, o = sel.options;
+          for (var i = 0; i < o.length; i++){ if (o[i].value === v){ has = true; break; } }
+          if (!has) addOpt(sel, v);
+        }
+        proto.set.call(sel, v);
+      }
+    });
+    sel.value = "";
+  }
+  var all = document.querySelectorAll("select.timesel");
+  for (var i = 0; i < all.length; i++) build(all[i]);
+})();
+</script>
 </body>
 </html>
