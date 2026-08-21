@@ -1443,7 +1443,7 @@ function renderCareers(){
     return `<div class="cvcard">
       <div class="cvh">
         <b>${esc(a.name)||"—"}</b>
-        <span class="cvrole">${esc(a.role)}</span>
+        <span class="cvrole">${esc(a.role)}${a.roleScope?" · "+esc(a.roleScope):""}</span>
         <span>${esc(a.nationality)||"—"}</span>
         ${a.years?`<span>· ${esc(a.years)}</span>`:""}
         <span class="num">${esc(a.email)}</span>

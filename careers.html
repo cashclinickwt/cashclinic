@@ -107,8 +107,24 @@
           <div class="box"><span class="ic">📷</span><span class="nm">تصوير فوتوغرافي أو فيديو</span></div></label>
         <label><input type="radio" name="role" value="مونتاج فيديوهات">
           <div class="box"><span class="ic">🎬</span><span class="nm">مونتاج فيديوهات</span></div></label>
+        <label><input type="radio" name="role" value="محاسب">
+          <div class="box"><span class="ic">📊</span><span class="nm">محاسب</span></div></label>
+        <label><input type="radio" name="role" value="مختص سلوكيات مالية">
+          <div class="box"><span class="ic">🧠</span><span class="nm">مختص سلوكيات مالية</span></div></label>
         <label><input type="radio" name="role" value="سكرتارية">
           <div class="box"><span class="ic">🗂️</span><span class="nm">سكرتارية</span></div></label>
+      </div>
+
+      <div class="fld" id="jScopeWrap" hidden>
+        <label>تشتغل مع؟</label>
+        <div class="roles" style="margin-top:8px">
+          <label><input type="radio" name="roleScope" value="أفراد">
+            <div class="box"><span class="ic">🙍</span><span class="nm">أفراد</span></div></label>
+          <label><input type="radio" name="roleScope" value="شركات">
+            <div class="box"><span class="ic">🏢</span><span class="nm">شركات</span></div></label>
+          <label><input type="radio" name="roleScope" value="الاثنين">
+            <div class="box"><span class="ic">🤝</span><span class="nm">الاثنين</span></div></label>
+        </div>
       </div>
 
       <h2>بياناتك</h2>
@@ -228,12 +244,27 @@ function toBase64(file){
   });
 }
 
+/* an accountant works with individuals or with companies — different jobs
+   in practice, so ask, but only when that role is the one selected */
+const SCOPED_ROLES = ["محاسب"];
+function syncScope(){
+  const wrap = $("#jScopeWrap"); if(!wrap) return;
+  const needed = SCOPED_ROLES.indexOf(pick("role")) !== -1;
+  wrap.hidden = !needed;
+  /* clear the answer when it stops applying, so a stale pick cannot ride
+     along with a different role */
+  if(!needed) document.querySelectorAll('input[name="roleScope"]').forEach(r=>{ r.checked=false; });
+}
+document.querySelectorAll('input[name="role"]').forEach(r=>r.addEventListener("change", syncScope));
+
 $("#jBtn").addEventListener("click", async () => {
   $("#jErr").style.display="none";
-  const role=pick("role"), name=$("#jName").value.trim(), email=$("#jEmail").value.trim();
+  const role=pick("role"), roleScope=pick("roleScope"),
+        name=$("#jName").value.trim(), email=$("#jEmail").value.trim();
   const phone=$("#jPhone").value.trim(), nat=$("#jNat").value.trim();
 
   if(!role) return fail("اختر الوظيفة اللي تناسبك");
+  if(SCOPED_ROLES.indexOf(role)!==-1 && !roleScope) return fail("اختر: تشتغل مع أفراد أو شركات؟");
   if(name.length<2) return fail("اكتب اسمك الكامل");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("إيميل غير صحيح");
   const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
@@ -250,7 +281,7 @@ $("#jBtn").addEventListener("click", async () => {
   try{
     const cvBase64 = await toBase64(CV);
     const r = await submitJobApplication({
-      role, name, email, phone:"+"+cc+local, nationality:nat,
+      role, roleScope, name, email, phone:"+"+cc+local, nationality:nat,
       years:$("#jYears").value, portfolio:$("#jPort").value.trim(), note:$("#jNote").value.trim(),
       cvBase64, cvName: CV.name,
     });
