@@ -13,6 +13,7 @@
   <a class="b quiet" href="../index.html">الرئيسية</a>
   <button class="b" onclick="openClients()">العملاء</button>
   <button class="b quiet" onclick="newClient()">ملف جديد</button>
+  <button class="b quiet" onclick="openBooked()">من الحجوزات</button>
   <button class="b quiet" onclick="resetAll()">مسح</button>
   <button class="b" onclick="exportOne()">نسخة الملف</button>
   <button class="b solid" onclick="saveClient(this)">حفظ العميل</button>
@@ -243,7 +244,7 @@
       <div class="hero keep">
         <img class="wm" src="../assets/img/mark-cream-2.png" alt="">
         <div class="in">
-          <h3>الخطوات التي سألتزم فيها من اليوم</h3>
+          <h3>توصيات المستشار</h3>
           <p>هدف الخطة أن ينتقل العميل من <span class="k">العشوائية</span> إلى
             <span class="k">التزام واضح ومقاس</span>، بخطوات صغيرة قابلة للتنفيذ تبدأ من اليوم.</p>
           <label>الخطة</label>
@@ -333,6 +334,20 @@
         <button class="skip" onclick="closeTip()">إلغاء</button>
         <button class="go" onclick="goPrint()">متابعة للطباعة</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- من الحجوزات: يفتح ملف جاهز من موعد محجوز -->
+<div class="ov no-print" id="bookedModal">
+  <div class="box">
+    <div class="hd"><h3>ابدأ من حجز</h3><button class="x" onclick="closeBooked()">✕</button></div>
+    <div class="bd">
+      <p style="font-size:13px;color:#5B5566;line-height:1.9;margin:0 0 12px">
+        العملاء اللي عندهم موعد مؤكد. اختر واحد وينفتح لك ملف جاهز باسمه ورقم ملفه وتاريخ جلسته.
+      </p>
+      <input type="text" class="srch" id="bookedSearch" placeholder="ابحث بالاسم أو رقم الملف .." oninput="filterBooked()">
+      <div id="bookedBody"></div>
     </div>
   </div>
 </div>
@@ -532,6 +547,7 @@ function saveClient(btn) {
   var rec = { id: currentId, name: name, caseNo: ($('f_caseNo').value || '').trim(),
     pkg: $('f_pkg').value, date: $('f_date').value,
     consultant: ($('f_consultant').value || '').trim(), data: snapshot() };
+  if (BOOKED_CONTACT) { rec.email = BOOKED_CONTACT.email; rec.phone = BOOKED_CONTACT.phone; }
   var old = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الحفظ…'; }
   pill('جارٍ الحفظ…');
@@ -588,11 +604,80 @@ function filterClients() {
   });
 }
 function closeClients() { $('clientsModal').style.display = 'none'; }
+
+/* ---- ابدأ من حجز ---- */
+var BOOKED = [];
+function openBooked() {
+  var modal = $('bookedModal'), body = $('bookedBody');
+  modal.style.display = 'flex';
+  body.innerHTML = '<div class="empty">جارٍ التحميل…</div>';
+  window.NasStore.booked().then(function (list) {
+    BOOKED = list || [];
+    drawBooked();
+  }).catch(function (e) {
+    body.innerHTML = '<div class="empty">تعذّر تحميل الحجوزات: ' +
+      window.NasStore.esc((e && e.message) || '') + '</div>';
+  });
+}
+function closeBooked() { $('bookedModal').style.display = 'none'; }
+
+function drawBooked() {
+  var body = $('bookedBody'), esc = window.NasStore.esc;
+  var q = ($('bookedSearch').value || '').trim().toLowerCase();
+  var rows = BOOKED.filter(function (c) {
+    if (!q) return true;
+    return (c.name || '').toLowerCase().indexOf(q) !== -1 ||
+           (c.fileNo || '').toLowerCase().indexOf(q) !== -1 ||
+           (c.email || '').toLowerCase().indexOf(q) !== -1;
+  });
+  if (!rows.length) { body.innerHTML = '<div class="empty">ما في حجوزات مؤكدة.</div>'; return; }
+  body.innerHTML = rows.map(function (c, i) {
+    var when = (c.sessions && c.sessions[0])
+      ? (c.sessions[0].startDate || '') + ' · ' + (c.sessions[0].startTime || '') : '';
+    var who = (c.sessions || []).map(function (s) { return s.consultantName; })
+      .filter(function (v, k, a) { return v && a.indexOf(v) === k; }).join(' · ');
+    return '<div class="citem">' +
+      '<div><div class="nm">' + esc(c.name || '(بدون اسم)') + '</div>' +
+      '<div class="mt">' + (c.fileNo ? '# ' + esc(c.fileNo) + ' · ' : '') +
+        esc(c.packageName || '') + (when ? ' · ' + esc(when) : '') +
+        (who ? ' · ' + esc(who) : '') + '</div></div>' +
+      '<div><button class="b" onclick="startFromBooking(' + i + ')">افتح ملف</button></div>' +
+      '</div>';
+  }).join('');
+}
+function filterBooked() { drawBooked(); }
+
+/* prefill a fresh report from the appointment */
+function startFromBooking(i) {
+  var q = ($('bookedSearch').value || '').trim().toLowerCase();
+  var rows = BOOKED.filter(function (c) {
+    if (!q) return true;
+    return (c.name || '').toLowerCase().indexOf(q) !== -1 ||
+           (c.fileNo || '').toLowerCase().indexOf(q) !== -1 ||
+           (c.email || '').toLowerCase().indexOf(q) !== -1;
+  });
+  var c = rows[i]; if (!c) return;
+  currentId = '';
+  clearDraft();
+  $('f_name').value = c.name || '';
+  $('f_caseNo').value = c.fileNo || '';
+  $('f_consultant').value = (c.sessions && c.sessions[0] && c.sessions[0].consultantName) || '';
+  if (c.sessions && c.sessions[0] && c.sessions[0].startDate) $('f_date').value = c.sessions[0].startDate;
+  /* held so the saved report can be matched back to this client */
+  BOOKED_CONTACT = { email: c.email || '', phone: c.phone || '' };
+  try { history.replaceState(null, '', 'asas-alhurriya.html'); } catch (e) {}
+  closeBooked();
+  if (typeof showSection === 'function') showSection('all');
+  pill('ملف جديد لـ ' + (c.name || 'العميل') + (c.fileNo ? ' · ' + c.fileNo : ''), 6000);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+var BOOKED_CONTACT = null;
 function loadClient(id) {
   pill('جارٍ فتح الملف…');
   window.NasStore.get(id).then(function (rec) {
     if (!rec) { alert('تعذر العثور على العميل.'); pill(''); return; }
     currentId = rec.id; clearDraft(); restore(rec.data);
+    BOOKED_CONTACT = (rec.email || rec.phone) ? { email: rec.email || '', phone: rec.phone || '' } : null;
     try { history.replaceState(null, '', 'asas-alhurriya.html?id=' + encodeURIComponent(currentId)); } catch (e) {}
     closeClients();
     if (typeof showSection === 'function') showSection('all');

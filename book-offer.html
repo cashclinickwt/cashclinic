@@ -125,13 +125,11 @@ function kwParts(iso){
 }
 function clock(iso){
   const p = kwParts(iso);
-  const ap = p.hh >= 12 ? "pm" : "am";
-  const h = p.hh % 12 === 0 ? 12 : p.hh % 12;
-  return h + (p.mm ? ":"+String(p.mm).padStart(2,"0") : "") + ap;
+  return String(p.hh).padStart(2,"0") + ":" + String(p.mm).padStart(2,"0");
 }
 function slotRange(iso, minutes){
   const end = new Date(Date.parse(iso) + (Number(minutes)||60)*60000).toISOString();
-  return clock(iso) + " to " + clock(end);
+  return clock(iso) + " - " + clock(end);
 }
 function fullWhen(iso, minutes){
   const p = kwParts(iso);

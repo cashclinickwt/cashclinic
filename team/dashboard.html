@@ -136,6 +136,23 @@
   .cltli .d{font-size:13px;color:var(--muted);line-height:1.8;margin-top:2px}
   .cltli .w{font-size:12px;color:var(--muted);margin-top:2px}
   .cltli .a{font-size:13px;font-weight:700;color:var(--auber)}
+  /* each consultant carries their clinic's colour, so it is obvious at a
+     glance whose schedule is on screen — the same accents used on their
+     public profile pages */
+  #bookingsSec{--acc:#2F1748;--acc-soft:#EDEAF2}
+  #bookingsSec .bkbox h4{color:var(--acc)}
+  #bookingsSec .bkbox{border-top:3px solid var(--acc)}
+  #bookingsSec .bksave{background:var(--acc)}
+  #bookingsSec #bkWho button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+  #bookingsSec .bkday.on{background:var(--acc);border-color:var(--acc);color:#fff}
+  #bookingsSec .bkchip{background:var(--acc-soft);color:var(--acc);border:1px solid var(--acc)}
+  #bookingsSec .bkcard.soon{border-inline-start-color:var(--acc)}
+  /* h2 span is the little gold bullet marker, so the name chip has to
+     undo that sizing or it renders as an 8px sliver */
+  #bookingsSec h2 span.whoname{display:inline-block;width:auto;height:auto;
+    background:var(--acc);color:#fff;border-radius:999px;
+    padding:4px 14px;font-size:12.5px;font-weight:700;margin-inline-start:8px;vertical-align:middle}
+  #bookingsSec h2 span.whoname:empty{display:none}
   /* manual sale */
   .addbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
   .addbox > h3{margin:0 0 4px;font-size:16px;color:var(--ink);display:flex;align-items:center;gap:8px}
@@ -415,6 +432,10 @@
     <div class="flt" id="quizFlt"></div>
     <div class="flt" id="grpFlt" style="display:none"></div>
     <div class="kpis" id="quizKpis"></div>
+    <div class="clbar">
+      <input id="qzSearch" type="search" placeholder="دوّر باسم العميل…">
+      <span class="clcount" id="qzCount"></span>
+    </div>
     <div class="tbl" id="quizTbl"></div>
   </div>
 
@@ -526,7 +547,8 @@
       </div>
       <div class="addrow" style="margin-top:4px">
         <label><input type="radio" name="nbPay" value="link" checked> أرسل له رابط دفع</label>
-        <label><input type="radio" name="nbPay" value="paid"> مدفوع مسبقاً · أكّد الحجز على طول</label>
+        <label><input type="radio" name="nbPay" value="cash"> مدفوع مسبقاً</label>
+        <label><input type="radio" name="nbPay" value="deema"> دفع بـ ديمة</label>
       </div>
       <div id="nbHint" style="font-size:12.5px;color:var(--muted);line-height:1.8;margin-top:6px"></div>
       <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="nbNotes" type="text" placeholder="أي شي لازم الاستشاري يعرفه"></div>
@@ -544,7 +566,7 @@
       </div>
     </div>
 
-    <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل</h2>
+    <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل <span class="whoname" id="bkWhoName"></span></h2>
     <div class="bkgrid">
       <div class="bkbox">
         <h4>أونلاين <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="onEn" checked> مفعّل</label></h4>
@@ -567,6 +589,12 @@
       <div class="bkbox">
         <h4>أيام مقفلة</h4>
         <div class="bkf"><label>أضف يوم إجازة</label><input id="blkDate" type="date"></div>
+        <div style="font-size:12.5px;color:var(--muted);margin:10px 0 6px">أو إجازة من تاريخ إلى تاريخ</div>
+        <div class="bktime">
+          <div class="bkf"><label>من</label><input id="blkFrom" type="date"></div>
+          <div class="bkf"><label>إلى</label><input id="blkTo" type="date"></div>
+        </div>
+        <button class="bksave" id="blkAdd" style="margin-top:8px;padding:9px 20px;font-size:13.5px">أقفل هذي الفترة</button>
         <div class="bkchips" id="blkList"></div>
         <h4 style="margin-top:14px">موعد خارج الجدول</h4>
         <div class="bktime">
@@ -589,30 +617,7 @@
     </div>
     <div id="bkList"></div>
 
-    <h2 style="font-size:17px;margin-top:26px"><span></span> أضف موعد يدوي</h2>
-    <p class="muted" style="font-size:13px;margin:0 0 12px">للمواعيد اللي تنحجز واتساب أو تليفون. ينحجز على طول بدون دفع أونلاين، وتقدر تحطه خارج أوقات الجدول.</p>
-    <div class="bkgrid">
-      <div class="bkbox">
-        <div class="bkf"><label>الاسم</label><input id="mbName" type="text"></div>
-        <div class="bkf"><label>الإيميل</label><input id="mbEmail" type="email" style="direction:ltr;text-align:left"></div>
-        <div class="bkf"><label>الجوال</label><input id="mbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
       </div>
-      <div class="bkbox">
-        <div class="bkf"><label>الباقة</label><select id="mbPkg"></select></div>
-        <div class="bkf"><label>الطريقة</label><select id="mbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
-        <div class="bktime">
-          <div class="bkf"><label>التاريخ</label><input id="mbDate" type="date"></div>
-          <div class="bkf"><label>الساعة</label><input id="mbTime" type="time" step="1800"></div>
-        </div>
-      </div>
-      <div class="bkbox">
-        <div class="bkf"><label>المبلغ المدفوع (د.ك)</label><input id="mbAmount" type="number" min="0" step="1" value="0"></div>
-        <div class="bkf"><label>ملاحظات</label><textarea id="mbNotes" rows="3"></textarea></div>
-        <label style="font-size:13px;color:var(--ink)"><input type="checkbox" id="mbNotify" checked> أرسل تأكيد بالإيميل</label>
-      </div>
-    </div>
-    <button class="bksave" id="mbAdd">أضف الموعد</button>
-  </div>
 
   <div class="sec" id="clientsSec" data-panel="clients" hidden>
     <h2><span></span> كل العملاء</h2>
@@ -683,6 +688,7 @@ const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFil
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
 const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
 const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
+const updateStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateStaffBooking");
 const listNewsletters=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listNewsletters");
 const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastNewsletter");
 const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
@@ -1063,19 +1069,20 @@ function nbSyncSession(){
      otherwise staff would accidentally charge the client twice. */
   const later = i>0;
   $("#nbAmount").value = later ? 0 : p.amount;
-  if(later){ const r=document.querySelector('input[name="nbPay"][value="paid"]'); if(r) r.checked=true; }
+  if(later){ const r=document.querySelector('input[name="nbPay"][value="cash"]'); if(r) r.checked=true; }
   nbHint();
 }
 
 function nbHint(){
   const p=nbCurrent(); if(!p) return;
   const i=Number($("#nbSession").value||0);
-  const paid=nbPayMode()==="paid";
+  const m=nbPayMode();
   const el=$("#nbHint"); if(!el) return;
-  el.textContent = paid
-    ? (i>0 ? "جلسة ثانية من باقة مدفوعة .. بيتأكد الحجز على طول وبيوصل العميل إيميل التأكيد."
-           : "بيتأكد الحجز على طول بدون دفع، وبيوصل العميل إيميل التأكيد.")
-    : "بيطلع لك رابط ترسله للعميل، والموعد محجوز له لين يدفع.";
+  el.textContent =
+    m==="link"  ? "بيطلع لك رابط ترسله للعميل، والموعد محجوز له لين يدفع." :
+    m==="deema" ? "العميل دفع عن طريق ديمة ويقسّطها معهم على أربع دفعات .. من ناحيتنا الحجز مدفوع ويتأكد على طول."
+    : (i>0 ? "جلسة ثانية من باقة مدفوعة .. بيتأكد الحجز على طول وبيوصل العميل إيميل التأكيد."
+           : "بيتأكد الحجز على طول بدون دفع أونلاين، وبيوصل العميل إيميل التأكيد.");
 }
 $("#nbPkg") && $("#nbPkg").addEventListener("change", nbSyncPkg);
 $("#nbSession") && $("#nbSession").addEventListener("change", nbSyncSession);
@@ -1098,8 +1105,10 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
   const dt=$("#nbDate").value, tm=$("#nbTime").value;
   if(!dt||!tm) return nbMsg("حدد تاريخ ووقت الجلسة","err");
 
-  const paid = nbPayMode()==="paid";
-  if(paid && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك مسبقاً؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
+  const method = nbPayMode();
+  const paid = method !== "link";
+  const how = method==="deema" ? "بـ ديمة" : "مسبقاً";
+  if(paid && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
 
   const btn=$("#nbCreate"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ التجهيز…";
   try{
@@ -1108,7 +1117,8 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
       consultantId:$("#nbConsultant").value,
       startIso:nbIso(dt,tm), mode:$("#nbMode").value,
       name, email, phone, amount:$("#nbAmount").value,
-      notes:$("#nbNotes").value.trim(), paid
+      notes:$("#nbNotes").value.trim(),
+      paymentMethod: nbPayMode()
     });
     const d=r.data||{};
     if(d.paid){
@@ -1146,6 +1156,7 @@ const CL_TYPE = {
   event:     { label:"لقاء",     color:"#2F8789" },
   course:    { label:"دورة",     color:"#D3A146" },
   question:  { label:"سؤال",     color:"#6B6577" },
+  report:    { label:"تقرير",    color:"#2F1748" },
   newsletter:{ label:"النشرة",   color:"#8E8899" },
   rating:    { label:"تقييم",    color:"#B35661" },
 };
@@ -1231,10 +1242,14 @@ function openClient(c){
         ${c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
         ${stat("book","كتاب")}${stat("booking","استشارة")}${stat("quiz","اختبار")}
         ${stat("course","دورة")}${stat("event","لقاء")}${stat("question","سؤال")}
-        ${stat("rating","تقييم")}${stat("newsletter","نشرة")}
+        ${stat("rating","تقييم")}${stat("newsletter","نشرة")}${stat("report","تقرير")}
         <span class="clstat">أول تعامل <b>${dt(c.firstSeen)}</b></span>
         <span class="clstat">آخر نشاط <b>${dt(c.lastSeen)}</b></span>
       </div>
+      ${c.reportId?`<a href="reports/reports/asas-alhurriya.html?id=${encodeURIComponent(c.reportId)}"
+            target="_blank" rel="noopener"
+            style="display:inline-block;background:var(--auber);color:#fff;border-radius:999px;
+                   padding:9px 20px;font-size:13.5px;text-decoration:none;margin-bottom:16px;margin-inline-end:8px">افتح تقريره ←</a>`:""}
       ${wa?`<a class="wa-btn" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener"
             style="display:inline-block;border:1.5px solid #25D366;color:#128C4A;border-radius:999px;
                    padding:8px 18px;font-size:13.5px;text-decoration:none;margin-bottom:16px">راسله واتساب</a>`:""}
@@ -1477,8 +1492,11 @@ function bkParts(iso){
 }
 function bkWhen(iso){
   if(!iso) return "—";
-  const p=bkParts(iso), ap=p.hh>=12?"م":"ص", h=p.hh%12===0?12:p.hh%12;
-  return `${BK_DAYS[p.w]} ${p.d} ${BK_MON[p.m]} · ${h}${p.mm?":"+String(p.mm).padStart(2,"0"):""} ${ap}`;
+  /* 24-hour clock: staff read these next to the schedule fields, which are
+     24-hour too, so mixing in ص/م only invites a misread */
+  const p=bkParts(iso);
+  const hh=String(p.hh).padStart(2,"0"), mm=String(p.mm).padStart(2,"0");
+  return `${BK_DAYS[p.w]} ${p.d} ${BK_MON[p.m]} · ${hh}:${mm}`;
 }
 function bkMsg(m,ok){ const e=$("#bkMsg"); if(!e) return; e.textContent=m; e.className="bkmsg "+(ok?"ok":"err");
   if(ok) setTimeout(()=>{ e.className="bkmsg"; },4000); }
@@ -1503,11 +1521,25 @@ function renderBookings(){
     `<div class="kpi"><div class="n">${fmt(t.cancelled||0)}</div><div class="l">ملغية</div></div>`+
     `<div class="kpi"><div class="n">${fmt(t.revenue||0)} <span style="font-size:14px">د.ك</span></div><div class="l">إيراد الاستشارات</div></div>`;
 
+  /* the same accents used on each consultant's public profile page */
+  const CONSULTANT_THEME = {
+    ghalia: { acc:"#505632", soft:"#CFD1AB" },   // كاش ناس
+    sara:   { acc:"#962E37", soft:"#FDE5E9" },   // كاش إنفست
+    hasan:  { acc:"#2F8789", soft:"#D6EAF2" },   // كاش ريادة
+  };
+  const th = CONSULTANT_THEME[BKWHO] || { acc:"#2F1748", soft:"#EDEAF2" };
+  const secEl = $("#bookingsSec");
+  if(secEl){ secEl.style.setProperty("--acc", th.acc); secEl.style.setProperty("--acc-soft", th.soft); }
+  const nameEl = $("#bkWhoName");
+  if(nameEl){
+    const who=(cons.find(c=>c.id===BKWHO)||{});
+    nameEl.textContent = cons.length>1 ? (who.name||"") : "";
+  }
+
   BKSCHED = (B.schedules||{})[BKWHO] || null;
   paintSchedule();
 
   const pkgs=(cons.find(c=>c.id===BKWHO)||{}).packages||[];
-  $("#mbPkg").innerHTML = pkgs.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${p.amount} د.ك</option>`).join("")
     + `<option value="custom">موعد خاص</option>`;
 
   renderBkList();
@@ -1552,8 +1584,14 @@ function paintSchedule(){
   $("#onStart").value=sc.online.start;  $("#onEnd").value=sc.online.end;
   $("#prStart").value=sc.present.start; $("#prEnd").value=sc.present.end;
   $("#onMeet").value=sc.meetUrl||"";    $("#prLoc").value=sc.location||"";
-  $("#blkList").innerHTML=(sc.blocked||[]).map(d=>
-    `<span class="bkchip">${esc(d)}<button type="button" data-blk="${esc(d)}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
+  /* a two-week holiday is fourteen dates in the data but should read as one
+     chip, so consecutive days are collapsed into a range */
+  const runs=blkRuns(sc.blocked||[]);
+  $("#blkList").innerHTML = runs.map(r=>{
+    const label = r.from===r.to ? r.from : `${r.from} ← ${r.to}`;
+    const days  = r.dates.length>1 ? ` <span style="opacity:.7">(${r.dates.length} يوم)</span>` : "";
+    return `<span class="bkchip">${esc(label)}${days}<button type="button" data-blkrun="${esc(r.dates.join(","))}">×</button></span>`;
+  }).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
   $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
     `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${x.mode==="present"?"حضوري":"أونلاين"}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
 }
@@ -1565,13 +1603,60 @@ $("#bkWho") && $("#bkWho").addEventListener("click",e=>{ const b=e.target.closes
 $("#onDays") && $("#onDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
 $("#prDays") && $("#prDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
 
+/* group a sorted list of dates into consecutive runs */
+function blkRuns(dates){
+  const list=[...new Set(dates)].filter(Boolean).sort();
+  const out=[];
+  for(const d of list){
+    const last=out[out.length-1];
+    if(last && nextDay(last.to)===d){ last.to=d; last.dates.push(d); }
+    else out.push({from:d,to:d,dates:[d]});
+  }
+  return out;
+}
+function nextDay(iso){
+  const d=new Date(iso+"T00:00:00Z"); d.setUTCDate(d.getUTCDate()+1);
+  return d.toISOString().slice(0,10);
+}
+/* every date from one day to another, inclusive */
+function daysBetween(a,b){
+  const out=[]; let cur=a;
+  for(let i=0;i<400 && cur<=b;i++){ out.push(cur); cur=nextDay(cur); }
+  return out;
+}
+
 $("#blkDate") && $("#blkDate").addEventListener("change",()=>{
   const v=$("#blkDate").value; if(!v||!BKSCHED) return;
   if(BKSCHED.blocked.indexOf(v)===-1) BKSCHED.blocked.push(v);
   BKSCHED.blocked.sort(); $("#blkDate").value=""; paintSchedule();
 });
-$("#blkList") && $("#blkList").addEventListener("click",e=>{ const b=e.target.closest("button[data-blk]"); if(!b||!BKSCHED)return;
-  BKSCHED.blocked=BKSCHED.blocked.filter(x=>x!==b.dataset.blk); paintSchedule(); });
+
+$("#blkAdd") && $("#blkAdd").addEventListener("click",()=>{
+  if(!BKSCHED) return;
+  const a=$("#blkFrom").value, b=$("#blkTo").value;
+  if(!a||!b) return bkMsg("حدد تاريخ البداية والنهاية",false);
+  if(b<a)    return bkMsg("تاريخ النهاية قبل البداية",false);
+  const span=daysBetween(a,b);
+  /* one holiday at a time: a range longer than three months is almost
+     certainly a mistyped year, and the backend silently drops anything
+     past 400 days, so refuse loudly instead of half-saving it */
+  if(span.length > 92)
+    return bkMsg(`الفترة ${span.length} يوم .. أقفلها على دفعات أقصر`,false);
+  if(BKSCHED.blocked.length + span.length > 380)
+    return bkMsg("وصلت الحد الأقصى للأيام المقفلة .. امسح فترة قديمة أول",false);
+  let added=0;
+  span.forEach(d=>{ if(BKSCHED.blocked.indexOf(d)===-1){ BKSCHED.blocked.push(d); added++; } });
+  BKSCHED.blocked.sort();
+  $("#blkFrom").value=""; $("#blkTo").value="";
+  paintSchedule();
+  bkMsg(added?`انقفلت ${added} يوم .. اضغط «احفظ الجدول» عشان تنحفظ.`:"هذي الأيام مقفلة من قبل",true);
+});
+$("#blkList") && $("#blkList").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-blkrun]"); if(!b||!BKSCHED) return;
+  const gone=new Set(String(b.dataset.blkrun).split(","));
+  BKSCHED.blocked=BKSCHED.blocked.filter(x=>!gone.has(x));
+  paintSchedule();
+});
 $("#exAdd") && $("#exAdd").addEventListener("click",()=>{
   if(!BKSCHED) return;
   const date=$("#exDate").value, time=$("#exTime").value, mode=$("#exMode").value;
@@ -1616,6 +1701,9 @@ function renderBkList(){
         <b>${esc(b.name)||"—"}</b>
         <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
+        ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
+        ${b.paymentMethod==="deema"?'<span class="bkpill" style="background:#962E37">ديمة</span>':""}
+        ${b.paymentMethod==="cash"?'<span class="bkpill" style="background:#505632">مدفوع مسبقاً</span>':""}
         ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
         ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
         ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
@@ -1626,6 +1714,8 @@ function renderBkList(){
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button data-edit="${esc(b.id)}">تعديل</button>
+        ${bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         <button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>
       </div>`:""}
     </div>`;
@@ -1635,7 +1725,91 @@ function renderBkList(){
 $("#bkFlt") && $("#bkFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
   BKFILTER=b.dataset.bk; $("#bkFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderBkList(); });
 
+/* a package with two sessions where only the first is on the books.
+   The second is offered on the card itself so nobody has to remember
+   which clients are still owed one. */
+function bkNeedsSecond(b){
+  if(!b.staffArranged || b.status==="cancelled") return false;
+  const pkg=(DATA.nasPackages||[]).find(p=>p.key===b.packageId);
+  if(!pkg || (pkg.sessions||[]).length<2) return false;
+  if(Number(b.sessionIndex||0)!==0) return false;
+  /* already booked? match on the client, since it is a separate order */
+  const key=(b.email||"").toLowerCase();
+  return !(DATA.bookings.list||[]).some(x=>
+    x.id!==b.id && x.packageId===b.packageId && Number(x.sessionIndex||0)===1 &&
+    x.status!=="cancelled" && (x.email||"").toLowerCase()===key);
+}
+
+/* prefill the booking box with the second session for this client */
+function bkAddSecond(b){
+  const pkg=(DATA.nasPackages||[]).find(p=>p.key===b.packageId); if(!pkg) return;
+  showPanel("bookings");
+  $("#nbPkg").value=b.packageId; nbSyncPkg();
+  $("#nbSession").value="1";     nbSyncSession();
+  $("#nbName").value=b.name||"";
+  $("#nbEmail").value=b.email||"";
+  $("#nbPhone").value=b.phone||"";
+  $("#nbMode").value=b.mode||"online";
+  $("#nbNotes").value="";
+  $("#nbDate").value=""; $("#nbTime").value="";
+  $("#nasBox").scrollIntoView({behavior:"smooth",block:"center"});
+  nbMsg(`جهّزنا الجلسة الثانية لـ ${b.name||"العميل"} .. حدد التاريخ والوقت.`,"ok");
+  setTimeout(()=>$("#nbDate").focus(),500);
+}
+
+/* ---- editing an existing booking ---- */
+let BEID="";
+function bkEditOpen(b){
+  BEID=b.id;
+  $("#bkEditTitle").textContent="تعديل الحجز";
+  $("#bkEditSub").textContent=`${b.packageName||""}${b.sessionLabel?" · "+b.sessionLabel:""}`;
+  $("#beConsultant").value=b.consultantId||"ghalia";
+  $("#beMode").value=b.mode||"online";
+  /* the stored time is UTC; the pickers work in Kuwait time */
+  if(b.startIso){
+    const d=new Date(Date.parse(b.startIso)+180*60000);
+    $("#beDate").value=d.toISOString().slice(0,10);
+    $("#beTime").value=d.toISOString().slice(11,16);
+  } else { $("#beDate").value=""; $("#beTime").value=""; }
+  $("#beName").value=b.name||"";
+  $("#beEmail").value=b.email||"";
+  $("#bePhone").value=b.phone||"";
+  $("#beAmount").value=b.amount||0;
+  $("#beNotes").value=b.notes||"";
+  $("#beMsg").className="addmsg"; $("#beMsg").textContent="";
+  document.getElementById("bkEditOvl").classList.add("on");
+}
+function bkEditClose(){ document.getElementById("bkEditOvl").classList.remove("on"); }
+window.bkEditClose=bkEditClose;
+
+$("#beSave") && $("#beSave").addEventListener("click", async ()=>{
+  const name=$("#beName").value.trim(), email=$("#beEmail").value.trim();
+  if(name.length<2){ $("#beMsg").textContent="اكتب اسم العميل"; $("#beMsg").className="addmsg err"; return; }
+  if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    $("#beMsg").textContent="الإيميل غير صحيح"; $("#beMsg").className="addmsg err"; return; }
+  const dt=$("#beDate").value, tm=$("#beTime").value;
+  const btn=$("#beSave"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الحفظ…";
+  try{
+    const r=await updateStaffBooking({
+      orderId:BEID,
+      consultantId:$("#beConsultant").value, mode:$("#beMode").value,
+      startIso: (dt&&tm) ? nbIso(dt,tm) : undefined,
+      name, email, phone:$("#bePhone").value.trim(),
+      amount:$("#beAmount").value, notes:$("#beNotes").value.trim()
+    });
+    bkEditClose();
+    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+    bkMsg((r.data&&r.data.moved)?"انحفظ التعديل، وانتقل الموعد لوقته الجديد.":"انحفظ التعديل.",true);
+  }catch(e){
+    $("#beMsg").textContent=(e&&e.message)||"تعذّر الحفظ"; $("#beMsg").className="addmsg err";
+  }finally{ btn.disabled=false; btn.textContent=t; }
+});
+
 $("#bkList") && $("#bkList").addEventListener("click",async e=>{
+  const ed=e.target.closest("button[data-edit]");
+  if(ed){ const row=(DATA.bookings.list||[]).find(x=>x.id===ed.dataset.edit); if(row) bkEditOpen(row); return; }
+  const sc=e.target.closest("button[data-second]");
+  if(sc){ const row=(DATA.bookings.list||[]).find(x=>x.id===sc.dataset.second); if(row) bkAddSecond(row); return; }
   const b=e.target.closest("button[data-cx]"); if(!b) return;
   if(!confirm("متأكد تبي تلغي هذا الموعد؟ الوقت بيرجع متاح للحجز.")) return;
   b.disabled=true;
@@ -1649,24 +1823,7 @@ $("#bkList") && $("#bkList").addEventListener("click",async e=>{
   }catch(err){ bkMsg((err&&err.message)||"تعذّر الإلغاء",false); b.disabled=false; }
 });
 
-$("#mbAdd") && $("#mbAdd").addEventListener("click",async()=>{
-  const date=$("#mbDate").value, time=$("#mbTime").value;
-  if(!date||!time) return bkMsg("اختر تاريخ وساعة الموعد",false);
-  const btn=$("#mbAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
-  try{
-    /* the inputs are Kuwait wall-clock, so shift to a real instant */
-    const startIso=new Date(Date.parse(date+"T"+time+":00Z")-KWOFF*60000).toISOString();
-    await addManualBooking({
-      consultantId:BKWHO, packageId:$("#mbPkg").value, mode:$("#mbMode").value, startIso,
-      name:$("#mbName").value.trim(), email:$("#mbEmail").value.trim(), phone:$("#mbPhone").value.trim(),
-      notes:$("#mbNotes").value.trim(), amount:Number($("#mbAmount").value)||0, notify:$("#mbNotify").checked,
-    });
-    ["#mbName","#mbEmail","#mbPhone","#mbNotes","#mbDate","#mbTime"].forEach(id=>{ $(id).value=""; });
-    bkMsg("انضاف الموعد ✅",true);
-    const r=await getDashboard(); if(r&&r.data){ DATA=r.data; renderBookings(); }
-  }catch(e){ bkMsg((e&&e.message)||"تعذّر إضافة الموعد",false); }
-  finally{ btn.disabled=false; btn.textContent=t; }
-});
+
 
 /* ================= EVENT RATINGS ================= */
 let RTFILTER="all";
@@ -2027,7 +2184,22 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
 });
 
 const GROUP_COLOR={ "مشروع جديد":"#2F8789", "مشروع منزلي":"#505632", "مشروع صغير أو متوسط":"#962E37" };
-let GFILTER="all";
+let GFILTER="all", QZQ="";
+
+/* search across whatever this member of staff is actually allowed to see:
+   for a consultant the contacts were stripped server-side, so the name is
+   all there is to match on and that is the correct behaviour */
+function qzMatches(l){
+  if(!QZQ) return true;
+  const q=QZQ.toLowerCase();
+  const digits=q.replace(/\D/g,"");
+  if((l.name||"").toLowerCase().indexOf(q)!==-1) return true;
+  if((l.email||"").toLowerCase().indexOf(q)!==-1) return true;
+  if(digits && String(l.phone||"").replace(/\D/g,"").indexOf(digits)!==-1) return true;
+  if((l.customerGroup||"").indexOf(QZQ)!==-1) return true;
+  if((l.band||"").indexOf(QZQ)!==-1) return true;
+  return false;
+}
 
 function renderQuiz(){
   const Q=DATA.quiz;
@@ -2038,6 +2210,13 @@ function renderQuiz(){
     <div class="kpi"><div class="n">${fmt(Q.totals.count)}</div><div class="l">عدد من أنهوا الاختبار</div></div>`+
     Q.byQuiz.map(q=>`<div class="kpi"><div class="n">${fmt(q.count)}</div><div class="l">${esc(q.title||q.source)}</div></div>`).join("")+
     gkeys.map(g=>`<div class="kpi"><div class="n">${fmt(gt[g])}</div><div class="l">${esc(g)}</div></div>`).join("");
+
+  /* the placeholder should promise only what this person can actually
+     search — a consultant has no contacts to match on */
+  const qs=$("#qzSearch");
+  if(qs) qs.placeholder = seesContacts()
+    ? "دوّر باسم، إيميل، رقم، أو فئة…"
+    : "دوّر باسم العميل أو الفئة…";
 
   /* group filter only makes sense when there are groups to filter by */
   const gf=$("#grpFlt");
@@ -2054,8 +2233,12 @@ function renderQuiz(){
   const multi=DATA.scope.length>1;
   const rows=Q.leads.map((l,i)=>({l,i}))
     .filter(x=>QFILTER==="all"||x.l.source===QFILTER)
-    .filter(x=>GFILTER==="all" ? true : (GFILTER==="none" ? !x.l.customerGroup : x.l.customerGroup===GFILTER));
-  if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">لا توجد نتائج بهذا التصنيف</div>`; return; }
+    .filter(x=>GFILTER==="all" ? true : (GFILTER==="none" ? !x.l.customerGroup : x.l.customerGroup===GFILTER))
+    .filter(x=>qzMatches(x.l));
+
+  const shown=$("#qzCount");
+  if(shown) shown.textContent = QZQ ? `${fmt(rows.length)} من ${fmt(Q.leads.length)}` : "";
+  if(!rows.length){ $("#quizTbl").innerHTML=`<div class="empty">${QZQ?"ما لقينا أحد بهذا البحث":"لا توجد نتائج بهذا التصنيف"}</div>`; return; }
   const anyGroup=gkeys.length>0;
   $("#quizTbl").innerHTML=`<table><thead><tr>
       <th>التاريخ</th><th>الاسم</th>${multi?"<th>الاختبار</th>":""}${anyGroup?"<th>الفئة</th>":""}<th>النتيجة</th><th>التقييم</th>${seesContacts()?"<th>الجوال</th><th>البريد</th>":""}<th></th></tr></thead><tbody>`+
@@ -2069,12 +2252,44 @@ function renderQuiz(){
       <td><button class="view-btn" onclick="openResult(${i})">عرض النتيجة</button></td></tr>`).join("")+`</tbody></table>`;
 }
 
+$("#qzSearch") && $("#qzSearch").addEventListener("input", e=>{
+  QZQ=e.target.value.trim(); renderQuiz();
+});
+
 $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   GFILTER=b.dataset.g; renderQuiz();
 });
 </script>
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
+
+<div class="ovl" id="bkEditOvl" onclick="if(event.target===this)bkEditClose()">
+  <div class="modal" style="max-width:560px;position:relative">
+    <button class="m-x" onclick="bkEditClose()">×</button>
+    <h3 style="margin:0 0 4px;font-size:19px" id="bkEditTitle">تعديل الحجز</h3>
+    <p class="muted" style="font-size:13px;margin:0 0 16px" id="bkEditSub"></p>
+    <div class="addgrid">
+      <div class="addf"><label>الاستشاري</label>
+        <select id="beConsultant">
+          <option value="ghalia">غالية النويف</option>
+          <option value="sara">سارة الهندي</option>
+        </select></div>
+      <div class="addf"><label>الطريقة</label>
+        <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+      <div class="addf"><label>التاريخ</label><input id="beDate" type="date"></div>
+      <div class="addf"><label>الوقت</label><input id="beTime" type="time" step="900"></div>
+      <div class="addf"><label>اسم العميل</label><input id="beName" type="text"></div>
+      <div class="addf"><label>الإيميل</label><input id="beEmail" type="email" style="direction:ltr;text-align:left"></div>
+      <div class="addf"><label>الجوال</label><input id="bePhone" type="text" style="direction:ltr;text-align:left"></div>
+      <div class="addf"><label>المبلغ</label><input id="beAmount" type="number" min="0" step="1"></div>
+    </div>
+    <div class="addf" style="margin-top:12px"><label>ملاحظات</label><input id="beNotes" type="text"></div>
+    <div class="addrow">
+      <button class="addbtn" id="beSave">احفظ التعديل</button>
+    </div>
+    <div class="addmsg" id="beMsg"></div>
+  </div>
+</div>
 
 <div class="ovl" id="clOvl" onclick="if(event.target===this)clClose()">
   <div class="modal" style="max-width:640px;position:relative">

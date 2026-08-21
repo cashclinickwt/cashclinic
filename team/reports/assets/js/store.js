@@ -97,6 +97,11 @@
     all: function () { return CACHE.slice(); },
     count: function () { return CACHE.length; },
 
+    /* everyone with a confirmed appointment, for «ابدأ من حجز» */
+    booked: function () {
+      return call("listBookedClients", {}).then(function (d) { return d.list || []; });
+    },
+
     get: function (id) {
       return call("getNasReport", { id: id }).then(function (d) { return d.report || null; });
     },
@@ -105,7 +110,9 @@
       return call("saveNasReport", {
         id: rec.id || "", reportType: CONFIG.reportType,
         name: rec.name, caseNo: rec.caseNo, pkg: rec.pkg,
-        date: rec.date, consultant: rec.consultant, data: rec.data
+        date: rec.date, consultant: rec.consultant,
+        email: rec.email || "", phone: rec.phone || "",
+        data: rec.data
       }).then(function (d) {
         rec.id = d.id;
         rec.updatedAt = d.savedAt || Date.now();
