@@ -248,6 +248,49 @@
   .bkacts button,.bkacts a{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
   .bkacts .no{border-color:#962E37;color:#962E37}
   .bkacts .wa{border-color:#25D366;color:#128C4A}
+  /* booking calendar — Calendly-style month view */
+  .bkcal{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px 16px;margin-bottom:14px}
+  .bkcal-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .bkcal-title{font-size:15.5px;font-weight:700;color:var(--ink);min-width:120px}
+  .bkcal-nav{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;
+             font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
+  .bkcal-nav:hover{border-color:var(--acc,var(--auber));color:var(--acc,var(--auber))}
+  .bkcal-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-bottom:10px}
+  .bkcal-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px;vertical-align:-1px}
+  .bkcal-head,.bkcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .bkcal-head{margin-bottom:6px}
+  .bkcal-head span{text-align:center;font-size:12px;font-weight:700;color:var(--muted)}
+  .bkcal-cell{border:1.5px solid var(--line);background:#fff;border-radius:11px;min-height:64px;padding:7px 4px 5px;
+              font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink)}
+  .bkcal-cell .dn{font-size:14px;font-weight:700;line-height:1}
+  .bkcal-cell .bd{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;line-height:1.5;
+                  background:var(--acc,var(--auber));color:#fff}
+  .bkcal-cell .fr{font-size:10.5px;color:var(--muted);line-height:1.4}
+  .bkcal-cell.pad{border:0;background:transparent;cursor:default}
+  .bkcal-cell.off{background:var(--bg);color:#A9A4B4}
+  .bkcal-cell.blk{background:#FDECEC;border-color:#F0C9CC;color:#962E37}
+  .bkcal-cell.blk .fr{color:#962E37}
+  .bkcal-cell.past{opacity:.45}
+  .bkcal-cell.today{border-color:var(--acc,var(--auber));border-width:2.5px}
+  .bkcal-cell.sel{background:var(--acc,var(--auber));border-color:var(--acc,var(--auber));color:#fff}
+  .bkcal-cell.sel .fr{color:rgba(255,255,255,.85)}
+  .bkcal-cell.sel .bd{background:#fff;color:var(--acc,var(--auber))}
+  .bkcal-day{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+  .bkcal-day h4{margin:0 0 3px;font-size:15.5px;color:var(--acc,var(--auber))}
+  .bkcal-sub{font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:10px}
+  .bkcal-slots{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .bkcal-slot{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+              font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
+  .bkcal-slot:hover{border-color:var(--acc,var(--auber));color:var(--acc,var(--auber))}
+  .bkcal-slot small{color:var(--muted);font-size:11px;margin-inline-start:5px}
+  .bkcal-slot:hover small{color:inherit}
+  @media(max-width:560px){
+    .bkcal{padding:12px 10px 14px}
+    .bkcal-head,.bkcal-grid{gap:4px}
+    .bkcal-cell{min-height:54px;padding:5px 2px 4px}
+    .bkcal-cell .bd{padding:2px 6px}
+    .bkcal-cell .fr{font-size:9.5px}
+  }
   .bkchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
   .bkchip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink);display:inline-flex;align-items:center;gap:7px}
   .bkchip button{border:0;background:none;color:#962E37;cursor:pointer;font-size:15px;line-height:1;padding:0}
@@ -610,6 +653,25 @@
       </div>
     </div>
     <button class="bksave" id="bkSave">احفظ الجدول</button>
+
+    <h2 style="font-size:17px;margin-top:26px"><span></span> التقويم <span class="whoname" id="bkCalWho"></span></h2>
+    <div class="bkcal" id="bkCal" hidden>
+      <div class="bkcal-top">
+        <button type="button" class="bkcal-nav" data-cal="prev">الشهر السابق</button>
+        <div class="bkcal-title" id="bkCalTitle"></div>
+        <button type="button" class="bkcal-nav" data-cal="next">الشهر التالي</button>
+        <button type="button" class="bkcal-nav" data-cal="today">اليوم</button>
+      </div>
+      <div class="bkcal-legend">
+        <span><i style="background:var(--acc,var(--auber))"></i>فيه حجز</span>
+        <span><i style="background:#fff;border:1.5px solid var(--line)"></i>يوم دوام</span>
+        <span><i style="background:var(--bg)"></i>خارج الدوام</span>
+        <span><i style="background:#FDECEC;border:1px solid #F0C9CC"></i>إجازة</span>
+      </div>
+      <div class="bkcal-head" id="bkCalHead"></div>
+      <div class="bkcal-grid" id="bkCalGrid"></div>
+      <div class="bkcal-day" id="bkCalDay"></div>
+    </div>
 
     <h2 style="font-size:17px;margin-top:26px"><span></span> الحجوزات</h2>
     <div class="flt" id="bkFlt">
@@ -1597,6 +1659,7 @@ function paintSchedule(){
   }).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
   $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
     `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${x.mode==="present"?"حضوري":"أونلاين"}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
+  renderBkCal();
 }
 
 function pickedDays(host){ return Array.from(document.querySelectorAll(host+" .bkday.on")).map(b=>Number(b.dataset.d)); }
@@ -1732,7 +1795,10 @@ $("#bkFlt") && $("#bkFlt").addEventListener("click",e=>{ const b=e.target.closes
    The second is offered on the card itself so nobody has to remember
    which clients are still owed one. */
 function bkNeedsSecond(b){
-  if(!b.staffArranged || b.status==="cancelled") return false;
+  /* a public Cash Nas booking needs its second session arranged just as
+     much as a staff-arranged one, and both carry a NAS package id, so the
+     package lookup below is the real test — not who typed it in */
+  if(b.status==="cancelled") return false;
   const pkg=(DATA.nasPackages||[]).find(p=>p.key===b.packageId);
   if(!pkg || (pkg.sessions||[]).length<2) return false;
   if(Number(b.sessionIndex||0)!==0) return false;
@@ -1808,7 +1874,7 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
   }finally{ btn.disabled=false; btn.textContent=t; }
 });
 
-$("#bkList") && $("#bkList").addEventListener("click",async e=>{
+async function bkRowAction(e){
   const ed=e.target.closest("button[data-edit]");
   if(ed){ const row=(DATA.bookings.list||[]).find(x=>x.id===ed.dataset.edit); if(row) bkEditOpen(row); return; }
   const sc=e.target.closest("button[data-second]");
@@ -1824,7 +1890,229 @@ $("#bkList") && $("#bkList").addEventListener("click",async e=>{
       if(row.startMs>=Date.now()) DATA.bookings.totals.upcoming=Math.max(0,(DATA.bookings.totals.upcoming||1)-1); }
     renderBookings(); bkMsg("انلغى الموعد، والوقت رجع متاح.",true);
   }catch(err){ bkMsg((err&&err.message)||"تعذّر الإلغاء",false); b.disabled=false; }
+}
+$("#bkList")   && $("#bkList").addEventListener("click", bkRowAction);
+$("#bkCalDay") && $("#bkCalDay").addEventListener("click", bkRowAction);
+
+
+/* ================= BOOKING CALENDAR =================
+   A month view of one consultant's diary, built entirely from data the
+   dashboard already holds: DATA.bookings.list for what is taken, and that
+   consultant's own schedule for what is open. Nothing extra is fetched.
+
+   The free-slot maths deliberately mirrors buildCandidateSlots() on the
+   server: working days, start -> end stepped by the session length, blocked
+   days removed, one-off extra slots added. One honest gap: a slot somebody
+   is mid-payment on is held for 20 minutes in the slots collection, which
+   the dashboard is never sent, so it can still read as free here. The
+   server refuses the double booking either way.
+   ===================================================== */
+let BKCAL_Y=0, BKCAL_M=-1, BKCAL_SEL="";
+const BKCAL_LTR=["ح","ن","ث","ر","خ","ج","س"];
+
+function bkPad2(n){ return (n<10?"0":"")+n; }
+function bkKey(y,m,d){ return y+"-"+bkPad2(m+1)+"-"+bkPad2(d); }
+function bkNowKw(){ return bkParts(new Date().toISOString()); }
+function bkDateKey(iso){ const p=bkParts(iso); return bkKey(p.y,p.m,p.d); }
+function bkMinOf(t){ const a=String(t||"").split(":"); return (Number(a[0])||0)*60+(Number(a[1])||0); }
+function bkHHMM(m){ return bkPad2(Math.floor(m/60))+":"+bkPad2(m%60); }
+function bkWeekday(key){ return new Date(key+"T00:00:00Z").getUTCDay(); }
+
+/* the slot length follows whatever session is picked in the booking box,
+   because that is what the appointment will actually take */
+function bkCalMinutes(){
+  try{
+    const p=nbCurrent(); const ss=(p&&p.sessions)||[];
+    const i=Number(($("#nbSession")||{}).value||0);
+    const m=ss[i]&&Number(ss[i].minutes);
+    if(m>0) return m;
+  }catch(e){}
+  return 60;
+}
+
+function bkCalDayRows(key){
+  return (DATA.bookings.list||[]).filter(x=>
+    x.consultantId===BKWHO && x.status!=="cancelled" && x.startIso && bkDateKey(x.startIso)===key
+  ).sort((a,b)=>a.startMs-b.startMs);
+}
+
+function bkCalBlocked(key){ return ((BKSCHED&&BKSCHED.blocked)||[]).indexOf(key)!==-1; }
+
+function bkCalWorks(key){
+  if(!BKSCHED) return false;
+  const w=bkWeekday(key);
+  if(["online","present"].some(m=>{ const r=BKSCHED[m];
+    return r && r.enabled!==false && (r.days||[]).indexOf(w)!==-1; })) return true;
+  return (BKSCHED.extra||[]).some(x=>x&&x.date===key);
+}
+
+function bkCalFree(key){
+  if(!BKSCHED || bkCalBlocked(key)) return [];
+  const step=Math.max(15,bkCalMinutes()), w=bkWeekday(key), seen={}, out=[];
+  ["online","present"].forEach(mode=>{
+    const r=BKSCHED[mode];
+    if(!r || r.enabled===false || (r.days||[]).indexOf(w)===-1) return;
+    const a=bkMinOf(r.start), b=bkMinOf(r.end);
+    for(let m=a; m+step<=b; m+=step){
+      const t=bkHHMM(m);
+      if(seen[t]){ if(seen[t].modes.indexOf(mode)===-1) seen[t].modes.push(mode); continue; }
+      seen[t]={time:t,min:m,modes:[mode]}; out.push(seen[t]);
+    }
+  });
+  (BKSCHED.extra||[]).forEach(x=>{
+    if(!x || x.date!==key || !x.time) return;
+    const t=String(x.time), mode=x.mode||"online";
+    if(seen[t]){ if(seen[t].modes.indexOf(mode)===-1) seen[t].modes.push(mode); return; }
+    seen[t]={time:t,min:bkMinOf(t),modes:[mode],extra:true}; out.push(seen[t]);
+  });
+  /* the consultant is one person, so a booking blocks the hour in both modes */
+  const taken=bkCalDayRows(key).map(b=>{
+    const p=bkParts(b.startIso), st=p.hh*60+p.mm;
+    return {s:st, e:st+(Number(b.minutes)||60)};
+  });
+  return out.filter(o=>!taken.some(t=>o.min < t.e && t.s < o.min+step))
+            .sort((a,b)=>a.min-b.min);
+}
+
+/* nothing in the past is offered, and today only from this minute on */
+function bkCalOpen(key){
+  const n=bkNowKw(), today=bkKey(n.y,n.m,n.d);
+  if(key<today) return [];
+  const free=bkCalFree(key);
+  return key>today ? free : free.filter(s=>s.min > n.hh*60+n.mm);
+}
+
+function renderBkCal(){
+  const host=$("#bkCal"); if(!host) return;
+  if(!BKSCHED){ host.hidden=true; return; }
+  host.hidden=false;
+
+  const n=bkNowKw(), today=bkKey(n.y,n.m,n.d);
+  if(BKCAL_M<0){ BKCAL_Y=n.y; BKCAL_M=n.m; }
+
+  const whoEl=$("#bkCalWho"), nameEl=$("#bkWhoName");
+  if(whoEl && nameEl) whoEl.textContent=nameEl.textContent||"";
+  $("#bkCalTitle").textContent=BK_MON[BKCAL_M]+" "+BKCAL_Y;
+  $("#bkCalHead").innerHTML=BKCAL_LTR.map((l,i)=>
+    `<span title="${esc(BK_DAYS[i])}">${l}</span>`).join("");
+
+  const first=new Date(Date.UTC(BKCAL_Y,BKCAL_M,1)).getUTCDay();
+  const days =new Date(Date.UTC(BKCAL_Y,BKCAL_M+1,0)).getUTCDate();
+  let html="";
+  for(let i=0;i<first;i++) html+='<div class="bkcal-cell pad"></div>';
+  for(let d=1;d<=days;d++){
+    const key=bkKey(BKCAL_Y,BKCAL_M,d);
+    const rows=bkCalDayRows(key), blocked=bkCalBlocked(key), open=bkCalOpen(key);
+    const cls=["bkcal-cell"];
+    if(blocked) cls.push("blk"); else if(!bkCalWorks(key)) cls.push("off");
+    if(key<today)  cls.push("past");
+    if(key===today) cls.push("today");
+    if(key===BKCAL_SEL) cls.push("sel");
+    const note = blocked ? "إجازة" : (open.length ? open.length+" فاضي" : "");
+    html+=`<button type="button" class="${cls.join(" ")}" data-day="${key}">`
+        + `<span class="dn">${d}</span>`
+        + (rows.length?`<span class="bd">${rows.length}</span>`:"")
+        + (note?`<span class="fr">${note}</span>`:"")
+        + `</button>`;
+  }
+  $("#bkCalGrid").innerHTML=html;
+  renderBkCalDay();
+}
+
+function renderBkCalDay(){
+  const box=$("#bkCalDay"); if(!box) return;
+  if(!BKCAL_SEL || !BKSCHED){
+    box.innerHTML='<div class="bkcal-sub">اضغط على أي يوم فوق عشان تشوف مواعيده وأوقاته الفاضية، وتحجز فيه على طول.</div>';
+    return;
+  }
+  const key=BKCAL_SEL, n=bkNowKw(), today=bkKey(n.y,n.m,n.d);
+  const d=Number(key.slice(8,10)), mo=Number(key.slice(5,7))-1;
+  const head=`${BK_DAYS[bkWeekday(key)]} ${d} ${BK_MON[mo]}`;
+  const rows=bkCalDayRows(key), open=bkCalOpen(key), blocked=bkCalBlocked(key);
+
+  let sub;
+  if(blocked)            sub="هذا اليوم مقفل كإجازة. شيله من «أيام مقفلة» فوق لو تبي تحجز فيه.";
+  else if(key<today)     sub=rows.length?`${rows.length} موعد راح.`:"يوم راح وما كان فيه مواعيد.";
+  else if(!bkCalWorks(key)) sub="خارج أيام الدوام. تقدر تضيفه من «موعد خارج الجدول» فوق.";
+  else sub=`${rows.length} محجوز · ${open.length} فاضي · الجلسة ${bkCalMinutes()} دقيقة`;
+
+  const slots = open.length
+    ? `<div class="bkcal-slots">`+open.map(s=>{
+        const lbl=s.modes.map(m=>m==="present"?"حضوري":"أونلاين").join(" · ");
+        return `<button type="button" class="bkcal-slot" data-slot="${esc(s.time)}" data-mode="${esc(s.modes[0])}">`
+             + `${esc(s.time)}<small>${esc(lbl)}</small></button>`;
+      }).join("")+`</div>` : "";
+
+  const list = rows.length ? rows.map(b=>{
+    const wa=String(b.phone||"").replace(/\D/g,"");
+    const gone=b.startMs<Date.now();
+    const pt=bkParts(b.startIso);
+    return `<div class="bkcard ${gone?"gone":"soon"}">
+      <div class="bkwhen">${bkPad2(pt.hh)}:${bkPad2(pt.mm)}<span style="font-size:12.5px;font-weight:400;color:var(--muted)"> · ${Number(b.minutes)||60} دقيقة</span></div>
+      <div class="bkh">
+        <b>${esc(b.name)||"—"}</b>
+        <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
+        <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
+        ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
+        <span class="num">${esc(b.email)}</span>
+        <span>· ${fmt(b.amount)} د.ك</span>
+      </div>
+      ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
+      ${!gone?`<div class="bkacts">
+        ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button data-edit="${esc(b.id)}">تعديل</button>
+        ${bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
+        <button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>
+      </div>`:""}
+    </div>`;
+  }).join("") : "";
+
+  const add = (key>=today && !blocked)
+    ? `<button type="button" class="bksave" style="padding:10px 22px;font-size:14px" data-addday="${esc(key)}">احجز بهذا اليوم</button>`
+    : "";
+
+  box.innerHTML=`<h4>${esc(head)}</h4><div class="bkcal-sub">${esc(sub)}</div>${slots}${list}${add}`;
+}
+
+$("#bkCal") && $("#bkCal").addEventListener("click", e=>{
+  const nav=e.target.closest("button[data-cal]");
+  if(nav){
+    const n=bkNowKw();
+    if(nav.dataset.cal==="today"){ BKCAL_Y=n.y; BKCAL_M=n.m; BKCAL_SEL=bkKey(n.y,n.m,n.d); }
+    else{
+      const step=nav.dataset.cal==="next"?1:-1;
+      const t=new Date(Date.UTC(BKCAL_Y,BKCAL_M+step,1));
+      BKCAL_Y=t.getUTCFullYear(); BKCAL_M=t.getUTCMonth();
+    }
+    renderBkCal(); return;
+  }
+  const cell=e.target.closest("button[data-day]");
+  if(cell){
+    BKCAL_SEL = (BKCAL_SEL===cell.dataset.day) ? "" : cell.dataset.day;
+    renderBkCal(); return;
+  }
+  const slot=e.target.closest("button[data-slot]");
+  if(slot){ bkCalPrefill(BKCAL_SEL, slot.dataset.slot, slot.dataset.mode); return; }
+  const add=e.target.closest("button[data-addday]");
+  if(add){ bkCalPrefill(add.dataset.addday, "", ""); return; }
 });
+
+/* hand the chosen day (and time) to the manual booking box */
+function bkCalPrefill(key, time, mode){
+  const box=$("#nasBox");
+  if(!box || box.hidden){ bkMsg("صندوق «احجز لعميل» مو متاح لحسابك.",false); return; }
+  if($("#nbConsultant")) $("#nbConsultant").value=BKWHO;
+  $("#nbDate").value=key||"";
+  $("#nbTime").value=time||"";
+  if(mode && $("#nbMode")) $("#nbMode").value=mode;
+  box.scrollIntoView({behavior:"smooth",block:"center"});
+  nbMsg(time ? `جهّزنا ${key} الساعة ${time} .. كمّل بيانات العميل.`
+             : `جهّزنا تاريخ ${key} .. اختر الوقت وكمّل بيانات العميل.`, "ok");
+}
+
+/* the slot length comes from the session, so redraw when either changes */
+$("#nbPkg")     && $("#nbPkg").addEventListener("change", renderBkCal);
+$("#nbSession") && $("#nbSession").addEventListener("change", renderBkCal);
 
 
 

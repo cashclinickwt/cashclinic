@@ -15,13 +15,20 @@
 <link rel="stylesheet" href="assets/ds/tokens/base.css">
 <link rel="stylesheet" href="assets/css/site.css">
 <style>
-  body{background:var(--cc-purple-050)}
-  .bk-hero{background:linear-gradient(150deg,var(--cc-purple-700),var(--cc-purple) 62%);color:var(--cc-cream);padding:46px 0 40px;position:relative;overflow:hidden}
+  /* Cash Nas runs on olive. Everything the customer touches inside the
+     clinic — steps, selected states, the pay button — reads --clinic, so
+     switching clinic later is one line rather than a repaint. */
+  :root{ --clinic:var(--cc-purple); --clinic-dark:var(--cc-purple-700);
+         --clinic-soft:var(--cc-purple-050); --clinic-line:var(--cc-purple-100); }
+  body.nas{ --clinic:#505632; --clinic-dark:#3A3E24;
+            --clinic-soft:#F2F3E8; --clinic-line:#CFD1AB; }
+  body{background:var(--clinic-soft)}
+  .bk-hero{background:linear-gradient(150deg,var(--clinic-dark),var(--clinic) 62%);color:var(--cc-cream);padding:46px 0 40px;position:relative;overflow:hidden}
   .bk-hero .cc-wrap{position:relative;z-index:1;text-align:center}
   .bk-hero .mark{position:absolute;inset-inline-end:-26px;bottom:-30px;width:150px;opacity:.12}
   .bk-hero h1{font-size:clamp(25px,3.8vw,38px);font-weight:300;line-height:1.3;margin:14px 0 0;color:#fff}
-  .bk-hero p{font-size:16px;line-height:1.9;color:var(--cc-purple-100);margin:12px auto 0;max-width:52ch}
-  .bk-badge{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
+  .bk-hero p{font-size:16px;line-height:1.9;color:rgba(255,255,255,.86);margin:12px auto 0;max-width:52ch}
+  .bk-badge{display:inline-block;background:var(--cc-gold);color:#3A3E24;font-weight:700;font-size:13.5px;border-radius:999px;padding:7px 16px}
   /* consultant identity */
   .bk-who{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:26px;text-align:start}
   .bk-photo{flex:0 0 auto;width:104px;height:104px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,231,188,.34);background:var(--cc-purple-700)}
@@ -31,7 +38,7 @@
   .bk-clinic img{width:20px;height:20px;border-radius:50%;object-fit:contain;background:#fff}
   .bk-name{font-size:21px;font-weight:700;color:#fff;line-height:1.4}
   .bk-role{font-size:14.5px;color:var(--cc-gold);margin-top:3px}
-  .bk-bio{font-size:14.5px;line-height:1.9;color:var(--cc-purple-100);margin-top:9px}
+  .bk-bio{font-size:14.5px;line-height:1.9;color:rgba(255,255,255,.84);margin-top:9px}
   .bk-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
   .bk-stat{background:rgba(255,255,255,.10);border-radius:10px;padding:7px 13px;font-size:13px;color:#fff}
   .bk-stat b{color:var(--cc-gold)}
@@ -39,33 +46,40 @@
 
   .bk-wrap{max-width:860px;margin:-24px auto 64px;padding:0 18px;position:relative;z-index:2}
   .bk-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:22px;padding:26px 24px;box-shadow:0 16px 44px rgba(47,23,72,.10);margin-bottom:18px}
-  .bk-card h2{font-size:18px;font-weight:700;color:var(--cc-purple);margin:0 0 4px}
+  .bk-card h2{font-size:18px;font-weight:700;color:var(--clinic);margin:0 0 4px}
   .bk-card .hint{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:0 0 18px}
-  .bk-step{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--cc-purple);color:var(--cc-cream);font-size:14px;font-weight:700;margin-inline-end:9px}
+  .bk-step{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--clinic);color:var(--cc-cream);font-size:14px;font-weight:700;margin-inline-end:9px}
 
   /* packages */
   .pk{display:grid;gap:12px}
   .pk label{display:block;cursor:pointer}
   .pk input{position:absolute;opacity:0;pointer-events:none}
   .pk .box{border:2px solid var(--cc-grey-200);border-radius:16px;padding:16px 18px;transition:.15s;display:flex;gap:14px;align-items:flex-start}
-  .pk input:checked + .box{border-color:var(--cc-purple);background:var(--cc-purple-050)}
+  .pk input:checked + .box{border-color:var(--clinic);background:var(--clinic-soft)}
   .pk .box .t{flex:1 1 auto}
-  .pk .box .nm{font-size:16.5px;font-weight:700;color:var(--cc-purple);margin-bottom:4px}
+  .pk .box .nm{font-size:16.5px;font-weight:700;color:var(--clinic);margin-bottom:4px}
   .pk .box .tg{font-size:14px;color:var(--cc-grey-700);line-height:1.75}
-  .pk .box .pr{flex:0 0 auto;text-align:center;background:var(--cc-cream);border-radius:12px;padding:9px 13px;font-weight:700;color:var(--cc-purple);font-size:15px;white-space:nowrap}
+  .pk .box .pr{flex:0 0 auto;text-align:center;background:var(--cc-cream);border-radius:12px;padding:9px 13px;font-weight:700;color:#3A3E24;font-size:15px;white-space:nowrap}
   .pk .box .du{display:block;font-size:11.5px;font-weight:400;color:var(--cc-grey-700);margin-top:2px}
   /* the chosen package opens up in full so nobody books blind */
-  .pk-detail{display:none;margin-top:14px;background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:16px;padding:20px 20px 18px}
+  .pk-detail{display:none;margin-top:14px;background:var(--clinic-soft);border:1px solid var(--clinic-line);border-radius:16px;padding:20px 20px 18px}
   .pk-detail.on{display:block}
-  .pk-detail h3{font-size:17px;font-weight:700;color:var(--cc-purple);margin:0 0 4px}
-  .pk-detail .who{font-size:13.5px;color:var(--cc-teal-700);font-weight:700;margin-bottom:12px}
+  .pk-detail h3{font-size:17px;font-weight:700;color:var(--clinic);margin:0 0 4px}
+  .pk-detail .who{font-size:13.5px;color:var(--clinic);font-weight:700;margin-bottom:12px;opacity:.9}
   .pk-detail p{font-size:14.5px;line-height:1.95;color:var(--cc-grey-900);margin:0 0 16px}
-  .pk-detail h4{font-size:14px;font-weight:700;color:var(--cc-purple);margin:0 0 10px}
+  .pk-detail h4{font-size:14px;font-weight:700;color:var(--clinic);margin:16px 0 10px}
+  .pk-detail h4:first-of-type{margin-top:0}
   .pk-detail ul{list-style:none;margin:0;padding:0}
   .pk-detail li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.85;color:var(--cc-ink);padding:6px 0}
-  .pk-detail li::before{content:"✓";flex:0 0 auto;color:var(--cc-teal);font-weight:700}
-  .pk-detail .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--cc-purple-100)}
-  .pk-detail .meta span{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--cc-purple);font-weight:700}
+  .pk-detail li::before{content:"✓";flex:0 0 auto;color:var(--clinic);font-weight:700}
+  .pk-detail ul.dot li::before{content:"•"}
+  .pk-detail .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--clinic-line)}
+  .pk-detail .meta span{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--clinic);font-weight:700}
+  /* a two-session package: say plainly that only session one is booked here */
+  .pk-sess{background:var(--cc-white);border:1px solid var(--clinic-line);border-radius:14px;padding:14px 16px;margin-top:14px}
+  .pk-sess .s{display:flex;gap:10px;align-items:baseline;font-size:14px;line-height:1.85;color:var(--cc-ink);padding:3px 0}
+  .pk-sess .s i{flex:0 0 auto;font-style:normal;font-weight:700;color:var(--clinic)}
+  .pk-sess .n{font-size:13px;color:var(--cc-grey-700);line-height:1.8;margin-top:9px;padding-top:9px;border-top:1px dashed var(--clinic-line)}
 
   /* mode */
   .md{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -73,22 +87,22 @@
   .md label{cursor:pointer}
   .md input{position:absolute;opacity:0;pointer-events:none}
   .md .box{border:2px solid var(--cc-grey-200);border-radius:16px;padding:15px 16px;text-align:center;transition:.15s}
-  .md input:checked + .box{border-color:var(--cc-teal);background:var(--cc-teal-050,#EAF5F5)}
-  .md .box b{display:block;font-size:16px;color:var(--cc-purple);margin-bottom:4px}
+  .md input:checked + .box{border-color:var(--clinic);background:var(--clinic-soft)}
+  .md .box b{display:block;font-size:16px;color:var(--clinic);margin-bottom:4px}
   .md .box span{font-size:13px;color:var(--cc-grey-700);line-height:1.7}
   .md input:disabled + .box{opacity:.45;cursor:not-allowed}
 
   /* days + slots */
   .days{display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .day{flex:0 0 auto;border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:14px;padding:11px 15px;text-align:center;cursor:pointer;font-family:inherit;min-width:82px;transition:.15s}
-  .day.on{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream)}
+  .day.on{border-color:var(--clinic);background:var(--clinic);color:var(--cc-cream)}
   .day .dw{display:block;font-size:12.5px;opacity:.8}
   .day .dd{display:block;font-size:17px;font-weight:700;margin-top:2px}
   .day .dm{display:block;font-size:11.5px;opacity:.75}
   .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:9px;margin-top:16px}
   .slot{border:2px solid var(--cc-grey-200);background:var(--cc-white);border-radius:12px;padding:12px 6px;font-size:14px;font-family:inherit;color:var(--cc-ink);cursor:pointer;transition:.15s;direction:ltr;white-space:nowrap}
-  .slot:hover{border-color:var(--cc-purple-200)}
-  .slot.on{border-color:var(--cc-purple);background:var(--cc-purple);color:var(--cc-cream);font-weight:700}
+  .slot:hover{border-color:var(--clinic-line)}
+  .slot.on{border-color:var(--clinic);background:var(--clinic);color:var(--cc-cream);font-weight:700}
   .bk-empty{text-align:center;color:var(--cc-grey-500);font-size:14.5px;padding:26px 10px;line-height:1.9}
 
   /* form */
@@ -96,18 +110,52 @@
   .fld label{display:block;font-size:13.5px;font-weight:700;color:var(--cc-ink);margin-bottom:6px}
   .fld input,.fld textarea,.fld select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white);box-sizing:border-box}
   .fld textarea{min-height:84px;resize:vertical;line-height:1.8}
-  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:0;border-color:var(--cc-purple)}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:0;border-color:var(--clinic)}
   .phone{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:9px}
 
-  .sum{background:var(--cc-purple-050);border:1px solid var(--cc-purple-100);border-radius:14px;padding:15px 17px;margin-bottom:16px;font-size:14.5px;line-height:2;color:var(--cc-purple)}
+  .sum{background:var(--clinic-soft);border:1px solid var(--clinic-line);border-radius:14px;padding:15px 17px;margin-bottom:16px;font-size:14.5px;line-height:2;color:var(--clinic)}
   .sum b{color:var(--cc-ink)}
-  .pay{width:100%;padding:17px;border:0;border-radius:999px;background:var(--cc-purple);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+  .pay{width:100%;padding:17px;border:0;border-radius:999px;background:var(--clinic);color:var(--cc-cream);font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
   .pay:hover{filter:brightness(1.08)}
   .pay:disabled{opacity:.55;cursor:not-allowed}
   .err{display:none;background:#FDECEC;color:var(--cc-danger);border:1px solid #F3C9C9;border-radius:12px;padding:12px 15px;font-size:14.5px;margin-top:13px;text-align:center;line-height:1.75}
   .ok{display:none;background:#E9F7EF;color:#1B7A43;border:1px solid #BDE5CB;border-radius:12px;padding:14px 16px;font-size:15px;text-align:center;line-height:1.9}
   .muted{font-size:13px;color:var(--cc-grey-500);line-height:1.85;text-align:center;margin-top:14px}
   .hide{display:none!important}
+
+  /* clinic chooser — the first thing a customer sees */
+  .cl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .cl{position:relative;display:block;width:100%;text-align:start;border:2px solid var(--cc-grey-200);
+      background:var(--cc-white);border-radius:18px;padding:20px 20px 18px;font-family:inherit;cursor:pointer;transition:.15s}
+  .cl:hover{border-color:#505632;transform:translateY(-2px);box-shadow:0 12px 28px rgba(80,86,50,.14)}
+  .cl .lg{width:52px;height:52px;border-radius:14px;object-fit:contain;background:var(--cc-grey-050,#F6F5F8);padding:6px;display:block;margin-bottom:12px}
+  .cl .nm{font-size:18px;font-weight:700;color:#505632;margin-bottom:5px}
+  .cl .tg{font-size:13.5px;line-height:1.8;color:var(--cc-grey-700)}
+  .cl .go{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700;color:#505632}
+  .cl.soon{cursor:not-allowed;opacity:.72;background:var(--cc-grey-050,#F6F5F8)}
+  .cl.soon:hover{border-color:var(--cc-grey-200);transform:none;box-shadow:none}
+  .cl.soon .nm{color:var(--cc-grey-700)}
+  .cl .sn{position:absolute;inset-block-start:16px;inset-inline-end:16px;background:var(--cc-cream);
+          color:#3A3E24;font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 11px}
+  .cl-back{background:none;border:0;font-family:inherit;font-size:14px;color:var(--clinic);
+           cursor:pointer;padding:0;margin-bottom:14px;font-weight:700}
+
+  /* choose a consultant (only for الاتصال السريع, which is not tied to one) */
+  .cn{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.cn{grid-template-columns:1fr}}
+  .cn label{cursor:pointer}
+  .cn input{position:absolute;opacity:0;pointer-events:none}
+  .cn .box{border:2px solid var(--cc-grey-200);border-radius:16px;padding:14px 15px;display:flex;gap:12px;align-items:center;transition:.15s}
+  .cn input:checked + .box{border-color:var(--clinic);background:var(--clinic-soft)}
+  .cn .box img{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+  .cn .box b{display:block;font-size:15.5px;color:var(--clinic)}
+  .cn .box span{font-size:12.5px;color:var(--cc-grey-700)}
+
+  /* pay in full, or split it with Deema */
+  .paygrid{display:grid;gap:10px}
+  .pay.alt{background:var(--cc-white);color:var(--clinic);border:2px solid var(--clinic)}
+  .pay.alt:hover{background:var(--clinic-soft);filter:none}
+  .pay-note{font-size:12.5px;color:var(--cc-grey-700);line-height:1.85;text-align:center;margin-top:4px}
 </style>
 </head>
 <body>
@@ -126,7 +174,7 @@
   <div class="cc-wrap">
     <span class="bk-badge" id="bkBadge">حجز استشارة</span>
     <h1 id="bkTitle">احجز استشارتك</h1>
-    <p id="bkSub">اختر الباقة والموعد اللي يناسبك، وادفع أونلاين. بيوصلك تأكيد على إيميلك مع ملف تقويم.</p>
+    <p id="bkSub">اختر العيادة اللي تناسب وضعك، وبنكمل معك خطوة خطوة.</p>
 
     <div class="bk-who hide" id="bkWho">
       <div class="bk-photo"><img id="bkPhoto" src="" alt=""></div>
@@ -150,6 +198,13 @@
     </p>
   </div>
 
+  <!-- step 0: which clinic. Cash Nas is the only one taking bookings today. -->
+  <div class="bk-card hide" id="cardClinic">
+    <h2>وين تبي تحجز؟</h2>
+    <p class="hint">اختر العيادة اللي تناسب وضعك، وبنكمل معك من هناك.</p>
+    <div class="cl-grid" id="clinicList"></div>
+  </div>
+
   <div class="bk-card" id="bkLoading">
     <p class="hint" style="margin:0;text-align:center">جارٍ تحميل المواعيد…</p>
   </div>
@@ -166,15 +221,23 @@
 
   <!-- 1 · package -->
   <div class="bk-card hide" id="cardPkg">
+    <button class="cl-back" type="button" id="clinicBack">→ رجوع للعيادات</button>
     <h2><span class="bk-step">١</span> اختر الاستشارة</h2>
-    <p class="hint" id="pkgHint">كل استشارة ساعة كاملة مع الاستشاري مباشرة.</p>
+    <p class="hint" id="pkgHint">اختر الباقة اللي تناسب وضعك، وبتلقى تفاصيلها كاملة تحتها.</p>
     <div class="pk" id="pkgList"></div>
     <div class="pk-detail" id="pkgDetail"></div>
   </div>
 
+  <!-- only shown for a package that is not tied to one consultant -->
+  <div class="bk-card hide" id="cardCons">
+    <h2><span class="bk-step">٢</span> مع مين تحب؟</h2>
+    <p class="hint">الاثنين يقدرون يجاوبونك، اختر اللي يريحك.</p>
+    <div class="cn" id="consList"></div>
+  </div>
+
   <!-- 2 · mode -->
   <div class="bk-card hide" id="cardMode">
-    <h2><span class="bk-step">٢</span> أونلاين ولا حضوري؟</h2>
+    <h2><span class="bk-step">٣</span> أونلاين ولا حضوري؟</h2>
     <p class="hint" id="modeHint"></p>
     <div class="md">
       <label><input type="radio" name="mode" value="online" checked>
@@ -186,7 +249,7 @@
 
   <!-- 3 · date + slot -->
   <div class="bk-card hide" id="cardSlot">
-    <h2><span class="bk-step">٣</span> اختر الموعد</h2>
+    <h2><span class="bk-step">٤</span> اختر الموعد</h2>
     <p class="hint">التوقيت بتوقيت الكويت.</p>
     <div class="days" id="dayList"></div>
     <div class="slots" id="slotList"></div>
@@ -195,7 +258,7 @@
 
   <!-- 4 · details -->
   <div class="bk-card hide" id="cardForm">
-    <h2><span class="bk-step">٤</span> بياناتك</h2>
+    <h2><span class="bk-step">٥</span> بياناتك</h2>
     <div class="sum" id="sum"></div>
     <div class="fld"><label>الاسم</label><input id="bName" type="text" autocomplete="name" placeholder="اسمك الكامل"></div>
     <div class="fld"><label>الإيميل</label><input id="bEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
@@ -221,7 +284,11 @@
     </div>
     <div class="fld"><label>تحب تذكر شي قبل الاستشارة؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
       <textarea id="bNotes" placeholder="أي معلومة تساعد الاستشاري يجهّز لك…"></textarea></div>
-    <button class="pay" id="payBtn" type="button">ادفع واحجز</button>
+    <div class="paygrid">
+      <button class="pay" id="payBtn" type="button">ادفع كامل واحجز</button>
+      <button class="pay alt" id="deemaBtn" type="button">قسّطها مع ديمة</button>
+    </div>
+    <p class="pay-note">الدفع الكامل يتم أونلاين بالبطاقة ويتأكد حجزك على طول. مع ديمة نحجز لك الموعد ونكمل التقسيط معك بالواتساب.</p>
     <div class="err" id="bErr"></div>
     <p class="muted">الدفع آمن عبر Tap. الحجز يتأكد فور نجاح الدفع.</p>
   </div>
@@ -251,6 +318,7 @@ const fns = getFunctions(app, CONFIG.functionsRegion);
 const getBookingOptions   = httpsCallable(fns,"getBookingOptions");
 const getAvailableSlots   = httpsCallable(fns,"getAvailableSlots");
 const createBookingCharge = httpsCallable(fns,"createBookingCharge");
+const createDeemaBooking  = httpsCallable(fns,"createDeemaBooking");
 const getBookingByToken   = httpsCallable(fns,"getBookingByToken");
 const rescheduleBooking   = httpsCallable(fns,"rescheduleBooking");
 
@@ -290,6 +358,7 @@ const CONSULTANT_ID = QS.get("c") || "ghalia";
 const RESCHED = { id:QS.get("r"), token:QS.get("t") };
 
 let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO = "";
+let OPTS = null, CLINIC = "", CONSULTANTS = [];
 
 /* ---------------- boot ---------------- */
 (async function boot(){
@@ -305,35 +374,22 @@ let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO =
       $("#bkSub").textContent   = "نجهّز المواعيد الحين.";
       return;
     }
-    const list = data.consultants || [];
-    C = list.find(x => x.id === CONSULTANT_ID) || list[0];
-    if(!C){ $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">الحجز مقفل حالياً. راسلنا واتساب ونرتب لك موعد.</p>'; return; }
+    OPTS = data;
+    CONSULTANTS = data.consultants || [];
+    if(!CONSULTANTS.length){ $("#bkLoading").innerHTML = '<p class="hint" style="margin:0;text-align:center">الحجز مقفل حالياً. راسلنا واتساب ونرتب لك موعد.</p>'; return; }
 
-    $("#bkTitle").textContent = "احجز استشارتك مع " + C.name;
-    $("#bkSub").textContent = C.title;
-    paintWho(C);
-    $("#mOnline").textContent  = "Google Meet · " + dayRange(C.modes.online);
-    $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
-    $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك.";
-
-    if(!C.modes.present.enabled) document.querySelector('input[name="mode"][value="present"]').disabled = true;
-    if(!C.modes.online.enabled){
-      document.querySelector('input[name="mode"][value="online"]').disabled = true;
-      document.querySelector('input[name="mode"][value="present"]').checked = true; MODE = "present";
+    /* a reschedule link points at one existing booking, so it skips the
+       clinic chooser entirely and goes straight to picking a new time */
+    if(RESCHED.id && RESCHED.token){
+      C = CONSULTANTS.find(x => x.id === CONSULTANT_ID) || CONSULTANTS[0];
+      openClinic("nas", { silent:true });
+      await bootReschedule();
+      return;
     }
 
-    if(RESCHED.id && RESCHED.token){ await bootReschedule(); return; }
+    paintClinics(data.clinics || []);
+    show("#bkLoading",false); show("#cardClinic",true);
 
-    $("#pkgList").innerHTML = C.packages.map((p) => `
-      <label><input type="radio" name="pkg" value="${esc(p.id)}">
-        <div class="box">
-          <div class="t"><div class="nm">${esc(p.name)}</div><div class="tg">${esc(p.tagline||"")}</div></div>
-          <div class="pr">${p.amount} د.ك<span class="du">${p.minutes} دقيقة</span></div>
-        </div></label>`).join("");
-
-    show("#bkLoading",false); show("#cardPkg",true);
-    document.querySelectorAll('input[name="pkg"]').forEach(el =>
-      el.addEventListener("change", () => { if(el.checked) choosePackage(el.value); }));
     document.querySelectorAll('input[name="mode"]').forEach(el =>
       el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
   }catch(e){
@@ -351,9 +407,85 @@ const BIOS = {
   ghalia: { role:"مؤسِسة كاش كلينك · مستشارة مالية",
             bio:"غالية النويف، مؤسِسة كاش كلينك وصاحبة فكرة العلاج المالي. تشتغل معك على وضعك المالي كما هو، بشخصيتك وظروفك، بدون ما تطلب منك تقلب حياتك أو تقصّر على نفسك وعائلتك.",
             stats:[["+11","سنة خبرة"],["1:1","استشارة خاصة"],["60","دقيقة"]] },
-  sara:   { role:"استشارية استثمار", bio:"", stats:[] },
+  sara:   { role:"استشارية سلوكيات مالية واستثمار",
+            bio:"سارة الهندي، تشتغل على السلوكيات المالية اللي وراء أرقامك، وعلى بناء خطة استثمار واضحة تناسب أهدافك ودرجة تحملك للمخاطر.",
+            stats:[["1:1","جلسة خاصة"],["60","دقيقة"]] },
   hasan:  { role:"استشاري أعمال",   bio:"", stats:[] },
 };
+
+/* ---------------- clinic chooser ---------------- */
+function paintClinics(list){
+  $("#clinicList").innerHTML = list.map(c => `
+    <button type="button" class="cl${c.active?"":" soon"}" data-clinic="${esc(c.id)}"${c.active?"":" disabled"}>
+      ${c.active?"":'<span class="sn">قريباً</span>'}
+      <img class="lg" src="${esc(c.logo)}" alt="${esc(c.name)}">
+      <div class="nm">${esc(c.name)}</div>
+      <div class="tg">${esc(c.tagline)}</div>
+      ${c.active?'<span class="go">احجز هنا ←</span>':""}
+    </button>`).join("");
+}
+
+$("#clinicList").addEventListener("click", e => {
+  const b = e.target.closest("button[data-clinic]");
+  if(b && !b.disabled) openClinic(b.dataset.clinic);
+});
+
+/* Cash Nas is the only clinic taking bookings, so opening it paints the
+   olive theme and hands over to the package list the page already had. */
+function openClinic(id, opt){
+  CLINIC = id;
+  document.body.classList.add("nas");
+  const cl = ((OPTS && OPTS.clinics) || []).find(x => x.id === id) || { name:"كاش ناس" };
+  $("#bkBadge").textContent = "حجز استشارة · " + cl.name;
+  show("#cardClinic", false);
+  if(opt && opt.silent) return;
+
+  $("#bkTitle").textContent = "احجز استشارتك · " + cl.name;
+  $("#bkSub").textContent   = "اختر الباقة والموعد اللي يناسبك. الجلسة مع الاستشاري مباشرة، أونلاين أو حضوري.";
+  paintTeam();
+
+  const pkgs = (OPTS && OPTS.packages) || [];
+  $("#pkgList").innerHTML = pkgs.map(p => `
+    <label><input type="radio" name="pkg" value="${esc(p.id)}">
+      <div class="box">
+        <div class="t"><div class="nm">${esc(p.name)}</div><div class="tg">${esc(p.tagline||"")}</div></div>
+        <div class="pr">${p.amount} د.ك<span class="du">${p.sessions.length>1 ? p.sessions.length+" جلسات" : p.minutes+" دقيقة"}</span></div>
+      </div></label>`).join("");
+  document.querySelectorAll('input[name="pkg"]').forEach(el =>
+    el.addEventListener("change", () => { if(el.checked) choosePackage(el.value); }));
+
+  show("#cardPkg", true);
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+$("#clinicBack").addEventListener("click", () => {
+  document.body.classList.remove("nas");
+  PKG = null; PICK_ISO = ""; PICK_DATE = "";
+  ["#cardPkg","#cardCons","#cardMode","#cardSlot","#cardForm"].forEach(x => show(x,false));
+  $("#pkgDetail").classList.remove("on");
+  show("#bkWho", false);
+  $("#bkBadge").textContent = "حجز استشارة";
+  $("#bkTitle").textContent = "احجز استشارتك";
+  $("#bkSub").textContent   = "اختر العيادة اللي تناسب وضعك، وبنكمل معك خطوة خطوة.";
+  show("#cardClinic", true);
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+
+/* both Cash Nas consultants sit in the hero, since a package may use either */
+function paintTeam(){
+  const wrap = $("#bkWho");
+  wrap.innerHTML = CONSULTANTS.map(c => {
+    const b = BIOS[c.id] || {};
+    const photo = c.photo || (CLINIC_ART[c.clinic]||{}).photo || "";
+    return `<div style="display:flex;gap:14px;align-items:center;text-align:start">
+      ${photo?`<div class="bk-photo" style="width:78px;height:78px"><img src="${esc(photo)}" alt="${esc(c.name)}"></div>`:""}
+      <div class="bk-id" style="flex:0 1 250px">
+        <div class="bk-name" style="font-size:18px">${esc(c.name)}</div>
+        <div class="bk-role">${esc(b.role || c.title || "")}</div>
+      </div></div>`;
+  }).join("");
+  show("#bkWho", true);
+}
 
 function paintWho(c){
   const art = CLINIC_ART[c.clinic] || {};
@@ -373,25 +505,82 @@ function paintWho(c){
 
 /* picking a package opens its full description, then unlocks the rest of the page */
 function choosePackage(id){
-  PKG = C.packages.find(p => p.id === id);
+  PKG = ((OPTS && OPTS.packages) || []).find(p => p.id === id);
   if(!PKG) return;
+  PICK_ISO = ""; PICK_DATE = "";
+
+  const li  = (arr, cls) => `<ul${cls?` class="${cls}"`:""}>${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  const many = PKG.sessions.length > 1;
+
   const d = $("#pkgDetail");
   d.innerHTML =
     `<h3>${esc(PKG.name)}</h3>` +
     (PKG.forWho ? `<div class="who">${esc(PKG.forWho)}</div>` : "") +
     (PKG.desc ? `<p>${esc(PKG.desc)}</p>` : "") +
-    ((PKG.benefits && PKG.benefits.length)
-      ? `<h4>شنو راح تستفيد من هذي الباقة؟</h4><ul>${
-          PKG.benefits.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : "") +
-    `<div class="meta"><span>${PKG.amount} د.ك</span><span>${PKG.minutes} دقيقة</span>` +
-    `<span>أونلاين أو حضوري</span></div>`;
+    (PKG.audience.length ? `<h4>لمن هذه الباقة؟</h4>${li(PKG.audience,"dot")}` : "") +
+    (PKG.benefits.length ? `<h4>هدف الباقة</h4>${li(PKG.benefits)}` : "") +
+    (PKG.results.length  ? `<h4>النتائج المتوقعة</h4>${li(PKG.results)}`  : "") +
+    (many
+      ? `<div class="pk-sess"><h4 style="margin-top:0">الباقة عبارة عن ${PKG.sessions.length} جلسات</h4>` +
+        PKG.sessions.map(x =>
+          `<div class="s"><i>${x.index+1}.</i><span>${esc(x.label)}${
+            x.consultantName?` · ${esc(x.consultantName)}`:""} · ${x.minutes} دقيقة</span></div>`).join("") +
+        `<div class="n">تحجز الجلسة الأولى الحين، ونتفق معك على موعد الجلسة الثانية بالواتساب بعدها. السعر يشمل الجلستين.</div></div>`
+      : "") +
+    `<div class="meta"><span>${PKG.amount} د.ك${PKG.monthly?" / شهر":""}</span>` +
+    `<span>${PKG.minutes} دقيقة</span><span>أونلاين أو حضوري</span></div>`;
   d.classList.add("on");
+
+  /* a package that names its own consultant fixes the choice; الاتصال
+     السريع does not, so the customer picks */
+  if(PKG.firstConsultantId){
+    C = CONSULTANTS.find(x => x.id === PKG.firstConsultantId) || CONSULTANTS[0];
+    show("#cardCons", false);
+    applyConsultant();
+  } else {
+    paintConsultants();
+    show("#cardCons", true);
+    show("#cardMode", false); show("#cardSlot", false); show("#cardForm", false);
+  }
+  d.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+
+function paintConsultants(){
+  const keep = C && CONSULTANTS.some(x => x.id === C.id) ? C.id : "";
+  $("#consList").innerHTML = CONSULTANTS.map(c => {
+    const b = BIOS[c.id] || {};
+    const photo = c.photo || (CLINIC_ART[c.clinic]||{}).photo || "";
+    return `<label><input type="radio" name="cons" value="${esc(c.id)}"${c.id===keep?" checked":""}>
+      <div class="box">${photo?`<img src="${esc(photo)}" alt="${esc(c.name)}">`:""}
+        <div><b>${esc(c.name)}</b><span>${esc(b.role || c.title || "")}</span></div>
+      </div></label>`;
+  }).join("");
+  document.querySelectorAll('input[name="cons"]').forEach(el =>
+    el.addEventListener("change", () => {
+      if(!el.checked) return;
+      C = CONSULTANTS.find(x => x.id === el.value);
+      applyConsultant();
+    }));
+  if(keep) applyConsultant(); else { C = null; }
+}
+
+/* once we know who the session is with, their hours drive the rest */
+function applyConsultant(){
+  if(!C) return;
+  const on = document.querySelector('input[name="mode"][value="online"]');
+  const pr = document.querySelector('input[name="mode"][value="present"]');
+  $("#mOnline").textContent  = "Google Meet · " + dayRange(C.modes.online);
+  $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
+  $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك. الجلسة مع " + C.name + ".";
+  on.disabled = !C.modes.online.enabled;
+  pr.disabled = !C.modes.present.enabled;
+  if(!C.modes.online.enabled && C.modes.present.enabled){ pr.checked = true; MODE = "present"; }
+  else if(C.modes.online.enabled && !pr.checked){ on.checked = true; MODE = "online"; }
 
   show("#cardMode", true);
   show("#cardSlot", true);
   show("#cardForm", false);
   loadSlots();
-  d.scrollIntoView({ behavior:"smooth", block:"nearest" });
 }
 
 function dayRange(m){
@@ -450,11 +639,13 @@ $("#slotList").addEventListener("click", e => {
   PICK_ISO = b.dataset.iso;
   renderSlots();
   if(RESCHED.id) return showReschedConfirm();
+  const more = (PKG.sessions && PKG.sessions.length > 1)
+    ? `<br><span style="font-size:13px">الجلسة الثانية نتفق عليها بالواتساب بعد الأولى</span>` : "";
   $("#sum").innerHTML =
-    `<b>${esc(PKG.name)}</b> مع ${esc(C.name)}<br>` +
+    `<b>${esc(PKG.name)}</b>${PKG.sessions.length>1?` · ${esc(PKG.sessions[0].label)}`:""} مع ${esc(C.name)}<br>` +
     `${humanFull(PICK_ISO, PKG.minutes)}<br>` +
     `${MODE==="present" ? "حضوري · " + esc(C.location||"بالمقر") : "أونلاين · Google Meet"}<br>` +
-    `<b>${PKG.amount} د.ك</b> · ${PKG.minutes} دقيقة`;
+    `<b>${PKG.amount} د.ك</b> · ${PKG.minutes} دقيقة${more}`;
   show("#cardForm",true);
   $("#cardForm").scrollIntoView({behavior:"smooth",block:"start"});
 });
@@ -462,8 +653,9 @@ $("#slotList").addEventListener("click", e => {
 /* ---------------- pay ---------------- */
 function fail(m){ const e=$("#bErr"); e.textContent=m; e.style.display="block"; }
 
-$("#payBtn").addEventListener("click", async () => {
-  $("#bErr").style.display="none";
+/* both buttons send the same booking; only the destination differs, so the
+   form is validated in one place and can never diverge between them */
+function readForm(){
   const name=$("#bName").value.trim(), email=$("#bEmail").value.trim(), phone=$("#bPhone").value.trim();
   if(name.length<2) return fail("اكتب اسمك");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("إيميل غير صحيح");
@@ -471,27 +663,45 @@ $("#payBtn").addEventListener("click", async () => {
   if(fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#bEmail")); return fail("تأكد من إيميلك، هل تقصد "+fix+"؟"); }
   if(phone.replace(/\D/g,"").length<7) return fail("رقم واتساب غير صحيح");
   if(!PICK_ISO) return fail("اختر موعد أول");
+  if(!C || !PKG) return fail("اختر الباقة أول");
 
   const cc = $("#bCC").value;
   let local = phone.replace(/\D/g,"").replace(/^0+/,"");
   if(cc && local.indexOf(cc)===0 && local.length>cc.length) local = local.slice(cc.length);
 
-  $("#payBtn").disabled=true; $("#payBtn").textContent="جارٍ التحويل للدفع…";
+  return { consultantId:C.id, packageId:PKG.id, mode:MODE, startIso:PICK_ISO,
+           name, email, phone:"+"+cc+local, notes:$("#bNotes").value.trim(), preview: PREVIEW };
+}
+
+const PAY_LABEL = { pay:"ادفع كامل واحجز", deema:"قسّطها مع ديمة" };
+function payBusy(which, on){
+  const a=$("#payBtn"), b=$("#deemaBtn");
+  a.disabled = b.disabled = on;
+  if(on) (which==="deema"?b:a).textContent = "لحظة…";
+  else { a.textContent = PAY_LABEL.pay; b.textContent = PAY_LABEL.deema; }
+}
+
+async function submitBooking(which){
+  $("#bErr").style.display="none";
+  const payload = readForm();
+  if(!payload) return;
+  payBusy(which, true);
   try{
-    const r = await createBookingCharge({
-      consultantId:C.id, packageId:PKG.id, mode:MODE, startIso:PICK_ISO,
-      name, email, phone:"+"+cc+local, notes:$("#bNotes").value.trim(), preview: PREVIEW,
-    });
+    const call = which==="deema" ? createDeemaBooking : createBookingCharge;
+    const r = await call(payload);
     const url = r.data && r.data.url;
     if(!url) throw new Error("no url");
     location.href = url;
   }catch(e){
-    fail((e && e.message) || "تعذّر إنشاء الدفعة، حاول مرة ثانية");
+    fail((e && e.message) || "تعذّر إتمام الحجز، حاول مرة ثانية");
     /* somebody may have taken the slot while this form was open */
     loadSlots();
-    $("#payBtn").disabled=false; $("#payBtn").textContent="ادفع واحجز";
+    payBusy(which, false);
   }
-});
+}
+
+$("#payBtn").addEventListener("click",   () => submitBooking("pay"));
+$("#deemaBtn").addEventListener("click", () => submitBooking("deema"));
 
 /* ---------------- reschedule ---------------- */
 async function bootReschedule(){
@@ -502,7 +712,11 @@ async function bootReschedule(){
   try{
     const r = await getBookingByToken({ orderId:RESCHED.id, token:RESCHED.token });
     const b = r.data || {};
-    PKG = (C.packages.find(p=>p.id===b.packageId)) || { id:b.packageId, name:b.packageName, minutes:b.minutes, amount:0 };
+    PKG = ((OPTS && OPTS.packages) || []).find(p => p.id === b.packageId)
+       || (C.packages || []).find(p => p.id === b.packageId)
+       || { id:b.packageId, name:b.packageName, minutes:b.minutes, amount:0, sessions:[] };
+    /* an older booking may belong to the other consultant */
+    if(b.consultantId) C = CONSULTANTS.find(x => x.id === b.consultantId) || C;
     MODE = b.mode;
     $("#reschedSum").innerHTML = `<b>${esc(b.packageName)}</b> مع ${esc(b.consultantName)}<br>موعدك الحالي: ${humanFull(b.startIso, b.minutes)}`;
     if(!b.canReschedule){
