@@ -238,6 +238,36 @@ async function enter(){
 }
 function fail(m){ const e=$("#lvErr"); e.textContent=m; e.style.display="block"; }
 
+/* The hero used to be static text, so a visitor standing at the gate still
+   read the previous لقاء's name however many times staff renamed it. Ask the
+   server what is on right now, before anyone types anything — this call
+   carries no email, so it comes back with the title and the state and
+   nothing else. */
+function paintHero(d){
+  const t = d.title || "";
+  if(t){
+    $("#lvTitle").textContent = t;
+    document.title = t + " | Cash Clinic";
+  }
+  const badge = $("#lvBadge"), btxt = $("#lvBadgeTxt");
+  const st = d.state || "soon";
+  if(st==="live"){ badge.className="lv-badge on"; btxt.textContent="مباشر الآن"; }
+  else if(st==="ended"){ badge.className="lv-badge"; btxt.textContent="انتهى اللقاء"; }
+  else { badge.className="lv-badge"; btxt.textContent="يبدأ قريباً"; }
+}
+
+(async function(){
+  try{
+    const r = await livePoll({});
+    const d = r.data || {};
+    if(d.eventId) EVENT_ID = d.eventId;
+    CFG.state   = d.state   || CFG.state;
+    CFG.startAt = Number(d.startAt || 0) || CFG.startAt;
+    CFG.title   = d.title   || CFG.title;
+    paintHero(d);
+  }catch(e){ /* the gate still works, it just keeps the default wording */ }
+})();
+
 /* remembered from a previous visit: go straight in */
 (function(){
   let saved="", last="";
