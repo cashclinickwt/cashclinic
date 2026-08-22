@@ -573,7 +573,7 @@
     <div class="flt" id="bkWho"></div>
 
     <div class="addbox" id="nasBox" hidden>
-      <h3>📅 احجز لعميل · كاش ناس</h3>
+      <h3>📅 احجز لعميل <span id="nbClinic">· كاش ناس</span></h3>
       <p>جلسة وحدة بكل حجز. احجز الجلسة الأولى الحين، وجلسة الثانية بعدين لما تتفقون على موعدها. لو العميل دفع بالواتساب اختر «مدفوع مسبقاً» ويتأكد حجزه على طول.</p>
       <div class="addgrid">
         <div class="addf"><label>الباقة</label><select id="nbPkg"></select></div>
@@ -582,6 +582,7 @@
           <select id="nbConsultant">
             <option value="ghalia">غالية النويف</option>
             <option value="sara">سارة الهندي</option>
+            <option value="hasan">حسن أكبر</option>
           </select></div>
         <div class="addf"><label>التاريخ</label><input id="nbDate" type="date"></div>
         <div class="addf"><label>الوقت</label><select id="nbTime" class="timesel" data-step="15"></select></div>
@@ -1093,8 +1094,25 @@ function nbMsg(m,kind){
   e.textContent=m; e.className="addmsg "+(kind||"ok");
   if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },10000);
 }
-function nbPkgs(){ return DATA.nasPackages||[]; }
-function nbCurrent(){ return nbPkgs().find(p=>p.key===($("#nbPkg")||{}).value); }
+/* every package the dashboard can sell, both clinics */
+function nbAll(){ return (DATA.nasPackages||[]).concat(DATA.riyadaPackages||[]); }
+
+/* which clinic a consultant belongs to — حسن runs Cash Riyada, the rest
+   run Cash Nas */
+function nbClinicOf(id){ return id==="hasan" ? "riyada" : "nas"; }
+
+/* The box follows whoever is picked at the top of the tab: حسن sells the
+   Riyada packages, غالية and سارة sell the Cash Nas ones. A package from
+   the other clinic still shows if that consultant is actually in one of
+   its sessions — غالية sits in the Riyada التشخيص جلسة, so she keeps it. */
+function nbPkgs(){
+  const who = BKWHO || "ghalia";
+  const home = nbClinicOf(who);
+  return nbAll().filter(p =>
+    p.clinic === home ||
+    (p.sessions||[]).some(x => x.consultantId===who || (x.with||[]).indexOf(who)!==-1));
+}
+function nbCurrent(){ return nbAll().find(p=>p.key===($("#nbPkg")||{}).value); }
 function nbPayMode(){ const el=document.querySelector('input[name="nbPay"]:checked'); return el?el.value:"link"; }
 
 function renderNasBooking(){
@@ -1102,9 +1120,22 @@ function renderNasBooking(){
   const pkgs=nbPkgs();
   if(!pkgs.length){ box.hidden=true; return; }
   box.hidden=false;
+  const cl=$("#nbClinic");
+  if(cl) cl.textContent = nbClinicOf(BKWHO||"ghalia")==="riyada" ? "· كاش ريادة" : "· كاش ناس";
   const sel=$("#nbPkg");
-  if(sel && sel.options.length!==pkgs.length){
-    sel.innerHTML=pkgs.map(p=>`<option value="${esc(p.key)}">${esc(p.name)} · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}</option>`).join("");
+  if(!sel) return;
+  /* switching consultant swaps the whole list, and the count alone can
+     match across clinics — compare the keys instead */
+  const want = pkgs.map(p=>p.key).join("|");
+  if(sel.dataset.keys !== want){
+    sel.dataset.keys = want;
+    const home=nbClinicOf(BKWHO||"ghalia");
+    sel.innerHTML=pkgs.map(p=>{
+      /* غالية sits in the Riyada joint sessions, so those show on her list
+         too — tagged, so it is never a surprise which clinic she is selling */
+      const tag = p.clinic!==home ? (p.clinic==="riyada" ? " · كاش ريادة" : " · كاش ناس") : "";
+      return `<option value="${esc(p.key)}">${esc(p.name)} · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}${tag}</option>`;
+    }).join("");
     nbSyncPkg();
   }
 }
@@ -1115,7 +1146,10 @@ function nbSyncPkg(){
   const ss=p.sessions||[];
   const sel=$("#nbSession");
   sel.innerHTML = ss.length
-    ? ss.map((x,i)=>`<option value="${i}">الجلسة ${i+1} · ${esc(x.label)}</option>`).join("")
+    ? ss.map((x,i)=>{
+        const who=[x.consultantName].concat(x.withNames||[]).filter(Boolean).join(" + ");
+        return `<option value="${i}">الجلسة ${i+1} · ${esc(x.label)}${who?" · "+esc(who):""}</option>`;
+      }).join("")
     : `<option value="0">بدون جلسة مجدولة</option>`;
   sel.disabled = !ss.length;
   nbSyncSession();
@@ -1572,7 +1606,9 @@ function renderBookings(){
   if(!cons.length){ sec.hidden=true; return; }
   sec.hidden=false;
 
+  const wasWho=BKWHO;
   if(!BKWHO || !cons.some(c=>c.id===BKWHO)) BKWHO=cons[0].id;
+  if(BKWHO!==wasWho) setTimeout(renderNasBooking,0);
   $("#bkWho").innerHTML = cons.length>1
     ? cons.map(c=>`<button data-who="${esc(c.id)}"${c.id===BKWHO?' class="on"':''}>${esc(c.name)}</button>`).join("")
     : "";
@@ -1665,7 +1701,7 @@ function paintSchedule(){
 function pickedDays(host){ return Array.from(document.querySelectorAll(host+" .bkday.on")).map(b=>Number(b.dataset.d)); }
 
 $("#bkWho") && $("#bkWho").addEventListener("click",e=>{ const b=e.target.closest("button[data-who]"); if(!b)return;
-  BKWHO=b.dataset.who; renderBookings(); });
+  BKWHO=b.dataset.who; renderBookings(); renderNasBooking(); });
 $("#onDays") && $("#onDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
 $("#prDays") && $("#prDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
 
@@ -1799,7 +1835,7 @@ function bkNeedsSecond(b){
      much as a staff-arranged one, and both carry a NAS package id, so the
      package lookup below is the real test — not who typed it in */
   if(b.status==="cancelled") return false;
-  const pkg=(DATA.nasPackages||[]).find(p=>p.key===b.packageId);
+  const pkg=nbAll().find(p=>p.key===b.packageId);
   if(!pkg || (pkg.sessions||[]).length<2) return false;
   if(Number(b.sessionIndex||0)!==0) return false;
   /* already booked? match on the client, since it is a separate order */
@@ -1811,7 +1847,7 @@ function bkNeedsSecond(b){
 
 /* prefill the booking box with the second session for this client */
 function bkAddSecond(b){
-  const pkg=(DATA.nasPackages||[]).find(p=>p.key===b.packageId); if(!pkg) return;
+  const pkg=nbAll().find(p=>p.key===b.packageId); if(!pkg) return;
   showPanel("bookings");
   $("#nbPkg").value=b.packageId; nbSyncPkg();
   $("#nbSession").value="1";     nbSyncSession();
