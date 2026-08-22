@@ -776,11 +776,14 @@ const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"
 const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
 
 const $=s=>document.querySelector(s);
-const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة"};
+const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة",sales:"فريق المبيعات"};
 let DATA=null, SFILTER="all", QFILTER="all", BFILTER="all";
 
 const fmt=n=>Number(n||0).toLocaleString("en-US");
 const money=n=>fmt(n)+" د.ك";
+/* the server blanks amounts for roles that may not see them; the page stops
+   drawing the KPIs and columns so nothing reads as a real zero */
+const seesMoney = () => DATA && DATA.seesMoney !== false;
 const dt=ms=>{ if(!ms) return "—"; const d=new Date(ms);
   return d.toLocaleDateString("en-GB")+" · "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); };
 const bandColor=b=>{ if(/ممتاز|جيد/.test(b))return"#2F8789"; if(/متوسط/.test(b))return"#D3A146"; return"#962E37"; };
@@ -878,8 +881,17 @@ function render(){
 const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
+/* Tabs a role is allowed anywhere near. The server already refuses the data
+   and the actions; this only stops empty tabs appearing. Sales work people —
+   the client list, the diary, the لقاء, the newsletter and the courses —
+   and never see المبيعات، الاختبارات، التوظيف، البث، أسئلة الكتاب or التقارير. */
+const ROLE_PANELS = {
+  sales: ["clients","bookings","events","subscribers","courses","composer"],
+};
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
+  const allow = ROLE_PANELS[(DATA&&DATA.role)||""];
+  if(allow && allow.indexOf(k)===-1) return false;
   if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq"||k==="clients") return !el.hidden;
   return true;
 }
@@ -936,16 +948,16 @@ function renderCourses(){
   const seatsLeft = prog && prog.seatsOnsite!=null ? Math.max(0, prog.seatsOnsite - (prog.onsite||0)) : null;
   $("#courseKpis").innerHTML=`
     <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي التسجيلات</div></div>
-    <div class="kpi"><div class="n">${money(t.revenue||0)}</div><div class="l">إجمالي الإيرادات</div></div>
+    ${seesMoney()?`<div class="kpi"><div class="n">${money(t.revenue||0)}</div><div class="l">إجمالي الإيرادات</div></div>`:""}
     <div class="kpi"><div class="n">${fmt(t.onsite||0)}</div><div class="l">حضوري${seatsLeft!=null?` · باقي ${fmt(seatsLeft)} مقعد`:""}</div></div>
     <div class="kpi"><div class="n">${fmt(t.online||0)}</div><div class="l">أونلاين</div></div>`;
   $("#courseTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th><th>الدورة</th><th>الحضور</th><th>المبلغ</th><th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
+      <th>التاريخ</th><th>الاسم</th><th>الدورة</th><th>الحضور</th>${seesMoney()?"<th>المبلغ</th>":""}<th>الجوال</th><th>البريد</th></tr></thead><tbody>`+
     C.regs.map(r=>`<tr>
       <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
       <td>${esc(r.program)}</td>
       <td><span class="badge" style="background:${r.mode==="onsite"?"#505632":"#2F8789"}">${r.mode==="onsite"?"حضوري":"أونلاين"}</span></td>
-      <td class="num">${money(r.amount)}</td>
+      ${seesMoney()?`<td class="num">${money(r.amount)}</td>`:""}
       <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
@@ -1295,15 +1307,15 @@ function clMatches(c){
 function renderClients(){
   const sec=$("#clientsSec"); if(!sec) return;
   const all=DATA.clients||[];
-  if(!all.length && DATA.role!=="all"){ sec.hidden=true; return; }
+  if(!all.length && DATA.role!=="all" && DATA.role!=="sales"){ sec.hidden=true; return; }
   sec.hidden=false;
 
   const paid=all.filter(c=>c.spent>0);
   const revenue=all.reduce((a,c)=>a+Number(c.spent||0),0);
   $("#clKpis").innerHTML=
     `<div class="kpi"><div class="n">${fmt(all.length)}</div><div class="l">عميل</div></div>`+
-    `<div class="kpi"><div class="n">${fmt(paid.length)}</div><div class="l">دفعوا لنا</div></div>`+
-    `<div class="kpi"><div class="n">${money(revenue)}</div><div class="l">إجمالي ما صرفوه</div></div>`+
+    (seesMoney()?`<div class="kpi"><div class="n">${fmt(paid.length)}</div><div class="l">دفعوا لنا</div></div>`:"")+
+    (seesMoney()?`<div class="kpi"><div class="n">${money(revenue)}</div><div class="l">إجمالي ما صرفوه</div></div>`:"")+
     `<div class="kpi"><div class="n">${fmt(all.filter(c=>(c.counts&&c.counts.booking)||0).length)}</div><div class="l">حجزوا استشارة</div></div>`;
 
   const rows=all.filter(clMatches);
@@ -1321,7 +1333,7 @@ function renderClients(){
         <b>${esc(c.name)||"(بدون اسم)"}</b>
         <span class="num">${esc((c.emails||[])[0]||"")}</span>
         <span class="num">${esc((c.phones||[])[0]||"")}</span>
-        ${c.spent>0?`<span class="clspent">${money(c.spent)}</span>`:""}
+        ${seesMoney()&&c.spent>0?`<span class="clspent">${money(c.spent)}</span>`:""}
       </div>
       <div class="clchips">${chips}<span class="clchip" style="background:#EDEAF2;color:var(--muted)">آخر نشاط ${dt(c.lastSeen)}</span></div>
     </div>`;
@@ -1354,7 +1366,7 @@ function openClient(c){
         ${(c.phones||[]).length?"<br>"+(c.phones||[]).map(x=>esc(x)).join(" · "):""}
       </div>
       <div class="clstats">
-        ${c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
+        ${seesMoney()&&c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
         ${stat("book","كتاب")}${stat("booking","استشارة")}${stat("quiz","اختبار")}
         ${stat("course","دورة")}${stat("event","لقاء")}${stat("question","سؤال")}
         ${stat("rating","تقييم")}${stat("newsletter","نشرة")}${stat("report","تقرير")}
@@ -1374,7 +1386,7 @@ function openClient(c){
           return `<div class="cltli" style="--dot:${ty.color}">
             <div class="t">${esc(ty.label)} · ${esc(t.title)}</div>
             ${t.detail?`<div class="d">${esc(t.detail)}</div>`:""}
-            <div class="w">${dt(t.when)}${t.amount?` · <span class="a">${money(t.amount)}</span>`:""}</div>
+            <div class="w">${dt(t.when)}${seesMoney()&&t.amount?` · <span class="a">${money(t.amount)}</span>`:""}</div>
           </div>`;
         }).join("")}
       </div>
@@ -1636,7 +1648,7 @@ function renderBookings(){
     `<div class="kpi"><div class="n">${fmt(t.upcoming||0)}</div><div class="l">مواعيد قادمة</div></div>`+
     `<div class="kpi"><div class="n">${fmt(t.past||0)}</div><div class="l">مواعيد سابقة</div></div>`+
     `<div class="kpi"><div class="n">${fmt(t.cancelled||0)}</div><div class="l">ملغية</div></div>`+
-    `<div class="kpi"><div class="n">${fmt(t.revenue||0)} <span style="font-size:14px">د.ك</span></div><div class="l">إيراد الاستشارات</div></div>`;
+    (seesMoney()?`<div class="kpi"><div class="n">${fmt(t.revenue||0)} <span style="font-size:14px">د.ك</span></div><div class="l">إيراد الاستشارات</div></div>`:"");
 
   /* the same accents used on each consultant's public profile page */
   const CONSULTANT_THEME = {
@@ -1827,7 +1839,7 @@ function renderBkList(){
         ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
         <span class="num">${esc(b.email)}</span>
         ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(b.phone)}</a>`:""}
-        <span>· ${fmt(b.amount)} د.ك</span>
+        ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}
       </div>
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${b.status!=="cancelled"?`<div class="bkacts">
@@ -2112,7 +2124,7 @@ function renderBkCalDay(){
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
         ${(b.withNames&&b.withNames.length)?`<span class="bkpill" style="background:#962E37">مع ${esc(b.withNames.join(" + "))}</span>`:""}
         <span class="num">${esc(b.email)}</span>
-        <span>· ${fmt(b.amount)} د.ك</span>
+        ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}
       </div>
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${!gone?`<div class="bkacts">
