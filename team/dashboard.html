@@ -606,9 +606,9 @@
         <div class="addf"><label>اسم العميل</label><input id="nbName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل</label><input id="nbEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
         <div class="addf"><label>الجوال</label><input id="nbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
-        <div class="addf"><label>المبلغ</label><input id="nbAmount" type="number" min="0" step="1"></div>
+        <div class="addf" id="nbAmountWrap"><label>المبلغ</label><input id="nbAmount" type="number" min="0" step="1"></div>
       </div>
-      <div class="addrow" style="margin-top:4px">
+      <div class="addrow" style="margin-top:4px" id="nbPayWrap">
         <label><input type="radio" name="nbPay" value="link" checked> أرسل له رابط دفع</label>
         <label><input type="radio" name="nbPay" value="cash"> مدفوع مسبقاً</label>
         <label><input type="radio" name="nbPay" value="deema"> دفع بـ ديمة</label>
@@ -629,6 +629,7 @@
       </div>
     </div>
 
+    <div id="bkSchedWrap">
     <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل <span class="whoname" id="bkWhoName"></span></h2>
     <div class="bkgrid">
       <div class="bkbox">
@@ -670,6 +671,7 @@
       </div>
     </div>
     <button class="bksave" id="bkSave">احفظ الجدول</button>
+    </div>
 
     <h2 style="font-size:17px;margin-top:26px"><span></span> التقويم <span class="whoname" id="bkCalWho"></span></h2>
     <div class="bkcal" id="bkCal" hidden>
@@ -784,6 +786,9 @@ const money=n=>fmt(n)+" د.ك";
 /* the server blanks amounts for roles that may not see them; the page stops
    drawing the KPIs and columns so nothing reads as a real zero */
 const seesMoney = () => DATA && DATA.seesMoney !== false;
+/* editing or cancelling somebody else's session is not a sales job — the
+   server refuses it either way, this only stops the button appearing */
+const mayEdit = () => !DATA || DATA.role !== "sales";
 const dt=ms=>{ if(!ms) return "—"; const d=new Date(ms);
   return d.toLocaleDateString("en-GB")+" · "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); };
 const bandColor=b=>{ if(/ممتاز|جيد/.test(b))return"#2F8789"; if(/متوسط/.test(b))return"#D3A146"; return"#962E37"; };
@@ -1150,6 +1155,17 @@ function renderNasBooking(){
   box.hidden=false;
   const cl=$("#nbClinic");
   if(cl) cl.textContent = nbClinicOf(BKWHO||"ghalia")==="riyada" ? "· كاش ريادة" : "· كاش ناس";
+
+  /* Sales put appointments in the diary; they do not price them and they do
+     not decide anything is paid. The server applies the package price and
+     always issues a payment link, so these controls would only be misleading. */
+  const money = seesMoney();
+  const aw=$("#nbAmountWrap"); if(aw) aw.hidden = !money;
+  const pw=$("#nbPayWrap");    if(pw) pw.hidden = !money;
+  if(!money){
+    const link=document.querySelector('input[name="nbPay"][value="link"]');
+    if(link) link.checked = true;
+  }
   const sel=$("#nbPkg");
   if(!sel) return;
   /* switching consultant swaps the whole list, and the count alone can
@@ -1162,7 +1178,8 @@ function renderNasBooking(){
       /* غالية sits in the Riyada joint sessions, so those show on her list
          too — tagged, so it is never a surprise which clinic she is selling */
       const tag = p.clinic!==home ? (p.clinic==="riyada" ? " · كاش ريادة" : " · كاش ناس") : "";
-      return `<option value="${esc(p.key)}">${esc(p.name)} · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}${tag}</option>`;
+      const price = seesMoney() ? ` · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}` : "";
+      return `<option value="${esc(p.key)}">${esc(p.name)}${price}${tag}</option>`;
     }).join("");
     nbSyncPkg();
   }
@@ -1205,6 +1222,10 @@ function nbHint(){
   const i=Number($("#nbSession").value||0);
   const m=nbPayMode();
   const el=$("#nbHint"); if(!el) return;
+  if(!seesMoney()){
+    el.textContent = "بيطلع لك رابط دفع ترسله للعميل، والموعد محجوز له لين يدفع.";
+    return;
+  }
   el.textContent =
     m==="link"  ? "بيطلع لك رابط ترسله للعميل، والموعد محجوز له لين يدفع." :
     m==="deema" ? "العميل دفع عن طريق ديمة ويقسّطها معهم على أربع دفعات .. من ناحيتنا الحجز مدفوع ويتأكد على طول."
@@ -1235,7 +1256,7 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
   const method = nbPayMode();
   const paid = method !== "link";
   const how = method==="deema" ? "بـ ديمة" : "مسبقاً";
-  if(paid && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
+  if(paid && seesMoney() && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
 
   const btn=$("#nbCreate"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ التجهيز…";
   try{
@@ -1704,6 +1725,15 @@ $("#bkLaunch") && $("#bkLaunch").addEventListener("click", async e=>{
   }catch(err){ bkMsg((err&&err.message)||"تعذّر التغيير",false); b.disabled=false; b.textContent=t; }
 });
 
+/* Sales may fill the diary but not reshape it, so the whole schedule editor
+   goes rather than sitting there with a احفظ الجدول button the server would
+   refuse. The calendar below it stays: seeing the week is the point. */
+function syncSchedulePerms(){
+  const w=$("#bkSchedWrap"); if(!w) return;
+  const may = DATA && DATA.role !== "sales";
+  w.hidden = !may;
+}
+
 function paintSchedule(){
   const sc=BKSCHED; if(!sc) return;
   const dayBtns=(host,sel)=>{ $(host).innerHTML=BK_DAYS.map((d,i)=>
@@ -1724,6 +1754,7 @@ function paintSchedule(){
   $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
     `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${x.mode==="present"?"حضوري":"أونلاين"}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
   renderBkCal();
+  syncSchedulePerms();
 }
 
 function pickedDays(host){ return Array.from(document.querySelectorAll(host+" .bkday.on")).map(b=>Number(b.dataset.d)); }
@@ -1844,9 +1875,9 @@ function renderBkList(){
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
-        <button data-edit="${esc(b.id)}">تعديل</button>
-        ${bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
-        <button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>
+        ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
+        ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
+        ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:""}
     </div>`;
   }).join("");
@@ -2129,9 +2160,9 @@ function renderBkCalDay(){
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${!gone?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
-        <button data-edit="${esc(b.id)}">تعديل</button>
-        ${bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
-        <button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>
+        ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
+        ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
+        ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:""}
     </div>`;
   }).join("") : "";
