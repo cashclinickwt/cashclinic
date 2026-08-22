@@ -63,6 +63,8 @@
   .lv-meet p{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:14px auto 0;max-width:40ch}
   .lv-who{font-size:14px;color:var(--cc-grey-700);margin:14px 0 0;text-align:center}
   .lv-who b{color:var(--cc-purple)}
+  .lv-vip{display:inline-block;background:var(--cc-gold);color:var(--cc-purple);font-size:12px;
+          font-weight:700;border-radius:999px;padding:3px 11px;margin-inline-start:8px}
   .lv-out{background:none;border:0;font-family:inherit;font-size:13.5px;color:var(--cc-grey-700);
           text-decoration:underline;cursor:pointer;padding:2px 6px;margin-inline-start:4px}
   .lv-out:hover{color:var(--cc-burgundy,#962E37)}
@@ -140,7 +142,7 @@
           <a class="go" id="lvMeetGo" href="#" target="_blank" rel="noopener">ادخل اللقاء الآن</a>
           <p>البث يفتح بتطبيق Google Meet بنافذة جديدة. خلّ هذي الصفحة مفتوحة عشان ترسل أسئلتك وتشوف الأجوبة.</p>
         </div>
-        <p class="lv-who">أهلاً <b id="lvName">بك</b> · دخولك مسجّل<button class="lv-out" type="button" id="lvOut">سجّل خروج</button></p>
+        <p class="lv-who">أهلاً <b id="lvName">بك</b> · دخولك مسجّل<span id="lvWhoTag" class="lv-vip" style="display:none"></span><button class="lv-out" type="button" id="lvOut">سجّل خروج</button></p>
       </div>
 
       <!-- Q&A -->
@@ -182,13 +184,19 @@ const getLiveAccess   = httpsCallable(fns,"getLiveAccess");
 const livePoll        = httpsCallable(fns,"livePoll");
 const askLiveQuestion = httpsCallable(fns,"askLiveQuestion");
 
-const EVENT_ID = "liqa";
-const KEY      = "cc_live_email_" + EVENT_ID;
+/* The event is whichever one the dashboard has selected, so switching from
+   one لقاء to the next needs no upload here. The saved email is keyed on the
+   event too, so last month's attendee is not walked into this month's room. */
+let EVENT_ID = "";
+const KEY_BASE = "cc_live_email_";
+const KEY_LAST = "cc_live_last_event";
+function keyFor(id){ return KEY_BASE + (id || "any"); }
 const $ = s => document.querySelector(s);
 const esc = t => String(t||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-let ME    = { email:"", name:"" };
-let CFG   = { mode:"youtube", videoId:"", meetUrl:"", state:"soon", startAt:0, title:"" };
+let ME    = { email:"", name:"", vip:false, enteredAt:0 };
+let CFG   = { mode:"youtube", videoId:"", meetUrl:"", state:"soon", startAt:0, title:"",
+              audience:"all", qaOpen:true };
 let MINE  = [];               // my own pending questions, shown locally until approved
 let mounted = "";             // what the player is currently showing
 let timer = null, poller = null;
@@ -207,10 +215,16 @@ async function enter(){
 
   $("#lvGo").disabled=true; $("#lvGo").textContent="لحظة…";
   try{
-    const r = await getLiveAccess({ eventId:EVENT_ID, email });
+    const r = await getLiveAccess({ email });
     const d = r.data || {};
-    ME = { email, name: d.name || "" };
-    try{ localStorage.setItem(KEY, email); }catch(e){}
+    EVENT_ID = d.eventId || EVENT_ID;
+    ME = { email, name: d.name || "", vip: !!d.vip, enteredAt: Number(d.enteredAt) || Date.now() };
+    try{
+      localStorage.setItem(keyFor(EVENT_ID), email);
+      localStorage.setItem(KEY_LAST, EVENT_ID);
+    }catch(e){}
+    CFG.audience = d.audience || "all";
+    CFG.qaOpen   = d.qaOpen !== false;
     applyConfig(d);
     $("#lvName").textContent = ME.name || "بك";
     $("#lvGate").style.display="none";
@@ -226,15 +240,23 @@ function fail(m){ const e=$("#lvErr"); e.textContent=m; e.style.display="block";
 
 /* remembered from a previous visit: go straight in */
 (function(){
-  let saved=""; try{ saved = localStorage.getItem(KEY) || ""; }catch(e){}
+  let saved="", last="";
+  try{
+    last  = localStorage.getItem(KEY_LAST) || "";
+    saved = localStorage.getItem(keyFor(last)) || "";
+  }catch(e){}
   if(saved){ $("#lvEmail").value = saved; enter(); }
 })();
 
 /* Signing out has to actually forget the email, otherwise the next reload
    walks straight back in. It also stops the pollers, so a signed-out page
    is not still asking the server about a stream it can no longer show. */
-$("#lvOut").addEventListener("click", () => {
-  try{ localStorage.removeItem(KEY); }catch(e){}
+$("#lvOut").addEventListener("click", () => { signOut(); });
+
+/* Shared by the sign-out button and by being pushed out of the room, so the
+   two can never drift into leaving the page half torn down. */
+function signOut(note){
+  try{ localStorage.removeItem(keyFor(EVENT_ID)); }catch(e){}
   if(timer)  clearInterval(timer);
   if(poller) clearInterval(poller);
   timer = poller = null;
@@ -244,11 +266,11 @@ $("#lvOut").addEventListener("click", () => {
   const fr = $("#lvFrame"); if(fr){ const f = fr.querySelector("iframe"); if(f) f.remove(); }
   $("#lvStage").style.display = "none";
   $("#lvGate").style.display  = "block";
-  $("#lvEmail").value = "";
-  $("#lvErr").style.display = "none";
+  /* the email stays in the box on a kick: a VIP only has to press ادخل again */
+  if(note){ fail(note); } else { $("#lvEmail").value = ""; $("#lvErr").style.display = "none"; }
   window.scrollTo({ top:0, behavior:"smooth" });
   $("#lvEmail").focus();
-});
+}
 
 /* ---------------- state ---------------- */
 function applyConfig(d){
@@ -297,8 +319,21 @@ function paint(){
 
   /* Q&A availability */
   const ended = CFG.state==="ended";
-  $("#lvQaBox").style.display  = ended ? "none" : "flex";
-  $("#lvQaLock").style.display = ended ? "block" : "none";
+  /* asking is shut off either by the event ending or by staff closing the
+     Q&A for a stretch — reading what is already approved stays open */
+  const asking = !ended && CFG.qaOpen !== false;
+  $("#lvQaBox").style.display  = asking ? "flex" : "none";
+  $("#lvQaLock").style.display = asking ? "none" : "block";
+  $("#lvQaLock").textContent   = ended
+    ? "انتهى اللقاء والأسئلة مقفلة. تقدر تقرأ الأسئلة والأجوبة تحت."
+    : "الأسئلة مقفلة حالياً. تقدر تقرأ الأسئلة والأجوبة تحت، وبنفتحها بعدين.";
+  /* a book buyer in the private hour should know why the room got quieter */
+  const who = $("#lvWhoTag");
+  if(who){
+    const vipHour = CFG.audience === "vip";
+    who.style.display = vipHour ? "inline-block" : "none";
+    who.textContent   = "ساعة خاصة · عملاء الكتيّب";
+  }
   $("#lvQaHint").style.display = ended ? "none" : "block";
 
   tick();
@@ -331,8 +366,23 @@ function startLoops(){
 
 async function poll(){
   try{
-    const r = await livePoll({ eventId: EVENT_ID });
+    const r = await livePoll({ eventId: EVENT_ID, email: ME.email, enteredAt: ME.enteredAt });
     const d = r.data || {};
+
+    /* the room was emptied, or handed over to the book buyers while this
+       page sat open — either way this browser must go back to the gate
+       rather than keep playing a stream it is no longer entitled to */
+    if(d.kicked || d.denied){
+      const vipOnly = (d.audience === "vip");
+      signOut(d.denied && vipOnly
+        ? "الساعة الثانية خاصة بعملاء كتيّب أهدافي المالية. لو عندك الكتيّب دخّل إيميلك مرة ثانية."
+        : "انتهت هذي الجولة. دخّل إيميلك مرة ثانية للاستمرار.");
+      return;
+    }
+
+    CFG.audience = d.audience || CFG.audience;
+    CFG.qaOpen   = d.qaOpen !== false;
+    ME.vip       = !!d.vip;
     const stateChanged = d.state !== CFG.state;
     CFG.state   = d.state   || CFG.state;
     CFG.mode    = d.mode    || CFG.mode;
@@ -340,6 +390,13 @@ async function poll(){
     CFG.title   = d.title   || CFG.title;
 
     /* the stream id is gated, so re-ask for it the moment one exists */
+    /* the VIP hour runs on its own stream, so a changed id has to replace
+       the player, not sit behind the one already mounted */
+    const incoming = CFG.mode==="meet" ? (d.meetUrl||"") : (d.videoId||"");
+    const current  = CFG.mode==="meet" ? CFG.meetUrl : CFG.videoId;
+    if(incoming && incoming !== current){
+      if(CFG.mode==="meet") CFG.meetUrl = incoming; else CFG.videoId = incoming;
+    }
     const needStream = (CFG.state!=="soon") &&
                        (CFG.mode==="meet" ? !CFG.meetUrl : !CFG.videoId);
     if(d.hasStream && (needStream || stateChanged)) await refreshAccess();
@@ -356,6 +413,7 @@ async function refreshAccess(){
     CFG.videoId = d.videoId || CFG.videoId;
     CFG.meetUrl = d.meetUrl || CFG.meetUrl;
     CFG.mode    = d.mode    || CFG.mode;
+    ME.vip      = !!d.vip;
   }catch(e){}
 }
 

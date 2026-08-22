@@ -244,6 +244,7 @@ const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDom
 
 const app = initializeApp(CONFIG.firebase);
 const submitEventRating = httpsCallable(getFunctions(app, CONFIG.functionsRegion), "submitEventRating");
+const EVENT_ID = new URLSearchParams(location.search).get("e") || "";
 
 const $  = s => document.querySelector(s);
 const pick = n => { const el=document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; };
@@ -290,7 +291,10 @@ $("#rtBtn").addEventListener("click", async () => {
   $("#rtBtn").disabled = true; $("#rtBtn").textContent = "جارٍ الإرسال…";
   try{
     const r = await submitEventRating({
-      eventId:"liqa", name, email, phone:"+"+cc+local,
+      /* which لقاء this rates: ?e=... when the link says so, otherwise the
+         one the dashboard currently has selected. Hard-coding it meant every
+         rating for every event piled onto the first one forever. */
+      eventId: EVENT_ID, name, email, phone:"+"+cc+local,
       attended: att === "نعم",
       absenceReason: $("#rAbsence").value.trim(),
       rating: pick("rate"), ratingReason: $("#rRateWhy").value.trim(),
