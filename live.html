@@ -63,6 +63,9 @@
   .lv-meet p{font-size:14px;color:var(--cc-grey-700);line-height:1.8;margin:14px auto 0;max-width:40ch}
   .lv-who{font-size:14px;color:var(--cc-grey-700);margin:14px 0 0;text-align:center}
   .lv-who b{color:var(--cc-purple)}
+  .lv-out{background:none;border:0;font-family:inherit;font-size:13.5px;color:var(--cc-grey-700);
+          text-decoration:underline;cursor:pointer;padding:2px 6px;margin-inline-start:4px}
+  .lv-out:hover{color:var(--cc-burgundy,#962E37)}
 
   /* ---------- Q&A ---------- */
   .qa-box{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
@@ -137,7 +140,7 @@
           <a class="go" id="lvMeetGo" href="#" target="_blank" rel="noopener">ادخل اللقاء الآن</a>
           <p>البث يفتح بتطبيق Google Meet بنافذة جديدة. خلّ هذي الصفحة مفتوحة عشان ترسل أسئلتك وتشوف الأجوبة.</p>
         </div>
-        <p class="lv-who">أهلاً <b id="lvName">بك</b> · دخولك مسجّل</p>
+        <p class="lv-who">أهلاً <b id="lvName">بك</b> · دخولك مسجّل<button class="lv-out" type="button" id="lvOut">سجّل خروج</button></p>
       </div>
 
       <!-- Q&A -->
@@ -226,6 +229,26 @@ function fail(m){ const e=$("#lvErr"); e.textContent=m; e.style.display="block";
   let saved=""; try{ saved = localStorage.getItem(KEY) || ""; }catch(e){}
   if(saved){ $("#lvEmail").value = saved; enter(); }
 })();
+
+/* Signing out has to actually forget the email, otherwise the next reload
+   walks straight back in. It also stops the pollers, so a signed-out page
+   is not still asking the server about a stream it can no longer show. */
+$("#lvOut").addEventListener("click", () => {
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  if(timer)  clearInterval(timer);
+  if(poller) clearInterval(poller);
+  timer = poller = null;
+  ME = { email:"", name:"" };
+  MINE = [];
+  mounted = "";
+  const fr = $("#lvFrame"); if(fr){ const f = fr.querySelector("iframe"); if(f) f.remove(); }
+  $("#lvStage").style.display = "none";
+  $("#lvGate").style.display  = "block";
+  $("#lvEmail").value = "";
+  $("#lvErr").style.display = "none";
+  window.scrollTo({ top:0, behavior:"smooth" });
+  $("#lvEmail").focus();
+});
 
 /* ---------------- state ---------------- */
 function applyConfig(d){

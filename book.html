@@ -22,6 +22,8 @@
          --clinic-soft:var(--cc-purple-050); --clinic-line:var(--cc-purple-100); }
   body.nas{ --clinic:#505632; --clinic-dark:#3A3E24;
             --clinic-soft:#F2F3E8; --clinic-line:#CFD1AB; }
+  body.riyada{ --clinic:#2F8789; --clinic-dark:#1F5C5E;
+               --clinic-soft:#EAF4F4; --clinic-line:#B9DBDB; }
   body{background:var(--clinic-soft)}
   .bk-hero{background:linear-gradient(150deg,var(--clinic-dark),var(--clinic) 62%);color:var(--cc-cream);padding:46px 0 40px;position:relative;overflow:hidden}
   .bk-hero .cc-wrap{position:relative;z-index:1;text-align:center}
@@ -127,11 +129,15 @@
   .cl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
   .cl{position:relative;display:block;width:100%;text-align:start;border:2px solid var(--cc-grey-200);
       background:var(--cc-white);border-radius:18px;padding:20px 20px 18px;font-family:inherit;cursor:pointer;transition:.15s}
-  .cl:hover{border-color:#505632;transform:translateY(-2px);box-shadow:0 12px 28px rgba(80,86,50,.14)}
+  .cl:hover{border-color:var(--cc-purple);transform:translateY(-2px);box-shadow:0 12px 28px rgba(47,23,73,.14)}
   .cl .lg{width:52px;height:52px;border-radius:14px;object-fit:contain;background:var(--cc-grey-050,#F6F5F8);padding:6px;display:block;margin-bottom:12px}
-  .cl .nm{font-size:18px;font-weight:700;color:#505632;margin-bottom:5px}
+  .cl .nm{font-size:18px;font-weight:700;color:var(--cc-purple);margin-bottom:5px}
+  .cl[data-clinic="nas"] .nm,.cl[data-clinic="nas"] .go{color:#505632}
+  .cl[data-clinic="nas"]:hover{border-color:#505632}
+  .cl[data-clinic="riyada"] .nm,.cl[data-clinic="riyada"] .go{color:#2F8789}
+  .cl[data-clinic="riyada"]:hover{border-color:#2F8789}
   .cl .tg{font-size:13.5px;line-height:1.8;color:var(--cc-grey-700)}
-  .cl .go{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700;color:#505632}
+  .cl .go{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700}
   .cl.soon{cursor:not-allowed;opacity:.72;background:var(--cc-grey-050,#F6F5F8)}
   .cl.soon:hover{border-color:var(--cc-grey-200);transform:none;box-shadow:none}
   .cl.soon .nm{color:var(--cc-grey-700)}
@@ -156,6 +162,17 @@
   .pay.alt{background:var(--cc-white);color:var(--clinic);border:2px solid var(--clinic)}
   .pay.alt:hover{background:var(--clinic-soft);filter:none}
   .pay-note{font-size:12.5px;color:var(--cc-grey-700);line-height:1.85;text-align:center;margin-top:4px}
+
+  /* the rules have to be accepted before any money moves */
+  .agree{background:var(--clinic-soft);border:1.5px solid var(--clinic-line);border-radius:14px;
+         padding:14px 16px;margin-bottom:14px}
+  .agree label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;line-height:1.9;color:var(--cc-ink)}
+  .agree input{width:19px;height:19px;flex:0 0 auto;margin-top:3px;accent-color:var(--clinic);cursor:pointer}
+  .agree a{color:var(--clinic);font-weight:700}
+  .agree ul{margin:10px 0 0;padding:0;list-style:none;font-size:12.5px;color:var(--cc-grey-700);line-height:1.95}
+  .agree li{padding-inline-start:15px;position:relative}
+  .agree li::before{content:"•";position:absolute;inset-inline-start:0;color:var(--clinic)}
+  .agree.bad{border-color:var(--cc-burgundy,#962E37);background:#FDECEC}
 </style>
 </head>
 <body>
@@ -284,6 +301,18 @@
     </div>
     <div class="fld"><label>تحب تذكر شي قبل الاستشارة؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
       <textarea id="bNotes" placeholder="أي معلومة تساعد الاستشاري يجهّز لك…"></textarea></div>
+    <div class="agree" id="agreeBox">
+      <label>
+        <input type="checkbox" id="agreeChk">
+        <span>قرأت <a href="policy.html" target="_blank" rel="noopener">سياسة المواعيد والإلغاء وإعادة الجدولة</a> وأوافق عليها.</span>
+      </label>
+      <ul>
+        <li>الإلغاء ما يرجّع المبلغ نقداً، بس يتحفظ لك كرصيد تستخدمه بموعد ثاني.</li>
+        <li>تقدر تأجّل الموعد مرة وحدة لكل حجز.</li>
+        <li>لو تأخرت أكثر من ١٠ دقائق أو ما حضرت بدون إشعار، تنحسب الجلسة مستهلكة.</li>
+      </ul>
+    </div>
+
     <div class="paygrid">
       <button class="pay" id="payBtn" type="button">ادفع كامل واحجز</button>
       <button class="pay alt" id="deemaBtn" type="button">قسّطها مع ديمة</button>
@@ -434,7 +463,8 @@ $("#clinicList").addEventListener("click", e => {
    olive theme and hands over to the package list the page already had. */
 function openClinic(id, opt){
   CLINIC = id;
-  document.body.classList.add("nas");
+  document.body.classList.remove("nas","riyada");
+  document.body.classList.add(id === "riyada" ? "riyada" : "nas");
   const cl = ((OPTS && OPTS.clinics) || []).find(x => x.id === id) || { name:"كاش ناس" };
   $("#bkBadge").textContent = "حجز استشارة · " + cl.name;
   show("#cardClinic", false);
@@ -444,7 +474,7 @@ function openClinic(id, opt){
   $("#bkSub").textContent   = "اختر الباقة والموعد اللي يناسبك. الجلسة مع الاستشاري مباشرة، أونلاين أو حضوري.";
   paintTeam();
 
-  const pkgs = (OPTS && OPTS.packages) || [];
+  const pkgs = ((OPTS && OPTS.packages) || []).filter(p => p.clinic === id);
   $("#pkgList").innerHTML = pkgs.map(p => `
     <label><input type="radio" name="pkg" value="${esc(p.id)}">
       <div class="box">
@@ -459,7 +489,7 @@ function openClinic(id, opt){
 }
 
 $("#clinicBack").addEventListener("click", () => {
-  document.body.classList.remove("nas");
+  document.body.classList.remove("nas","riyada");
   PKG = null; PICK_ISO = ""; PICK_DATE = "";
   ["#cardPkg","#cardCons","#cardMode","#cardSlot","#cardForm"].forEach(x => show(x,false));
   $("#pkgDetail").classList.remove("on");
@@ -474,7 +504,14 @@ $("#clinicBack").addEventListener("click", () => {
 /* both Cash Nas consultants sit in the hero, since a package may use either */
 function paintTeam(){
   const wrap = $("#bkWho");
-  wrap.innerHTML = CONSULTANTS.map(c => {
+  /* whoever appears in this clinic's packages, in the order they appear */
+  const ids = [];
+  ((OPTS && OPTS.packages) || []).filter(p => p.clinic === CLINIC).forEach(p =>
+    p.sessions.forEach(x => [x.consultantId].concat(x.with || []).forEach(i => {
+      if(i && ids.indexOf(i) === -1) ids.push(i);
+    })));
+  const team = ids.map(i => CONSULTANTS.find(c => c.id === i)).filter(Boolean);
+  wrap.innerHTML = (team.length ? team : CONSULTANTS).map(c => {
     const b = BIOS[c.id] || {};
     const photo = c.photo || (CLINIC_ART[c.clinic]||{}).photo || "";
     return `<div style="display:flex;gap:14px;align-items:center;text-align:start">
@@ -520,12 +557,16 @@ function choosePackage(id){
     (PKG.audience.length ? `<h4>لمن هذه الباقة؟</h4>${li(PKG.audience,"dot")}` : "") +
     (PKG.benefits.length ? `<h4>هدف الباقة</h4>${li(PKG.benefits)}` : "") +
     (PKG.results.length  ? `<h4>النتائج المتوقعة</h4>${li(PKG.results)}`  : "") +
+    (PKG.reports.length  ? `<h4>التقارير</h4>${li(PKG.reports)}`          : "") +
     (many
       ? `<div class="pk-sess"><h4 style="margin-top:0">الباقة عبارة عن ${PKG.sessions.length} جلسات</h4>` +
-        PKG.sessions.map(x =>
-          `<div class="s"><i>${x.index+1}.</i><span>${esc(x.label)}${
-            x.consultantName?` · ${esc(x.consultantName)}`:""} · ${x.minutes} دقيقة</span></div>`).join("") +
-        `<div class="n">تحجز الجلسة الأولى الحين، ونتفق معك على موعد الجلسة الثانية بالواتساب بعدها. السعر يشمل الجلستين.</div></div>`
+        PKG.sessions.map(x => {
+          const who = [x.consultantName].concat(x.withNames||[]).filter(Boolean).join(" + ");
+          return `<div class="s"><i>${x.index+1}.</i><span>${esc(x.label)}${
+            who?` · ${esc(who)}`:""} · ${x.minutes} دقيقة</span></div>`;
+        }).join("") +
+        (PKG.visits ? `<div class="s"><i>+</i><span>${PKG.visits === 1 ? "زيارة ميدانية وحدة" : PKG.visits + " زيارات ميدانية"}</span></div>` : "") +
+        `<div class="n">تحجز الجلسة الأولى الحين، ونتفق معك على مواعيد باقي الجلسات بالواتساب بعدها. السعر يشمل الباقة كاملة.</div></div>`
       : "") +
     `<div class="meta"><span>${PKG.amount} د.ك${PKG.monthly?" / شهر":""}</span>` +
     `<span>${PKG.minutes} دقيقة</span><span>أونلاين أو حضوري</span></div>`;
@@ -571,7 +612,13 @@ function applyConsultant(){
   const pr = document.querySelector('input[name="mode"][value="present"]');
   $("#mOnline").textContent  = "Google Meet · " + dayRange(C.modes.online);
   $("#mPresent").textContent = (C.location || "بالمقر") + " · " + dayRange(C.modes.present);
-  $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك. الجلسة مع " + C.name + ".";
+  /* when two of them sit in on the first session, say so — the times on
+     offer are the ones they are BOTH free for, which is why there are fewer */
+  const withNames = ((PKG && PKG.sessions[0] && PKG.sessions[0].withNames) || [])
+    .filter(Boolean);
+  const who = [C.name].concat(withNames).join(" + ");
+  $("#modeHint").textContent = "الأونلاين والحضوري بنفس السعر، اختر اللي يريحك. الجلسة مع " + who
+    + (withNames.length ? " مع بعض، فالمواعيد المعروضة هي اللي الاثنين فاضيين فيها." : ".");
   on.disabled = !C.modes.online.enabled;
   pr.disabled = !C.modes.present.enabled;
   if(!C.modes.online.enabled && C.modes.present.enabled){ pr.checked = true; MODE = "present"; }
@@ -640,9 +687,10 @@ $("#slotList").addEventListener("click", e => {
   renderSlots();
   if(RESCHED.id) return showReschedConfirm();
   const more = (PKG.sessions && PKG.sessions.length > 1)
-    ? `<br><span style="font-size:13px">الجلسة الثانية نتفق عليها بالواتساب بعد الأولى</span>` : "";
+    ? `<br><span style="font-size:13px">باقي الجلسات نتفق عليها بالواتساب بعد الأولى</span>` : "";
+  const sumWho = [C.name].concat(((PKG.sessions[0]||{}).withNames)||[]).filter(Boolean).join(" + ");
   $("#sum").innerHTML =
-    `<b>${esc(PKG.name)}</b>${PKG.sessions.length>1?` · ${esc(PKG.sessions[0].label)}`:""} مع ${esc(C.name)}<br>` +
+    `<b>${esc(PKG.name)}</b>${PKG.sessions.length>1?` · ${esc(PKG.sessions[0].label)}`:""} مع ${esc(sumWho)}<br>` +
     `${humanFull(PICK_ISO, PKG.minutes)}<br>` +
     `${MODE==="present" ? "حضوري · " + esc(C.location||"بالمقر") : "أونلاين · Google Meet"}<br>` +
     `<b>${PKG.amount} د.ك</b> · ${PKG.minutes} دقيقة${more}`;
@@ -664,13 +712,19 @@ function readForm(){
   if(phone.replace(/\D/g,"").length<7) return fail("رقم واتساب غير صحيح");
   if(!PICK_ISO) return fail("اختر موعد أول");
   if(!C || !PKG) return fail("اختر الباقة أول");
+  if(!$("#agreeChk").checked){
+    $("#agreeBox").classList.add("bad");
+    $("#agreeBox").scrollIntoView({ behavior:"smooth", block:"center" });
+    return fail("لازم توافق على سياسة المواعيد قبل ما تكمل");
+  }
 
   const cc = $("#bCC").value;
   let local = phone.replace(/\D/g,"").replace(/^0+/,"");
   if(cc && local.indexOf(cc)===0 && local.length>cc.length) local = local.slice(cc.length);
 
   return { consultantId:C.id, packageId:PKG.id, mode:MODE, startIso:PICK_ISO,
-           name, email, phone:"+"+cc+local, notes:$("#bNotes").value.trim(), preview: PREVIEW };
+           name, email, phone:"+"+cc+local, notes:$("#bNotes").value.trim(),
+           agreePolicy: true, preview: PREVIEW };
 }
 
 const PAY_LABEL = { pay:"ادفع كامل واحجز", deema:"قسّطها مع ديمة" };
@@ -700,6 +754,9 @@ async function submitBooking(which){
   }
 }
 
+$("#agreeChk").addEventListener("change", () => {
+  if($("#agreeChk").checked) $("#agreeBox").classList.remove("bad");
+});
 $("#payBtn").addEventListener("click",   () => submitBooking("pay"));
 $("#deemaBtn").addEventListener("click", () => submitBooking("deema"));
 

@@ -1749,7 +1749,7 @@ $("#bkSave") && $("#bkSave").addEventListener("click",async()=>{
 });
 
 function renderBkList(){
-  const B=DATA.bookings||{}; const all=(B.list||[]).filter(x=>x.consultantId===BKWHO);
+  const B=DATA.bookings||{}; const all=(B.list||[]).filter(bkOnDiary);
   const now=Date.now();
   const rows = BKFILTER==="all" ? all
     : BKFILTER==="upcoming" ? all.filter(x=>x.status!=="cancelled"&&x.startMs>=now)
@@ -1930,9 +1930,13 @@ function bkCalMinutes(){
   return 60;
 }
 
+function bkOnDiary(x){
+  const on = (x.participantIds && x.participantIds.length) ? x.participantIds : [x.consultantId];
+  return on.indexOf(BKWHO) !== -1;
+}
 function bkCalDayRows(key){
   return (DATA.bookings.list||[]).filter(x=>
-    x.consultantId===BKWHO && x.status!=="cancelled" && x.startIso && bkDateKey(x.startIso)===key
+    bkOnDiary(x) && x.status!=="cancelled" && x.startIso && bkDateKey(x.startIso)===key
   ).sort((a,b)=>a.startMs-b.startMs);
 }
 
@@ -2054,6 +2058,7 @@ function renderBkCalDay(){
         <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
+        ${(b.withNames&&b.withNames.length)?`<span class="bkpill" style="background:#962E37">مع ${esc(b.withNames.join(" + "))}</span>`:""}
         <span class="num">${esc(b.email)}</span>
         <span>· ${fmt(b.amount)} د.ك</span>
       </div>
