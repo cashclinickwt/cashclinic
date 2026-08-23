@@ -328,7 +328,7 @@ $("#evBtn").addEventListener("click", async () => {
   const fix = window.ccEmailSuggest ? window.ccEmailSuggest(email) : "";
   if(fix) return msg("تأكد من إيميلك، هل تقصد " + fix + "؟");
   if(local.length < 7) return msg("رقم الجوال غير صحيح");
-  if(!$("#evAudience").value) return msg("اختر وش يوصفك من القائمة");
+  if(!$("#evAudience").value) return msg("اختر شنو يوصفك من القائمة");
 
   const b = $("#evBtn"); b.disabled = true; const t = b.textContent; b.textContent = "جارٍ التسجيل…";
   try{

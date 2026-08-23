@@ -494,6 +494,13 @@
       <div class="f"><label>المبلغ (د.ك)</label><input id="bkVcAmount" type="number" step="0.001" min="0" style="width:120px"></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkVcAdd">أضف للشهر</button></div>
     </div>
+    <div class="pfbar">
+      <div class="f"><label>تكلفة ثابتة — الوصف</label><input id="bkFcLabel" type="text" placeholder="مثال: اشتراك جديد"></div>
+      <div class="f"><label>المبلغ</label><input id="bkFcAmount" type="number" step="0.01" min="0" style="width:110px"></div>
+      <div class="f"><label>العملة</label><select id="bkFcCur"><option value="KWD">KWD</option><option value="USD">USD</option></select></div>
+      <div class="f"><label>الدورة</label><select id="bkFcBasis"><option value="monthly">شهري</option><option value="yearly">سنوي</option></select></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkFcAdd">أضف تكلفة ثابتة</button></div>
+    </div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> دخل يدوي — العقود وغيرها</h2>
     <div class="pfbar">
@@ -507,6 +514,7 @@
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> النسب</h2>
     <div id="bkRules"></div>
+    <button class="pfbtn go" id="bkRuleNew" style="margin-top:12px">+ قاعدة جديدة</button>
     <div class="addmsg" id="bkMsg"></div>
   </div>
 
@@ -1138,7 +1146,7 @@ function renderBooks(){
         return `<tr>
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
           <td class="num">${kwd(due[k])}</td>
-          <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لسا ما تحوّل</span>'}</td>
+          <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
           <td><button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button></td></tr>`;
       }).join("")+`</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في مستحقات بهذا الشهر.</div>`;
@@ -1169,15 +1177,33 @@ function renderBooks(){
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في حركة بهذا الشهر.</div>`;
 
+  /* Every cost is editable in place. It has to be: the seeded figures only
+     ever land in Firestore once, on the very first read, so a wrong seed can
+     never be corrected by changing the code — the row has to be reachable
+     from here or the number is stuck forever. */
   const costs=BK.costs||[];
+  const CUR=["KWD","USD"], BAS=[["monthly","شهري"],["yearly","سنوي"]];
   $("#bkCosts").innerHTML = costs.length
-    ? `<table class="pftab"><thead><tr><th>البند</th><th>الأصل</th><th>بالدينار</th><th></th></tr></thead><tbody>`+
-      costs.map(c=>`<tr>
+    ? `<table class="pftab"><thead><tr><th>البند</th><th>المبلغ</th><th>العملة</th><th>الدورة</th><th>بالدينار / شهر</th><th></th></tr></thead><tbody>`+
+      costs.map(c=>{
+        const id=String(c.id);
+        const isVar=id.indexOf("var:")===0, isSal=id.indexOf("salary:")===0;
+        const what=isVar?"varcost":(isSal?"salary":"cost");
+        const key=isVar?id.slice(4):(isSal?id.slice(7):id);
+        const fixed=!isVar&&!isSal;
+        return `<tr>
         <td>${esc(c.label)}${c.note?`<div class="pfrule">${esc(c.note)}</div>`:""}</td>
-        <td class="num">${c.currency?esc(String(c.amount))+" "+esc(c.currency):"—"}</td>
+        <td class="num"><input type="number" step="0.01" min="0" style="width:96px"
+             class="pfamt" data-what="${what}" data-key="${esc(key)}" value="${esc(String(c.amount==null?c.kwd:c.amount))}"></td>
+        <td>${fixed?`<select class="pfcur" data-what="${what}" data-key="${esc(key)}">`+
+              CUR.map(x=>`<option value="${x}"${x===c.currency?" selected":""}>${x}</option>`).join("")+`</select>`
+             :`<span class="pfrule">KWD</span>`}</td>
+        <td>${fixed?`<select class="pfbas" data-what="${what}" data-key="${esc(key)}">`+
+              BAS.map(([v,l])=>`<option value="${v}"${v===c.basis?" selected":""}>${l}</option>`).join("")+`</select>`
+             :`<span class="pfrule">${isSal?"راتب":"هذا الشهر"}</span>`}</td>
         <td class="num">${kwd(c.kwd)}</td>
-        <td>${String(c.id).indexOf("var:")===0
-              ?`<button class="pfbtn" data-delvar="${esc(String(c.id).slice(4))}">احذف</button>`:""}</td></tr>`).join("")+
+        <td>${isVar?`<button class="pfbtn" data-delvar="${esc(key)}">احذف</button>`:""}</td></tr>`;
+      }).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في تكاليف.</div>`;
 
@@ -1187,22 +1213,44 @@ function renderBooks(){
     rsel.innerHTML=(BK.rules||[]).map(r=>`<option value="${esc(r.id)}">${esc(r.label)}</option>`).join("");
   }
 
-  $("#bkRules").innerHTML =
-    `<table class="pftab"><thead><tr><th>القاعدة</th><th>على وش تنطبق</th><th>التوزيع</th></tr></thead><tbody>`+
-    (BK.rules||[]).map(r=>{
-      const m=r.match||{};
-      const band=(m.min!=null?`من ${m.min} `:"")+(m.max!=null?`أقل من ${m.max}`:"");
-      return `<tr>
-        <td><b>${esc(r.label)}</b></td>
-        <td class="pfrule">${esc(PF_KIND[m.kind]||m.kind||"")}${(m.who||[]).length?" · "+(m.who||[]).map(w=>{
-            const nm=((BK.members||[]).find(x=>x.id===w)||{}).name||(w==="external"?"مستشار خارجي":w); return esc(nm);
-          }).join(" + "):""}${m.organiser?" · تنظيم "+esc(((BK.members||[]).find(x=>x.id===m.organiser)||{}).name||m.organiser):""}${band?" · "+esc(band)+" د.ك":""}</td>
-        <td class="pfrule">${Object.keys(r.split||{}).map(k=>{
-            const nm=((BK.members||[]).find(x=>x.id===k)||{}).name||(k==="external"?"مستشار خارجي":k);
-            return esc(nm)+" "+r.split[k]+"%";
-          }).join(" · ")}</td></tr>`;
-    }).join("")+`</tbody></table>`;
+  /* Every rule is editable here, because a percentage that needs a deploy to
+     change is a percentage that will be wrong for a month. The split is only
+     accepted at exactly 100% — the server checks it too, so a bad total can
+     never reach a payout. */
+  const RULE_KINDS=[["book","كتيّب"],["consult","استشارة"],["call","اتصال سريع"],["course","ورشة / دورة"],["contract","عقد"]];
+  const RULE_WHO=["ghalia","sara","hasan","external"];
+  const whoName=(k)=>k==="external"?"مستشار خارجي":(((BK.members||[]).find(x=>x.id===k)||{}).name||k);
+  const ruleCard=(r,isNew)=>{
+    const m=r.match||{}, sp=r.split||{};
+    const id=isNew?"__new":esc(r.id);
+    return `<div class="pfcard rulecard" data-rule="${id}" style="margin-bottom:12px">
+      <div class="pfbar">
+        <div class="f" style="flex:1 1 240px"><label>اسم القاعدة</label>
+          <input class="rlabel" type="text" value="${esc(r.label||"")}" placeholder="مثال: ورش غالية وسارة"></div>
+        <div class="f"><label>النوع</label><select class="rkind">`+
+          RULE_KINDS.map(([v,l])=>`<option value="${v}"${v===m.kind?" selected":""}>${l}</option>`).join("")+`</select></div>
+        <div class="f"><label>من (د.ك)</label><input class="rmin" type="number" step="0.5" min="0" style="width:90px" value="${m.min!=null?esc(String(m.min)):""}" placeholder="—"></div>
+        <div class="f"><label>أقل من (د.ك)</label><input class="rmax" type="number" step="0.5" min="0" style="width:90px" value="${m.max!=null?esc(String(m.max)):""}" placeholder="—"></div>
+        <div class="f"><label>التنظيم</label><select class="rorg"><option value="">—</option>`+
+          RULE_WHO.filter(w=>w!=="external").map(w=>`<option value="${w}"${w===m.organiser?" selected":""}>${esc(whoName(w))}</option>`).join("")+`</select></div>
+      </div>
+      <div style="margin:4px 0 10px"><span class="pfrule">مين يدخل بالقاعدة:</span>
+        ${RULE_WHO.map(w=>`<label style="margin-inline-start:12px;font-size:13.5px">
+          <input type="checkbox" class="rwho" value="${w}"${(m.who||[]).indexOf(w)!==-1?" checked":""}> ${esc(whoName(w))}</label>`).join("")}</div>
+      <div class="pfbar" style="margin-bottom:8px">
+        ${RULE_WHO.concat(["company"]).map(w=>`<div class="f"><label>${esc(whoName(w))} %</label>
+          <input class="rsplit" data-who="${w}" type="number" step="0.5" min="0" max="100" style="width:82px"
+                 value="${sp[w]!=null?esc(String(sp[w])):""}"></div>`).join("")}
+        <div class="f"><label>المجموع</label><div class="rtotal" style="font-weight:800;padding:9px 0">—</div></div>
+      </div>
+      <button class="pfbtn go rsave">${isNew?"أضف القاعدة":"احفظ"}</button>
+      ${isNew?`<button class="pfbtn rcancel">إلغاء</button>`:`<button class="pfbtn rdel" style="color:#962E37;border-color:#F0C9CC">احذف</button>`}
+    </div>`;
+  };
+  $("#bkRules").innerHTML=(BK.rules||[]).map(r=>ruleCard(r, r.id==="__new")).join("");
+  document.querySelectorAll("#bkRules .rulecard").forEach(ruleTotal);
 }
+
 const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد"};
 
 $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
@@ -1249,12 +1297,94 @@ $("#bkVcAdd") && $("#bkVcAdd").addEventListener("click", async ()=>{
   }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
 });
 
+/* one handler for the amount, the currency and the cycle */
+$("#bkCosts") && $("#bkCosts").addEventListener("change", async e=>{
+  const el=e.target.closest(".pfamt,.pfcur,.pfbas"); if(!el) return;
+  const what=el.dataset.what, id=el.dataset.key, row={};
+  if(el.classList.contains("pfamt")){
+    const v=Number(el.value);
+    if(!(v>=0)) return pfMsg("اكتب مبلغ صحيح", false);
+    row.amount=v;
+  }
+  else if(el.classList.contains("pfcur")) row.currency=el.value;
+  else row.basis=el.value;
+  el.disabled=true;
+  try{ await saveProfitItem({ what, id, row }); await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true); }
+  catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); el.disabled=false; }
+});
+
 $("#bkCosts") && $("#bkCosts").addEventListener("click", async e=>{
   const b=e.target.closest("button[data-delvar]"); if(!b) return;
   if(!confirm("تحذف هذي التكلفة؟")) return;
   try{ await saveProfitItem({ what:"varcost", id:b.dataset.delvar, remove:true });
        await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
   catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+});
+
+/* the live total, so a split that cannot be saved is obvious before trying */
+function ruleTotal(card){
+  let t=0;
+  card.querySelectorAll(".rsplit").forEach(i=>{ t+=Number(i.value)||0; });
+  const el=card.querySelector(".rtotal");
+  t=Math.round(t*10)/10;
+  el.textContent=t+"%";
+  el.style.color = t===100 ? "#128C4A" : "#962E37";
+}
+function ruleRead(card){
+  const who=[...card.querySelectorAll(".rwho")].filter(i=>i.checked).map(i=>i.value);
+  const split={};
+  card.querySelectorAll(".rsplit").forEach(i=>{ const v=Number(i.value)||0; if(v>0) split[i.dataset.who]=v; });
+  const g=(c)=>card.querySelector(c).value.trim();
+  return { label:g(".rlabel"),
+    match:{ kind:g(".rkind"), who, min:g(".rmin"), max:g(".rmax"), organiser:g(".rorg") },
+    split };
+}
+
+$("#bkRules") && $("#bkRules").addEventListener("input", e=>{
+  const card=e.target.closest(".rulecard"); if(card) ruleTotal(card);
+});
+
+$("#bkRules") && $("#bkRules").addEventListener("click", async e=>{
+  const card=e.target.closest(".rulecard"); if(!card) return;
+  if(e.target.closest(".rcancel")){ card.remove(); return; }
+  if(e.target.closest(".rdel")){
+    if(!confirm("تحذف هذي القاعدة؟ العمليات اللي كانت تنطبق عليها بتصير بدون قاعدة.")) return;
+    try{ await saveProfitItem({ what:"rule", id:card.dataset.rule, remove:true });
+         await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
+    catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+    return;
+  }
+  if(e.target.closest(".rsave")){
+    const btn=e.target.closest(".rsave"); btn.disabled=true;
+    const isNew=card.dataset.rule==="__new";
+    try{
+      await saveProfitItem(Object.assign({ what:"rule" }, isNew?{}:{ id:card.dataset.rule }, { row:ruleRead(card) }));
+      await loadBooks(BKMONTH); pfMsg(isNew?"انضافت ✅":"انحفظت ✅", true);
+    }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); btn.disabled=false; }
+  }
+});
+
+/* A blank rule is added to the list in memory and the whole table is drawn
+   again, so the new card is built by the same renderer as every other one
+   and cannot drift from them. It only reaches Firestore when أضف is pressed. */
+$("#bkRuleNew") && $("#bkRuleNew").addEventListener("click", ()=>{
+  if(!BK || document.querySelector('.rulecard[data-rule="__new"]')) return;
+  BK.rules=[{ id:"__new", label:"", match:{ kind:"consult", who:[] }, split:{} }].concat(BK.rules||[]);
+  renderBooks();
+  const card=document.querySelector('.rulecard[data-rule="__new"]');
+  if(card){ card.scrollIntoView({behavior:"smooth",block:"center"}); card.querySelector(".rlabel").focus(); }
+});
+
+$("#bkFcAdd") && $("#bkFcAdd").addEventListener("click", async ()=>{
+  const label=$("#bkFcLabel").value.trim(), amount=Number($("#bkFcAmount").value);
+  if(label.length<2) return pfMsg("اكتب وصف التكلفة", false);
+  if(!(amount>0))    return pfMsg("اكتب مبلغ صحيح", false);
+  try{
+    await saveProfitItem({ what:"cost", row:{ label, amount,
+      currency:$("#bkFcCur").value, basis:$("#bkFcBasis").value } });
+    $("#bkFcLabel").value=""; $("#bkFcAmount").value="";
+    await loadBooks(BKMONTH); pfMsg("انضافت ✅", true);
+  }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
 });
 
 $("#bkMnAdd") && $("#bkMnAdd").addEventListener("click", async ()=>{
