@@ -878,7 +878,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
 function render(){
   buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
-  if(_subOpt && DATA && DATA.role!=="all") _subOpt.remove();
+  if(_subOpt && DATA && DATA.role!=="all" && DATA.role!=="sales") _subOpt.remove();
   syncTabs();
 }
 
@@ -2638,14 +2638,69 @@ window.cClose=cClose;
 const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",subscribers:"المشتركين بالنشرة",single:"إيميل عميل محدد"};
 $("#openComposer") && $("#openComposer").addEventListener("click", cOpen);
 $("#cmpAud") && $("#cmpAud").addEventListener("change", cmpSyncAud);
+let _cmpLastAud="";
 function cmpSyncAud(){ const v=($("#cmpAud")&&$("#cmpAud").value)||"quiz"; const _sg=v==="single";
+  /* A period chosen for quiz leads is meaningless for subscribers, and left
+     in place it quietly filters the new audience down to nobody. */
+  if(_cmpLastAud && _cmpLastAud!==v){
+    if($("#cmpFrom")) $("#cmpFrom").value="";
+    if($("#cmpTo"))   $("#cmpTo").value="";
+  }
+  _cmpLastAud=v;
   if($("#cmpSingleWrap")) $("#cmpSingleWrap").style.display=_sg?"block":"none";
   if($("#cmpDateWrap")) $("#cmpDateWrap").style.display=_sg?"none":"block";
   const nQ=(DATA&&DATA.quiz&&DATA.quiz.byQuiz&&DATA.quiz.byQuiz.length)||0;
   const nB=(DATA&&DATA.sales&&DATA.sales.byProduct&&DATA.sales.byProduct.length)||0;
   if($("#cmpQuizWrap")) $("#cmpQuizWrap").style.display=(v==="quiz"&&nQ>1)?"block":"none";
   if($("#cmpBookWrap")) $("#cmpBookWrap").style.display=(v==="book"&&nB>1)?"block":"none";
+  cmpSyncCount();
 }
+["#cmpFrom","#cmpTo","#cmpBookSel","#cmpQuizSel"].forEach(sel=>{
+  const el=$(sel); if(el) el.addEventListener("change", cmpSyncCount);
+});
+/* How many people this will actually reach, worked out from the same lists
+   and the same date range the server will use. A campaign that resolves to
+   nobody now says so before the send button is pressed, instead of failing
+   afterwards with nothing to explain it. */
+function cmpRecipients(){
+  if(!DATA) return null;
+  const aud=($("#cmpAud")&&$("#cmpAud").value)||"quiz";
+  if(aud==="single") return null;
+  let from=($("#cmpFrom")&&$("#cmpFrom").value)||"", to=($("#cmpTo")&&$("#cmpTo").value)||"";
+  if(from && to && from>to){ const t=from; from=to; to=t; }
+  const fMs=from?Date.parse(from+"T00:00:00Z"):null, tMs=to?Date.parse(to+"T23:59:59Z"):null;
+  const inR=(ts)=>{ if(fMs!=null&&ts<fMs) return false; if(tMs!=null&&ts>tMs) return false; return true; };
+  const emails=new Set();
+  const add=(rows,tsKey)=>((rows||[]).forEach(r=>{
+    const e=String(r.email||"").trim().toLowerCase();
+    if(e && inR(Number(r[tsKey]||r.when||0))) emails.add(e);
+  }));
+  if(aud==="quiz")            add((DATA.quiz||{}).leads,"when");
+  else if(aud==="event")      add((DATA.events||{}).regs,"when");
+  else if(aud==="subscribers")add((DATA.subscribers||{}).list,"when");
+  else if(aud==="book"){
+    const key=($("#cmpBookSel")&&$("#cmpBookSel").value)||"";
+    ((DATA.sales||{}).orders||[]).forEach(o=>{
+      if(o.kind==="course") return;
+      if(key && (o.productKey||o.product)!==key) return;
+      const e=String(o.email||"").trim().toLowerCase();
+      if(e && inR(Number(o.when||0))) emails.add(e);
+    });
+  }
+  return emails.size;
+}
+function cmpSyncCount(){
+  const el=$("#cmpCount"); if(!el) return;
+  const n=cmpRecipients();
+  if(n===null){ el.textContent=""; return; }
+  const dated=(($("#cmpFrom")&&$("#cmpFrom").value)||($("#cmpTo")&&$("#cmpTo").value));
+  el.style.color = n===0 ? "#962E37" : "var(--muted)";
+  el.textContent = n===0
+    ? (dated ? "٠ مستلم بهذه الفترة .. فرّغ التواريخ عشان توصل للكل."
+             : "٠ مستلم بهذه الفئة.")
+    : `بتوصل لـ ${fmt(n)} مستلم${dated?" ضمن الفترة المختارة":""}.`;
+}
+
 function cStat(kind,msg){ const st=$("#cmpStatus"); st.className="cmp-status "+kind; st.textContent=msg; }
 function readB64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=rej; r.readAsDataURL(file); }); }
 $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
@@ -2824,6 +2879,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
           <input id="cmpTo" type="date" style="flex:1" aria-label="إلى تاريخ">
         </div>
         <div class="cmp-hint">مثال: من 2026-07-10 إلى اليوم. اتركها فارغة للكل.</div>
+        <div class="cmp-hint" id="cmpCount" style="font-weight:700;margin-top:6px"></div>
       </div>
       <div class="cmp-fld"><label>عنوان الرسالة</label>
         <input id="cmpSubj" type="text" placeholder="مثال: دعوة خاصة من كاش كلينك">
