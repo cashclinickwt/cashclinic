@@ -357,6 +357,52 @@
   .echart .sw{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
   .echart .lg-row b{margin-inline-start:auto;font-variant-numeric:tabular-nums;color:var(--ink)}
   .echart .lg-row .pct{color:var(--muted);font-size:12.5px;min-width:40px;text-align:left;direction:ltr}
+
+  /* profit + company books */
+  .pfbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:16px}
+  .pfbar .f{display:flex;flex-direction:column;gap:5px}
+  .pfbar label{font-size:12.5px;font-weight:700;color:var(--muted)}
+  .pfbar select,.pfbar input{border:1.5px solid var(--line);border-radius:11px;padding:9px 12px;
+    font-size:14px;font-family:inherit;color:var(--ink);background:#fff}
+  .pfnote{background:#FFF6E2;border:1px solid #E8D6A8;border-radius:14px;padding:14px 16px;
+    font-size:13.5px;line-height:1.9;color:#6B5620;margin-bottom:14px}
+  .pfnudge{background:#FDECEC;border:1px solid #F0C9CC;border-radius:16px;padding:16px 18px;margin-bottom:18px}
+  .pfnudge h3{margin:0 0 6px;font-size:16px;color:#962E37}
+  .pfnudge p{margin:0 0 10px;font-size:13.5px;line-height:1.9;color:var(--ink)}
+  .pfnudge .who{display:inline-block;background:#fff;border:1px solid #F0C9CC;border-radius:999px;
+    padding:5px 13px;font-size:13px;margin:0 6px 6px 0}
+  .pftab{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
+    border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .pftab th{background:var(--bg);font-weight:700;font-size:12.5px;color:var(--muted);
+    padding:11px 12px;text-align:start;white-space:nowrap}
+  .pftab td{padding:11px 12px;border-top:1px solid var(--line);vertical-align:middle}
+  .pftab .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+  .pfrule{font-size:12px;color:var(--muted)}
+  .pfwarn td{background:#FDECEC}
+  .pfbtn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;
+    font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
+  .pfbtn:hover{border-color:var(--acc,var(--auber));color:var(--acc,var(--auber))}
+  .pfbtn.go{background:var(--acc,var(--auber));border-color:var(--acc,var(--auber));color:#fff}
+  .pfbtn.paid{border-color:#128C4A;color:#128C4A}
+  .pfgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:18px}
+  .pfcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .pfcard h4{margin:0 0 12px;font-size:14.5px;color:var(--acc,var(--auber))}
+  .tgcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:16px}
+  .tgcard h3{margin:0 0 4px;font-size:18px;color:var(--auber)}
+  .tgwin{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .tgbig{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .tgbig .pct{font-size:38px;font-weight:800;line-height:1;color:var(--olive);
+    font-variant-numeric:tabular-nums;direction:ltr}
+  .tgbig .of{font-size:14px;color:var(--muted)}
+  .tgtrack{height:20px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+  .tgfill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--olive));
+    transition:width .5s ease;min-width:3px}
+  .tgfill.hit{background:linear-gradient(90deg,#43C77A,#128C4A)}
+  .tgmeta{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:13.5px;color:var(--muted)}
+  .tgmeta b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .tghit{background:#EAF6EE;border:1px solid #BFE0CB;color:#14532D;border-radius:12px;
+    padding:11px 14px;margin-top:14px;font-size:14px;font-weight:700}
+  @media(max-width:640px){ .pftab{font-size:12.5px} .pftab th,.pftab td{padding:9px 8px} }
 </style>
 </head>
 <body>
@@ -384,6 +430,9 @@
     <button class="lo" id="logoutBtn">تسجيل الخروج</button>
   </div>
 
+  <!-- the payout reminder rides on top of whatever tab she lands on -->
+  <div id="topNudge"></div>
+
   <nav class="tabs" id="dashTabs">
     <button data-tab="sales" class="on">المبيعات</button>
     <button data-tab="clients">كل العملاء</button>
@@ -396,8 +445,70 @@
     <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
     <button data-tab="composer">مراسلة العملاء</button>
+    <button data-tab="target">هدف المبيعات</button>
+    <button data-tab="profit">أرباحي</button>
+    <button data-tab="books">حسابات الشركة</button>
     <button data-tab="reports">التقارير</button>
   </nav>
+
+  <!-- ===== هدف المبيعات ===== -->
+  <div class="sec" id="targetSec" data-panel="target" hidden>
+    <h2><span></span> هدف المبيعات</h2>
+    <div id="tgList"></div>
+  </div>
+
+  <!-- ===== أرباحي — every member sees only their own column ===== -->
+  <div class="sec" id="profitSec" data-panel="profit" hidden>
+    <h2><span></span> أرباحي <span class="whoname" id="pfWho"></span></h2>
+    <div class="pfbar">
+      <div class="f"><label>الشهر</label><select id="pfMonth"></select></div>
+    </div>
+    <div class="kpis" id="pfKpis"></div>
+    <div id="pfPaid"></div>
+    <div id="pfList"></div>
+  </div>
+
+  <!-- ===== حسابات الشركة — غالية وعبدالله فقط ===== -->
+  <div class="sec" id="booksSec" data-panel="books" hidden>
+    <h2><span></span> حسابات الشركة</h2>
+    <div id="bkNudge"></div>
+    <div class="pfbar">
+      <div class="f"><label>الشهر</label><select id="bkMonth"></select></div>
+      <div class="f"><label>سعر الدولار بالدينار</label><input id="bkFx" type="number" step="0.001" min="0" style="width:120px"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn" id="bkFxSave">احفظ السعر</button></div>
+    </div>
+    <div class="kpis" id="bkKpisMoney"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> المستحق لكل واحد</h2>
+    <div id="bkDue"></div>
+
+    <div id="bkUnmatched"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> حركة الشهر</h2>
+    <div id="bkLines"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> التكاليف</h2>
+    <div id="bkCosts"></div>
+    <div class="pfbar" style="margin-top:12px">
+      <div class="f"><label>تكلفة متغيّرة — الوصف</label><input id="bkVcLabel" type="text" placeholder="مثال: قاعة كاش كلَب"></div>
+      <div class="f"><label>المبلغ (د.ك)</label><input id="bkVcAmount" type="number" step="0.001" min="0" style="width:120px"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkVcAdd">أضف للشهر</button></div>
+    </div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> دخل يدوي — العقود وغيرها</h2>
+    <div class="pfbar">
+      <div class="f"><label>الوصف</label><input id="bkMnLabel" type="text" placeholder="عقد شركة ..."></div>
+      <div class="f"><label>المبلغ</label><input id="bkMnAmount" type="number" step="0.001" min="0" style="width:110px"></div>
+      <div class="f"><label>تكاليف تُخصم</label><input id="bkMnCosts" type="number" step="0.001" min="0" style="width:110px"></div>
+      <div class="f"><label>القاعدة</label><select id="bkMnRule"></select></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkMnAdd">أضف</button></div>
+    </div>
+    <div id="bkManual"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> النسب</h2>
+    <div id="bkRules"></div>
+    <div class="addmsg" id="bkMsg"></div>
+  </div>
 
   <div class="sec" id="reportsSec" data-panel="reports" hidden>
     <h2><span></span> أنظمة التقارير</h2>
@@ -760,6 +871,11 @@ const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDom
 const app=initializeApp(CONFIG.firebase);
 const auth=getAuth(app);
 const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDashboard");
+const getProfit=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getProfit");
+const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
+const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
+const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
+const setProfitOverride=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setProfitOverride");
 const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCampaign");
 const setLiveConfig=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLiveConfig");
 const moderateLiveQuestion=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"moderateLiveQuestion");
@@ -874,16 +990,315 @@ function buildFilters(){
 function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date();
   return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth(); }
 
+
+/* ================= PROFIT =================
+   Two views on the same month. «أرباحي» is one column — the person's own
+   lines and nothing else, because the server never sends them anybody
+   else's. «حسابات الشركة» is the whole picture, and only غالية and عبدالله
+   are handed it. The month is fetched on demand rather than bundled into
+   the dashboard payload, so opening the dashboard does not cost a scan of
+   every order in the account.
+   ========================================= */
+let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null;
+const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
+const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+function monthLabel(m){
+  const p=String(m||"").split("-"); if(p.length!==2) return m||"";
+  return (MON_AR[Number(p[1])-1]||p[1]) + " " + p[0];
+}
+function fillMonths(sel, months, current){
+  if(!sel) return;
+  if(sel.dataset.keys!==(months||[]).join("|")){
+    sel.dataset.keys=(months||[]).join("|");
+    sel.innerHTML=(months||[]).map(m=>`<option value="${esc(m)}">${esc(monthLabel(m))}</option>`).join("");
+  }
+  if(current) sel.value=current;
+}
+
+/* The target board. Nora is sent a percentage, a count and the window —
+   never a per-order figure. Being straight about the limit: a percentage of
+   a target she can see is a total she can work out, and that is the point of
+   showing her a target at all. What it withholds is what each sale was worth. */
+async function loadTarget(){
+  const box=$("#tgList"); if(!box) return;
+  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{ const r=await getSalesTarget({}); TG=r.data||null; renderTarget(); }
+  catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+
+function renderTarget(){
+  const box=$("#tgList"); if(!box||!TG) return;
+  const rows=TG.targets||[];
+  if(!rows.length){ box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">ما في أهداف مسجّلة.</div>'; return; }
+  box.innerHTML=rows.map(t=>{
+    /* the bar is capped so going past target does not overflow the track,
+       while the number above it still shows the real figure */
+    const w=Math.min(100, Math.max(0, Number(t.pct)||0));
+    return `<div class="tgcard">
+      <h3>${esc(t.label)}</h3>
+      <div class="tgwin">من ${esc(t.from)} إلى ${esc(t.to)} · باقي ${fmt(t.daysLeft)} يوم</div>
+      <div class="tgbig">
+        <span class="pct">${fmt(t.pct)}%</span>
+        <span class="of">من هدف ${kwd(t.target)}</span>
+      </div>
+      <div class="tgtrack"><div class="tgfill${t.hit?" hit":""}" style="width:${w}%"></div></div>
+      <div class="tgmeta">
+        <span>عدد المبيعات: <b>${fmt(t.count)}</b></span>
+        ${TG.money?`<span>تحقّق: <b>${kwd(t.achieved)}</b></span>
+                    <span>باقي: <b>${kwd(Math.max(0,(t.target||0)-(t.achieved||0)))}</b></span>`:""}
+      </div>
+      ${t.hit?`<div class="tghit">🎉 وصلنا الهدف! ${TG.money?esc(kwd(t.achieved))+" من "+esc(kwd(t.target)):fmt(t.pct)+"%"}</div>`:""}
+      ${TG.money&&(t.byProduct||[]).length?`<table class="pftab" style="margin-top:16px">
+        <thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>`+
+        t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")+
+        `</tbody></table>`:""}
+    </div>`;
+  }).join("");
+}
+
+async function loadProfit(month){
+  const box=$("#pfList"); if(!box) return;
+  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{
+    const r=await getProfit(month?{month}:{});
+    PF=r.data||null; PFMONTH=(PF&&PF.month)||"";
+    renderProfit();
+  }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+
+function renderProfit(){
+  if(!PF || !$("#pfKpis")) return;
+  fillMonths($("#pfMonth"), PF.months, PF.month);
+  const who=$("#pfWho"); if(who) who.textContent=PF.name||"";
+  const t=PF.totals||{};
+
+  $("#pfKpis").innerHTML=
+    `<div class="kpi"><div class="n">${kwd(t.due)}</div><div class="l">مستحق لك هذا الشهر</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.share)}</div><div class="l">حصتك من المبيعات</div></div>`+
+    (PF.salary?`<div class="kpi"><div class="n">${kwd(PF.salary)}</div><div class="l">الراتب</div></div>`:"")+
+    `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">عملية</div></div>`;
+
+  $("#pfPaid").innerHTML = PF.paidAt
+    ? `<div class="pfnote" style="background:#EAF6EE;border-color:#BFE0CB;color:#14532D">✅ تم تحويل مستحقك عن ${esc(monthLabel(PF.month))}.</div>`
+    : `<div class="pfnote">مستحقك عن ${esc(monthLabel(PF.month))} ما تحوّل بعد.</div>`;
+
+  const rows=PF.lines||[];
+  $("#pfList").innerHTML = rows.length
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>الوصف</th><th>العميل</th><th>القاعدة</th><th>حصتك</th></tr></thead><tbody>`+
+      rows.map(l=>`<tr>
+        <td class="num">${dt(l.when)}</td>
+        <td>${esc(l.what)||"—"}</td>
+        <td>${esc(l.client)||"—"}</td>
+        <td class="pfrule">${esc(l.ruleLabel)||"—"}</td>
+        <td class="num"><b>${kwd(l.share)}</b></td></tr>`).join("")+
+      `</tbody></table>`
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في عمليات لك بهذا الشهر.</div>`;
+}
+
+$("#pfMonth") && $("#pfMonth").addEventListener("change", ()=>loadProfit($("#pfMonth").value));
+
+/* ---------- company books ---------- */
+
+async function loadBooks(month){
+  const box=$("#bkLines"); if(!box) return;
+  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{
+    const r=await getProfit(month?{month}:{});
+    BK=r.data||null; BKMONTH=(BK&&BK.month)||"";
+    renderBooks();
+  }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+/* the bookings tab already owns bkMsg — this one talks to the books tab */
+function pfMsg(m,ok){ const el=$("#bkMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
+
+function renderBooks(){
+  if(!BK || !$("#bkKpisMoney")) return;
+  fillMonths($("#bkMonth"), BK.months, BK.month);
+  if(document.activeElement!==$("#bkFx")) $("#bkFx").value=BK.usdRate||"";
+  const t=BK.totals||{};
+
+  $("#bkKpisMoney").innerHTML=
+    `<div class="kpi"><div class="n">${kwd(t.gross)}</div><div class="l">إجمالي الدخل</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.fees)}</div><div class="l">رسوم الدفع</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.shares)}</div><div class="l">حصص الفريق</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.company)}</div><div class="l">حصة كاش كلينيك</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.costs)}</div><div class="l">التكاليف</div></div>`+
+    `<div class="kpi" style="${(t.net||0)<0?"outline:2px solid #962E37":""}"><div class="n">${kwd(t.net)}</div><div class="l">الصافي بعد كل شي</div></div>`;
+
+  /* who is owed what, and whether it has gone out */
+  const paid=(BK.payout&&BK.payout.people)||{};
+  const due=BK.due||{};
+  const people=Object.keys(due).filter(k=>due[k]>0 || paid[k]);
+  $("#bkDue").innerHTML = people.length
+    ? `<table class="pftab"><thead><tr><th>الشخص</th><th>المستحق</th><th>الحالة</th><th></th></tr></thead><tbody>`+
+      people.map(k=>{
+        const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
+        const p=paid[k]||{}; const done=!!p.paidAt;
+        const pd=(BK.payDays||{})[k];
+        return `<tr>
+          <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
+          <td class="num">${kwd(due[k])}</td>
+          <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لسا ما تحوّل</span>'}</td>
+          <td><button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button></td></tr>`;
+      }).join("")+`</tbody></table>`
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في مستحقات بهذا الشهر.</div>`;
+
+  /* anything the rules could not place — never silently dropped */
+  const un=BK.unmatched||[];
+  $("#bkUnmatched").innerHTML = un.length
+    ? `<div class="pfnote"><b>${fmt(un.length)} عملية ما انطبقت عليها أي قاعدة</b> — مبالغها داخلة بالدخل بس ما انقسمت على أحد. اختر لها قاعدة من جدول الحركة تحت.</div>`
+    : "";
+
+  const lines=BK.lines||[];
+  const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
+    `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
+  $("#bkLines").innerHTML = lines.length
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th><th>الصافي</th><th>القاعدة</th><th>التوزيع</th></tr></thead><tbody>`+
+      lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
+        <td class="num">${dt(l.when)}</td>
+        <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
+        <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}</div></td>
+        <td class="num">${kwd(l.amount)}</td>
+        <td class="num">${l.fee?kwd(l.fee):"—"}</td>
+        <td class="num">${kwd(l.net)}</td>
+        <td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>
+        <td class="pfrule">${Object.keys(l.shares||{}).map(k=>{
+            const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
+            return esc(nm)+" "+kwd(l.shares[k]);
+          }).join("<br>")||"—"}</td></tr>`).join("")+
+      `</tbody></table>`
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في حركة بهذا الشهر.</div>`;
+
+  const costs=BK.costs||[];
+  $("#bkCosts").innerHTML = costs.length
+    ? `<table class="pftab"><thead><tr><th>البند</th><th>الأصل</th><th>بالدينار</th><th></th></tr></thead><tbody>`+
+      costs.map(c=>`<tr>
+        <td>${esc(c.label)}${c.note?`<div class="pfrule">${esc(c.note)}</div>`:""}</td>
+        <td class="num">${c.currency?esc(String(c.amount))+" "+esc(c.currency):"—"}</td>
+        <td class="num">${kwd(c.kwd)}</td>
+        <td>${String(c.id).indexOf("var:")===0
+              ?`<button class="pfbtn" data-delvar="${esc(String(c.id).slice(4))}">احذف</button>`:""}</td></tr>`).join("")+
+      `</tbody></table>`
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في تكاليف.</div>`;
+
+  const rsel=$("#bkMnRule");
+  if(rsel && rsel.dataset.keys!==(BK.rules||[]).map(r=>r.id).join("|")){
+    rsel.dataset.keys=(BK.rules||[]).map(r=>r.id).join("|");
+    rsel.innerHTML=(BK.rules||[]).map(r=>`<option value="${esc(r.id)}">${esc(r.label)}</option>`).join("");
+  }
+
+  $("#bkRules").innerHTML =
+    `<table class="pftab"><thead><tr><th>القاعدة</th><th>على وش تنطبق</th><th>التوزيع</th></tr></thead><tbody>`+
+    (BK.rules||[]).map(r=>{
+      const m=r.match||{};
+      const band=(m.min!=null?`من ${m.min} `:"")+(m.max!=null?`أقل من ${m.max}`:"");
+      return `<tr>
+        <td><b>${esc(r.label)}</b></td>
+        <td class="pfrule">${esc(PF_KIND[m.kind]||m.kind||"")}${(m.who||[]).length?" · "+(m.who||[]).map(w=>{
+            const nm=((BK.members||[]).find(x=>x.id===w)||{}).name||(w==="external"?"مستشار خارجي":w); return esc(nm);
+          }).join(" + "):""}${m.organiser?" · تنظيم "+esc(((BK.members||[]).find(x=>x.id===m.organiser)||{}).name||m.organiser):""}${band?" · "+esc(band)+" د.ك":""}</td>
+        <td class="pfrule">${Object.keys(r.split||{}).map(k=>{
+            const nm=((BK.members||[]).find(x=>x.id===k)||{}).name||(k==="external"?"مستشار خارجي":k);
+            return esc(nm)+" "+r.split[k]+"%";
+          }).join(" · ")}</td></tr>`;
+    }).join("")+`</tbody></table>`;
+}
+const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد"};
+
+$("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
+
+$("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-pay]"); if(!b) return;
+  const who=b.dataset.pay;
+  const paid=((BK.payout&&BK.payout.people)||{})[who];
+  const nm=((BK.members||[]).find(m=>m.id===who)||{}).name||who;
+  if(!paid && !confirm(`تأكيد: حوّلت ${kwd(b.dataset.amount)} لـ ${nm} عن ${monthLabel(BKMONTH)}؟`)) return;
+  b.disabled=true;
+  try{
+    await markPayout({ month:BKMONTH, who, amount:Number(b.dataset.amount)||0, paid: paid?false:true });
+    await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); b.disabled=false; }
+});
+
+$("#bkLines") && $("#bkLines").addEventListener("change", async e=>{
+  const sel=e.target.closest("select.pfrulesel"); if(!sel) return;
+  const orderId=sel.dataset.order;
+  try{
+    await setProfitOverride(sel.value
+      ? { month:BKMONTH, orderId, ruleId:sel.value }
+      : { month:BKMONTH, orderId, clear:true });
+    await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); }
+});
+
+$("#bkFxSave") && $("#bkFxSave").addEventListener("click", async ()=>{
+  const rate=Number($("#bkFx").value);
+  if(!(rate>0)) return pfMsg("اكتب سعر صرف صحيح", false);
+  try{ await saveProfitItem({ what:"fx", usdToKwd:rate }); await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true); }
+  catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
+});
+
+$("#bkVcAdd") && $("#bkVcAdd").addEventListener("click", async ()=>{
+  const label=$("#bkVcLabel").value.trim(), amount=Number($("#bkVcAmount").value);
+  if(label.length<2) return pfMsg("اكتب وصف التكلفة", false);
+  if(!(amount>0))    return pfMsg("اكتب مبلغ صحيح", false);
+  try{
+    await saveProfitItem({ what:"varcost", row:{ label, amount, month:BKMONTH } });
+    $("#bkVcLabel").value=""; $("#bkVcAmount").value="";
+    await loadBooks(BKMONTH); pfMsg("انضافت ✅", true);
+  }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
+});
+
+$("#bkCosts") && $("#bkCosts").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-delvar]"); if(!b) return;
+  if(!confirm("تحذف هذي التكلفة؟")) return;
+  try{ await saveProfitItem({ what:"varcost", id:b.dataset.delvar, remove:true });
+       await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
+  catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+});
+
+$("#bkMnAdd") && $("#bkMnAdd").addEventListener("click", async ()=>{
+  const label=$("#bkMnLabel").value.trim();
+  const amount=Number($("#bkMnAmount").value), costs=Number($("#bkMnCosts").value)||0;
+  if(label.length<2) return pfMsg("اكتب وصف الدخل", false);
+  if(!(amount>0))    return pfMsg("اكتب مبلغ صحيح", false);
+  try{
+    await saveProfitItem({ what:"manual", row:{ label, amount, costs, month:BKMONTH,
+      ruleId:$("#bkMnRule").value, kind:"contract", when:Date.now() } });
+    $("#bkMnLabel").value=""; $("#bkMnAmount").value=""; $("#bkMnCosts").value="";
+    await loadBooks(BKMONTH); pfMsg("انضاف ✅", true);
+  }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
+});
+
 /* ---------- render ---------- */
+function renderPayoutNudge(){
+  const n=DATA&&DATA.payoutNudge, box=$("#bkNudge"), top=$("#topNudge");
+  if(!n || n.done || !(n.owed||[]).length){
+    if(box) box.innerHTML=""; if(top) top.innerHTML=""; return;
+  }
+  const html=`<div class="pfnudge">
+      <h3>💸 تحويلات ${esc(monthLabel(n.month))} ما طلعت بعد</h3>
+      <p>باقي ${fmt(n.owed.length)} شخص ما استلموا مستحقاتهم، بمجموع <b>${kwd(n.total)}</b>.</p>
+      <div>${n.owed.map(o=>`<span class="who">${esc(o.name)} · ${kwd(o.amount)}</span>`).join("")}</div>
+      <p style="margin:10px 0 0"><button class="pfbtn go" id="nudgeGo">افتح حسابات الشركة</button></p>
+    </div>`;
+  if(box) box.innerHTML=html;
+  if(top) top.innerHTML = ACTIVE_PANEL==="books" ? "" : html;
+}
+document.addEventListener("click", e=>{
+  if(e.target && e.target.id==="nudgeGo"){ showPanel("books"); if(!BK) loadBooks(); }
+});
+
 function render(){
   buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
+  renderPayoutNudge();
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
   if(_subOpt && DATA && DATA.role!=="all" && DATA.role!=="sales") _subOpt.remove();
   syncTabs();
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","reports"];
+const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","target","profit","books","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 /* Tabs a role is allowed anywhere near. The server already refuses the data
@@ -891,12 +1306,17 @@ function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); 
    the client list, the diary, the لقاء, the newsletter and the courses —
    and never see المبيعات، الاختبارات، التوظيف، البث، أسئلة الكتاب or التقارير. */
 const ROLE_PANELS = {
-  sales: ["clients","bookings","events","subscribers","courses","composer"],
+  sales: ["clients","bookings","events","subscribers","courses","composer","target","profit"],
 };
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
   const allow = ROLE_PANELS[(DATA&&DATA.role)||""];
   if(allow && allow.indexOf(k)===-1) return false;
+  /* the target belongs to Nora and to whoever watches her numbers;
+     أرباحي to anyone with a share; the company books to غالية and عبدالله */
+  if(k==="target") return !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
+  if(k==="profit") return !!(DATA && DATA.profitMember);
+  if(k==="books")  return !!(DATA && DATA.seesBooks);
   if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq"||k==="clients") return !el.hidden;
   return true;
 }
@@ -910,6 +1330,11 @@ function showPanel(k){
   /* keep the moderation queue fresh only while the live tab is the one on screen */
   if(LIVE_TIMER){ clearInterval(LIVE_TIMER); LIVE_TIMER=null; }
   if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
+  /* a month is worked out from every order in the account, so it is fetched
+     when the tab is actually opened rather than on every dashboard load */
+  if(k==="target" && !TG) loadTarget();
+  if(k==="profit" && !PF) loadProfit();
+  if(k==="books"  && !BK) loadBooks();
 }
 function syncTabs(){
   document.querySelectorAll('#dashTabs button').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
