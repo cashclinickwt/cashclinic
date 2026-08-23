@@ -1244,10 +1244,37 @@ function renderBooks(){
         <div class="f"><label>المجموع</label><div class="rtotal" style="font-weight:800;padding:9px 0">—</div></div>
       </div>
       <button class="pfbtn go rsave">${isNew?"أضف القاعدة":"احفظ"}</button>
-      ${isNew?`<button class="pfbtn rcancel">إلغاء</button>`:`<button class="pfbtn rdel" style="color:#962E37;border-color:#F0C9CC">احذف</button>`}
+      <button class="pfbtn rcancel">إلغاء</button>
+      ${isNew?"":`<button class="pfbtn rdel" style="color:#962E37;border-color:#F0C9CC">احذف</button>`}
     </div>`;
   };
-  $("#bkRules").innerHTML=(BK.rules||[]).map(r=>ruleCard(r, r.id==="__new")).join("");
+  /* The list stays a quiet table you can read at a glance. The editor only
+     appears for the one rule being changed, so twenty percentage boxes are
+     not sitting open on screen the whole time waiting to be knocked. */
+  const kindAr=(k)=>(RULE_KINDS.find(x=>x[0]===k)||[,k])[1];
+  const rulesTable=()=>
+    `<table class="pftab"><thead><tr><th>القاعدة</th><th>على شنو تنطبق</th><th>التوزيع</th><th></th></tr></thead><tbody>`+
+    (BK.rules||[]).map(r=>{
+      const m=r.match||{};
+      const band=(m.min!=null?`من ${m.min} `:"")+(m.max!=null?`أقل من ${m.max}`:"");
+      const on=[kindAr(m.kind)]
+        .concat((m.who||[]).length?[(m.who||[]).map(whoName).join(" + ")]:[])
+        .concat(m.organiser?["تنظيم "+whoName(m.organiser)]:[])
+        .concat(band?[band+" د.ك"]:[]);
+      return `<tr${RULE_EDIT===r.id?' style="background:#FFF6E2"':''}>
+        <td><b>${esc(r.label)}</b></td>
+        <td class="pfrule">${esc(on.join(" · "))}</td>
+        <td class="pfrule">${Object.keys(r.split||{}).map(k=>esc(whoName(k))+" "+r.split[k]+"%").join(" · ")}</td>
+        <td><button class="pfbtn" data-redit="${esc(r.id)}">تعديل</button></td></tr>`;
+    }).join("")+`</tbody></table>`;
+
+  const editing = RULE_EDIT
+    ? (RULE_EDIT==="__new"
+        ? { id:"__new", label:"", match:{ kind:"consult", who:[] }, split:{} }
+        : (BK.rules||[]).find(r=>r.id===RULE_EDIT))
+    : null;
+
+  $("#bkRules").innerHTML = (editing ? ruleCard(editing, RULE_EDIT==="__new") : "") + rulesTable();
   document.querySelectorAll("#bkRules .rulecard").forEach(ruleTotal);
 }
 
@@ -1322,6 +1349,9 @@ $("#bkCosts") && $("#bkCosts").addEventListener("click", async e=>{
 });
 
 /* the live total, so a split that cannot be saved is obvious before trying */
+/* which rule the editor is open on: a rule id, "__new", or null for none */
+let RULE_EDIT=null;
+
 function ruleTotal(card){
   let t=0;
   card.querySelectorAll(".rsplit").forEach(i=>{ t+=Number(i.value)||0; });
@@ -1345,12 +1375,19 @@ $("#bkRules") && $("#bkRules").addEventListener("input", e=>{
 });
 
 $("#bkRules") && $("#bkRules").addEventListener("click", async e=>{
+  const open=e.target.closest("button[data-redit]");
+  if(open){
+    RULE_EDIT=open.dataset.redit; renderBooks();
+    const c=document.querySelector(".rulecard");
+    if(c){ c.scrollIntoView({behavior:"smooth",block:"center"}); c.querySelector(".rlabel").focus(); }
+    return;
+  }
   const card=e.target.closest(".rulecard"); if(!card) return;
-  if(e.target.closest(".rcancel")){ card.remove(); return; }
+  if(e.target.closest(".rcancel")){ RULE_EDIT=null; renderBooks(); return; }
   if(e.target.closest(".rdel")){
     if(!confirm("تحذف هذي القاعدة؟ العمليات اللي كانت تنطبق عليها بتصير بدون قاعدة.")) return;
     try{ await saveProfitItem({ what:"rule", id:card.dataset.rule, remove:true });
-         await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
+         RULE_EDIT=null; await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
     catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
     return;
   }
@@ -1359,18 +1396,16 @@ $("#bkRules") && $("#bkRules").addEventListener("click", async e=>{
     const isNew=card.dataset.rule==="__new";
     try{
       await saveProfitItem(Object.assign({ what:"rule" }, isNew?{}:{ id:card.dataset.rule }, { row:ruleRead(card) }));
-      await loadBooks(BKMONTH); pfMsg(isNew?"انضافت ✅":"انحفظت ✅", true);
+      RULE_EDIT=null; await loadBooks(BKMONTH); pfMsg(isNew?"انضافت ✅":"انحفظت ✅", true);
     }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); btn.disabled=false; }
   }
 });
 
-/* A blank rule is added to the list in memory and the whole table is drawn
-   again, so the new card is built by the same renderer as every other one
-   and cannot drift from them. It only reaches Firestore when أضف is pressed. */
+/* A new rule is just the editor opened on nothing. It reaches Firestore only
+   when أضف is pressed, so backing out leaves no half-made rule behind. */
 $("#bkRuleNew") && $("#bkRuleNew").addEventListener("click", ()=>{
-  if(!BK || document.querySelector('.rulecard[data-rule="__new"]')) return;
-  BK.rules=[{ id:"__new", label:"", match:{ kind:"consult", who:[] }, split:{} }].concat(BK.rules||[]);
-  renderBooks();
+  if(!BK) return;
+  RULE_EDIT="__new"; renderBooks();
   const card=document.querySelector('.rulecard[data-rule="__new"]');
   if(card){ card.scrollIntoView({behavior:"smooth",block:"center"}); card.querySelector(".rlabel").focus(); }
 });
