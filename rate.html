@@ -177,13 +177,23 @@
         </div>
       </div>
 
-      <!-- booklet -->
+      <!-- booklet: which one, not just whether -->
       <div class="rt-q">
-        <label class="q">اشتريت كتيّب الوفرة المالية؟</label>
+        <label class="q">عندك أي كتيّب من كاش كلينك؟</label>
         <div class="rt-opts">
-          <label class="rt-opt"><input type="radio" name="book" value="نعم"><span>نعم</span></label>
+          <label class="rt-opt"><input type="radio" name="book" value="نعم"><span>نعم، عندي</span></label>
           <label class="rt-opt"><input type="radio" name="book" value="لا"><span>لا</span></label>
           <label class="rt-opt"><input type="radio" name="book" value="أبي أشتريه"><span>أبي أشتريه</span></label>
+        </div>
+      </div>
+
+      <!-- which title, shown once we know there is one to name -->
+      <div class="rt-q rt-hide" id="rtWhichQ">
+        <label class="q" id="rtWhichL">أي كتيّب؟</label>
+        <div class="rt-opts">
+          <label class="rt-opt"><input type="radio" name="title" value="dalil"><span>دليل الوفرة المالية</span></label>
+          <label class="rt-opt"><input type="radio" name="title" value="ahdafi"><span>كتيّب أهدافي المالية</span></label>
+          <label class="rt-opt"><input type="radio" name="title" value="both"><span>الاثنين</span></label>
         </div>
       </div>
 
@@ -261,6 +271,14 @@ function sync(){
   const vip = pick("vip") === "نعم";
   show("#qVipRating", vip);
   show("#qVipWhy",    vip && (pick("vrate") === "متوسط" || pick("vrate") === "ضعيف"));
+
+  /* Which title only matters once there is one to name — and the wording
+     changes, because "which one do you own" and "which one do you want"
+     are different questions wearing the same options. */
+  const bk = pick("book");
+  show("#rtWhichQ", bk === "نعم" || bk === "أبي أشتريه");
+  const lbl = $("#rtWhichL");
+  if(lbl) lbl.textContent = bk === "أبي أشتريه" ? "أي كتيّب تبي؟" : "أي كتيّب عندك؟";
 }
 document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", sync));
 sync();
@@ -300,6 +318,7 @@ $("#rtBtn").addEventListener("click", async () => {
       rating: pick("rate"), ratingReason: $("#rRateWhy").value.trim(),
       source: pick("src"), sourceOther: $("#rSrcOther").value.trim(),
       booklet: pick("book"),
+      bookletTitle: pick("title"),
       vipAttended: pick("vip") === "نعم",
       vipRating: pick("vrate"), vipRatingReason: $("#rVipWhy").value.trim(),
       benefit: $("#rBenefit").value.trim(),
@@ -308,7 +327,19 @@ $("#rtBtn").addEventListener("click", async () => {
     if(r.data && r.data.ok){
       if(r.data.updated) $("#rtOkMsg").textContent = "حدّثنا تقييمك السابق بالإجابات الجديدة. شكراً لوقتك.";
       /* a raised hand for the booklet is a warm lead: give them the button now */
-      if(pick("book") === "أبي أشتريه") $("#rtBuy").classList.remove("rt-hide");
+      if(pick("book") === "أبي أشتريه"){
+        /* send them to the one they actually asked for */
+        const want = pick("title");
+        const buy  = $("#rtBuy");
+        if(want === "ahdafi"){
+          buy.href = "quiz/checkout.html?product=ahdafi";
+          buy.textContent = "احجز كتيّب أهدافي المالية ←";
+        } else if(want === "both"){
+          buy.href = "books/";
+          buy.textContent = "شوف الكتيّبات ←";
+        }
+        buy.classList.remove("rt-hide");
+      }
       $("#rtForm").style.display = "none";
       $("#rtOk").style.display = "block";
       window.scrollTo({ top:0, behavior:"smooth" });

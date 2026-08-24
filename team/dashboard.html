@@ -1086,7 +1086,7 @@ function renderProfit(){
   $("#pfKpis").innerHTML=
     `<div class="kpi"><div class="n">${kwd(t.due)}</div><div class="l">مستحق لك هذا الشهر</div></div>`+
     `<div class="kpi"><div class="n">${kwd(t.share)}</div><div class="l">حصتك من المبيعات</div></div>`+
-    ((t.held||0)>0?`<div class="kpi"><div class="n">${kwd(t.held)}</div><div class="l">معلّق حتى انتهاء الجلسات</div></div>`:"")+
+    ((t.held||0)>0?`<div class="kpi"><div class="n">${kwd(t.held)}</div><div class="l">منها لعملاء ما أنهوا جلساتهم</div></div>`:"")+
     (PF.salary?`<div class="kpi"><div class="n">${kwd(PF.salary)}</div><div class="l">الراتب</div></div>`:"")+
     `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">عملية</div></div>`;
 
@@ -1102,7 +1102,7 @@ function renderProfit(){
         <td>${esc(l.what)||"—"}</td>
         <td>${esc(l.client)||"—"}</td>
         <td class="pfrule">${DELIV_AR[l.delivery]||""}</td>
-        <td class="num"><b>${kwd(l.share)}</b>${l.delivery==="pending"?'<div class="pfrule">معلّق</div>':""}</td></tr>`).join("")+
+        <td class="num"><b>${kwd(l.share)}</b></td></tr>`).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في عمليات لك بهذا الشهر.</div>`;
 }
@@ -1150,7 +1150,7 @@ function renderBooks(){
         const hl=(BK.held||{})[k]||0;
         return `<tr>
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
-          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">+ ${esc(kwd(hl))} معلّق</div>`:""}</td>
+          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}</td>
           <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
           <td><button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button></td></tr>`;
       }).join("")+`</tbody></table>`
@@ -1184,7 +1184,7 @@ function renderBooks(){
         <td class="pfrule">${Object.keys(l.shares||{}).map(k=>{
             const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
             return esc(nm)+" "+kwd(l.shares[k]);
-          }).join("<br>")||"—"}${l.payable?"":'<div style="color:#962E37;font-weight:700">معلّق</div>'}</td></tr>`).join("")+
+          }).join("<br>")||"—"}</td></tr>`).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في حركة بهذا الشهر.</div>`;
 
