@@ -1125,6 +1125,15 @@ function pfMsg(m,ok){ const el=$("#bkMsg"); if(!el) return; el.className="addmsg
 
 function renderBooks(){
   if(!BK || !$("#bkKpisMoney")) return;
+  /* a viewer gets the company picture without the rates or the controls
+     that move money — the server already refuses those, this just keeps
+     buttons off the screen that would only ever return "ما عندك صلاحية" */
+  const canEdit = BK.canEdit !== false;
+  ["#bkFx","#bkFxSave","#bkVcLabel","#bkVcAmount","#bkVcAdd","#bkFcLabel","#bkFcAmount",
+   "#bkFcCur","#bkFcBasis","#bkFcAdd","#bkMnLabel","#bkMnAmount","#bkMnCosts","#bkMnRule",
+   "#bkMnAdd","#bkRuleNew"].forEach(sel=>{ const el=$(sel); if(el) el.disabled=!canEdit; });
+  const rulesH=$("#bkRules"); if(rulesH) rulesH.style.display=canEdit?"":"none";
+  const rn=$("#bkRuleNew");  if(rn) rn.style.display=canEdit?"":"none";
   fillMonths($("#bkMonth"), BK.months, BK.month);
   if(document.activeElement!==$("#bkFx")) $("#bkFx").value=BK.usdRate||"";
   const t=BK.totals||{};
@@ -1152,7 +1161,7 @@ function renderBooks(){
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
           <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}</td>
           <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
-          <td><button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button></td></tr>`;
+          <td>${canEdit?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`:""}</td></tr>`;
       }).join("")+`</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في مستحقات بهذا الشهر.</div>`;
 
@@ -1166,15 +1175,15 @@ function renderBooks(){
   const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
     `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
   $("#bkLines").innerHTML = lines.length
-    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th><th>القاعدة</th><th>التسليم</th><th>التوزيع</th></tr></thead><tbody>`+
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>التسليم</th><th>التوزيع</th></tr></thead><tbody>`+
       lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}</div></td>
         <td class="num">${kwd(l.amount)}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}</td>
-        <td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>
-        <td>${l.canMark
+        ${canEdit?`<td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>`:""}
+        <td>${l.canMark && canEdit
               ? `<select class="pfdeliv" data-order="${esc(l.orderId)}">`+
                 [["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]]
                   .map(([v,t])=>`<option value="${v}"${v===l.delivery?" selected":""}>${t}</option>`).join("")+
