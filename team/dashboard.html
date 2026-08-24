@@ -655,7 +655,7 @@
       <div class="f"><label>طريقة البث</label>
         <select id="lvMode">
           <option value="youtube">يوتيوب (بث مدمج بالصفحة)</option>
-          <option value="meet">Google Meet (زر دخول)</option>
+          <option value="meet">زوم / Meet (زر دخول)</option>
         </select>
       </div>
       <div class="f"><label>حالة اللقاء</label>
@@ -669,7 +669,9 @@
         <input id="lvVideo" type="text" placeholder="https://youtube.com/live/xxxx أو xxxx" style="direction:ltr;text-align:left"></div>
       <div class="f" id="lvVipWrap"><label>بث الـ VIP · رابط يوتيوب أو الـ ID</label>
         <input id="lvVipVideo" type="text" placeholder="رابط الساعة الثانية (اختياري)" style="direction:ltr;text-align:left"></div>
-      <div class="f" id="lvMeetWrap"><label>رابط Google Meet</label>
+      <div class="f" id="lvVipMeetWrap"><label>رابط الساعة الخاصة (VIP)</label>
+        <input id="lvVipMeet" type="text" placeholder="رابط اجتماع الساعة الثانية" style="direction:ltr;text-align:left"></div>
+      <div class="f" id="lvMeetWrap"><label>رابط الاجتماع (زوم / Meet)</label>
         <input id="lvMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
       <div class="f"><label>موعد البداية (للعدّاد)</label>
         <input id="lvStart" type="datetime-local"></div>
@@ -2966,9 +2968,10 @@ function toLocalInput(ms){
 
 function syncLiveMode(){
   const m=$("#lvMode").value;
-  $("#lvVidWrap").style.display  = m==="meet" ? "none" : "block";
-  $("#lvVipWrap").style.display  = m==="meet" ? "none" : "block";
-  $("#lvMeetWrap").style.display = m==="meet" ? "block" : "none";
+  $("#lvVidWrap").style.display     = m==="meet" ? "none" : "block";
+  $("#lvVipWrap").style.display     = m==="meet" ? "none" : "block";
+  $("#lvMeetWrap").style.display    = m==="meet" ? "block" : "none";
+  $("#lvVipMeetWrap").style.display = m==="meet" ? "block" : "none";
 }
 
 function renderLive(){
@@ -2994,6 +2997,7 @@ function renderLive(){
   if(document.activeElement!==$("#lvVideo"))    $("#lvVideo").value=c.videoId||"";
   if(document.activeElement!==$("#lvVipVideo")) $("#lvVipVideo").value=c.vipVideoId||"";
   if(document.activeElement!==$("#lvMeet"))     $("#lvMeet").value=c.meetUrl||"";
+  if(document.activeElement!==$("#lvVipMeet"))  $("#lvVipMeet").value=c.vipMeetUrl||"";
   if(document.activeElement!==$("#lvStart"))   $("#lvStart").value=toLocalInput(c.startAt);
   if(document.activeElement!==$("#lvTitleIn")) $("#lvTitleIn").value=c.title||"";
   syncLiveMode();
@@ -3067,7 +3071,7 @@ function lvPayload(extra){
     mode:$("#lvMode").value, state:$("#lvState").value,
     audience:$("#lvAudience").value, qa:$("#lvQa").value,
     videoId:$("#lvVideo").value.trim(), vipVideoId:$("#lvVipVideo").value.trim(),
-    meetUrl:$("#lvMeet").value.trim(),
+    meetUrl:$("#lvMeet").value.trim(), vipMeetUrl:$("#lvVipMeet").value.trim(),
     startAt: sv ? new Date(sv).getTime() : 0,
     title:$("#lvTitleIn").value.trim(),
   }, extra||{});
