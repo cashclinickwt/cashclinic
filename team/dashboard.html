@@ -880,6 +880,7 @@ const app=initializeApp(CONFIG.firebase);
 const auth=getAuth(app);
 const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDashboard");
 const getProfit=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getProfit");
+const setDelivery=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setDelivery");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
 const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
@@ -1083,6 +1084,7 @@ function renderProfit(){
   $("#pfKpis").innerHTML=
     `<div class="kpi"><div class="n">${kwd(t.due)}</div><div class="l">مستحق لك هذا الشهر</div></div>`+
     `<div class="kpi"><div class="n">${kwd(t.share)}</div><div class="l">حصتك من المبيعات</div></div>`+
+    ((t.held||0)>0?`<div class="kpi"><div class="n">${kwd(t.held)}</div><div class="l">معلّق حتى انتهاء الجلسات</div></div>`:"")+
     (PF.salary?`<div class="kpi"><div class="n">${kwd(PF.salary)}</div><div class="l">الراتب</div></div>`:"")+
     `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">عملية</div></div>`;
 
@@ -1092,13 +1094,13 @@ function renderProfit(){
 
   const rows=PF.lines||[];
   $("#pfList").innerHTML = rows.length
-    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>الوصف</th><th>العميل</th><th>القاعدة</th><th>حصتك</th></tr></thead><tbody>`+
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>الوصف</th><th>العميل</th><th>الحالة</th><th>حصتك</th></tr></thead><tbody>`+
       rows.map(l=>`<tr>
         <td class="num">${dt(l.when)}</td>
         <td>${esc(l.what)||"—"}</td>
         <td>${esc(l.client)||"—"}</td>
-        <td class="pfrule">${esc(l.ruleLabel)||"—"}</td>
-        <td class="num"><b>${kwd(l.share)}</b></td></tr>`).join("")+
+        <td class="pfrule">${DELIV_AR[l.delivery]||""}</td>
+        <td class="num"><b>${kwd(l.share)}</b>${l.delivery==="pending"?'<div class="pfrule">معلّق</div>':""}</td></tr>`).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في عمليات لك بهذا الشهر.</div>`;
 }
@@ -1143,9 +1145,10 @@ function renderBooks(){
         const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
         const p=paid[k]||{}; const done=!!p.paidAt;
         const pd=(BK.payDays||{})[k];
+        const hl=(BK.held||{})[k]||0;
         return `<tr>
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
-          <td class="num">${kwd(due[k])}</td>
+          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">+ ${esc(kwd(hl))} معلّق</div>`:""}</td>
           <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
           <td><button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button></td></tr>`;
       }).join("")+`</tbody></table>`
@@ -1161,19 +1164,25 @@ function renderBooks(){
   const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
     `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
   $("#bkLines").innerHTML = lines.length
-    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th><th>الصافي</th><th>القاعدة</th><th>التوزيع</th></tr></thead><tbody>`+
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th><th>القاعدة</th><th>التسليم</th><th>التوزيع</th></tr></thead><tbody>`+
       lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}</div></td>
         <td class="num">${kwd(l.amount)}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}</td>
-        <td class="num">${kwd(l.net)}</td>
         <td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>
+        <td>${l.canMark
+              ? `<select class="pfdeliv" data-order="${esc(l.orderId)}">`+
+                [["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]]
+                  .map(([v,t])=>`<option value="${v}"${v===l.delivery?" selected":""}>${t}</option>`).join("")+
+                `</select>`+
+                (l.voucherUntil?`<div class="pfrule">الرصيد صالح حتى ${esc(dt(l.voucherUntil))}</div>`:"")
+              : `<span class="pfrule">${esc(DELIV_AR[l.delivery]||"")}</span>`}</td>
         <td class="pfrule">${Object.keys(l.shares||{}).map(k=>{
             const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
             return esc(nm)+" "+kwd(l.shares[k]);
-          }).join("<br>")||"—"}</td></tr>`).join("")+
+          }).join("<br>")||"—"}${l.payable?"":'<div style="color:#962E37;font-weight:700">معلّق</div>'}</td></tr>`).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في حركة بهذا الشهر.</div>`;
 
@@ -1279,6 +1288,7 @@ function renderBooks(){
 }
 
 const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد"};
+const DELIV_AR={done:"خلّص جلساته",voucher:"ألغى وأخذ رصيد",pending:"لم تنتهي حتى الآن"};
 
 $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
 
@@ -1296,6 +1306,20 @@ $("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
 });
 
 $("#bkLines") && $("#bkLines").addEventListener("change", async e=>{
+  /* Marking a cancellation issues the voucher and releases the share: the
+     client keeps credit for ninety days, the money stays with us, so the
+     consultant is paid for work they were ready to do. */
+  const dv=e.target.closest("select.pfdeliv");
+  if(dv){
+    if(dv.value==="voucher" && !confirm("العميل ألغى وبيتعطى رصيد ٩٠ يوم؟\n\nحصة الاستشاري بتنصرف لأن المبلغ باقي عندنا.")) {
+      renderBooks(); return;
+    }
+    dv.disabled=true;
+    try{ await setDelivery({ orderId:dv.dataset.order, state:dv.value });
+         await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true); }
+    catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); dv.disabled=false; }
+    return;
+  }
   const sel=e.target.closest("select.pfrulesel"); if(!sel) return;
   const orderId=sel.dataset.order;
   try{
