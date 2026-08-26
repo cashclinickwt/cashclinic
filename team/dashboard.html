@@ -379,6 +379,12 @@
   .pftab .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
   .pfrule{font-size:12px;color:var(--muted)}
   .pfwarn td{background:#FDECEC}
+  .pfsub{width:100%;border-collapse:collapse;font-size:12.5px}
+  .pfsub td{padding:5px 8px;border:0;border-top:1px dashed var(--line);vertical-align:middle}
+  .pfsub tr:first-child td{border-top:0}
+  .pfsub .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pfsub select{border:1.5px solid var(--line);border-radius:9px;padding:5px 8px;
+    font-family:inherit;font-size:12.5px;background:#fff;color:var(--ink)}
   .pfbtn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;
     font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
   .pfbtn:hover{border-color:var(--acc,var(--auber));color:var(--acc,var(--auber))}
@@ -485,6 +491,10 @@
     <div id="bkUnmatched"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> حركة الشهر</h2>
+    <div class="flt" id="bkTab">
+      <button data-mv="open" class="on">تحت التحويل</button>
+      <button data-mv="done">تم التحويل</button>
+    </div>
     <div id="bkLines"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> التكاليف</h2>
@@ -883,6 +893,7 @@ const auth=getAuth(app);
 const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDashboard");
 const getProfit=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getProfit");
 const setDelivery=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setDelivery");
+const setLineTransfer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineTransfer");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
 const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
@@ -1010,7 +1021,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
-let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null;
+let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, BKMV = "open";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
 const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function monthLabel(m){
@@ -1171,11 +1182,28 @@ function renderBooks(){
     ? `<div class="pfnote"><b>${fmt(un.length)} عملية ما انطبقت عليها أي قاعدة</b> — مبالغها داخلة بالدخل بس ما انقسمت على أحد. اختر لها قاعدة من جدول الحركة تحت.</div>`
     : "";
 
-  const lines=BK.lines||[];
+  /* Two lists, one table. A line sits under «تحت التحويل» until every person
+     on it has actually been paid, then it moves to «تم» — so the pending tab
+     is a worklist that empties, not a log that only ever grows. */
+  const allLines=BK.lines||[];
+  const lines=allLines.filter(l => BKMV==="done" ? l.closed : !l.closed);
   const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
     `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
+
+  const tabs=$("#bkTab");
+  if(tabs){
+    const nOpen=allLines.filter(l=>!l.closed).length, nDone=allLines.filter(l=>l.closed).length;
+    tabs.querySelectorAll("button").forEach(b=>{
+      const k=b.dataset.mv;
+      b.classList.toggle("on", k===BKMV);
+      b.textContent = (k==="done" ? "تم التحويل" : "تحت التحويل") + " · " + fmt(k==="done"?nDone:nOpen);
+    });
+  }
+
+  const DELIV_OPTS=[["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]];
+
   $("#bkLines").innerHTML = lines.length
-    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>التسليم</th><th>التوزيع</th></tr></thead><tbody>`+
+    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>الحصص والتحويل</th></tr></thead><tbody>`+
       lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
@@ -1183,24 +1211,28 @@ function renderBooks(){
         <td class="num">${kwd(l.amount)}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}</td>
         ${canEdit?`<td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>`:""}
-        <td>${l.canMark && canEdit
-              ? `<select class="pfdeliv" data-order="${esc(l.orderId)}">`+
-                [["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]]
-                  .map(([v,t])=>`<option value="${v}"${v===l.delivery?" selected":""}>${t}</option>`).join("")+
-                `</select>`+
-                (l.voucherUntil?`<div class="pfrule">الرصيد صالح حتى ${esc(dt(l.voucherUntil))}</div>`:"")
-              : `<span class="pfrule">${esc(DELIV_AR[l.delivery]||"")}</span>`}</td>
-        <td class="pfrule">${Object.keys(l.shares||{}).map(k=>{
-            const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
-            return esc(nm)+" "+kwd(l.shares[k]);
-          }).join("<br>")||"—"}</td></tr>`).join("")+
+        <td>${(l.people||[]).length ? `<table class="pfsub">`+
+          (l.people||[]).map(p=>{
+            /* the company has no session to finish and nobody to pay */
+            const isCo = p.id==="company";
+            return `<tr>
+              <td><b>${esc(p.name)}</b></td>
+              <td class="num">${kwd(p.share)}</td>
+              <td>${(!isCo && l.canMark)
+                    ? (canEdit
+                        ? `<select class="pfdeliv" data-order="${esc(l.orderId)}" data-who="${esc(p.id)}">`+
+                          DELIV_OPTS.map(([v,t])=>`<option value="${v}"${v===p.delivery?" selected":""}>${t}</option>`).join("")+
+                          `</select>`+(p.voucherUntil?`<div class="pfrule">الرصيد صالح حتى ${esc(dt(p.voucherUntil))}</div>`:"")
+                        : `<span class="pfrule">${esc(DELIV_AR[p.delivery]||"")}</span>`)
+                    : ""}</td>
+              <td>${isCo ? "" : (canEdit
+                    ? `<button class="pfbtn ${p.transferred?"paid":"go"}" data-tf="${esc(l.orderId)}" data-who="${esc(p.id)}" data-on="${p.transferred?"0":"1"}" data-amount="${p.share}">${p.transferred?"تراجع":"حوّلت له"}</button>`
+                    : `<span class="pfrule">${p.transferred?"تم التحويل":"لم يتم التحويل حتى الآن"}</span>`)}</td>
+            </tr>`;
+          }).join("")+`</table>` : "—"}</td></tr>`).join("")+
       `</tbody></table>`
-    : `<div class="muted" style="font-size:13px;padding:10px">ما في حركة بهذا الشهر.</div>`;
+    : `<div class="muted" style="font-size:13px;padding:10px">${BKMV==="done"?"ما في شي تحوّل بهذا الشهر بعد.":"كل شي تحوّل ✅"}</div>`;
 
-  /* Every cost is editable in place. It has to be: the seeded figures only
-     ever land in Firestore once, on the very first read, so a wrong seed can
-     never be corrected by changing the code — the row has to be reachable
-     from here or the number is stuck forever. */
   const costs=BK.costs||[];
   const CUR=["KWD","USD"], BAS=[["monthly","شهري"],["yearly","سنوي"]];
   $("#bkCosts").innerHTML = costs.length
@@ -1303,6 +1335,25 @@ const DELIV_AR={done:"خلّص جلساته",voucher:"ألغى وأخذ رصيد
 
 $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
 
+$("#bkTab") && $("#bkTab").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-mv]"); if(!b) return;
+  BKMV=b.dataset.mv; renderBooks();
+});
+
+/* paying one person for one booking, without touching the rest of their month */
+$("#bkLines") && $("#bkLines").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-tf]"); if(!b) return;
+  const on=b.dataset.on==="1";
+  if(on && !confirm(`تأكيد: حوّلت ${kwd(b.dataset.amount)} عن هذا الحجز؟`)) return;
+  b.disabled=true;
+  try{
+    await setLineTransfer({ orderId:b.dataset.tf, who:b.dataset.who, on,
+                            amount:Number(b.dataset.amount)||0 });
+    await loadBooks(BKMONTH);
+    pfMsg(on?"انسجّل التحويل ✅":"انتراجعنا عن التحويل", true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); b.disabled=false; }
+});
+
 $("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
   const b=e.target.closest("button[data-pay]"); if(!b) return;
   const who=b.dataset.pay;
@@ -1322,11 +1373,12 @@ $("#bkLines") && $("#bkLines").addEventListener("change", async e=>{
      consultant is paid for work they were ready to do. */
   const dv=e.target.closest("select.pfdeliv");
   if(dv){
-    if(dv.value==="voucher" && !confirm("العميل ألغى وبيتعطى رصيد ٩٠ يوم؟\n\nحصة الاستشاري بتنصرف لأن المبلغ باقي عندنا.")) {
+    const who=dv.dataset.who;
+    if(dv.value==="voucher" && !confirm("العميل ألغى جلساته مع هذا الاستشاري وبياخذ رصيد ٩٠ يوم؟")) {
       renderBooks(); return;
     }
     dv.disabled=true;
-    try{ await setDelivery({ orderId:dv.dataset.order, state:dv.value });
+    try{ await setDelivery({ orderId:dv.dataset.order, who, state:dv.value });
          await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true); }
     catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); dv.disabled=false; }
     return;

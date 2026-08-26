@@ -384,6 +384,12 @@ function humanFull(iso, minutes){
 const QS = new URLSearchParams(location.search);
 const PREVIEW = QS.get("preview") || "";
 const CONSULTANT_ID = QS.get("c") || "ghalia";
+/* Someone arriving from the quiz has already been told which package fits
+   them, so landing them back on the clinic chooser would make them pick it
+   twice. ?pkg= opens straight onto that package; the rest of the page is
+   unchanged, and they can still go back and choose differently. */
+const WANT_PKG  = QS.get("pkg") || "";
+const PRE = { name: QS.get("name") || "", email: QS.get("email") || "", phone: QS.get("phone") || "" };
 const RESCHED = { id:QS.get("r"), token:QS.get("t") };
 
 let C = null, PKG = null, MODE = "online", DAYS = [], PICK_DATE = "", PICK_ISO = "";
@@ -413,6 +419,22 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
       C = CONSULTANTS.find(x => x.id === CONSULTANT_ID) || CONSULTANTS[0];
       openClinic("nas", { silent:true });
       await bootReschedule();
+      return;
+    }
+
+    /* the quiz already collected their details at the gate — no reason to
+       ask a second time on the way to the same booking */
+    if(PRE.name  && $("#bName"))  $("#bName").value  = PRE.name;
+    if(PRE.email && $("#bEmail")) $("#bEmail").value = PRE.email;
+    if(PRE.phone && $("#bPhone")) $("#bPhone").value = String(PRE.phone).replace(/^\+?965/, "");
+
+    /* arriving with a package in hand skips the clinic chooser */
+    const wanted = WANT_PKG && (data.packages || []).find(p => p.id === WANT_PKG);
+    if(wanted){
+      show("#bkLoading",false);
+      openClinic(wanted.clinic || "nas", { pkg: wanted.id });
+      document.querySelectorAll('input[name="mode"]').forEach(el =>
+        el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
       return;
     }
 
@@ -485,6 +507,12 @@ function openClinic(id, opt){
     el.addEventListener("change", () => { if(el.checked) choosePackage(el.value); }));
 
   show("#cardPkg", true);
+
+  /* the package the quiz recommended, already open */
+  if(opt && opt.pkg){
+    const el = document.querySelector(`input[name="pkg"][value="${opt.pkg}"]`);
+    if(el){ el.checked = true; choosePackage(opt.pkg); }
+  }
   window.scrollTo({ top:0, behavior:"smooth" });
 }
 

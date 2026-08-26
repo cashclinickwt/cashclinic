@@ -82,6 +82,37 @@ img{max-width:100%;display:block}
 .acard h3{font-size:19px;font-weight:800;margin:0 0 10px}
 .acard p{color:var(--muted);font-size:14.5px;line-height:1.85;margin:0}
 
+.nx{margin:40px 0 10px}
+.nx>h3{font-size:clamp(20px,3.2vw,26px);font-weight:800;color:#2F1749;text-align:center;margin:0 0 6px}
+.nx>p.sub{text-align:center;color:#756E80;font-size:15px;line-height:1.8;margin:0 auto 26px;max-width:46ch}
+.nxg{display:grid;gap:16px}
+@media(min-width:820px){.nxg{grid-template-columns:repeat(3,1fr)}}
+.nxc{background:#fff;border:1.5px solid #E6E3EC;border-radius:20px;padding:24px 22px;display:flex;
+  flex-direction:column;text-align:start}
+.nxc.pick{border-color:#D3A146;box-shadow:0 12px 34px rgba(211,161,70,.16)}
+.nxc .tag{display:inline-block;align-self:flex-start;background:#F3F0F8;color:#2F1749;font-size:12px;
+  font-weight:700;border-radius:999px;padding:5px 12px;margin-bottom:12px}
+.nxc.pick .tag{background:#D3A146;color:#2F1749}
+.nxc h4{font-size:18px;font-weight:800;color:#2F1749;margin:0 0 8px;line-height:1.45}
+.nxc p{font-size:14.5px;line-height:1.85;color:#5C5568;margin:0 0 16px}
+.nxc .price{font-size:15px;font-weight:800;color:#505632;margin:0 0 16px}
+.nxc .price s{color:#9A94A6;font-weight:500;margin-inline-end:8px}
+.nxc .go{margin-top:auto}
+.nxc .go a,.nxc .go button{display:block;width:100%;text-align:center;border:0;cursor:pointer;
+  font-family:inherit;font-size:15.5px;font-weight:700;border-radius:999px;padding:14px 18px;
+  text-decoration:none;background:#2F1749;color:#FFE7BC}
+.nxc .go a:hover,.nxc .go button:hover{filter:brightness(1.12)}
+.nxc.pick .go a{background:#D3A146;color:#2F1749}
+.nxpick{display:flex;gap:8px;margin:0 0 14px}
+.nxpick label{flex:1}
+.nxpick input{position:absolute;opacity:0;pointer-events:none}
+.nxpick .who{display:block;text-align:center;border:1.5px solid #E6E3EC;border-radius:14px;
+  padding:10px 8px;font-size:14px;font-weight:700;color:#5C5568;cursor:pointer}
+.nxpick input:checked+.who{border-color:#505632;background:#F4F6EE;color:#505632}
+.nxbooks input:checked+.who{border-color:#505632;background:#F4F6EE}
+.nxbooks input:checked+.who b{color:#505632}
+.nxnote{font-size:13px;color:#756E80;text-align:center;margin:18px auto 0;max-width:52ch;line-height:1.8}
+
 .cta-band{background:var(--teal);border-radius:20px;padding:52px 30px;text-align:center;margin:44px 0 34px}
 .cta-band .eyebrow{color:#d6f0ef;font-weight:600;font-size:15px;margin-bottom:14px}
 .cta-band h2{font-size:clamp(21px,3.4vw,30px);font-weight:800;line-height:1.55;margin:0 0 26px;max-width:760px;margin-inline:auto}
@@ -481,10 +512,127 @@ function renderResult(sc, leadId){
       <button class="btn gold block" id="cta">${CTA_BTN}</button>
       <div id="ctaErr" style="color:#ffd7d7;margin-top:10px;font-size:14px"></div>
       <a class="wa" href="${waLink(sc)}" target="_blank" rel="noopener">${WA_ICON}<span>${WA_TEXT}</span></a>
-    </div>`;
+    </div>
+    ${nextSteps(sc)}`;
   window.scrollTo(0,0);
   document.getElementById("cta").addEventListener("click", CTA==='tap'?buyNow:goBook);
+  wireNextSteps();
   requestAnimationFrame(()=>animateResult(sc));
+}
+
+/* ================= WHAT NOW =================
+   Three ways forward, offered together rather than one at a time: a book to
+   read, a short call, or the package their own answers point at. The package
+   is the one marked "الأنسب لك" — chosen from the result, not the same card
+   shown to everybody, because a diagnosis that ends in one generic button
+   wastes the diagnosis.
+   ============================================ */
+
+const NX_BOOKS = [
+  { key:"dalil",  name:"دليل الوفرة المالية", was:30, now:20,
+    desc:"الأساس: خطوات عملية تنقلك من التخبط للوضوح، وتبني بها وفرتك خطوة بخطوة." },
+  { key:"ahdafi", name:"كتيّب أهدافي المالية", was:0, now:25,
+    desc:"تحوّل أهدافك من أمنيات لأرقام ومواعيد، وتعرف بالضبط شنو الخطوة الجاية." },
+];
+
+/* Where الوفرة takes over from الأساس. Deliberately its own number rather
+   than reusing B2: the display bands say how the result is described, this
+   says which package is right, and the two are free to differ. */
+const NX_CUT = 60;
+
+/** which package this result points at */
+function nxRecommend(sc){
+  const ov = sc.overall || 0;
+  if(ov >= NX_CUT){
+    return { id:"wafra", name:"باقة الوفرة المالية", amount:299, sessions:"جلستين",
+      why:"نتيجتك تبين أساس قوي. الوفرة تبني عليه نظام موحد يربط أهدافك بواقعك وينقلك من الاستقرار للوفرة." };
+  }
+  /* below the top band the foundation is the thing that pays off first */
+  const weakest = ORDER.slice().sort((a,b)=>(sc[a]||0)-(sc[b]||0))[0];
+  const lbl = (DIMS[weakest]||{}).title || "";
+  return { id:"asas", name:"باقة أساس الحرية المالية", amount:168, sessions:"جلستين",
+    why: ov >= B1
+      ? `عندك نقاط قوة واضحة، وأضعف محور عندك ${lbl}. الأساس يشتغل على المحاور اللي تحتاج تطوير وحدة وحدة.`
+      : `أضعف محور عندك ${lbl}. الأساس يبدأ من وعيك بمصاريفك ويبني معك أساس مالي واضح.` };
+}
+
+function nxLink(pkg, extra){
+  const L = window.__LEAD || {};
+  const qs = new URLSearchParams(Object.assign({
+    pkg, name:L.name||"", email:L.email||"", phone:L.phone||""
+  }, extra||{})).toString();
+  return "../book.html?" + qs;
+}
+
+function nextSteps(sc){
+  const rec = nxRecommend(sc);
+  const books = NX_BOOKS.map(b=>`
+    <label style="display:block;margin-bottom:8px">
+      <input type="radio" name="nxbook" value="${b.key}"${b.key==="dalil"?" checked":""} style="position:absolute;opacity:0;pointer-events:none">
+      <span class="who" style="text-align:start;padding:12px 14px;display:block;border:1.5px solid #E6E3EC;border-radius:14px;cursor:pointer">
+        <b style="display:block;color:#2F1749;font-size:15px">${b.name}</b>
+        <span style="font-size:13.5px;color:#756E80;line-height:1.7">${b.desc}</span>
+        <span style="display:block;margin-top:6px;font-weight:800;color:#505632">${b.was?`<s style="color:#9A94A6;font-weight:500">${b.was} د.ك</s> `:""}${b.now} د.ك</span>
+      </span>
+    </label>`).join("");
+
+  return `
+  <section class="nx">
+    <h3>شنو خطوتك الجاية؟</h3>
+    <p class="sub">اختر اللي يناسبك الحين. تقدر تبدأ صغير وترجع لنا بأي وقت.</p>
+    <div class="nxg">
+
+      <div class="nxc">
+        <span class="tag">١ · اقرأ</span>
+        <h4>ابدأ بكتيّب</h4>
+        <div class="nxbooks">${books}</div>
+        <div class="go"><button type="button" id="nxBookGo">اشتر الكتيّب</button></div>
+      </div>
+
+      <div class="nxc">
+        <span class="tag">٢ · اتصال سريع</span>
+        <h4>الاتصال السريع</h4>
+        <p>مكالمة قصيرة تسأل فيها اللي محتار فيه، وتطلع بخطوة وحدة واضحة.</p>
+        <div class="price">٣٥ د.ك · ٣٠ دقيقة</div>
+        <div class="nxpick">
+          <label><input type="radio" name="nxcons" value="ghalia" checked><span class="who">غالية النويف</span></label>
+          <label><input type="radio" name="nxcons" value="sara"><span class="who">سارة الهندي</span></label>
+        </div>
+        <div class="go"><a id="nxCallGo" href="${nxLink("ittisal",{c:"ghalia"})}">احجز اتصالك</a></div>
+      </div>
+
+      <div class="nxc pick">
+        <span class="tag">٣ · الأنسب لك</span>
+        <h4>${esc0(rec.name)}</h4>
+        <p>${esc0(rec.why)}</p>
+        <div class="price">${rec.amount} د.ك · ${rec.sessions}</div>
+        <div class="go"><a href="${nxLink(rec.id)}">احجز موعدك الأول</a></div>
+      </div>
+
+    </div>
+    <p class="nxnote">أي باقة تقدر تقسّطها مع ديمة على أربع دفعات، وتختار موعد جلستك الأولى بنفسك.</p>
+  </section>`;
+}
+
+function esc0(x){ return String(x==null?"":x)
+  .replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function wireNextSteps(){
+  /* the call link follows whoever they pick, so they land on that diary */
+  document.querySelectorAll('input[name="nxcons"]').forEach(el =>
+    el.addEventListener("change", () => {
+      const a = document.getElementById("nxCallGo");
+      if(a && el.checked) a.href = nxLink("ittisal", { c: el.value });
+    }));
+
+  const go = document.getElementById("nxBookGo");
+  if(go) go.addEventListener("click", () => {
+    const picked = document.querySelector('input[name="nxbook"]:checked');
+    const L = window.__LEAD || {};
+    const qs = new URLSearchParams({ product: picked ? picked.value : "dalil",
+      name:L.name||"", email:L.email||"", phone:L.phone||"" }).toString();
+    window.location.href = "checkout.html?" + qs;
+  });
 }
 function goBook(){
   const L=window.__LEAD||{};
