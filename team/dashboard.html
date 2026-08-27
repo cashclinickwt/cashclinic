@@ -1330,7 +1330,12 @@ function renderBooks(){
             </tr>`;
           }).join("")+`</table>` : "—"}</td></tr>`).join("")+
       `</tbody></table>`
-    : `<div class="muted" style="font-size:13px;padding:10px">${BKMV==="done"?"ما في شي تحوّل بهذا الشهر بعد.":"كل شي تحوّل ✅"}</div>`;
+    : `<div class="muted" style="font-size:13px;padding:10px">${
+        BKMV==="done"
+          ? (BKKIND==="all" ? "ما تحوّل شي بهذا الشهر بعد."
+                            : "ما تحوّل شي من هذا القسم بعد.")
+          : (BKKIND==="all" ? "ما في شي ناقص تحويل ✅"
+                            : "هذا القسم كله تحوّل ✅")}</div>`;
 
   /* a redraw must not silently drop what was already ticked */
   document.querySelectorAll("#bkLines .pfsel").forEach(el=>{
