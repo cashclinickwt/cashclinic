@@ -385,6 +385,19 @@
   .pfsub .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
   .pfsub select{border:1.5px solid var(--line);border-radius:9px;padding:5px 8px;
     font-family:inherit;font-size:12.5px;background:#fff;color:var(--ink)}
+  .bknotes{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .bknoteitem{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:9px 12px;
+    font-size:13px;line-height:1.8;color:var(--ink)}
+  .bknoteitem .w{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+  .pftick{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;
+    color:var(--muted);border:1.5px solid var(--line);border-radius:999px;padding:5px 12px}
+  .pftick input{accent-color:var(--olive);width:15px;height:15px;cursor:pointer}
+  .pftick:has(input:checked){border-color:var(--olive);background:#F4F6EE;color:var(--olive);font-weight:700}
+  .pfsend{position:sticky;top:8px;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    background:#2F1749;color:#FFE7BC;border-radius:14px;padding:12px 16px;margin-bottom:12px}
+  .pfsend span{font-size:13.5px;font-weight:700;margin-inline-end:auto}
+  .pfsend .pfbtn{background:rgba(255,255,255,.12);border-color:transparent;color:#FFE7BC}
+  .pfsend .pfbtn.go{background:var(--gold);color:var(--auber);border-color:var(--gold)}
   .pfbtn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;
     font-size:12.5px;font-family:inherit;cursor:pointer;color:var(--ink)}
   .pfbtn:hover{border-color:var(--acc,var(--auber));color:var(--acc,var(--auber))}
@@ -495,6 +508,13 @@
       <button data-mv="open" class="on">تحت التحويل</button>
       <button data-mv="done">تم التحويل</button>
     </div>
+    <div class="flt" id="bkKind"></div>
+    <div class="pfsend" id="bkSendBar" hidden>
+      <span id="bkSelInfo"></span>
+      <button class="pfbtn go" id="bkSendGo">سجّل التحويل للمحدد</button>
+      <button class="pfbtn" id="bkSelAll">حدّد الكل</button>
+      <button class="pfbtn" id="bkSelNone">إلغاء التحديد</button>
+    </div>
     <div id="bkLines"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> التكاليف</h2>
@@ -521,6 +541,15 @@
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkMnAdd">أضف</button></div>
     </div>
     <div id="bkManual"></div>
+
+    <h2 style="font-size:17px;margin-top:22px"><span></span> المكافآت</h2>
+    <div class="pfbar">
+      <div class="f"><label>الشخص</label><select id="bkBnWho"></select></div>
+      <div class="f"><label>المبلغ (د.ك)</label><input id="bkBnAmount" type="number" step="0.5" min="0" style="width:120px"></div>
+      <div class="f"><label>السبب (اختياري)</label><input id="bkBnNote" type="text" placeholder="مثال: شغل إضافي"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkBnAdd">أضف مكافأة</button></div>
+    </div>
+    <div id="bkBonus"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> النسب</h2>
     <div id="bkRules"></div>
@@ -894,6 +923,8 @@ const getDashboard=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getDa
 const getProfit=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getProfit");
 const setDelivery=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setDelivery");
 const setLineTransfer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineTransfer");
+const setBonus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBonus");
+const setLineCost=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineCost");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
 const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
@@ -903,6 +934,8 @@ const setLiveConfig=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setL
 const moderateLiveQuestion=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"moderateLiveQuestion");
 const fixRegistrantEmail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"fixRegistrantEmail");
 const setConsultantSchedule=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setConsultantSchedule");
+const addBookingNote=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addBookingNote");
+const setSubscriptionStart=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setSubscriptionStart");
 const addManualBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualBooking");
 const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelBooking");
 const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
@@ -927,6 +960,33 @@ const seesMoney = () => DATA && DATA.seesMoney !== false;
 /* editing or cancelling somebody else's session is not a sales job — the
    server refuses it either way, this only stops the button appearing */
 const mayEdit = () => !DATA || DATA.role !== "sales";
+
+/* the subscriptions — a package billed by the month rather than by session */
+function bkIsMonthly(b){
+  const p = nbAll().find(x=>x.key===b.packageId);
+  return !!(b.monthly || (p && p.monthly));
+}
+
+/* A subscription sold in one month may not start until the next, so the
+   window is stated rather than assumed from the booking date. */
+function bkSubLine(b){
+  if(!bkIsMonthly(b)) return "";
+  if(!b.subStart) return `<div class="bknote" style="background:#FFF6E2;border-color:#E8D6A8">
+      ⚠️ اشتراك شهري بدون تاريخ بداية — حدّده عشان نعرف متى ينتهي.</div>`;
+  const over = b.subEnd && b.subEnd < new Date().toISOString().slice(0,10);
+  return `<div class="bknote"${over?' style="background:#FDECEC;border-color:#F0C9CC"':""}>
+      اشتراك ${esc(String(b.subMonths||1))} شهر · من ${esc(b.subStart)} إلى ${esc(b.subEnd||"—")}${over?" · انتهى":""}</div>`;
+}
+
+/* What happened in the session, so whoever calls the client next can read it
+   instead of asking the consultant. */
+function bkNotesBlock(b){
+  const ns=(b.sessionNotes||[]).slice().sort((x,y)=>(y.at||0)-(x.at||0));
+  if(!ns.length) return "";
+  return `<div class="bknotes">`+ns.map(n=>`<div class="bknoteitem">
+      <span class="w">${esc(dt(n.at))} · ${esc(String(n.by||"").split("@")[0])}</span>
+      <div>${esc(n.text)}</div></div>`).join("")+`</div>`;
+}
 const dt=ms=>{ if(!ms) return "—"; const d=new Date(ms);
   return d.toLocaleDateString("en-GB")+" · "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); };
 const bandColor=b=>{ if(/ممتاز|جيد/.test(b))return"#2F8789"; if(/متوسط/.test(b))return"#D3A146"; return"#962E37"; };
@@ -1021,7 +1081,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
-let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, BKMV = "open";
+let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, BKMV = "open", BKKIND = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
 const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function monthLabel(m){
@@ -1095,40 +1155,50 @@ function renderProfit(){
   const t=PF.totals||{};
 
   $("#pfKpis").innerHTML=
-    `<div class="kpi"><div class="n">${kwd(t.due)}</div><div class="l">مستحق لك هذا الشهر</div></div>`+
-    `<div class="kpi"><div class="n">${kwd(t.share)}</div><div class="l">حصتك من المبيعات</div></div>`+
-    ((t.held||0)>0?`<div class="kpi"><div class="n">${kwd(t.held)}</div><div class="l">منها لعملاء ما أنهوا جلساتهم</div></div>`:"")+
-    (PF.salary?`<div class="kpi"><div class="n">${kwd(PF.salary)}</div><div class="l">الراتب</div></div>`:"")+
-    `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">عملية</div></div>`;
+    `<div class="kpi"><div class="n">${kwd(t.total)}</div><div class="l">إجمالي ${esc(monthLabel(PF.month))}</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.sent)}</div><div class="l">تحوّل لك</div></div>`+
+    `<div class="kpi"><div class="n">${kwd(t.due)}</div><div class="l">باقي لك</div></div>`+
+    ((t.held||0)>0?`<div class="kpi"><div class="n">${kwd(t.held)}</div><div class="l">منها لعملاء ما أنهوا جلساتهم</div></div>`:"");
 
-  $("#pfPaid").innerHTML = PF.paidAt
-    ? `<div class="pfnote" style="background:#EAF6EE;border-color:#BFE0CB;color:#14532D">✅ تم تحويل مستحقك عن ${esc(monthLabel(PF.month))}.</div>`
-    : `<div class="pfnote">مستحقك عن ${esc(monthLabel(PF.month))} ما تحوّل بعد.</div>`;
+  $("#pfPaid").innerHTML = (t.due||0) <= 0 && (t.total||0) > 0
+    ? `<div class="pfnote" style="background:#EAF6EE;border-color:#BFE0CB;color:#14532D">✅ تحوّل لك كل مستحقك عن ${esc(monthLabel(PF.month))}.</div>`
+    : "";
 
-  const rows=PF.lines||[];
-  $("#pfList").innerHTML = rows.length
-    ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>الوصف</th><th>العميل</th><th>الحالة</th><th>حصتك</th></tr></thead><tbody>`+
-      rows.map(l=>`<tr>
-        <td class="num">${dt(l.when)}</td>
-        <td>${esc(l.what)||"—"}</td>
-        <td>${esc(l.client)||"—"}</td>
-        <td class="pfrule">${DELIV_AR[l.delivery]||""}</td>
-        <td class="num"><b>${kwd(l.share)}</b></td></tr>`).join("")+
+  /* Grouped by where the money came from — a salary is one line, and nobody
+     scrolls a client list to read their own pay. */
+  const cats=PF.categories||[];
+  $("#pfList").innerHTML = cats.length
+    ? `<table class="pftab"><thead><tr><th>البند</th><th>العدد</th><th>لك</th><th>تحوّل</th><th>باقي</th></tr></thead><tbody>`+
+      cats.map(c=>`<tr>
+        <td><b>${esc(c.label)}</b></td>
+        <td class="num">${c.key==="salary"||c.key==="bonus"?"—":fmt(c.count)}</td>
+        <td class="num">${kwd(c.share)}</td>
+        <td class="num" style="color:#128C4A">${c.sent?kwd(c.sent):"—"}</td>
+        <td class="num" style="color:${c.owed?"#962E37":"var(--muted)"}">${c.owed?kwd(c.owed):"—"}</td></tr>`).join("")+
+      `<tr style="background:var(--bg)"><td><b>المجموع</b></td><td></td>
+        <td class="num"><b>${kwd(t.total)}</b></td>
+        <td class="num"><b>${kwd(t.sent)}</b></td>
+        <td class="num"><b>${kwd(t.due)}</b></td></tr>`+
       `</tbody></table>`
-    : `<div class="muted" style="font-size:13px;padding:10px">ما في عمليات لك بهذا الشهر.</div>`;
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في شي لك بهذا الشهر.</div>`;
 }
 
 $("#pfMonth") && $("#pfMonth").addEventListener("change", ()=>loadProfit($("#pfMonth").value));
 
 /* ---------- company books ---------- */
 
-async function loadBooks(month){
+async function loadBooks(month, keepScroll){
   const box=$("#bkLines"); if(!box) return;
-  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  /* Re-rendering after every tick used to scroll the page back to the top,
+     which is unusable when you are working down a list of transfers. Hold the
+     position and put it back once the new table is in. */
+  const y = keepScroll ? window.scrollY : null;
+  if(!keepScroll) box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
   try{
     const r=await getProfit(month?{month}:{});
     BK=r.data||null; BKMONTH=(BK&&BK.month)||"";
     renderBooks();
+    if(y!=null) requestAnimationFrame(()=>window.scrollTo({ top:y }));
   }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 /* the bookings tab already owns bkMsg — this one talks to the books tab */
@@ -1186,7 +1256,27 @@ function renderBooks(){
      on it has actually been paid, then it moves to «تم» — so the pending tab
      is a worklist that empties, not a log that only ever grows. */
   const allLines=BK.lines||[];
-  const lines=allLines.filter(l => BKMV==="done" ? l.closed : !l.closed);
+
+  /* Narrowing to one kind is what makes "pay everybody their book money"
+     a single act: filter to الكتيّبات, حدّد الكل, send. Each chip also says
+     how many of that kind are still waiting, so whether a category is
+     finished for the month is answerable at a glance. */
+  const KINDS=[["all","الكل"],["book","الكتيّبات"],["consult","الاستشارات"],
+               ["call","الاتصال السريع"],["course","الورش والدورات"],["contract","العقود"]];
+  const kindBox=$("#bkKind");
+  if(kindBox){
+    kindBox.innerHTML=KINDS.map(([k,label])=>{
+      const of = k==="all" ? allLines : allLines.filter(l=>l.kind===k);
+      if(!of.length && k!=="all") return "";
+      const left = of.filter(l=>!l.closed).length;
+      const tag = of.length ? (left ? " · "+fmt(left) : " ✅") : "";
+      return `<button data-kind="${k}"${k===BKKIND?' class="on"':''}>${esc(label)}${tag}</button>`;
+    }).join("");
+  }
+
+  const lines=allLines
+    .filter(l => BKMV==="done" ? l.closed : !l.closed)
+    .filter(l => BKKIND==="all" || l.kind===BKKIND);
   const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
     `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
 
@@ -1202,6 +1292,9 @@ function renderBooks(){
 
   const DELIV_OPTS=[["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]];
 
+  const keepSel = new Set([...document.querySelectorAll("#bkLines .pfsel:checked")]
+    .map(el=>el.dataset.order+"|"+el.dataset.who));
+
   $("#bkLines").innerHTML = lines.length
     ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>الحصص والتحويل</th></tr></thead><tbody>`+
       lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
@@ -1209,7 +1302,11 @@ function renderBooks(){
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}</div></td>
         <td class="num">${kwd(l.amount)}</td>
-        <td class="num">${l.fee?kwd(l.fee):"—"}</td>
+        <td class="num">${l.fee?kwd(l.fee):"—"}
+          ${canEdit?`<div><button class="pfbtn" style="padding:3px 9px;font-size:11.5px;margin-top:4px"
+             data-cost="${esc(l.orderId)}" data-amount="${l.cost||0}" data-label="${esc(l.costLabel||"")}"
+             >${l.cost?("مصروف "+esc(kwd(l.cost))):"+ مصروف"}</button></div>`
+           :(l.cost?`<div class="pfrule">مصروف ${esc(kwd(l.cost))}</div>`:"")}</td>
         ${canEdit?`<td><select class="pfrulesel" data-order="${esc(l.orderId)}">${opts(l.ruleId)}</select></td>`:""}
         <td>${(l.people||[]).length ? `<table class="pfsub">`+
           (l.people||[]).map(p=>{
@@ -1226,12 +1323,19 @@ function renderBooks(){
                         : `<span class="pfrule">${esc(DELIV_AR[p.delivery]||"")}</span>`)
                     : ""}</td>
               <td>${isCo ? "" : (canEdit
-                    ? `<button class="pfbtn ${p.transferred?"paid":"go"}" data-tf="${esc(l.orderId)}" data-who="${esc(p.id)}" data-on="${p.transferred?"0":"1"}" data-amount="${p.share}">${p.transferred?"تراجع":"حوّلت له"}</button>`
+                    ? (p.transferred
+                        ? `<button class="pfbtn paid" data-tf="${esc(l.orderId)}" data-who="${esc(p.id)}" data-on="0" data-amount="${p.share}">تراجع</button>`
+                        : `<label class="pftick"><input type="checkbox" class="pfsel" data-order="${esc(l.orderId)}" data-who="${esc(p.id)}" data-amount="${p.share}"><span>حدّد</span></label>`)
                     : `<span class="pfrule">${p.transferred?"تم التحويل":"لم يتم التحويل حتى الآن"}</span>`)}</td>
             </tr>`;
           }).join("")+`</table>` : "—"}</td></tr>`).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">${BKMV==="done"?"ما في شي تحوّل بهذا الشهر بعد.":"كل شي تحوّل ✅"}</div>`;
+
+  /* a redraw must not silently drop what was already ticked */
+  document.querySelectorAll("#bkLines .pfsel").forEach(el=>{
+    if(keepSel.has(el.dataset.order+"|"+el.dataset.who)) el.checked=true; });
+  bkSyncSel();
 
   const costs=BK.costs||[];
   const CUR=["KWD","USD"], BAS=[["monthly","شهري"],["yearly","سنوي"]];
@@ -1258,6 +1362,24 @@ function renderBooks(){
       }).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في تكاليف.</div>`;
+
+  /* who can receive a bonus — everyone with a share, plus the salaried */
+  const bsel=$("#bkBnWho");
+  const bnPeople=(BK.members||[]).filter(m=>m.id!=="company");
+  if(bsel && bsel.dataset.keys!==bnPeople.map(m=>m.id).join("|")){
+    bsel.dataset.keys=bnPeople.map(m=>m.id).join("|");
+    bsel.innerHTML=bnPeople.map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("");
+  }
+  const bons=BK.bonuses||[];
+  $("#bkBonus").innerHTML = bons.length
+    ? `<table class="pftab"><thead><tr><th>الشخص</th><th>المبلغ</th><th>السبب</th><th></th></tr></thead><tbody>`+
+      bons.map(b=>{
+        const nm=((BK.members||[]).find(m=>m.id===b.member)||{}).name||b.member;
+        return `<tr><td><b>${esc(nm)}</b></td><td class="num">${kwd(b.amount)}</td>
+          <td class="pfrule">${esc(b.note)||"—"}</td>
+          <td>${canEdit?`<button class="pfbtn" data-delbn="${esc(b.id)}">احذف</button>`:""}</td></tr>`;
+      }).join("")+`</tbody></table>`
+    : `<div class="muted" style="font-size:13px;padding:10px">ما في مكافآت بهذا الشهر.</div>`;
 
   const rsel=$("#bkMnRule");
   if(rsel && rsel.dataset.keys!==(BK.rules||[]).map(r=>r.id).join("|")){
@@ -1340,17 +1462,61 @@ $("#bkTab") && $("#bkTab").addEventListener("click", e=>{
   BKMV=b.dataset.mv; renderBooks();
 });
 
-/* paying one person for one booking, without touching the rest of their month */
+$("#bkKind") && $("#bkKind").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-kind]"); if(!b) return;
+  BKKIND=b.dataset.kind; renderBooks();
+});
+
+/* ---- selecting several transfers and sending them together ---- */
+function bkSelected(){
+  return [...document.querySelectorAll("#bkLines .pfsel:checked")].map(el=>({
+    orderId: el.dataset.order, who: el.dataset.who, amount: Number(el.dataset.amount)||0 }));
+}
+function bkSyncSel(){
+  const bar=$("#bkSendBar"); if(!bar) return;
+  const sel=bkSelected();
+  const anyTick = !!document.querySelector("#bkLines .pfsel");
+  bar.hidden = !anyTick;
+  const total = sel.reduce((a,x)=>a+x.amount,0);
+  const KIND_AR={all:"",book:"الكتيّبات",consult:"الاستشارات",call:"الاتصال السريع",
+                 course:"الورش والدورات",contract:"العقود"};
+  const scope = BKKIND==="all" ? "" : " من " + (KIND_AR[BKKIND]||"");
+  $("#bkSelInfo").textContent = sel.length
+    ? `${fmt(sel.length)} تحويل محدد${scope} · ${kwd(total)}`
+    : `حدّد اللي حوّلته${scope} وسجّلها مرة وحدة`;
+  $("#bkSendGo").disabled = !sel.length;
+}
+
+$("#bkLines") && $("#bkLines").addEventListener("change", e=>{
+  if(e.target.closest(".pfsel")) bkSyncSel();
+});
+/* ticks only what is on screen, so it respects whichever kind is filtered */
+$("#bkSelAll")  && $("#bkSelAll").addEventListener("click", ()=>{
+  document.querySelectorAll("#bkLines .pfsel").forEach(el=>{ el.checked=true; }); bkSyncSel(); });
+$("#bkSelNone") && $("#bkSelNone").addEventListener("click", ()=>{
+  document.querySelectorAll("#bkLines .pfsel").forEach(el=>{ el.checked=false; }); bkSyncSel(); });
+
+$("#bkSendGo") && $("#bkSendGo").addEventListener("click", async ()=>{
+  const items=bkSelected(); if(!items.length) return;
+  const total=items.reduce((a,x)=>a+x.amount,0);
+  if(!confirm(`تأكيد: حوّلت ${fmt(items.length)} حصة بمجموع ${kwd(total)}؟`)) return;
+  const btn=$("#bkSendGo"); btn.disabled=true; const t=btn.textContent; btn.textContent="لحظة…";
+  try{
+    await setLineTransfer({ items, on:true });
+    await loadBooks(BKMONTH, true);
+    pfMsg(`انسجّل ${fmt(items.length)} تحويل ✅`, true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); btn.disabled=false; }
+  finally{ btn.textContent=t; }
+});
+
+/* undoing a single transfer stays a one-click action */
 $("#bkLines") && $("#bkLines").addEventListener("click", async e=>{
   const b=e.target.closest("button[data-tf]"); if(!b) return;
-  const on=b.dataset.on==="1";
-  if(on && !confirm(`تأكيد: حوّلت ${kwd(b.dataset.amount)} عن هذا الحجز؟`)) return;
   b.disabled=true;
   try{
-    await setLineTransfer({ orderId:b.dataset.tf, who:b.dataset.who, on,
-                            amount:Number(b.dataset.amount)||0 });
-    await loadBooks(BKMONTH);
-    pfMsg(on?"انسجّل التحويل ✅":"انتراجعنا عن التحويل", true);
+    await setLineTransfer({ orderId:b.dataset.tf, who:b.dataset.who, on:false });
+    await loadBooks(BKMONTH, true);
+    pfMsg("انتراجعنا عن التحويل", true);
   }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); b.disabled=false; }
 });
 
@@ -1495,6 +1661,39 @@ $("#bkRuleNew") && $("#bkRuleNew").addEventListener("click", ()=>{
   RULE_EDIT="__new"; renderBooks();
   const card=document.querySelector('.rulecard[data-rule="__new"]');
   if(card){ card.scrollIntoView({behavior:"smooth",block:"center"}); card.querySelector(".rlabel").focus(); }
+});
+
+$("#bkBnAdd") && $("#bkBnAdd").addEventListener("click", async ()=>{
+  const member=$("#bkBnWho").value, amount=Number($("#bkBnAmount").value);
+  if(!(amount>0)) return pfMsg("اكتب مبلغ صحيح", false);
+  try{
+    await setBonus({ month:BKMONTH, member, amount, note:$("#bkBnNote").value.trim() });
+    $("#bkBnAmount").value=""; $("#bkBnNote").value="";
+    await loadBooks(BKMONTH, true); pfMsg("انضافت المكافأة ✅", true);
+  }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
+});
+
+$("#bkBonus") && $("#bkBonus").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-delbn]"); if(!b) return;
+  if(!confirm("تحذف هذي المكافأة؟")) return;
+  try{ await setBonus({ id:b.dataset.delbn, remove:true });
+       await loadBooks(BKMONTH, true); pfMsg("انحذفت ✅", true); }
+  catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+});
+
+/* the office hours for one session, put on the session */
+$("#bkLines") && $("#bkLines").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-cost]"); if(!b) return;
+  const cur=Number(b.dataset.amount)||0;
+  const v=prompt("مصروف هذا الحجز بالدينار (٠ يشيله):", cur||"");
+  if(v===null) return;
+  const amount=Number(v);
+  if(!(amount>=0)) return pfMsg("اكتب مبلغ صحيح", false);
+  const label = amount>0 ? (prompt("وصف المصروف:", b.dataset.label||"المكتب الحضوري")||"") : "";
+  try{
+    await setLineCost({ orderId:b.dataset.cost, amount, label });
+    await loadBooks(BKMONTH, true); pfMsg("انحفظ ✅", true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); }
 });
 
 $("#bkFcAdd") && $("#bkFcAdd").addEventListener("click", async ()=>{
@@ -2550,8 +2749,12 @@ function renderBkList(){
         ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}
       </div>
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
+      ${bkSubLine(b)}
+      ${bkNotesBlock(b)}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button data-note="${esc(b.id)}">أضف ملاحظة</button>
+        ${bkIsMonthly(b)&&mayEdit()?`<button data-sub="${esc(b.id)}">${b.subStart?"عدّل تاريخ البداية":"حدّد تاريخ البداية"}</button>`:""}
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
         ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
@@ -2647,6 +2850,44 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
 });
 
 async function bkRowAction(e){
+  /* a note anybody on the team can leave, and anybody on the team can read */
+  const nt=e.target.closest("button[data-note]");
+  if(nt){
+    const text=prompt("ملاحظة على هذي الجلسة — شنو صار وشنو الخطوة الجاية؟");
+    if(text===null) return;
+    if(text.trim().length<2) return bkMsg("اكتب الملاحظة", false);
+    nt.disabled=true;
+    try{
+      await addBookingNote({ orderId:nt.dataset.note, text });
+      const row=(DATA.bookings.list||[]).find(x=>x.id===nt.dataset.note);
+      if(row){ row.sessionNotes=(row.sessionNotes||[]).concat([
+        { text:text.trim(), by:(DATA.email||""), at:Date.now() }]); }
+      renderBookings(); bkMsg("انحفظت الملاحظة ✅", true);
+    }catch(err){ bkMsg((err&&err.message)||"تعذّر الحفظ", false); nt.disabled=false; }
+    return;
+  }
+
+  /* when a monthly package actually starts running */
+  const sb=e.target.closest("button[data-sub]");
+  if(sb){
+    const row=(DATA.bookings.list||[]).find(x=>x.id===sb.dataset.sub)||{};
+    const start=prompt("تاريخ بداية الاشتراك (YYYY-MM-DD):",
+      row.subStart || new Date().toISOString().slice(0,10));
+    if(start===null) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(start.trim())) return bkMsg("التاريخ لازم يكون YYYY-MM-DD", false);
+    const months=Number(prompt("كم شهر؟", String(row.subMonths||1)));
+    if(!(months>=1)) return bkMsg("عدد الشهور غير صحيح", false);
+    sb.disabled=true;
+    try{
+      const r=await setSubscriptionStart({ orderId:sb.dataset.sub, startDate:start.trim(), months });
+      const d=(r&&r.data)||{};
+      if(row){ row.subStart=d.subStart||""; row.subEnd=d.subEnd||""; row.subMonths=d.months||months; }
+      renderBookings();
+      bkMsg(`الاشتراك من ${esc(d.subStart||start.trim())} إلى ${esc(d.subEnd||"—")} ✅`, true);
+    }catch(err){ bkMsg((err&&err.message)||"تعذّر الحفظ", false); sb.disabled=false; }
+    return;
+  }
+
   const ed=e.target.closest("button[data-edit]");
   if(ed){ const row=(DATA.bookings.list||[]).find(x=>x.id===ed.dataset.edit); if(row) bkEditOpen(row); return; }
   const sc=e.target.closest("button[data-second]");
