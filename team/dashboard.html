@@ -499,6 +499,7 @@
     <div class="kpis" id="bkKpisMoney"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> المستحق لكل واحد</h2>
+    <div class="addmsg" id="bkDueMsg"></div>
     <div id="bkDue"></div>
 
     <div id="bkUnmatched"></div>
@@ -1151,8 +1152,10 @@ async function loadProfit(month){
 function renderProfit(){
   if(!PF || !$("#pfKpis")) return;
   fillMonths($("#pfMonth"), PF.months, PF.month);
-  const who=$("#pfWho"); if(who) who.textContent=PF.name||"";
-  const t=PF.totals||{};
+  /* the personal block, which now rides along with the company payload too */
+  const M=PF.mine||{};
+  const who=$("#pfWho"); if(who) who.textContent=M.name||PF.name||"";
+  const t=M.totals||{};
 
   $("#pfKpis").innerHTML=
     `<div class="kpi"><div class="n">${kwd(t.total)}</div><div class="l">إجمالي ${esc(monthLabel(PF.month))}</div></div>`+
@@ -1166,7 +1169,7 @@ function renderProfit(){
 
   /* Grouped by where the money came from — a salary is one line, and nobody
      scrolls a client list to read their own pay. */
-  const cats=PF.categories||[];
+  const cats=M.categories||[];
   $("#pfList").innerHTML = cats.length
     ? `<table class="pftab"><thead><tr><th>البند</th><th>العدد</th><th>لك</th><th>تحوّل</th><th>باقي</th></tr></thead><tbody>`+
       cats.map(c=>`<tr>
@@ -1202,7 +1205,14 @@ async function loadBooks(month, keepScroll){
   }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 /* the bookings tab already owns bkMsg — this one talks to the books tab */
-function pfMsg(m,ok){ const el=$("#bkMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
+/* An error shown at the foot of a long page is an error nobody sees — which
+   is exactly how a failing transfer looked like a button that did nothing.
+   Report next to whatever was clicked. */
+function pfMsg(m,ok,where){
+  const el=$(where||"#bkMsg"); if(!el) return;
+  el.className="addmsg "+(ok?"ok":"err"); el.textContent=m;
+  if(!ok) el.scrollIntoView({behavior:"smooth",block:"center"});
+}
 
 function renderBooks(){
   if(!BK || !$("#bkKpisMoney")) return;
@@ -1531,11 +1541,15 @@ $("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
   const paid=((BK.payout&&BK.payout.people)||{})[who];
   const nm=((BK.members||[]).find(m=>m.id===who)||{}).name||who;
   if(!paid && !confirm(`تأكيد: حوّلت ${kwd(b.dataset.amount)} لـ ${nm} عن ${monthLabel(BKMONTH)}؟`)) return;
-  b.disabled=true;
+  b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
   try{
     await markPayout({ month:BKMONTH, who, amount:Number(b.dataset.amount)||0, paid: paid?false:true });
-    await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true);
-  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); b.disabled=false; }
+    await loadBooks(BKMONTH, true);
+    pfMsg(paid?`رجّعنا ${nm} لغير مدفوع`:`تسجّل التحويل لـ ${nm} ✅`, true, "#bkDueMsg");
+  }catch(err){
+    pfMsg((err&&err.message)||"تعذّر الحفظ", false, "#bkDueMsg");
+    b.disabled=false; b.textContent=t0;
+  }
 });
 
 $("#bkLines") && $("#bkLines").addEventListener("change", async e=>{
