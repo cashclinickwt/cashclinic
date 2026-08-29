@@ -100,12 +100,50 @@
   .cmp-send{width:100%;justify-content:center;border:0;cursor:pointer}
   .cmp-send:disabled{opacity:.65;cursor:default}
   /* section tabs */
-  .tabs{position:sticky;top:0;z-index:30;display:flex;gap:8px;overflow-x:auto;background:var(--bg);padding:12px 0 12px;margin:2px 0 18px;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tabs button{flex:0 0 auto;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:9px 17px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
-  .tabs button:hover{border-color:var(--auber)}
-  .tabs button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
+  /* ---- side navigation ----
+     Every section listed down one rail so the whole dashboard is visible at
+     once, instead of a scrolling strip of pills where half the tabs were
+     always off the edge. It collapses to icons on a laptop that needs the
+     width, and becomes a slide-over on a phone. */
+  .shell{display:flex;gap:22px;align-items:flex-start}
+  .tabs{position:sticky;top:16px;flex:0 0 226px;display:flex;flex-direction:column;gap:4px;
+    background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;
+    max-height:calc(100vh - 32px);overflow-y:auto;scrollbar-width:thin}
+  .tabs button{display:flex;align-items:center;gap:10px;width:100%;text-align:start;border:0;
+    background:none;color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14.5px;
+    font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;transition:background .15s,color .15s}
+  .tabs button:hover{background:var(--bg)}
+  .tabs button.on{background:var(--auber);color:#fff}
   .tabs button[hidden]{display:none}
+  .navtoggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    border:1px dashed var(--line);background:none;border-radius:12px;padding:8px;margin-bottom:6px;
+    font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer}
+  .navtoggle:hover{border-color:var(--auber);color:var(--auber)}
+  .shellbody{flex:1 1 auto;min-width:0}
+
+  /* collapsed: icons only, so the sections stay reachable on a narrow laptop */
+  .shell.mini .tabs{flex-basis:62px}
+  .shell.mini .tabs button{justify-content:center;padding:11px 0}
+  .shell.mini .tabs button .lbl{display:none}
+  .shell.mini .navtoggle span{display:none}
+
+  .navburger{display:none}
+  @media(max-width:900px){
+    .shell{display:block}
+    .navburger{display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:31;width:100%;
+      background:var(--bg);border:0;border-bottom:1px solid var(--line);padding:12px 2px;
+      font-family:inherit;font-size:15px;font-weight:700;color:var(--auber);cursor:pointer}
+    .tabs{position:fixed;inset:0 auto 0 0;z-index:40;flex-basis:auto;width:78%;max-width:300px;
+      border-radius:0 18px 18px 0;max-height:100vh;transform:translateX(-105%);
+      transition:transform .22s ease}
+    html[dir="rtl"] .tabs{inset:0 0 0 auto;border-radius:18px 0 0 18px;transform:translateX(105%)}
+    .shell.navopen .tabs{transform:translateX(0)}
+    .navscrim{display:none;position:fixed;inset:0;background:rgba(20,10,30,.42);z-index:39}
+    .shell.navopen .navscrim{display:block}
+    .shell.mini .tabs button{justify-content:flex-start;padding:10px 12px}
+    .shell.mini .tabs button .lbl{display:inline}
+  }
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
   /* all clients */
@@ -452,7 +490,12 @@
   <!-- the payout reminder rides on top of whatever tab she lands on -->
   <div id="topNudge"></div>
 
+  <button class="navburger" id="navBurger" type="button">☰ <span id="navHere">الأقسام</span></button>
+
+  <div class="shell" id="shell">
+  <div class="navscrim" id="navScrim"></div>
   <nav class="tabs" id="dashTabs">
+    <button class="navtoggle" id="navToggle" type="button">⇄ <span>طيّ القائمة</span></button>
     <button data-tab="sales" class="on">المبيعات</button>
     <button data-tab="clients">كل العملاء</button>
     <button data-tab="quiz">الاختبارات</button>
@@ -467,8 +510,26 @@
     <button data-tab="target">هدف المبيعات</button>
     <button data-tab="profit">أرباحي</button>
     <button data-tab="books">حسابات الشركة</button>
+    <button data-tab="tasks">مهامي</button>
     <button data-tab="reports">التقارير</button>
   </nav>
+  <div class="shellbody">
+
+  <!-- ===== مهامي ===== -->
+  <div class="sec" id="tasksSec" data-panel="tasks" hidden>
+    <h2><span></span> مهامي</h2>
+    <div class="pfbar">
+      <div class="f"><label>لمين؟</label><select id="tkWho"></select></div>
+      <div class="f" style="flex:1 1 280px"><label>المهمة</label><input id="tkText" type="text" placeholder="مثال: راجعي حجوزات الأسبوع الجاي"></div>
+      <div class="f"><label>الموعد (اختياري)</label><input id="tkDue" type="date"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tkAdd">أرسل المهمة</button></div>
+    </div>
+    <div class="addmsg" id="tkMsg"></div>
+    <h2 style="font-size:17px;margin-top:20px"><span></span> اللي عليّ</h2>
+    <div id="tkMine"></div>
+    <h2 style="font-size:17px;margin-top:22px"><span></span> اللي أرسلته</h2>
+    <div id="tkSent"></div>
+  </div>
 
   <!-- ===== هدف المبيعات ===== -->
   <div class="sec" id="targetSec" data-panel="target" hidden>
@@ -903,6 +964,8 @@
     <div class="kpis" id="bqKpis"></div>
     <div class="tbl" id="bqTbl"></div>
   </div>
+  </div><!-- /shellbody -->
+  </div><!-- /shell -->
 </div></div>
 <script src="../assets/js/email-typo.js"></script>
 
@@ -926,11 +989,18 @@ const setDelivery=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setDel
 const setLineTransfer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineTransfer");
 const setBonus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBonus");
 const setLineCost=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineCost");
+const addTask=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addTask");
+const listTasks=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listTasks");
+const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
 const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
 const setProfitOverride=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setProfitOverride");
-const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCampaign");
+/* The browser gives a callable 70 seconds by default and then reports
+   deadline-exceeded — even though the function keeps running and the mail
+   goes out. A campaign to a few hundred people is legitimately slower than
+   that, so it gets its own patience. */
+const sendCampaign=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCampaign",{timeout:540000});
 const setLiveConfig=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLiveConfig");
 const moderateLiveQuestion=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"moderateLiveQuestion");
 const fixRegistrantEmail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"fixRegistrantEmail");
@@ -960,7 +1030,9 @@ const money=n=>fmt(n)+" د.ك";
 const seesMoney = () => DATA && DATA.seesMoney !== false;
 /* editing or cancelling somebody else's session is not a sales job — the
    server refuses it either way, this only stops the button appearing */
-const mayEdit = () => !DATA || DATA.role !== "sales";
+/* Nora edits and cancels the same as anyone; only the schedule editor and
+   the money stay out of her reach. */
+const mayEdit = () => true;
 
 /* the subscriptions — a package billed by the month rather than by session */
 function bkIsMonthly(b){
@@ -1082,7 +1154,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
-let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, BKMV = "open", BKKIND = "all";
+let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, BKMV = "open", BKKIND = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
 const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function monthLabel(m){
@@ -1102,6 +1174,79 @@ function fillMonths(sel, months, current){
    never a per-order figure. Being straight about the limit: a percentage of
    a target she can see is a total she can work out, and that is the point of
    showing her a target at all. What it withholds is what each sale was worth. */
+/* ================= TASKS ================= */
+async function loadTasks(){
+  const box=$("#tkMine"); if(!box) return;
+  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{ const r=await listTasks({}); TK=r.data||null; renderTasks(); }
+  catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+function tkMsg(m,ok){ const el=$("#tkMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
+function tkName(email){
+  const p=((TK&&TK.people)||[]).find(x=>x.email===email);
+  return (p&&p.name) || String(email||"").split("@")[0];
+}
+function tkTable(rows, mineSide){
+  if(!rows.length) return `<div class="muted" style="font-size:13px;padding:10px">ما في شي هني.</div>`;
+  return `<table class="pftab"><thead><tr><th>المهمة</th><th>${mineSide?"من":"إلى"}</th><th>الموعد</th><th>الحالة</th><th></th></tr></thead><tbody>`+
+    rows.map(t=>`<tr${t.done?' style="opacity:.55"':''}>
+      <td><b style="${t.done?"text-decoration:line-through":""}">${esc(t.text)}</b>
+          <div class="pfrule">${esc(dt(t.when))}</div></td>
+      <td>${esc(tkName(mineSide?t.from:t.to))}</td>
+      <td class="num">${t.due?esc(t.due):"—"}</td>
+      <td>${t.done?'<span style="color:#128C4A;font-weight:700">خلصت ✅</span>'
+                  :'<span style="color:#962E37;font-weight:700">مفتوحة</span>'}</td>
+      <td>${mineSide
+            ? `<button class="pfbtn ${t.done?"":"go"}" data-tk="${esc(t.id)}" data-done="${t.done?"0":"1"}">${t.done?"رجّعها مفتوحة":"خلّصتها"}</button>`
+            : `<button class="pfbtn" data-tkdel="${esc(t.id)}">احذف</button>`}</td></tr>`).join("")+
+    `</tbody></table>`;
+}
+function renderTasks(){
+  if(!TK || !$("#tkMine")) return;
+  const sel=$("#tkWho");
+  const ppl=(TK.people||[]).filter(p=>p.email!==TK.me);
+  if(sel && sel.dataset.keys!==ppl.map(p=>p.email).join("|")){
+    sel.dataset.keys=ppl.map(p=>p.email).join("|");
+    sel.innerHTML=ppl.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+  }
+  $("#tkMine").innerHTML=tkTable(TK.mine||[], true);
+  $("#tkSent").innerHTML=tkTable(TK.sent||[], false);
+
+  /* a count on the tab, so a new task is noticed without opening it */
+  const tab=document.querySelector('#dashTabs button[data-tab="tasks"] .lbl');
+  if(tab){ const n=(TK.mine||[]).filter(t=>!t.done).length;
+    tab.textContent = "مهامي" + (n?` · ${fmt(n)}`:""); }
+}
+
+$("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
+  const to=$("#tkWho").value, text=$("#tkText").value.trim();
+  if(text.length<2) return tkMsg("اكتب المهمة", false);
+  const b=$("#tkAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+  try{
+    await addTask({ to, text, due:$("#tkDue").value||"" });
+    $("#tkText").value=""; $("#tkDue").value="";
+    await loadTasks(); tkMsg(`انرسلت لـ ${tkName(to)} ✅ ووصلها إيميل`, true);
+  }catch(e){ tkMsg((e&&e.message)||"تعذّر الإرسال", false); }
+  finally{ b.disabled=false; b.textContent=t0; }
+});
+
+document.addEventListener("click", async e=>{
+  const d=e.target.closest("button[data-tk]");
+  if(d){
+    d.disabled=true;
+    try{ await setTaskDone({ id:d.dataset.tk, done:d.dataset.done==="1" }); await loadTasks(); }
+    catch(err){ tkMsg((err&&err.message)||"تعذّر الحفظ", false); d.disabled=false; }
+    return;
+  }
+  const x=e.target.closest("button[data-tkdel]");
+  if(x){
+    if(!confirm("تحذف هذي المهمة؟")) return;
+    x.disabled=true;
+    try{ await setTaskDone({ id:x.dataset.tkdel, remove:true }); await loadTasks(); tkMsg("انحذفت ✅", true); }
+    catch(err){ tkMsg((err&&err.message)||"تعذّر الحذف", false); x.disabled=false; }
+  }
+});
+
 async function loadTarget(){
   const box=$("#tgList"); if(!box) return;
   box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
@@ -1252,7 +1397,9 @@ function renderBooks(){
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
           <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}</td>
           <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
-          <td>${canEdit?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`:""}</td></tr>`;
+          <td>${canEdit?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`
+              +(!done&&(BK.owing||{})[k]>0?` <button class="pfbtn" data-payall="${esc(k)}">حدّد كل حصصه</button>`:"")
+              :""}</td></tr>`;
       }).join("")+`</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في مستحقات بهذا الشهر.</div>`;
 
@@ -1535,6 +1682,22 @@ $("#bkLines") && $("#bkLines").addEventListener("click", async e=>{
   }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); b.disabled=false; }
 });
 
+/* Tick every outstanding share belonging to one person, so paying Ghalia
+   out is one sweep rather than hunting her rows down the table. */
+$("#bkDue") && $("#bkDue").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-payall]"); if(!b) return;
+  const who=b.dataset.payall;
+  if(BKMV!=="open"){ BKMV="open"; renderBooks(); }
+  let n=0;
+  document.querySelectorAll("#bkLines .pfsel").forEach(el=>{
+    if(el.dataset.who===who){ el.checked=true; n++; }
+  });
+  bkSyncSel();
+  const bar=$("#bkSendBar");
+  if(bar && !bar.hidden) bar.scrollIntoView({behavior:"smooth",block:"center"});
+  pfMsg(n?`تحدّدت ${fmt(n)} حصة — راجعها واضغط «سجّل التحويل للمحدد»`:"ما فيه حصص مفتوحة له بهذا القسم", !!n, "#bkDueMsg");
+});
+
 $("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
   const b=e.target.closest("button[data-pay]"); if(!b) return;
   const who=b.dataset.pay;
@@ -1768,7 +1931,7 @@ function render(){
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","target","profit","books","reports"];
+const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","tasks","target","profit","books","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 /* Tabs a role is allowed anywhere near. The server already refuses the data
@@ -1776,7 +1939,7 @@ function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); 
    the client list, the diary, the لقاء, the newsletter and the courses —
    and never see المبيعات، الاختبارات، التوظيف، البث، أسئلة الكتاب or التقارير. */
 const ROLE_PANELS = {
-  sales: ["clients","bookings","events","subscribers","courses","composer","target","profit"],
+  sales: ["clients","bookings","events","subscribers","courses","composer","tasks","target","profit"],
 };
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
@@ -1784,6 +1947,7 @@ function panelAvailable(k){
   if(allow && allow.indexOf(k)===-1) return false;
   /* the target belongs to Nora and to whoever watches her numbers;
      أرباحي to anyone with a share; the company books to غالية and عبدالله */
+  if(k==="tasks")  return true;   /* everyone with a login has a task list */
   if(k==="target") return !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
   if(k==="profit") return !!(DATA && DATA.profitMember);
   if(k==="books")  return !!(DATA && DATA.seesBooks);
@@ -1793,25 +1957,67 @@ function panelAvailable(k){
 function showPanel(k){
   if(!panelAvailable(k)) return;
   document.querySelectorAll('.sec[data-panel]').forEach(s=>s.classList.remove("pon"));
-  document.querySelectorAll('#dashTabs button').forEach(b=>b.classList.remove("on"));
+  document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>b.classList.remove("on"));
   const el=panelEl(k); if(el) el.classList.add("pon");
   const tab=document.querySelector('#dashTabs button[data-tab="'+k+'"]'); if(tab) tab.classList.add("on");
   ACTIVE_PANEL=k;
+  /* on a phone the rail covers the page, so choosing a section closes it */
+  const sh=$("#shell");
+  if(sh){
+    sh.classList.remove("navopen");
+    const here=$("#navHere"), lbl=document.querySelector(`#dashTabs button[data-tab="${k}"] .lbl`);
+    if(here && lbl) here.textContent=lbl.textContent;
+  }
   /* keep the moderation queue fresh only while the live tab is the one on screen */
   if(LIVE_TIMER){ clearInterval(LIVE_TIMER); LIVE_TIMER=null; }
   if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
   /* a month is worked out from every order in the account, so it is fetched
      when the tab is actually opened rather than on every dashboard load */
+  if(k==="tasks"  && !TK) loadTasks();
   if(k==="target" && !TG) loadTarget();
   if(k==="profit" && !PF) loadProfit();
   if(k==="books"  && !BK) loadBooks();
 }
+/* An icon per section, so a collapsed rail is still navigable. */
+const TAB_ICON={sales:"💳",clients:"👥",quiz:"📝",events:"🎟️",live:"🔴",bookings:"📅",
+  careers:"🧑‍💼",subscribers:"✉️",bookq:"❓",courses:"🎓",composer:"📣",tasks:"✅",
+  target:"🎯",profit:"💰",books:"📊",reports:"📄"};
+
+/* Labels are wrapped once so collapsing can hide the text without losing it,
+   and so a live count (مهامي · 2) can be rewritten without eating the icon. */
+function decorateTabs(){
+  document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>{
+    if(b.dataset.dressed) return;
+    const k=b.dataset.tab;
+    b.innerHTML=`<span class="ico">${TAB_ICON[k]||"•"}</span><span class="lbl">${esc(b.textContent.trim())}</span>`;
+    b.title=b.querySelector(".lbl").textContent;
+    b.dataset.dressed="1";
+  });
+}
+
 function syncTabs(){
-  document.querySelectorAll('#dashTabs button').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
+  decorateTabs();
+  document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
   if(!ACTIVE_PANEL || !panelAvailable(ACTIVE_PANEL)) ACTIVE_PANEL = PANEL_ORDER.find(panelAvailable) || "sales";
   showPanel(ACTIVE_PANEL);
 }
-document.querySelectorAll('#dashTabs button').forEach(b=>b.addEventListener("click",()=>{
+/* Open on a wide screen, and it remembers being collapsed. */
+(function(){
+  const sh=document.getElementById("shell");
+  if(!sh) return;
+  try{ if(localStorage.getItem("cc_nav_mini")==="1") sh.classList.add("mini"); }catch(e){}
+  const t=document.getElementById("navToggle");
+  if(t) t.addEventListener("click",()=>{
+    sh.classList.toggle("mini");
+    try{ localStorage.setItem("cc_nav_mini", sh.classList.contains("mini")?"1":"0"); }catch(e){}
+  });
+  const burger=document.getElementById("navBurger");
+  if(burger) burger.addEventListener("click",()=>sh.classList.toggle("navopen"));
+  const scrim=document.getElementById("navScrim");
+  if(scrim) scrim.addEventListener("click",()=>sh.classList.remove("navopen"));
+})();
+
+document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>b.addEventListener("click",()=>{
   showPanel(b.dataset.tab); window.scrollTo({top:0,behavior:"smooth"});
 }));
 
