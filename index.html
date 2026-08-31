@@ -500,7 +500,7 @@
     <a class="cc-ad-imgwrap" href="courses/raha.html">
       <img src="courses/img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية" width="1080" height="1350" loading="eager">
     </a>
-    <a class="cc-ad-cta" href="courses/raha.html">سجّل بالتسجيل المبكر · 21–23 سبتمبر ←</a>
+    <a class="cc-ad-cta" href="courses/raha.html" id="ccAdCta">احجز مقعدك · ٢١–٢٣ سبتمبر ←</a>
   </div>
 </div>
 <script>
@@ -557,6 +557,26 @@ if(fnlBtn){ fnlBtn.addEventListener("click", async ()=>{
   }catch(e){ fnlShow((e&&e.message)||"صار خطأ، حاول مرة ثانية", false); }
   finally{ fnlBtn.disabled=false; fnlBtn.textContent=t; }
 }); }
+</script>
+
+<script type="module">
+/* The popup used to promise early booking in fixed text, so it kept selling
+   a discount that had already closed. It asks now. */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
+try{
+  const fns=getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
+  const d=(await httpsCallable(fns,"getCoursePublic")({courseId:"raha"})).data||{};
+  const cta=document.getElementById("ccAdCta");
+  if(cta && d.amount){
+    cta.textContent = d.earlyOpen
+      ? `سجّل بالتسجيل المبكر · ${d.amount} د.ك ←`
+      : `احجز مقعدك · ${d.amount} د.ك · ٢١–٢٣ سبتمبر ←`;
+  }
+}catch(e){}
 </script>
 </body>
 </html>

@@ -132,16 +132,13 @@
 
 <section class="crs-sec">
   <div class="cc-wrap">
-    <div class="crs-prices">
+    <!-- filled from the server, so the page can never advertise a price the
+         checkout is not charging -->
+    <div class="crs-prices" id="rahaPrices">
       <div class="crs-pcard hot">
-        <div class="lbl">التسجيل المبكر</div>
-        <div class="amt">115 <span style="font-size:18px;">د.ك</span></div>
-        <div class="n">ينتهي 31/8 — بعدها 148 د.ك</div>
-      </div>
-      <div class="crs-pcard">
         <div class="lbl">سعر الورشة</div>
         <div class="amt">148 <span style="font-size:18px;">د.ك</span></div>
-        <div class="n">السعر الكامل بعد انتهاء المبكر</div>
+        <div class="n">شامل الأيام الثلاثة</div>
       </div>
     </div>
   </div>
@@ -346,6 +343,37 @@ $("#payBtn").addEventListener("click", async ()=>{
   }finally{ $("#payBtn").disabled=false; $("#payBtn").textContent="احجز وادفع"; }
 });
 function showErr(m){ const e=$("#regErr"); e.textContent=m; e.style.display="block"; }
+</script>
+
+<script type="module">
+/* The workshop price switches itself when early booking closes. The page
+   reads it rather than repeating it, because a page that says 115 while the
+   checkout takes 148 is worse than one that loads a moment later. */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
+try{
+  const fns=getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
+  const r=await httpsCallable(fns,"getCoursePublic")({courseId:"raha"});
+  const d=r.data||{};
+  const box=document.getElementById("rahaPrices");
+  if(box && d.amount){
+    const seats = (d.seatsLeft!=null && d.seatsLeft<=5 && d.seatsLeft>0)
+      ? `<div class="n">باقي ${d.seatsLeft} مقاعد حضورية</div>` : "";
+    box.innerHTML = d.earlyOpen
+      ? `<div class="crs-pcard hot"><div class="lbl">التسجيل المبكر</div>
+           <div class="amt">${d.amount} <span style="font-size:18px;">د.ك</span></div>
+           <div class="n">ينتهي ${d.earlyUntil} — بعدها ${d.fullPrice} د.ك</div></div>
+         <div class="crs-pcard"><div class="lbl">سعر الورشة</div>
+           <div class="amt">${d.fullPrice} <span style="font-size:18px;">د.ك</span></div>
+           <div class="n">السعر الكامل بعد انتهاء المبكر</div></div>`
+      : `<div class="crs-pcard hot"><div class="lbl">سعر الورشة</div>
+           <div class="amt">${d.amount} <span style="font-size:18px;">د.ك</span></div>
+           <div class="n">شامل الأيام الثلاثة</div>${seats}</div>`;
+  }
+}catch(e){ /* the printed 148 stands if the call fails */ }
 </script>
 </body>
 </html>

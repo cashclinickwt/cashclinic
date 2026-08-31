@@ -423,6 +423,15 @@
   .pfsub .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
   .pfsub select{border:1.5px solid var(--line);border-radius:9px;padding:5px 8px;
     font-family:inherit;font-size:12.5px;background:#fff;color:var(--ink)}
+  /* The rating chips. They were spans carrying only a background colour —
+     no padding, no radius, no readable text colour — so they rendered like
+     highlighter strokes across the line instead of labels. */
+  .pfpill{display:inline-flex;align-items:center;gap:5px;color:#fff;font-size:12.5px;
+    font-weight:700;border-radius:999px;padding:5px 12px;line-height:1.5;white-space:nowrap}
+  .pfgrid{display:grid;gap:12px}
+  @media(min-width:760px){.pfgrid{grid-template-columns:repeat(3,1fr)}}
+  .pfcard h4{font-size:14.5px;font-weight:800;color:var(--auber);margin:0 0 12px}
+
   .bknotes{margin-top:8px;display:flex;flex-direction:column;gap:6px}
   .bknoteitem{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:9px 12px;
     font-size:13px;line-height:1.8;color:var(--ink)}

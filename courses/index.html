@@ -103,10 +103,8 @@
           <span class="crs-chip">اونلاين وحضوري</span>
           <span class="crs-chip">3 أيام</span>
         </div>
-        <div class="crs-price">
-          <span class="tag">التسجيل المبكر</span>
-          <span class="now">115 د.ك</span>
-          <span class="was">148 د.ك</span>
+        <div class="crs-price" id="rahaCardPrice">
+          <span class="now">148 د.ك</span>
         </div>
         <span class="crs-go">التفاصيل والتسجيل ←</span>
       </div>
@@ -227,5 +225,24 @@
 })();
 </script>
 <script src="../assets/js/nav.js"></script>
+
+<script type="module">
+/* same live price as the workshop page, so the two cannot disagree */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
+try{
+  const fns=getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
+  const d=(await httpsCallable(fns,"getCoursePublic")({courseId:"raha"})).data||{};
+  const box=document.getElementById("rahaCardPrice");
+  if(box && d.amount){
+    box.innerHTML = d.earlyOpen
+      ? `<span class="tag">التسجيل المبكر</span><span class="now">${d.amount} د.ك</span><span class="was">${d.fullPrice} د.ك</span>`
+      : `<span class="now">${d.amount} د.ك</span>`;
+  }
+}catch(e){}
+</script>
 </body>
 </html>
