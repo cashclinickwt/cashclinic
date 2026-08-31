@@ -617,6 +617,7 @@
     <div id="bkRules"></div>
     <button class="pfbtn go" id="bkRuleNew" style="margin-top:12px">+ قاعدة جديدة</button>
     <div class="addmsg" id="bkMsg"></div>
+    <p class="pfrule" id="bkBuild" style="text-align:end;margin-top:18px;opacity:.6"></p>
   </div>
 
   <div class="sec" id="reportsSec" data-panel="reports" hidden>
@@ -708,6 +709,25 @@
   <div class="sec" id="coursesSec" data-panel="courses" hidden>
     <h2><span></span> تسجيلات الدورات</h2>
     <div class="kpis" id="courseKpis"></div>
+
+    <div class="addbox" id="crAddBox">
+      <h3>➕ سجّل مقعد يدوياً</h3>
+      <p class="hint">للحجوزات اللي تجي بالواتساب. تنحسب بالمقاعد والإيراد مثل أي حجز من الموقع.</p>
+      <div class="addrow">
+        <div class="addf"><label>الورشة</label><select id="crCourse"><option value="raha">ورشة كيف تصنع راحتك المالية</option></select></div>
+        <div class="addf"><label>الحضور</label><select id="crAttend"><option value="onsite">حضوري</option><option value="online">أونلاين</option></select></div>
+        <div class="addf"><label>اسم العميل</label><input id="crName" type="text" placeholder="الاسم الكامل"></div>
+        <div class="addf"><label>الإيميل</label><input id="crEmail" type="email" placeholder="example@email.com" style="direction:ltr;text-align:left"></div>
+      </div>
+      <div class="addrow">
+        <div class="addf"><label>الجوال</label><input id="crPhone" type="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:left"></div>
+        <div class="addf" id="crAmountWrap"><label>المبلغ (فاضي = سعر الورشة)</label><input id="crAmount" type="number" min="0" step="1"></div>
+        <div class="addf"><label>ملاحظة</label><input id="crNotes" type="text" placeholder="اختياري"></div>
+      </div>
+      <button class="addbtn" id="crAdd">سجّل المقعد</button>
+      <div class="addmsg" id="crMsg"></div>
+    </div>
+
     <div class="tbl" id="courseTbl"></div>
   </div>
 
@@ -989,6 +1009,7 @@ const setDelivery=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setDel
 const setLineTransfer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineTransfer");
 const setBonus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBonus");
 const setLineCost=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineCost");
+const addCourseRegistration=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addCourseRegistration");
 const addTask=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addTask");
 const listTasks=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listTasks");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -1218,6 +1239,31 @@ function renderTasks(){
     tab.textContent = "مهامي" + (n?` · ${fmt(n)}`:""); }
 }
 
+/* A seat sold over WhatsApp, recorded the same as one sold on the site so
+   the seat count and the revenue stay true. */
+function crMsg(m,ok){ const el=$("#crMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
+$("#crAdd") && $("#crAdd").addEventListener("click", async ()=>{
+  const name=$("#crName").value.trim(), email=$("#crEmail").value.trim();
+  if(name.length<2)  return crMsg("اكتب اسم العميل", false);
+  if(!email.includes("@")) return crMsg("اكتب إيميل صحيح", false);
+  const b=$("#crAdd"); b.disabled=true; const t=b.textContent; b.textContent="لحظة…";
+  try{
+    const r=await addCourseRegistration({
+      courseId:$("#crCourse").value, attend:$("#crAttend").value,
+      name, email, phone:$("#crPhone").value.trim(),
+      amount:$("#crAmount").value===""?undefined:Number($("#crAmount").value),
+      notes:$("#crNotes").value.trim() });
+    ["#crName","#crEmail","#crPhone","#crAmount","#crNotes"].forEach(x=>{ if($(x)) $(x).value=""; });
+    crMsg(`انسجّل ✅ بمبلغ ${kwd((r.data&&r.data.amount)||0)} — حدّث الصفحة عشان يظهر بالجدول`, true);
+  }catch(e){ crMsg((e&&e.message)||"تعذّر التسجيل", false); }
+  finally{ b.disabled=false; b.textContent=t; }
+});
+
+/* the in-person cap only applies to a room */
+$("#crAttend") && $("#crAttend").addEventListener("change", ()=>{
+  const w=$("#crAmountWrap"); if(w) w.style.opacity = "1";
+});
+
 $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
   const to=$("#tkWho").value, text=$("#tkText").value.trim();
   if(text.length<2) return tkMsg("اكتب المهمة", false);
@@ -1361,6 +1407,9 @@ function pfMsg(m,ok,where){
 
 function renderBooks(){
   if(!BK || !$("#bkKpisMoney")) return;
+  /* which build of the backend answered — so a partial deploy is visible */
+  const bd=$("#bkBuild");
+  if(bd) bd.textContent = BK.build ? ("نسخة الخادم: "+BK.build) : "نسخة الخادم: قديمة (ما ترسل رقم النسخة)";
   /* a viewer gets the company picture without the rates or the controls
      that move money — the server already refuses those, this just keeps
      buttons off the screen that would only ever return "ما عندك صلاحية" */
@@ -1457,7 +1506,8 @@ function renderBooks(){
       lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
-        <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}</div></td>
+        <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}${
+            l.mode?` · ${l.mode==="present"?"حضوري":"أونلاين"}`:""}</div></td>
         <td class="num">${kwd(l.amount)}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}
           ${canEdit?`<div><button class="pfbtn" style="padding:3px 9px;font-size:11.5px;margin-top:4px"
@@ -1925,8 +1975,10 @@ document.addEventListener("click", e=>{
 function render(){
   buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
   renderPayoutNudge();
+  const crBox=$("#crAddBox");
+  if(crBox) crBox.hidden = !(DATA && (DATA.role==="all" || DATA.role==="sales"));
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
-  if(_subOpt && DATA && DATA.role!=="all" && DATA.role!=="sales") _subOpt.remove();
+  /* the newsletter is a team job now, so the audience stays for everyone */
   syncTabs();
 }
 

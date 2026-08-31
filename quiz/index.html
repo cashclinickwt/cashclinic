@@ -506,16 +506,11 @@ function renderResult(sc, leadId){
     <div class="mgrid">${ORDER.map(k=>metricCard(k,sc[k])).join("")}</div>
     ${ANALYSIS?analysisBlock():''}
     <div class="cta-final">
-      <h3>${CTA_TITLE}</h3>
-      <p>${CTA_SUB}</p>
-      <div class="price">${PRICE_LABEL}</div>
-      <button class="btn gold block" id="cta">${CTA_BTN}</button>
-      <div id="ctaErr" style="color:#ffd7d7;margin-top:10px;font-size:14px"></div>
-      <a class="wa" href="${waLink(sc)}" target="_blank" rel="noopener">${WA_ICON}<span>${WA_TEXT}</span></a>
-    </div>
-    ${nextSteps(sc)}`;
+      ${nextSteps(sc)}`;
   window.scrollTo(0,0);
-  document.getElementById("cta").addEventListener("click", CTA==='tap'?buyNow:goBook);
+  /* The teal band used to sit here offering one book and a WhatsApp link.
+     It said the same thing the three cards below say, only worse — one
+     option instead of the one their own result points at. */
   wireNextSteps();
   requestAnimationFrame(()=>animateResult(sc));
 }
@@ -531,7 +526,7 @@ function renderResult(sc, leadId){
 const NX_BOOKS = [
   { key:"dalil",  name:"دليل الوفرة المالية", was:30, now:20,
     desc:"الأساس: خطوات عملية تنقلك من التخبط للوضوح، وتبني بها وفرتك خطوة بخطوة." },
-  { key:"ahdafi", name:"كتيّب أهدافي المالية", was:0, now:25,
+  { key:"ahdafi", name:"كتيّب أهدافي المالية", was:35, now:25,
     desc:"تحوّل أهدافك من أمنيات لأرقام ومواعيد، وتعرف بالضبط شنو الخطوة الجاية." },
 ];
 
