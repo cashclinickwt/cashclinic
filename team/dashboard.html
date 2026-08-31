@@ -510,10 +510,20 @@
     <button data-tab="target">هدف المبيعات</button>
     <button data-tab="profit">أرباحي</button>
     <button data-tab="books">حسابات الشركة</button>
+    <button data-tab="feedback">تقييم الجلسات</button>
     <button data-tab="tasks">مهامي</button>
     <button data-tab="reports">التقارير</button>
   </nav>
   <div class="shellbody">
+
+  <!-- ===== تقييم الجلسات ===== -->
+  <div class="sec" id="fbSec" data-panel="feedback" hidden>
+    <h2><span></span> تقييم الجلسات</h2>
+    <div class="kpis" id="fbKpis"></div>
+    <div class="flt" id="fbWhoFlt"></div>
+    <div id="fbBars"></div>
+    <div id="fbList"></div>
+  </div>
 
   <!-- ===== مهامي ===== -->
   <div class="sec" id="tasksSec" data-panel="tasks" hidden>
@@ -1010,6 +1020,7 @@ const setLineTransfer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"se
 const setBonus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBonus");
 const setLineCost=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setLineCost");
 const addCourseRegistration=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addCourseRegistration");
+const getSessionFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSessionFeedback");
 const addTask=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addTask");
 const listTasks=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listTasks");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -1175,7 +1186,8 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
-let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, BKMV = "open", BKKIND = "all";
+let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, FB = null,
+    FBWHO = "all", BKMV = "open", BKKIND = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
 const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function monthLabel(m){
@@ -1195,6 +1207,85 @@ function fillMonths(sel, months, current){
    never a per-order figure. Being straight about the limit: a percentage of
    a target she can see is a total she can work out, and that is the point of
    showing her a target at all. What it withholds is what each sale was worth. */
+/* ================= SESSION FEEDBACK ================= */
+const FB_TONE={ "ممتاز":"#128C4A", "جيد":"#7E8455", "متوسط":"#D3A146", "ضعيف":"#962E37" };
+const FB_ORDER=["ممتاز","جيد","متوسط","ضعيف"];
+
+async function loadFeedback(){
+  const box=$("#fbList"); if(!box) return;
+  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{ const r=await getSessionFeedback({}); FB=r.data||null; renderFeedback(); }
+  catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+
+/* counts, not an average — the answers are words, and scoring ممتاز as a
+   number would invent a precision nobody gave us */
+function fbBar(title, map, total){
+  const keys=FB_ORDER.filter(k=>(map||{})[k]);
+  if(!keys.length) return "";
+  return `<div class="pfcard" style="margin-bottom:12px"><h4>${esc(title)}</h4>`+
+    keys.map(k=>{
+      const n=map[k], pct=total?Math.round(n/total*100):0;
+      return `<div style="margin-bottom:9px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>${esc(k)}</span><span class="pfrule">${fmt(n)} · ${pct}%</span></div>
+        <div class="tgtrack" style="height:10px"><div class="tgfill" style="width:${pct}%;background:${FB_TONE[k]}"></div></div>
+      </div>`;
+    }).join("")+`</div>`;
+}
+
+function renderFeedback(){
+  if(!FB || !$("#fbKpis")) return;
+  const all=FB.rows||[];
+  const rows = FBWHO==="all" ? all : all.filter(r=>r.consultantId===FBWHO);
+
+  const flt=$("#fbWhoFlt");
+  if(flt){
+    /* only worth offering when there is more than one person to compare */
+    const ids=[...new Set(all.map(r=>r.consultantId).filter(Boolean))];
+    flt.innerHTML = (FB.seesAll && ids.length>1)
+      ? [["all","الكل"]].concat(ids.map(id=>[id,((FB.consultants||[]).find(c=>c.id===id)||{}).name||id]))
+          .map(([v,l])=>`<button data-fbwho="${esc(v)}"${v===FBWHO?' class="on"':''}>${esc(l)}</button>`).join("")
+      : "";
+  }
+
+  const tally=(key)=>{ const o={}; rows.forEach(r=>{ const v=r[key]; if(v) o[v]=(o[v]||0)+1; }); return o; };
+  const tS=tally("session"), tC=tally("consultantRating"), tP=tally("place");
+  const good=rows.filter(r=>r.session==="ممتاز"||r.session==="جيد").length;
+  const weak=rows.filter(r=>r.session==="متوسط"||r.session==="ضعيف").length;
+
+  $("#fbKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(rows.length)}</div><div class="l">تقييم وصلنا</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(good)}</div><div class="l">ممتاز أو جيد</div></div>`+
+    `<div class="kpi" style="${weak?"outline:2px solid #962E37":""}"><div class="n">${fmt(weak)}</div><div class="l">يحتاج التفاتة</div></div>`;
+
+  $("#fbBars").innerHTML = rows.length
+    ? `<div class="pfgrid">${fbBar("الاستشارة",tS,rows.length)}${fbBar("المستشار",tC,rows.length)}${fbBar("المكان",tP,rows.length)}</div>`
+    : "";
+
+  $("#fbList").innerHTML = rows.length
+    ? rows.map(r=>{
+        const chip=(l,v)=>v?`<span class="pfpill" style="background:${FB_TONE[v]||"#6B6577"}">${esc(l)}: ${esc(v)}</span>`:"";
+        return `<div class="pfcard" style="margin-bottom:12px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px">
+            ${chip("الاستشارة",r.session)}${chip("المستشار",r.consultantRating)}${chip("المكان",r.place)}
+            <span class="pfrule" style="margin-inline-start:auto">${esc(dt(r.when))}</span>
+          </div>
+          <div style="font-size:14px"><b>${esc(r.name)||"—"}</b>
+            <span class="pfrule"> · ${esc(r.packageName)||"جلسة"}${r.consultant?" · "+esc(r.consultant):""}${r.mode?" · "+(r.mode==="present"?"حضوري":"أونلاين"):""}</span></div>
+          ${r.learned?`<div class="bknoteitem" style="margin-top:8px"><span class="w">شنو تعلم</span><div>${esc(r.learned)}</div></div>`:""}
+          ${r.improve?`<div class="bknoteitem" style="margin-top:6px"><span class="w">شنو نحسّن</span><div>${esc(r.improve)}</div></div>`:""}
+          ${r.notes?`<div class="bknoteitem" style="margin-top:6px"><span class="w">ملاحظات</span><div>${esc(r.notes)}</div></div>`:""}
+        </div>`;
+      }).join("")
+    : `<div class="muted" style="font-size:13px;padding:10px">ما وصل تقييم بعد. التقييم يوصل العميل بالإيميل بعد ساعة من نهاية جلسته.</div>`;
+}
+
+$("#fbWhoFlt") && $("#fbWhoFlt").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-fbwho]"); if(!b) return;
+  FBWHO=b.dataset.fbwho; renderFeedback();
+});
+
 /* ================= TASKS ================= */
 async function loadTasks(){
   const box=$("#tkMine"); if(!box) return;
@@ -1983,7 +2074,7 @@ function render(){
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","tasks","target","profit","books","reports"];
+const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","feedback","tasks","target","profit","books","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 /* Tabs a role is allowed anywhere near. The server already refuses the data
@@ -1991,7 +2082,7 @@ function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); 
    the client list, the diary, the لقاء, the newsletter and the courses —
    and never see المبيعات، الاختبارات، التوظيف، البث، أسئلة الكتاب or التقارير. */
 const ROLE_PANELS = {
-  sales: ["clients","bookings","events","subscribers","courses","composer","tasks","target","profit"],
+  sales: ["clients","bookings","events","subscribers","courses","composer","feedback","tasks","target","profit"],
 };
 function panelAvailable(k){
   const el=panelEl(k); if(!el) return false;
@@ -2000,6 +2091,8 @@ function panelAvailable(k){
   /* the target belongs to Nora and to whoever watches her numbers;
      أرباحي to anyone with a share; the company books to غالية and عبدالله */
   if(k==="tasks")  return true;   /* everyone with a login has a task list */
+  /* consultants see their own feedback; admins and sales see all of it */
+  if(k==="feedback") return true;
   if(k==="target") return !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
   if(k==="profit") return !!(DATA && DATA.profitMember);
   if(k==="books")  return !!(DATA && DATA.seesBooks);
@@ -2025,6 +2118,7 @@ function showPanel(k){
   if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
   /* a month is worked out from every order in the account, so it is fetched
      when the tab is actually opened rather than on every dashboard load */
+  if(k==="feedback" && !FB) loadFeedback();
   if(k==="tasks"  && !TK) loadTasks();
   if(k==="target" && !TG) loadTarget();
   if(k==="profit" && !PF) loadProfit();
@@ -2032,7 +2126,7 @@ function showPanel(k){
 }
 /* An icon per section, so a collapsed rail is still navigable. */
 const TAB_ICON={sales:"💳",clients:"👥",quiz:"📝",events:"🎟️",live:"🔴",bookings:"📅",
-  careers:"🧑‍💼",subscribers:"✉️",bookq:"❓",courses:"🎓",composer:"📣",tasks:"✅",
+  careers:"🧑‍💼",subscribers:"✉️",bookq:"❓",courses:"🎓",composer:"📣",feedback:"⭐",tasks:"✅",
   target:"🎯",profit:"💰",books:"📊",reports:"📄"};
 
 /* Labels are wrapped once so collapsing can hide the text without losing it,
