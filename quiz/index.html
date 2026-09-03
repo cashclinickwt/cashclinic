@@ -193,10 +193,6 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 .anbox li b{color:#fff;font-weight:700}
 .angood .ic{background:var(--green)} .anwork .ic{background:var(--amber);color:#2b1140}
 
-.cta-final{background:var(--teal);border-radius:20px;padding:38px 26px;text-align:center;margin-top:8px}
-.cta-final h3{font-size:clamp(20px,3.4vw,26px);font-weight:800;margin:0 0 8px}
-.cta-final p{color:#d6f0ef;font-size:15px;margin:0 0 22px;line-height:1.8}
-.cta-final .price{font-size:15px;color:#fff;font-weight:700;margin-bottom:16px}
 .cta-final .wa{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;
   padding:15px 18px;border-radius:14px;background:rgba(255,255,255,.12);
   border:1.5px solid rgba(255,255,255,.5);color:#fff;font-size:15px;font-weight:700;
@@ -519,8 +515,7 @@ function renderResult(sc, leadId){
     <h2 class="axes-title" style="margin:24px 0 16px">${CARDS_TITLE}</h2>
     <div class="mgrid">${ORDER.map(k=>metricCard(k,sc[k])).join("")}</div>
     ${ANALYSIS?analysisBlock():''}
-    <div class="cta-final">
-      ${nextSteps(sc)}`;
+    ${nextSteps(sc)}`;
   window.scrollTo(0,0);
   /* The teal band used to sit here offering one book and a WhatsApp link.
      It said the same thing the three cards below say, only worse — one

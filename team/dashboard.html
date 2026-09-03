@@ -589,6 +589,7 @@
       <button data-mv="open" class="on">تحت التحويل</button>
       <button data-mv="done">تم التحويل</button>
     </div>
+    <div class="flt" id="bkWho"></div>
     <div class="flt" id="bkKind"></div>
     <div class="pfsend" id="bkSendBar" hidden>
       <span id="bkSelInfo"></span>
@@ -1196,7 +1197,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    every order in the account.
    ========================================= */
 let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, FB = null,
-    FBWHO = "all", BKMV = "open", BKKIND = "all";
+    FBWHO = "all", BKMV = "open", BKKIND = "all", BKPERSON = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
 const MON_AR = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 function monthLabel(m){
@@ -1572,23 +1573,51 @@ function renderBooks(){
   const kindBox=$("#bkKind");
   if(kindBox){
     kindBox.innerHTML=KINDS.map(([k,label])=>{
-      const of = k==="all" ? allLines : allLines.filter(l=>l.kind===k);
+      const of = k==="all" ? scoped : scoped.filter(l=>l.kind===k);
       if(!of.length && k!=="all") return "";
-      const left = of.filter(l=>!l.closed).length;
+      const left = of.filter(l=>!doneFor(l)).length;
       const tag = of.length ? (left ? " · "+fmt(left) : " ✅") : "";
       return `<button data-kind="${k}"${k===BKKIND?' class="on"':''}>${esc(label)}${tag}</button>`;
     }).join("");
   }
 
-  const lines=allLines
-    .filter(l => BKMV==="done" ? l.closed : !l.closed)
+  /* Whether a line is finished depends on who you are asking about. Looking
+     at everyone, it is finished when nobody is still owed. Looking at سارة,
+     it is finished when سارة has been paid — which is how the money actually
+     goes out, one person at a time. Judging every line by "has everybody
+     been paid" meant that paying سارة in full moved nothing at all, because
+     غالية is on almost every line too. */
+  const doneFor = (l) => {
+    if(BKPERSON==="all") return l.closed;
+    const p=(l.people||[]).find(x=>x.id===BKPERSON);
+    return !!(p && p.transferred);
+  };
+  const onLine  = (l) => BKPERSON==="all" || (l.people||[]).some(x=>x.id===BKPERSON && x.id!=="company");
+
+  const scoped = allLines.filter(onLine);
+  const lines = scoped
+    .filter(l => BKMV==="done" ? doneFor(l) : !doneFor(l))
     .filter(l => BKKIND==="all" || l.kind===BKKIND);
+
+  const whoBox=$("#bkWho");
+  if(whoBox){
+    const ids=[...new Set(allLines.flatMap(l=>(l.people||[])
+      .filter(x=>x.id!=="company").map(x=>x.id)))];
+    whoBox.innerHTML = ids.length>1
+      ? [["all","الكل"]].concat(ids.map(id=>{
+          const nm=((BK.members||[]).find(m=>m.id===id)||{}).name||id;
+          const mine=allLines.filter(l=>(l.people||[]).some(x=>x.id===id));
+          const left=mine.filter(l=>!(l.people||[]).find(x=>x.id===id).transferred).length;
+          return [id, nm+(left?" · "+fmt(left):" ✅")];
+        })).map(([v,l])=>`<button data-bkwho="${esc(v)}"${v===BKPERSON?' class="on"':''}>${esc(l)}</button>`).join("")
+      : "";
+  }
   const opts=(sel)=>`<option value="">— بدون —</option>`+(BK.rules||[]).map(r=>
     `<option value="${esc(r.id)}"${r.id===sel?" selected":""}>${esc(r.label)}</option>`).join("");
 
   const tabs=$("#bkTab");
   if(tabs){
-    const nOpen=allLines.filter(l=>!l.closed).length, nDone=allLines.filter(l=>l.closed).length;
+    const nOpen=scoped.filter(l=>!doneFor(l)).length, nDone=scoped.filter(l=>doneFor(l)).length;
     tabs.querySelectorAll("button").forEach(b=>{
       const k=b.dataset.mv;
       b.classList.toggle("on", k===BKMV);
@@ -1772,6 +1801,11 @@ $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMo
 $("#bkTab") && $("#bkTab").addEventListener("click", e=>{
   const b=e.target.closest("button[data-mv]"); if(!b) return;
   BKMV=b.dataset.mv; renderBooks();
+});
+
+$("#bkWho") && $("#bkWho").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-bkwho]"); if(!b) return;
+  BKPERSON=b.dataset.bkwho; renderBooks();
 });
 
 $("#bkKind") && $("#bkKind").addEventListener("click", e=>{
