@@ -432,6 +432,21 @@
   @media(min-width:760px){.pfgrid{grid-template-columns:repeat(3,1fr)}}
   .pfcard h4{font-size:14.5px;font-weight:800;color:var(--auber);margin:0 0 12px}
 
+  .cmpdraft{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .cmpdraft .open{flex:1;text-align:start;border:0;background:none;font-family:inherit;font-size:13.5px;
+    font-weight:700;color:var(--auber);cursor:pointer}
+  .cmpdraft .open:hover{text-decoration:underline}
+  .cmpdraft .del{border:0;background:none;font-family:inherit;font-size:12px;color:var(--burg);cursor:pointer}
+  .crfollow td{background:var(--bg);padding:10px 12px}
+  .crwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .crday{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+  .crday b{font-weight:700;color:var(--ink);margin-inline-end:2px}
+  .crb{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:4px 11px;
+    font-family:inherit;font-size:12.5px;color:var(--muted);cursor:pointer}
+  .crb:hover{border-color:var(--auber)}
+  .crb.on{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:700}
+  .crnote{border:1.5px dashed var(--line);background:none;border-radius:999px;padding:5px 13px;
+    font-family:inherit;font-size:12.5px;color:var(--muted);cursor:pointer}
   .bknotes{margin-top:8px;display:flex;flex-direction:column;gap:6px}
   .bknoteitem{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:9px 12px;
     font-size:13px;line-height:1.8;color:var(--ink)}
@@ -544,7 +559,10 @@
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tkAdd">أرسل المهمة</button></div>
     </div>
     <div class="addmsg" id="tkMsg"></div>
-    <h2 style="font-size:17px;margin-top:20px"><span></span> اللي عليّ</h2>
+    <div class="pfbar" id="tkViewBar" hidden>
+      <div class="f"><label>اعرض مهام</label><select id="tkView"></select></div>
+    </div>
+    <h2 style="font-size:17px;margin-top:20px"><span></span> <span id="tkMineTitle">اللي عليّ</span></h2>
     <div id="tkMine"></div>
     <h2 style="font-size:17px;margin-top:22px"><span></span> اللي أرسلته</h2>
     <div id="tkSent"></div>
@@ -561,6 +579,7 @@
     <h2><span></span> أرباحي <span class="whoname" id="pfWho"></span></h2>
     <div class="pfbar">
       <div class="f"><label>الشهر</label><select id="pfMonth"></select></div>
+      <div class="f" hidden><label>الشخص</label><select id="pfPerson"></select></div>
     </div>
     <div class="kpis" id="pfKpis"></div>
     <div id="pfPaid"></div>
@@ -990,6 +1009,7 @@
     <h2><span></span> طلبات التوظيف</h2>
     <div class="kpis" id="cvKpis"></div>
     <div class="flt" id="cvFlt"></div>
+    <div class="flt" id="cvStage"></div>
     <div id="cvList"></div>
   </div>
 
@@ -1297,10 +1317,11 @@ $("#fbWhoFlt") && $("#fbWhoFlt").addEventListener("click", e=>{
 });
 
 /* ================= TASKS ================= */
+let TKVIEW="";
 async function loadTasks(){
   const box=$("#tkMine"); if(!box) return;
   box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
-  try{ const r=await listTasks({}); TK=r.data||null; renderTasks(); }
+  try{ const r=await listTasks(TKVIEW?{who:TKVIEW}:{}); TK=r.data||null; renderTasks(); }
   catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 function tkMsg(m,ok){ const el=$("#tkMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
@@ -1325,6 +1346,22 @@ function tkTable(rows, mineSide){
 }
 function renderTasks(){
   if(!TK || !$("#tkMine")) return;
+
+  /* full access can read somebody else's list before piling more on them */
+  const vbar=$("#tkViewBar"), vsel=$("#tkView");
+  if(vbar) vbar.hidden = !TK.canSeeAll;
+  if(vsel && TK.canSeeAll){
+    const ppl=TK.people||[];
+    if(vsel.dataset.keys!==ppl.map(p=>p.email).join("|")){
+      vsel.dataset.keys=ppl.map(p=>p.email).join("|");
+      vsel.innerHTML=ppl.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+    }
+    if(TK.viewing) vsel.value=TK.viewing;
+  }
+  const t1=$("#tkMineTitle");
+  if(t1) t1.textContent = (TK.viewing && TK.viewing!==TK.me)
+    ? "اللي على "+tkName(TK.viewing) : "اللي عليّ";
+
   const sel=$("#tkWho");
   const ppl=(TK.people||[]).filter(p=>p.email!==TK.me);
   if(sel && sel.dataset.keys!==ppl.map(p=>p.email).join("|")){
@@ -1336,8 +1373,11 @@ function renderTasks(){
 
   /* a count on the tab, so a new task is noticed without opening it */
   const tab=document.querySelector('#dashTabs button[data-tab="tasks"] .lbl');
-  if(tab){ const n=(TK.mine||[]).filter(t=>!t.done).length;
-    tab.textContent = "مهامي" + (n?` · ${fmt(n)}`:""); }
+  /* the badge is your own workload, not whoever you are currently reading */
+  if(tab && (!TK.viewing || TK.viewing===TK.me)){
+    const n=(TK.mine||[]).filter(t=>!t.done).length;
+    tab.textContent = "مهامي" + (n?` · ${fmt(n)}`:"");
+  }
 }
 
 /* A seat sold over WhatsApp, recorded the same as one sold on the site so
@@ -1363,6 +1403,11 @@ $("#crAdd") && $("#crAdd").addEventListener("click", async ()=>{
 /* the in-person cap only applies to a room */
 $("#crAttend") && $("#crAttend").addEventListener("change", ()=>{
   const w=$("#crAmountWrap"); if(w) w.style.opacity = "1";
+});
+
+$("#tkView") && $("#tkView").addEventListener("change", e=>{
+  TKVIEW = e.target.value===TK.me ? "" : e.target.value;
+  loadTasks();
 });
 
 $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
@@ -1431,11 +1476,13 @@ function renderTarget(){
   }).join("");
 }
 
+let PFPERSON="";
 async function loadProfit(month){
   const box=$("#pfList"); if(!box) return;
   box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
   try{
-    const r=await getProfit(month?{month}:{});
+    const q={}; if(month) q.month=month; if(PFPERSON) q.who=PFPERSON;
+    const r=await getProfit(q);
     PF=r.data||null; PFMONTH=(PF&&PF.month)||"";
     renderProfit();
   }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
@@ -1477,6 +1524,10 @@ function renderProfit(){
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في شي لك بهذا الشهر.</div>`;
 }
+
+$("#pfPerson") && $("#pfPerson").addEventListener("change", e=>{
+  PFPERSON=e.target.value; loadProfit(PFMONTH);
+});
 
 $("#pfMonth") && $("#pfMonth").addEventListener("change", ()=>loadProfit($("#pfMonth").value));
 
@@ -2254,8 +2305,63 @@ function renderCourses(){
       <td>${esc(r.program)}</td>
       <td><span class="badge" style="background:${r.mode==="onsite"?"#505632":"#2F8789"}">${r.mode==="onsite"?"حضوري":"أونلاين"}</span></td>
       ${seesMoney()?`<td class="num">${money(r.amount)}</td>`:""}
-      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
+      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td></tr>`+
+      crFollowRow(r)).join("")+`</tbody></table>`;
 }
+
+/* A three-day workshop is three separate questions per person: somebody can
+   sit in the room on Monday and join online on Tuesday. Recorded per day,
+   with a note, so whoever calls them next knows where they stand. */
+const CR_DAYS = 3;
+const CR_STATE = [["onsite","حضوري"],["online","أونلاين"],["absent","غاب"]];
+
+function crFollowRow(r){
+  if(!(DATA && DATA.role==="all")) return "";
+  const cols = 4 + (seesMoney()?1:0) + 2;
+  const a = r.attendance || {};
+  const days = [...Array(CR_DAYS)].map((_,i)=>{
+    const d=i+1, cur=a["d"+d]||"";
+    return `<span class="crday"><b>يوم ${d}</b>`+
+      CR_STATE.map(([v,l])=>`<button class="crb${cur===v?" on":""}" data-cra="${esc(r.id)}" data-day="${d}" data-state="${v}">${l}</button>`).join("")+
+      `</span>`;
+  }).join("");
+  const notes=(r.followUp||[]).slice().sort((x,y)=>(y.at||0)-(x.at||0));
+  return `<tr class="crfollow"><td colspan="${cols}">
+    <div class="crwrap">${days}
+      <button class="crnote" data-crnote="${esc(r.id)}">أضف ملاحظة</button></div>
+    ${notes.length?`<div class="bknotes">`+notes.map(n=>`<div class="bknoteitem">
+        <span class="w">${esc(dt(n.at))} · ${esc(String(n.by||"").split("@")[0])}</span>
+        <div>${esc(n.text)}</div></div>`).join("")+`</div>`:""}
+  </td></tr>`;
+}
+
+$("#courseTbl") && $("#courseTbl").addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-cra]");
+  if(b){
+    const on=b.classList.contains("on");
+    b.disabled=true;
+    try{
+      await setCourseAttendance({ orderId:b.dataset.cra, day:Number(b.dataset.day),
+                                  state: on ? "" : b.dataset.state });
+      const row=(DATA.courses.regs||[]).find(x=>x.id===b.dataset.cra);
+      if(row){ row.attendance=row.attendance||{}; row.attendance["d"+b.dataset.day]= on ? "" : b.dataset.state; }
+      renderCourses();
+    }catch(err){ alert((err&&err.message)||"تعذّر الحفظ"); b.disabled=false; }
+    return;
+  }
+  const n=e.target.closest("button[data-crnote]");
+  if(n){
+    const text=prompt("ملاحظة على هذا المشترك:");
+    if(text===null || text.trim().length<2) return;
+    n.disabled=true;
+    try{
+      await setCourseAttendance({ orderId:n.dataset.crnote, note:text });
+      const row=(DATA.courses.regs||[]).find(x=>x.id===n.dataset.crnote);
+      if(row) row.followUp=(row.followUp||[]).concat([{text:text.trim(), by:DATA.email||"", at:Date.now()}]);
+      renderCourses();
+    }catch(err){ alert((err&&err.message)||"تعذّر الحفظ"); n.disabled=false; }
+  }
+});
 
 function renderEvents(){
   const E = DATA.events;
@@ -2860,7 +2966,7 @@ $("#fixList") && $("#fixList").addEventListener("click", async e=>{
 });
 
 /* ================= CAREERS ================= */
-let CVROLE="all";
+let CVROLE="all", CVSTAGE="pending";
 
 function renderCareers(){
   const C=DATA.careers; const sec=$("#careersSec"); if(!C||!sec) return;
@@ -2871,10 +2977,21 @@ function renderCareers(){
     `<div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">طلب توظيف</div></div>`+
     roles.map(r=>`<div class="kpi"><div class="n">${fmt(t.byRole[r])}</div><div class="l">${esc(r)}</div></div>`).join("");
 
+  /* Two lists: who still needs interviewing, and who has been seen. A flat
+     list of every applicant ever gives no sense of what is outstanding. */
+  const nPend=(C.list||[]).filter(x=>x.status!=="done").length;
+  const nDone=(C.list||[]).filter(x=>x.status==="done").length;
+  const st=$("#cvStage");
+  if(st) st.innerHTML =
+    `<button data-cvs="pending"${CVSTAGE==="pending"?' class="on"':''}>معلّق · ${fmt(nPend)}</button>`+
+    `<button data-cvs="done"${CVSTAGE==="done"?' class="on"':''}>تمت المقابلة · ${fmt(nDone)}</button>`;
+
   $("#cvFlt").innerHTML = [`<button data-cv="all"${CVROLE==="all"?' class="on"':''}>الكل</button>`]
     .concat(roles.map(r=>`<button data-cv="${esc(r)}"${CVROLE===r?' class="on"':''}>${esc(r)}</button>`)).join("");
 
-  const rows=(C.list||[]).filter(x=>CVROLE==="all"||x.role===CVROLE);
+  const rows=(C.list||[])
+    .filter(x=>CVSTAGE==="done" ? x.status==="done" : x.status!=="done")
+    .filter(x=>CVROLE==="all"||x.role===CVROLE);
   const box=$("#cvList");
   if(!rows.length){ box.innerHTML='<div class="empty">ما في طلبات بهذي القائمة.</div>'; return; }
   box.innerHTML=rows.map(a=>{
@@ -2890,10 +3007,16 @@ function renderCareers(){
         <span class="num">${dt(a.when)}</span>
       </div>
       ${a.note?`<div class="cvnote">${esc(a.note)}</div>`:""}
+      ${(a.notes||[]).length?`<div class="bknotes">`+(a.notes||[]).slice().sort((x,y)=>(y.at||0)-(x.at||0))
+        .map(n=>`<div class="bknoteitem"><span class="w">${esc(dt(n.at))} · ${esc(String(n.by||"").split("@")[0])}</span>
+          <div>${esc(n.text)}</div></div>`).join("")+`</div>`:""}
       <div class="cvacts">
         <button class="dl" data-cv-id="${esc(a.id)}">حمّل السيرة الذاتية (${(a.cvSize/1048576).toFixed(1)} م.ب)</button>
         ${a.portfolio?`<a href="${esc(a.portfolio)}" target="_blank" rel="noopener">شوف أعماله</a>`:""}
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button data-cvnote="${esc(a.id)}">أضف ملاحظة</button>
+        <button data-cvdone="${esc(a.id)}" data-to="${a.status==="done"?"pending":"done"}">${
+          a.status==="done" ? "رجّعه معلّق" : "تمت المقابلة"}</button>
       </div>
     </div>`;
   }).join("");
@@ -2901,6 +3024,35 @@ function renderCareers(){
 
 $("#cvFlt") && $("#cvFlt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
   CVROLE=b.dataset.cv; renderCareers(); });
+
+$("#cvStage") && $("#cvStage").addEventListener("click",e=>{ const b=e.target.closest("button[data-cvs]"); if(!b)return;
+  CVSTAGE=b.dataset.cvs; renderCareers(); });
+
+$("#cvList") && $("#cvList").addEventListener("click", async e=>{
+  const nb=e.target.closest("button[data-cvnote]");
+  if(nb){
+    const text=prompt("ملاحظة على هذا المتقدّم:");
+    if(text===null || text.trim().length<2) return;
+    nb.disabled=true;
+    try{
+      await setApplicationStatus({ id:nb.dataset.cvnote, note:text });
+      const row=(DATA.careers.list||[]).find(x=>x.id===nb.dataset.cvnote);
+      if(row) row.notes=(row.notes||[]).concat([{text:text.trim(), by:DATA.email||"", at:Date.now()}]);
+      renderCareers();
+    }catch(err){ alert((err&&err.message)||"تعذّر الحفظ"); nb.disabled=false; }
+    return;
+  }
+  const db2=e.target.closest("button[data-cvdone]");
+  if(db2){
+    db2.disabled=true;
+    try{
+      await setApplicationStatus({ id:db2.dataset.cvdone, status:db2.dataset.to });
+      const row=(DATA.careers.list||[]).find(x=>x.id===db2.dataset.cvdone);
+      if(row) row.status=db2.dataset.to;
+      renderCareers();
+    }catch(err){ alert((err&&err.message)||"تعذّر الحفظ"); db2.disabled=false; }
+  }
+});
 
 $("#cvList") && $("#cvList").addEventListener("click",async e=>{
   const b=e.target.closest("button[data-cv-id]"); if(!b) return;
@@ -3989,7 +4141,8 @@ function closeResult(){ document.getElementById("ovl").classList.remove("on"); }
 window.openResult=openResult; window.closeResult=closeResult;
 
 /* ---------- email composer ---------- */
-function cOpen(){ $("#cOvl").classList.add("on"); }
+function cOpen(){
+  cmpLoadDrafts(); $("#cOvl").classList.add("on"); }
 function cClose(){ $("#cOvl").classList.remove("on"); }
 window.cClose=cClose;
 const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",subscribers:"المشتركين بالنشرة",single:"إيميل عميل محدد"};
@@ -4060,14 +4213,92 @@ function cmpSyncCount(){
 
 function cStat(kind,msg){ const st=$("#cmpStatus"); st.className="cmp-status "+kind; st.textContent=msg; }
 function readB64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=rej; r.readAsDataURL(file); }); }
+/* ---- drafts: write several now, send them over the coming weeks ---- */
+let CMPDRAFT="";
+
+function cmpCollect(){
+  return {
+    id: CMPDRAFT || undefined,
+    subject: $("#cmpSubj").value.trim(),
+    body: $("#cmpBody").value.trim(),
+    audience: $("#cmpAud").value,
+    toEmails: $("#cmpSingle").value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean),
+    fromDate: ($("#cmpFrom")&&$("#cmpFrom").value)||"",
+    toDate: ($("#cmpTo")&&$("#cmpTo").value)||"",
+    quizSource: ($("#cmpQuizSel")&&$("#cmpQuizSel").value)||"",
+    product: ($("#cmpBookSel")&&$("#cmpBookSel").value)||"",
+  };
+}
+
+async function cmpLoadDrafts(){
+  const box=$("#cmpDrafts"); if(!box) return;
+  try{
+    const r=await listCampaignDrafts({});
+    const list=(r.data&&r.data.list)||[];
+    box.innerHTML = list.length
+      ? `<div class="cmp-hint" style="margin-bottom:6px">المسودات المحفوظة</div>`+
+        list.map(d=>`<div class="cmpdraft">
+          <button class="open" data-draft="${esc(d.id)}">${esc(d.subject)||"بدون عنوان"}</button>
+          <span class="cmp-hint">${esc(dt(d.when))}</span>
+          <button class="del" data-draftdel="${esc(d.id)}">حذف</button>
+        </div>`).join("")
+      : "";
+    box._list = list;
+  }catch(e){ box.innerHTML=""; }
+}
+
+$("#cmpSaveDraft") && $("#cmpSaveDraft").addEventListener("click", async ()=>{
+  const d=cmpCollect();
+  if(!d.subject && !d.body) return cStat("err","اكتب العنوان أو النص");
+  const b=$("#cmpSaveDraft"); b.disabled=true;
+  try{
+    const r=await saveCampaignDraft(d);
+    CMPDRAFT=(r.data&&r.data.id)||"";
+    await cmpLoadDrafts();
+    cStat("ok","انحفظت المسودة ✅ تقدر ترجع لها بأي وقت");
+  }catch(e){ cStat("err",(e&&e.message)||"تعذّر الحفظ"); }
+  finally{ b.disabled=false; }
+});
+
+$("#cmpDrafts") && $("#cmpDrafts").addEventListener("click", async e=>{
+  const o=e.target.closest("button[data-draft]");
+  if(o){
+    const d=(($("#cmpDrafts")._list)||[]).find(x=>x.id===o.dataset.draft); if(!d) return;
+    CMPDRAFT=d.id;
+    $("#cmpSubj").value=d.subject||""; $("#cmpBody").value=d.body||"";
+    if($("#cmpAud")) { $("#cmpAud").value=d.audience||"subscribers"; cmpSyncAud(); }
+    if($("#cmpSingle")) $("#cmpSingle").value=(d.toEmails||[]).join("\n");
+    if($("#cmpFrom")) $("#cmpFrom").value=d.fromDate||"";
+    if($("#cmpTo"))   $("#cmpTo").value=d.toDate||"";
+    cStat("info","فتحنا المسودة — عدّلها وأرسلها أو احفظها من جديد");
+    return;
+  }
+  const x=e.target.closest("button[data-draftdel]");
+  if(x){
+    if(!confirm("تحذف هذي المسودة؟")) return;
+    try{ await deleteCampaignDraft({ id:x.dataset.draftdel });
+         if(CMPDRAFT===x.dataset.draftdel) CMPDRAFT="";
+         await cmpLoadDrafts(); }
+    catch(err){ cStat("err",(err&&err.message)||"تعذّر الحذف"); }
+  }
+});
+
 $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
   const audience=$("#cmpAud").value;
   const subject=$("#cmpSubj").value.trim();
   const bodyHtml=$("#cmpBody").value.trim();
-  const toEmail=$("#cmpSingle").value.trim();
+  /* one per line or comma-separated — whichever they happen to paste */
+  const toEmails=$("#cmpSingle").value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
+  const toEmail=toEmails[0]||"";
   if(!subject) return cStat("err","اكتب عنوان الرسالة");
   if(!bodyHtml) return cStat("err","اكتب نص الرسالة");
-  if(audience==="single" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(toEmail)) return cStat("err","اكتب إيميل صحيح");
+  if(audience==="single"){
+    if(!toEmails.length) return cStat("err","اكتب إيميل واحد على الأقل");
+    const bad=toEmails.find(x=>!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x));
+    if(bad) return cStat("err","إيميل غير صحيح: "+bad);
+    if(toEmails.length>50) return cStat("err","أكثر من ٥٠ إيميل — استخدم قائمة");
+    if(toEmails.length>1 && !confirm(`بتُرسل الرسالة لـ ${toEmails.length} عميل. متأكد؟`)) return;
+  }
   const files=Array.from(($("#cmpFiles").files)||[]);
   let total=0; files.forEach(f=>total+=f.size);
   if(total > 7*1024*1024) return cStat("err","حجم المرفقات كبير — الحد حوالي 7 ميجابايت");
@@ -4081,8 +4312,10 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
     if(dateFrom && dateTo && dateFrom>dateTo){ const t=dateFrom; dateFrom=dateTo; dateTo=t; }
     const quizSource=(audience==="quiz" && $("#cmpQuizSel")) ? $("#cmpQuizSel").value : "";
     const bookKey=(audience==="book" && $("#cmpBookSel")) ? $("#cmpBookSel").value : "";
-    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, attachments, dateFrom, dateTo, quizSource, bookKey });
+    const r=await sendCampaign({ audience, subject, bodyHtml, toEmail, toEmails, attachments, dateFrom, dateTo, quizSource, bookKey });
     const d=(r&&r.data)||{};
+    /* a draft that has gone out is not a draft any more */
+    if(CMPDRAFT){ try{ await deleteCampaignDraft({ id:CMPDRAFT }); }catch(e){} CMPDRAFT=""; await cmpLoadDrafts(); }
     cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":""));
   }catch(e){ cStat("err",(e&&e.message)||"صار خطأ، حاول مرة ثانية"); }
   finally{ $("#cmpSend").disabled=false; }
@@ -4227,8 +4460,10 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
       <div class="cmp-fld" id="cmpBookWrap" style="display:none"><label>نوع الكتاب</label>
         <select id="cmpBookSel"><option value="">كل الكتب</option></select>
       </div>
-      <div class="cmp-fld" id="cmpSingleWrap" style="display:none"><label>إيميل العميل</label>
-        <input id="cmpSingle" type="email" placeholder="customer@email.com" style="direction:ltr;text-align:right">
+      <div id="cmpDrafts"></div>
+      <div class="cmp-fld" id="cmpSingleWrap" style="display:none"><label>إيميلات العملاء</label>
+        <textarea id="cmpSingle" rows="3" placeholder="customer@email.com&#10;another@email.com" style="direction:ltr;text-align:left"></textarea>
+        <div class="cmp-hint">إيميل بكل سطر، أو افصلهم بفاصلة. حتى ٥٠ إيميل.</div>
       </div>
       <div class="cmp-fld" id="cmpDateWrap"><label>الفترة (اختياري)</label>
         <div style="display:flex;gap:10px">
@@ -4249,6 +4484,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
         <div class="cmp-hint">الحد الأقصى حوالي 7 ميجابايت لكل الملفات.</div>
       </div>
       <div class="cmp-status" id="cmpStatus"></div>
+      <button class="report-btn" id="cmpSaveDraft" style="background:none;border:1.5px solid var(--line);color:var(--ink)">احفظ كمسودة</button>
       <button class="report-btn cmp-send" id="cmpSend">إرسال الرسالة</button>
     </div>
   </div>
