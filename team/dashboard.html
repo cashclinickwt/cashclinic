@@ -1564,23 +1564,6 @@ function renderBooks(){
      is a worklist that empties, not a log that only ever grows. */
   const allLines=BK.lines||[];
 
-  /* Narrowing to one kind is what makes "pay everybody their book money"
-     a single act: filter to الكتيّبات, حدّد الكل, send. Each chip also says
-     how many of that kind are still waiting, so whether a category is
-     finished for the month is answerable at a glance. */
-  const KINDS=[["all","الكل"],["book","الكتيّبات"],["consult","الاستشارات"],
-               ["call","الاتصال السريع"],["course","الورش والدورات"],["contract","العقود"]];
-  const kindBox=$("#bkKind");
-  if(kindBox){
-    kindBox.innerHTML=KINDS.map(([k,label])=>{
-      const of = k==="all" ? scoped : scoped.filter(l=>l.kind===k);
-      if(!of.length && k!=="all") return "";
-      const left = of.filter(l=>!doneFor(l)).length;
-      const tag = of.length ? (left ? " · "+fmt(left) : " ✅") : "";
-      return `<button data-kind="${k}"${k===BKKIND?' class="on"':''}>${esc(label)}${tag}</button>`;
-    }).join("");
-  }
-
   /* Whether a line is finished depends on who you are asking about. Looking
      at everyone, it is finished when nobody is still owed. Looking at سارة,
      it is finished when سارة has been paid — which is how the money actually
@@ -1598,6 +1581,24 @@ function renderBooks(){
   const lines = scoped
     .filter(l => BKMV==="done" ? doneFor(l) : !doneFor(l))
     .filter(l => BKKIND==="all" || l.kind===BKKIND);
+
+  /* Narrowing to one kind is what makes "pay everybody their book money"
+     a single act: filter to الكتيّبات, حدّد الكل, send. Each chip also says
+     how many of that kind are still waiting, so whether a category is
+     finished for the month is answerable at a glance. */
+  const KINDS=[["all","الكل"],["book","الكتيّبات"],["consult","الاستشارات"],
+               ["call","الاتصال السريع"],["course","الورش والدورات"],["contract","العقود"]];
+  const kindBox=$("#bkKind");
+  if(kindBox){
+    kindBox.innerHTML=KINDS.map(([k,label])=>{
+      const of = k==="all" ? scoped : scoped.filter(l=>l.kind===k);
+      if(!of.length && k!=="all") return "";
+      const left = of.filter(l=>!doneFor(l)).length;
+      const tag = of.length ? (left ? " · "+fmt(left) : " ✅") : "";
+      return `<button data-kind="${k}"${k===BKKIND?' class="on"':''}>${esc(label)}${tag}</button>`;
+    }).join("");
+  }
+
 
   const whoBox=$("#bkWho");
   if(whoBox){

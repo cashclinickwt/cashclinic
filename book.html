@@ -353,7 +353,10 @@ const rescheduleBooking   = httpsCallable(fns,"rescheduleBooking");
 
 const $  = s => document.querySelector(s);
 const esc = t => String(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const show = (sel,on) => $(sel).classList.toggle("hide", !on);
+/* Guarded: this is called on elements that may legitimately have been
+   removed, and an unguarded null here takes the whole page down rather than
+   skipping one line. */
+const show = (sel,on) => { const el=$(sel); if(el) el.classList.toggle("hide", !on); };
 
 const AR_DAY = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
 const AR_MON = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
@@ -436,11 +439,13 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
     const wanted = (data.packages || []).find(p => p.id === (data.lockedTo || WANT_PKG));
     if(wanted){
       show("#bkLoading",false);
+      /* openClinic hides the chooser itself, so it has to still exist when
+         it runs — removing it first threw on a null element and killed the
+         whole boot, which is why the page came up blank. Remove it after. */
+      openClinic(wanted.clinic || "nas", { pkg: wanted.id });
       if(data.lockedTo){
-        /* no way back to a list that was never sent */
         const cc = $("#cardClinic"); if(cc) cc.remove();
       }
-      openClinic(wanted.clinic || "nas", { pkg: wanted.id });
       document.querySelectorAll('input[name="mode"]').forEach(el =>
         el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
       return;
