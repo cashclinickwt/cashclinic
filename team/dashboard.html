@@ -2955,29 +2955,51 @@ function paintLaunch(B){
   const box=$("#bkLaunch"); if(!box) return;
   /* only the admin role gets the switch; a consultant just sees the state */
   const canLaunch = !!B.previewKey;
+  /* Three states, because "open to everyone" and "closed to everyone" were
+     not the only two useful answers. The middle one lets the quiz book while
+     the page itself stays unbrowsable. */
+  const mode = B.mode || (B.live ? "open" : "off");
   box.hidden=false;
-  box.className = "bklaunch " + (B.live ? "on" : "off");
+  box.className = "bklaunch " + (mode==="off" ? "off" : "on");
   const prev = B.previewKey
     ? `<div class="bkprev">رابط المعاينة: ${location.origin}/book.html?preview=${encodeURIComponent(B.previewKey)}</div>` : "";
-  box.innerHTML = B.live
-    ? `<div class="t"><b>الحجز مفتوح للعملاء ✅</b><span>صفحة book.html شغّالة والعملاء يقدرون يحجزون ويدفعون.</span></div>
-       ${canLaunch?'<button class="stop" id="bkToggle" data-live="0">أوقف الحجز</button>':""}${prev}`
-    : `<div class="t"><b>الحجز مقفل · وضع التجهيز</b><span>العملاء يشوفون صفحة «قريباً» وما يقدرون يدفعون. جهّز جدولك ورابط الميت والعنوان، وبعدين افتح الحجز.</span></div>
-       ${canLaunch?'<button class="go" id="bkToggle" data-live="1">افتح الحجز للعملاء</button>':""}${prev}`;
+
+  const TXT={
+    off:  ["الحجز مقفل · وضع التجهيز","العملاء يشوفون صفحة «قريباً» وما يقدرون يدفعون."],
+    quiz: ["الحجز عبر الاختبار فقط ✅","اللي يخلّص الاختبار يحجز الباقة اللي اخترناها له. صفحة book.html وحدها تظهر «قريباً»، وما فيه اختيار باقات."],
+    open: ["الحجز مفتوح للجميع ✅","صفحة book.html شغّالة، والعميل يختار الباقة بنفسه."],
+  };
+  const btn=(m,label,cls)=> mode===m ? "" :
+    `<button class="${cls}" id="bkToggle" data-mode="${m}">${label}</button>`;
+
+  box.innerHTML =
+    `<div class="t"><b>${esc(TXT[mode][0])}</b><span>${esc(TXT[mode][1])}</span></div>` +
+    (canLaunch ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${btn("quiz","حجز عبر الاختبار فقط","go")}
+        ${btn("open","افتح للجميع","go")}
+        ${btn("off","أوقف الحجز","stop")}
+      </div>` : "") + prev;
 }
 
 $("#bkLaunch") && $("#bkLaunch").addEventListener("click", async e=>{
   const b=e.target.closest("#bkToggle"); if(!b) return;
-  const goLive = b.dataset.live === "1";
-  if(goLive && !confirm("بتفتح الحجز لكل العملاء. متأكد إن الجدول ورابط الميت والعنوان جاهزين؟")) return;
-  if(!goLive && !confirm("بتوقف الحجز. العملاء بيشوفون صفحة «قريباً». الحجوزات الحالية ما تتأثر.")) return;
+  const mode=b.dataset.mode;
+  const ASK={
+    open:"بتفتح الحجز لكل العملاء ويختارون الباقة بأنفسهم. متأكد إن الجدول ورابط الميت والعنوان جاهزين؟",
+    quiz:"بيصير الحجز عبر الاختبار فقط — العميل يحجز الباقة اللي اخترناها له، وما يقدر يختار غيرها. متأكد إن الجدول جاهز؟",
+    off :"بتوقف الحجز. العملاء بيشوفون صفحة «قريباً». الحجوزات الحالية ما تتأثر.",
+  };
+  if(!confirm(ASK[mode])) return;
   b.disabled=true; const t=b.textContent; b.textContent="لحظة…";
   try{
-    const r=await setBookingLive({ live: goLive });
-    DATA.bookings.live = !!(r.data && r.data.live);
+    const r=await setBookingLive({ mode });
+    const d=(r&&r.data)||{};
+    DATA.bookings.mode = d.mode || mode;
+    DATA.bookings.live = !!d.live;
     paintLaunch(DATA.bookings);
-    bkMsg(DATA.bookings.live ? "انفتح الحجز ✅ صفحة book.html صارت شغّالة للعملاء."
-                             : "انقفل الحجز. العملاء بيشوفون صفحة «قريباً».", true);
+    bkMsg({ open:"انفتح الحجز للجميع ✅",
+            quiz:"الحجز صار عبر الاختبار فقط ✅",
+            off :"انقفل الحجز. العملاء بيشوفون صفحة «قريباً»." }[DATA.bookings.mode], true);
   }catch(err){ bkMsg((err&&err.message)||"تعذّر التغيير",false); b.disabled=false; b.textContent=t; }
 });
 

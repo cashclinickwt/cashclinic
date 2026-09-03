@@ -398,7 +398,9 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
 /* ---------------- boot ---------------- */
 (async function boot(){
   try{
-    const r = await getBookingOptions({ preview: PREVIEW });
+    /* the package travels with the request: in quiz mode the server only
+       answers for somebody who arrived with one we chose */
+    const r = await getBookingOptions({ preview: PREVIEW, pkg: WANT_PKG });
     const data = r.data || {};
     if(data.preview) show("#bkPreview",true);
     /* not launched yet: show the holding page and stop */
@@ -428,10 +430,16 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
     if(PRE.email && $("#bEmail")) $("#bEmail").value = PRE.email;
     if(PRE.phone && $("#bPhone")) $("#bPhone").value = String(PRE.phone).replace(/^\+?965/, "");
 
-    /* arriving with a package in hand skips the clinic chooser */
-    const wanted = WANT_PKG && (data.packages || []).find(p => p.id === WANT_PKG);
+    /* Arriving with a package skips the chooser entirely. When the server
+       says the visit is locked to it, the chooser is not merely skipped —
+       there is nothing else to choose, because nothing else was sent. */
+    const wanted = (data.packages || []).find(p => p.id === (data.lockedTo || WANT_PKG));
     if(wanted){
       show("#bkLoading",false);
+      if(data.lockedTo){
+        /* no way back to a list that was never sent */
+        const cc = $("#cardClinic"); if(cc) cc.remove();
+      }
       openClinic(wanted.clinic || "nas", { pkg: wanted.id });
       document.querySelectorAll('input[name="mode"]').forEach(el =>
         el.addEventListener("change", () => { if(el.checked){ MODE = el.value; loadSlots(); } }));
