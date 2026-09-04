@@ -608,7 +608,7 @@
       <button data-mv="open" class="on">تحت التحويل</button>
       <button data-mv="done">تم التحويل</button>
     </div>
-    <div class="flt" id="bkWho"></div>
+    <div class="flt" id="bkPersonFlt"></div>
     <div class="flt" id="bkKind"></div>
     <div class="pfsend" id="bkSendBar" hidden>
       <span id="bkSelInfo"></span>
@@ -655,7 +655,7 @@
     <h2 style="font-size:17px;margin-top:22px"><span></span> النسب</h2>
     <div id="bkRules"></div>
     <button class="pfbtn go" id="bkRuleNew" style="margin-top:12px">+ قاعدة جديدة</button>
-    <div class="addmsg" id="bkMsg"></div>
+    <div class="addmsg" id="pfBottomMsg"></div>
     <p class="pfrule" id="bkBuild" style="text-align:end;margin-top:18px;opacity:.6"></p>
   </div>
 
@@ -1552,7 +1552,10 @@ async function loadBooks(month, keepScroll){
    is exactly how a failing transfer looked like a button that did nothing.
    Report next to whatever was clicked. */
 function pfMsg(m,ok,where){
-  const el=$(where||"#bkMsg"); if(!el) return;
+  /* defaults to the books panel's own message line — it used to point at
+     #bkMsg, which the bookings diary also owned, so a books message could
+     land in the diary and vice versa */
+  const el=$(where||"#pfBottomMsg"); if(!el) return;
   el.className="addmsg "+(ok?"ok":"err"); el.textContent=m;
   if(!ok) el.scrollIntoView({behavior:"smooth",block:"center"});
 }
@@ -1651,7 +1654,10 @@ function renderBooks(){
   }
 
 
-  const whoBox=$("#bkWho");
+  /* Renamed from #bkWho: the consultant diary already owns that id, and two
+     elements sharing one id meant the diary's own chips were being written
+     into this panel instead — which is why only the first consultant showed. */
+  const whoBox=$("#bkPersonFlt");
   if(whoBox){
     const ids=[...new Set(allLines.flatMap(l=>(l.people||[])
       .filter(x=>x.id!=="company").map(x=>x.id)))];
@@ -1855,7 +1861,7 @@ $("#bkTab") && $("#bkTab").addEventListener("click", e=>{
   BKMV=b.dataset.mv; renderBooks();
 });
 
-$("#bkWho") && $("#bkWho").addEventListener("click", e=>{
+$("#bkPersonFlt") && $("#bkPersonFlt").addEventListener("click", e=>{
   const b=e.target.closest("button[data-bkwho]"); if(!b) return;
   BKPERSON=b.dataset.bkwho; renderBooks();
 });

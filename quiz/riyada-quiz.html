@@ -82,6 +82,37 @@ img{max-width:100%;display:block}
 .acard h3{font-size:19px;font-weight:800;margin:0 0 10px}
 .acard p{color:var(--muted);font-size:14.5px;line-height:1.85;margin:0}
 
+/* ---- what now: book, package, quick call ----
+   Its own cream panel, because the result page is dark and text placed on it
+   without an explicit background inherits pale colours meant for the dark
+   theme. Same lesson as the Cash Nas result. */
+.rqnx{background:#FFF9EE;border-radius:24px;padding:34px 22px 30px;margin:40px 0 18px}
+.rqnx>h3{font-size:clamp(21px,3.4vw,28px);font-weight:800;color:#2F1749;text-align:center;margin:0 0 8px}
+.rqnx>p.sub{text-align:center;color:#2F1749;font-weight:600;font-size:16px;margin:0 auto 24px;max-width:44ch}
+.rqbook,.rqpkg{background:#fff;border-radius:20px;padding:26px 22px;margin-bottom:16px;text-align:start}
+.rqbook{border:2.5px solid #2F8789}
+.rqpkg{border:2px solid #D3A146}
+.rqnx .rib{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:5px 13px;margin-bottom:12px}
+.rqbook .rib{background:#2F8789;color:#fff}
+.rqpkg  .rib{background:#D3A146;color:#2F1749}
+.rqnx h4{font-size:21px;font-weight:800;color:#2F1749;margin:0 0 10px;line-height:1.4}
+.rqnx p{font-size:15px;line-height:1.9;color:#332C40;margin:0 0 14px}
+.rqnx .price{font-size:18px;font-weight:800;color:#2F8789;margin:0 0 16px}
+.rqnx .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.rqnx .meta span{background:#F3EFF7;color:#2F1749;font-size:12.5px;font-weight:600;border-radius:999px;padding:5px 12px}
+.rqnx .go{display:block;text-align:center;text-decoration:none;background:#D3A146;color:#2F1749;
+  font-size:16px;font-weight:800;border-radius:999px;padding:15px 18px}
+.rqnx .pay{font-size:13px;color:#3F394B;text-align:center;margin:12px auto 0;max-width:44ch}
+.rqcall{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  background:#fff;border:1.5px dashed #C9C2D4;border-radius:18px;padding:16px 20px}
+.rqcall b{display:block;color:#2F1749;font-size:15.5px}
+.rqcall span{font-size:13.5px;color:#5C5568}
+.rqcall a{background:#2F1749;color:#FFE7BC;text-decoration:none;font-weight:700;font-size:14.5px;
+  border-radius:999px;padding:12px 22px;white-space:nowrap}
+.rqnx .wa{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;padding:14px 18px;
+  border:1.5px solid #25D366;border-radius:999px;color:#128C4A;text-decoration:none;font-weight:700;font-size:15px}
+.rqnx .wa svg{width:22px;height:22px;fill:#25D366;flex:none}
+
 .cta-band{background:var(--teal);border-radius:20px;padding:52px 30px;text-align:center;margin:44px 0 34px}
 .cta-band .eyebrow{color:#d6f0ef;font-weight:600;font-size:15px;margin-bottom:14px}
 .cta-band h2{font-size:clamp(21px,3.4vw,30px);font-weight:800;line-height:1.55;margin:0 0 26px;max-width:760px;margin-inline:auto}
@@ -301,7 +332,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
   try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); fns=firebase.functions(); }catch(e){ console.warn("firebase init",e); }
 </script>
 <script>
-const Q = [{"id": "q1", "dim": "cash", "text": "كيف وضع السيولة النقدية عندك الحين؟", "opts": [{"t": "ما عندي مشكلة — الكاش كافي لأكثر من 3 أشهر", "s": 3}, {"t": "أغطي مصاريفي لكن ما في فائض", "s": 2}, {"t": "أحياناً أتأخر في الدفع أو أضطر أقترض", "s": 1}, {"t": "في ضغط حقيقي — ما أعرف كيف أغطي الشهر القادم", "s": 0}]}, {"id": "q2", "dim": "cash", "text": "هل تعرف نقطة التعادل (Breakeven) لمشروعك؟", "opts": [{"t": "نعم — أعرف بالضبط كم أحتاج أبيع كل شهر", "s": 3}, {"t": "عندي فكرة تقريبية", "s": 2}, {"t": "لا — ما حسبتها قبل", "s": 0}, {"t": "ما أعرف شنو تعني", "s": 0}]}, {"id": "q3", "dim": "cash", "text": "كيف تتتبع إيراداتك ومصاريفك؟", "opts": [{"t": "نظام محاسبي أو Excel منظم — أشوف الأرقام دايماً", "s": 3}, {"t": "أسجل بعض الأشياء لكن مو منتظم", "s": 1}, {"t": "بالذاكرة أو ما في تتبع واضح", "s": 0}, {"t": "المحاسب يتكفل لكن ما أفهم التقارير", "s": 1}]}, {"id": "q4", "dim": "pricing", "text": "كيف وصلت لأسعارك الحالية؟", "opts": [{"t": "حسبت تكاليفي + هامش ربح + دراسة السوق", "s": 3}, {"t": "نظرت للمنافسين وأخذت سعر مشابه", "s": 1}, {"t": "خمّنت رقم يبدو معقول", "s": 0}, {"t": "العميل هو اللي يحدد — أنا أقبل", "s": 0}]}, {"id": "q5", "dim": "pricing", "text": "متى آخر مرة رفعت أسعارك؟", "opts": [{"t": "خلال 6 أشهر الماضية", "s": 3}, {"t": "منذ سنة أو أكثر", "s": 1}, {"t": "ما رفعت أسعاري من يوم ما بدأت", "s": 0}, {"t": "خايف أرفع — بخسر العملاء", "s": 0}]}, {"id": "q6", "dim": "sales", "text": "من وين تيجيك غالبية عملائك الجدد؟", "opts": [{"t": "تسويق منظم — إعلانات أو محتوى أو SEO", "s": 3}, {"t": "توصيات وWord of mouth", "s": 2}, {"t": "أنا اللي أروح أدور عليهم", "s": 1}, {"t": "العملاء ما يجون بالكفاية", "s": 0}]}, {"id": "q7", "dim": "sales", "text": "كم نسبة العملاء اللي يرجعون يشترون مرة ثانية؟", "opts": [{"t": "أكثر من 60٪ — عملائي وفيين", "s": 3}, {"t": "30-60٪", "s": 2}, {"t": "أقل من 30٪", "s": 1}, {"t": "ما عندي فكرة — ما قستها", "s": 0}]}, {"id": "q8", "dim": "sales", "text": "كيف تحول المهتم (Lead) لعميل يدفع؟", "opts": [{"t": "عندي process واضح — أعرف معدل التحويل", "s": 3}, {"t": "أتكلم معهم وأحياناً يشترون", "s": 1}, {"t": "ما عندي طريقة واضحة", "s": 0}, {"t": "أخفض السعر عشان أقنعهم", "s": 0}]}, {"id": "q9", "dim": "product", "text": "كيف تعرف إن منتجك أو خدمتك تلبي احتياج حقيقي؟", "opts": [{"t": "عندي feedback منتظم وأطور على أساسه", "s": 3}, {"t": "العملاء راضيين لكن ما جمعت بيانات رسمية", "s": 2}, {"t": "أعتقد إنه كويد لكن ما سألت", "s": 1}, {"t": "المبيعات ضعيفة وما أفهم ليش", "s": 0}]}, {"id": "q10", "dim": "product", "text": "شنو الفرق بينك وبين منافسيك؟", "opts": [{"t": "عندي ميزة واضحة وأقدر أشرحها في جملة", "s": 3}, {"t": "أحسن شوي لكن الفرق مو كبير", "s": 1}, {"t": "أرخص منهم — هذا الفرق", "s": 0}, {"t": "صراحة ما أعرف شنو يميزني", "s": 0}]}, {"id": "q11", "dim": "ops", "text": "لو سافرت شهر — شنو يصير للمشروع؟", "opts": [{"t": "يشتغل طبيعي — الفريق والأنظمة تغطي", "s": 3}, {"t": "يشتغل بصعوبة مع بعض المشاكل", "s": 1}, {"t": "يتوقف أو يتراجع بشكل كبير", "s": 0}, {"t": "أنا الشغل كله — بدوني ما في مشروع", "s": 0}]}, {"id": "q12", "dim": "ops", "text": "كيف وضع فريقك أو موظفيك؟", "opts": [{"t": "فريق مستقر — كل شخص يعرف دوره وله KPIs", "s": 3}, {"t": "فريق موجود لكن التنظيم ضعيف", "s": 1}, {"t": "أعتمد على أشخاص بدون عقود أو التزامات", "s": 0}, {"t": "أشتغل لحالي حالياً", "s": 2}]}, {"id": "q13", "dim": "strategy", "text": "وين تبي تكون بعد 12 شهر؟", "opts": [{"t": "عندي هدف واضح بأرقام وخطوات", "s": 3}, {"t": "عندي فكرة عامة لكن ما تفصّلت", "s": 1}, {"t": "أبي أكبر لكن ما أعرف كيف", "s": 0}, {"t": "أولوية أستقر أول قبل أفكر في النمو", "s": 0}]}, {"id": "q14", "dim": "strategy", "text": "كيف تتخذ قراراتك الكبيرة في المشروع؟", "opts": [{"t": "بناء على بيانات وأرقام واضحة", "s": 3}, {"t": "مزيج من الأرقام والحدس", "s": 2}, {"t": "بالحدس والخبرة أساساً", "s": 1}, {"t": "ما عندي طريقة واضحة", "s": 0}]}, {"id": "size", "psy": true, "text": "كم عدد موظفيك أو المشتغلين في مشروعك؟", "opts": [{"t": "1 - 5 أشخاص (عمل منزلي أو ناشئة)"}, {"t": "6 - 20 موظف (شركة صغيرة)"}, {"t": "أكثر من 20 موظف (شركة متوسطة)"}, {"t": "ما عندي موظفين — أعمل بمفردي"}, {"t": "مشروع جديد — ما بدأت بعد"}]}, {"id": "revenue", "psy": true, "text": "ما هي إيراداتك الشهرية التقريبية؟", "opts": [{"t": "أقل من 1000 دينار شهرياً"}, {"t": "1000 - 3000 دينار شهرياً"}, {"t": "3001 - 10000 دينار شهرياً"}, {"t": "أكثر من 10000 دينار شهرياً"}, {"t": "مشروع جديد — ما بدأت بعد"}]}];
+const Q = [{"id": "q1", "dim": "cash", "text": "كيف وضع السيولة النقدية عندك الحين؟", "opts": [{"t": "ما عندي مشكلة — الكاش كافي لأكثر من 3 أشهر", "s": 3}, {"t": "أغطي مصاريفي لكن ما في فائض", "s": 2}, {"t": "أحياناً أتأخر في الدفع أو أضطر أقترض", "s": 1}, {"t": "في ضغط حقيقي — ما أعرف كيف أغطي الشهر القادم", "s": 0}]}, {"id": "q2", "dim": "cash", "text": "هل تعرف نقطة التعادل (Breakeven) لمشروعك؟", "opts": [{"t": "نعم — أعرف بالضبط كم أحتاج أبيع كل شهر", "s": 3}, {"t": "عندي فكرة تقريبية", "s": 2}, {"t": "لا — ما حسبتها قبل", "s": 0}, {"t": "ما أعرف شنو تعني", "s": 0}]}, {"id": "q3", "dim": "cash", "text": "كيف تتتبع إيراداتك ومصاريفك؟", "opts": [{"t": "نظام محاسبي أو Excel منظم — أشوف الأرقام دايماً", "s": 3}, {"t": "أسجل بعض الأشياء لكن مو منتظم", "s": 1}, {"t": "بالذاكرة أو ما في تتبع واضح", "s": 0}, {"t": "المحاسب يتكفل لكن ما أفهم التقارير", "s": 1}]}, {"id": "q4", "dim": "pricing", "text": "كيف وصلت لأسعارك الحالية؟", "opts": [{"t": "حسبت تكاليفي + هامش ربح + دراسة السوق", "s": 3}, {"t": "نظرت للمنافسين وأخذت سعر مشابه", "s": 1}, {"t": "خمّنت رقم يبدو معقول", "s": 0}, {"t": "العميل هو اللي يحدد — أنا أقبل", "s": 0}]}, {"id": "q5", "dim": "pricing", "text": "متى آخر مرة رفعت أسعارك؟", "opts": [{"t": "خلال 6 أشهر الماضية", "s": 3}, {"t": "منذ سنة أو أكثر", "s": 1}, {"t": "ما رفعت أسعاري من يوم ما بدأت", "s": 0}, {"t": "خايف أرفع — بخسر العملاء", "s": 0}]}, {"id": "q6", "dim": "sales", "text": "من وين تيجيك غالبية عملائك الجدد؟", "opts": [{"t": "تسويق منظم — إعلانات أو محتوى أو SEO", "s": 3}, {"t": "توصيات وWord of mouth", "s": 2}, {"t": "أنا اللي أروح أدور عليهم", "s": 1}, {"t": "العملاء ما يجون بالكفاية", "s": 0}]}, {"id": "q7", "dim": "sales", "text": "كم نسبة العملاء اللي يرجعون يشترون مرة ثانية؟", "opts": [{"t": "أكثر من 60٪ — عملائي وفيين", "s": 3}, {"t": "30-60٪", "s": 2}, {"t": "أقل من 30٪", "s": 1}, {"t": "ما عندي فكرة — ما قستها", "s": 0}]}, {"id": "q8", "dim": "sales", "text": "كيف تحول المهتم (Lead) لعميل يدفع؟", "opts": [{"t": "عندي process واضح — أعرف معدل التحويل", "s": 3}, {"t": "أتكلم معهم وأحياناً يشترون", "s": 1}, {"t": "ما عندي طريقة واضحة", "s": 0}, {"t": "أخفض السعر عشان أقنعهم", "s": 0}]}, {"id": "q9", "dim": "product", "text": "كيف تعرف إن منتجك أو خدمتك تلبي احتياج حقيقي؟", "opts": [{"t": "عندي feedback منتظم وأطور على أساسه", "s": 3}, {"t": "العملاء راضيين لكن ما جمعت بيانات رسمية", "s": 2}, {"t": "أعتقد إنه كويد لكن ما سألت", "s": 1}, {"t": "المبيعات ضعيفة وما أفهم ليش", "s": 0}]}, {"id": "q10", "dim": "product", "text": "شنو الفرق بينك وبين منافسيك؟", "opts": [{"t": "عندي ميزة واضحة وأقدر أشرحها في جملة", "s": 3}, {"t": "أحسن شوي لكن الفرق مو كبير", "s": 1}, {"t": "أرخص منهم — هذا الفرق", "s": 0}, {"t": "صراحة ما أعرف شنو يميزني", "s": 0}]}, {"id": "q11", "dim": "ops", "text": "لو سافرت شهر — شنو يصير للمشروع؟", "opts": [{"t": "يشتغل طبيعي — الفريق والأنظمة تغطي", "s": 3}, {"t": "يشتغل بصعوبة مع بعض المشاكل", "s": 1}, {"t": "يتوقف أو يتراجع بشكل كبير", "s": 0}, {"t": "أنا الشغل كله — بدوني ما في مشروع", "s": 0}]}, {"id": "q12", "dim": "ops", "text": "كيف وضع فريقك أو موظفيك؟", "opts": [{"t": "فريق مستقر — كل شخص يعرف دوره وله KPIs", "s": 3}, {"t": "فريق موجود لكن التنظيم ضعيف", "s": 1}, {"t": "أعتمد على أشخاص بدون عقود أو التزامات", "s": 0}, {"t": "أشتغل لحالي حالياً", "s": 2}]}, {"id": "q13", "dim": "strategy", "text": "وين تبي تكون بعد 12 شهر؟", "opts": [{"t": "عندي هدف واضح بأرقام وخطوات", "s": 3}, {"t": "عندي فكرة عامة لكن ما تفصّلت", "s": 1}, {"t": "أبي أكبر لكن ما أعرف كيف", "s": 0}, {"t": "أولوية أستقر أول قبل أفكر في النمو", "s": 0}]}, {"id": "q14", "dim": "strategy", "text": "كيف تتخذ قراراتك الكبيرة في المشروع؟", "opts": [{"t": "بناء على بيانات وأرقام واضحة", "s": 3}, {"t": "مزيج من الأرقام والحدس", "s": 2}, {"t": "بالحدس والخبرة أساساً", "s": 1}, {"t": "ما عندي طريقة واضحة", "s": 0}]}, {"id": "lic", "psy": true, "text": "شنو نوع رخصتك أو نشاطك؟", "opts": [{"t": "رخصة منزلية — بدون محل"}, {"t": "عندي محل أو مكتب"}, {"t": "أونلاين فقط — بدون محل"}, {"t": "ما عندي رخصة بعد"}]}, {"id": "size", "psy": true, "text": "كم عدد موظفيك أو المشتغلين في مشروعك؟", "opts": [{"t": "1 - 5 أشخاص (عمل منزلي أو ناشئة)"}, {"t": "6 - 20 موظف (شركة صغيرة)"}, {"t": "أكثر من 20 موظف (شركة متوسطة)"}, {"t": "ما عندي موظفين — أعمل بمفردي"}, {"t": "مشروع جديد — ما بدأت بعد"}]}, {"id": "revenue", "psy": true, "text": "ما هي إيراداتك الشهرية التقريبية؟", "opts": [{"t": "أقل من 1000 دينار شهرياً"}, {"t": "1000 - 3000 دينار شهرياً"}, {"t": "3001 - 10000 دينار شهرياً"}, {"t": "أكثر من 10000 دينار شهرياً"}, {"t": "مشروع جديد — ما بدأت بعد"}]}];
 const DIMS = {"cash": {"title": "الكاش والمالية", "color": "#3CC8C0", "icon": "💧", "low": "كاش مشروعك تحت ضغط، وفي فجوات تأثر على استقرارك. غالبا ما تعرف نقطة التعادل ولا تتابع أرقامك بوضوح، وهذا يخليك تشتغل بالإحساس مو بالأرقام. أول خطوة: ابن نظام بسيط تشوف فيه دخلك ومصاريفك شهريا، وتعرف بالضبط كم تحتاج تبيع عشان تغطي.", "mid": "الكاش والمالية في مشروعك بمستوى متوسط. العمليات اليومية تسير لكن هناك هدر أو تذبذب في السيولة من فترة لأخرى. تحتاج إلى مراقبة أدق للمصروفات وتحسين إجراءات التحصيل. حاول بناء نظام تقارير شهرية واستخدم أدوات للتحكم في المصاريف.", "high": "كاش مشروعك في وضع صحي وقوي: عندك سيولة تغطيك، وتتابع أرقامك بوضوح وتعرف وين تروح كل فلس. حافظ على هالانضباط، وابدأ تفكر في توظيف الفائض في نمو المشروع بدل ما يبقى واقف."}, "pricing": {"title": "التسعير", "color": "#E7B84C", "icon": "🏷️", "low": "التسعير الحالي لا يعكس القيمة الحقيقية لمنتجك أو خدمتك، وهذا قد يؤدي إلى خسارة مستمرة أو تقليل هوامش الربح. تحتاج لإعادة دراسة السوق وتحديد أسعارك بناء على معايير علمية واضحة. لا تتردد في مراجعة استراتيجيتك بالكامل.", "mid": "تسعيرك مقبول لكن فيه مجال للتحسين، وغالبا يعتمد على المنافسين أكثر من قيمتك الحقيقية أو تكاليفك. راجع تكاليفك وهامشك، وتأكد إن سعرك يعكس القيمة اللي تقدمها مو بس سعر السوق.", "high": "تسعيرك مبني على أساس سليم: تكاليف + هامش + سوق، وتراجعه بانتظام. هذا يحمي هامش ربحك ويخليك تنمو بثقة. استمر على مراجعة أسعارك كل فترة عشان تواكب تكاليفك والسوق."}, "sales": {"title": "المبيعات والتسويق", "color": "#F2778A", "icon": "📈", "low": "مبيعاتك وتسويقك يعتمدون على مجهودك الشخصي أكثر من نظام واضح، والعملاء ما يجون بالكفاية أو ما يرجعون. تحتاج قناة تسويق ثابتة تجيب لك عملاء بشكل متوقع، وطريقة واضحة تحول فيها المهتم لعميل يدفع، بدل الاعتماد على تخفيض السعر.", "mid": "المبيعات والتسويق لديك مقبولة لكن غير مستقرة. هناك بعض الحملات الناجحة، لكنها لا تتكرر باستمرار. تحتاج إلى تنويع قنوات التسويق وتحسين متابعة العملاء المحتملين.", "high": "مبيعاتك وتسويقك في وضع قوي: عندك قنوات تجيب لك عملاء بشكل منتظم، وعملاء يرجعون لك، وعندك وضوح في تحويل المهتم لمشتري. ركز الحين على مضاعفة اللي يشتغل وأتمتة أكثر عشان تكبر بدون ما يزيد الضغط عليك."}, "product": {"title": "المنتج أو الخدمة", "color": "#4FD1A0", "icon": "📦", "low": "منتجك أو خدمتك تحتاج تتأكد إنها تلبي احتياج حقيقي في السوق، وميزتك عن المنافسين مو واضحة. ابدأ اجمع آراء عملائك بشكل منتظم، وحدد بالضبط شنو يميزك عشان يكون عندك سبب قوي يخلي العميل يختارك.", "mid": "منتجك أو خدمتك مقبولة في السوق لكن هناك ملاحظات أو فرص تحسين واضحة. جرب تطوير ميزات جديدة أو تحسين تجربة العميل. لا تتوقف عن جمع آراء العملاء والعمل على تطوير مستمر.", "high": "منتجك أو خدمتك في وضع قوي: عندك ميزة واضحة تقدر تشرحها بجملة، وتجمع آراء عملائك وتطور على أساسها. هذا اللي يخليك تتميز عن المنافسين. استمر في تطوير تجربة العميل عشان تبني ولاء أعمق."}, "ops": {"title": "العمليات والتشغيل", "color": "#B79BEA", "icon": "⚙️", "low": "المشروع يعتمد عليك أنت بشكل كبير، ولو غبت يتوقف أو يتراجع. هذا يحد من نموك ويستهلكك. أول خطوة: ابدأ توثق أهم عملياتك وتبني نظام بسيط يقدر غيرك يشتغل عليه، عشان المشروع يمشي بدونك.", "mid": "العمليات لديك تعمل لكن هناك بعض الهدر أو عدم الانضباط أحيانا. تحتاج إلى أتمتة بعض الإجراءات وتدريب الفريق على اتباع الأنظمة. تحسين هذا المحور سيقلل من الأخطاء ويزيد من الكفاءة.", "high": "عملياتك في وضع صحي: المشروع يشتغل بأنظمة وفريق مو بس بمجهودك الشخصي، ولو غبت يستمر. هذا اللي يخليك تكبر بدون ما تنهار العمليات. ركز على توثيق إجراءاتك عشان تسهل التوسع والتفويض."}, "strategy": {"title": "الاستراتيجية والنمو", "color": "#FFD9A0", "icon": "🚀", "low": "ما عندك خطة واضحة للنمو، وقراراتك الكبيرة غالبا بالحدس مو بالأرقام. ابدأ حدد وين تبي توصل بعد سنة بأرقام واضحة، وحولها لخطوات عملية، وخل قراراتك مبنية على بياناتك.", "mid": "لديك بعض ملامح الاستراتيجية وخطط نمو، لكنها غير مكتملة أو غير مفصلة بالأرقام. تحتاج إلى تحويل الأهداف العامة إلى خطط عمل واضحة مع مؤشرات أداء محددة. راجع استراتيجيتك كل 3 أشهر.", "high": "عندك رؤية واضحة بأرقام وخطوات، وتتخذ قراراتك الكبيرة بناء على بيانات. هذا اللي يفرق بين مشروع ينمو بثقة ومشروع يمشي بالحظ. استمر في مراجعة خطتك بانتظام وربط أهدافك بمؤشرات أداء واضحة."}};
 const ORDER = ["cash", "pricing", "sales", "product", "ops", "strategy"];
 const DIAG = {"low": "تشخيص مشروعك يبين إنه في مرحلة تحتاج تدخل سريع: في محاور أساسية فيها تسريبات تأثر على استقرار كاش مشروعك. لا تخاف من الأرقام، الخبر الزين إن معرفتك بوضعك الحين هي أول وأهم خطوة. ركز على محور واحد في كل مرة وابدأ من الكاش.", "mid": "تشخيص مشروعك يبين إنك بنيت أساس لا بأس فيه، بس في محاور تحتاج تشتغل عليها عشان تثبت وتكبر. عندك نقاط قوة واضحة ونقاط فيها تسريبات تأثر على كاش مشروعك. معالجة أهم محورين أو ثلاثة بتنقلك نقلة كبيرة.", "high": "تشخيص مشروعك يبين إنه في وضع صحي وقوي: عندك أساس متين في أغلب المحاور، وتشتغل بأرقام وأنظمة مو بس بالإحساس. الفرصة الحين إنك تنتقل من الاستقرار للنمو المتسارع، وتبني على نقاط قوتك عشان توسع بثقة."};
@@ -309,6 +340,45 @@ const B1 = 40, B2 = 70;
 const BANDS = ["ضعيف", "متوسط", "جيد"];
 const WIDGET = "donut", CTA = "book";
 const SOURCE = "riyada-quiz", PRODUCT = "riyada";
+
+/* ---- which Riyada package fits this business ----
+   Read off the two questions the quiz already asks — size and revenue — so
+   nobody is asked a third time for something they have just told us.
+
+     منزلي     رخصة منزلية، بدون محل ولا موظفين
+     الصغيرة   خمسة موظفين أو أقل، ودخل ٣٠٠٠ دينار أو أقل
+     المتوسطة  أكثر من خمسة موظفين، أو دخل يتجاوز ٣٠٠٠ دينار
+
+   Either condition alone lifts a business to المتوسطة — a four-person team
+   billing five thousand a month is not a small account. */
+const RQ_PACKS = {
+  muassis:     { id:"muassis",     name:"باقة المؤسس / منزلي",     amount:200,
+                 why:"مشروع منزلي أو في بدايته — الأولوية إنك تبني الأساس قبل ما تصرف." },
+  sagheera:    { id:"sagheera",    name:"باقة الشركات الصغيرة",     amount:400,
+                 why:"فريق صغير ودخل مستقر — الأولوية معالجة ما يوقفك عن النمو." },
+  mutawassita: { id:"mutawassita", name:"باقة الشركات المتوسطة",   amount:600,
+                 why:"حجمك أو دخلك تجاوز الشركات الصغيرة — تحتاج استراتيجية توسّع، مو ترقيع." },
+};
+
+function rqPick(){
+  const a = state.answers || {};
+  const licIdx = a["lic"], sizeIdx = a["size"], revIdx = a["revenue"];
+
+  /* option order as written in the questions above */
+  const homeLicence = licIdx === 0 || licIdx === 2 || licIdx === 3;  // منزلية، أونلاين، أو بلا رخصة
+  const bigTeam     = sizeIdx === 1 || sizeIdx === 2;                // ٦-٢٠، أو أكثر
+  const highRev     = revIdx === 2 || revIdx === 3;                  // أكثر من ٣٠٠٠
+
+  /* Size or revenue alone lifts a business out of الصغيرة — a four-person
+     team billing five thousand a month is not a small account. Checked first,
+     so a home licence that has genuinely outgrown itself is not held back. */
+  if(bigTeam || highRev) return RQ_PACKS.mutawassita;
+
+  /* no shop, five or fewer people, three thousand or under */
+  if(homeLicence) return RQ_PACKS.muassis;
+
+  return RQ_PACKS.sagheera;
+}
 const BOOK_NAME = "سحر إدارة الكاش", BOOK_URL = "riyada.html";
 const PRICE_LABEL = "نسخة رقمية تصلك على إيميلك فورا... 25 د.ك", WHATSAPP = "96522260820";
 const ANALYSIS = false, SHOW_CARD_DESC = true;
@@ -494,18 +564,58 @@ function renderResult(sc, leadId){
     <h2 class="axes-title" style="margin:24px 0 16px">${CARDS_TITLE}</h2>
     <div class="mgrid">${ORDER.map(k=>metricCard(k,sc[k])).join("")}</div>
     ${ANALYSIS?analysisBlock():''}
-    <div class="cta-final">
-      <h3>${CTA_TITLE}</h3>
-      <p>${CTA_SUB}</p>
-      <div class="price">${PRICE_LABEL}</div>
-      <button class="btn gold block" id="cta">${CTA_BTN}</button>
-      <div id="ctaErr" style="color:#ffd7d7;margin-top:10px;font-size:14px"></div>
-      <a class="wa" href="${waLink(sc)}" target="_blank" rel="noopener">${WA_ICON}<span>${WA_TEXT}</span></a>
-    </div>`;
+    ${rqNext(sc)}`;
   window.scrollTo(0,0);
   document.getElementById("cta").addEventListener("click", CTA==='tap'?buyNow:goBook);
   requestAnimationFrame(()=>animateResult(sc));
 }
+/* The book leads, then the package the answers point at, then the quick
+   call for whoever only wants one question answered. Same shape as the
+   Cash Nas result, so the two quizzes end the same way. */
+function rqLink(pkg){
+  const L=window.__LEAD||{};
+  return "../book.html?" + new URLSearchParams({
+    pkg, name:L.name||"", email:L.email||"", phone:L.phone||"" }).toString();
+}
+
+function rqNext(sc){
+  const rec = rqPick();
+  const e = x => String(x==null?"":x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  return `
+  <section class="rqnx">
+    <h3>شنو خطوتك الجاية؟</h3>
+    <p class="sub">اختر اللي يناسب وضعك الحين.</p>
+
+    <div class="rqbook">
+      <span class="rib">ابدأ من هني</span>
+      <h4>${e(BOOK_NAME)}</h4>
+      <p>${e(CTA_SUB)}</p>
+      <div class="price">${PRICE_LABEL}</div>
+      <button class="btn gold block" id="cta">${e(CTA_BTN)}</button>
+      <div id="ctaErr" style="color:#962E37;margin-top:10px;font-size:14px"></div>
+    </div>
+
+    <div class="rqpkg">
+      <span class="rib">الأنسب لمشروعك</span>
+      <h4>${e(rec.name)}</h4>
+      <p>${e(rec.why)}</p>
+      <div class="meta"><span>${rec.amount} د.ك</span><span>مع حسن أكبر</span><span>تختار موعدك بنفسك</span></div>
+      <a class="go" href="${rqLink(rec.id)}">احجز موعدك الأول</a>
+      <p class="pay">بالصفحة الجاية تختار التاريخ وطريقة الدفع — كامل بالبطاقة، أو تقسيط مع ديمة عبر الواتساب.</p>
+    </div>
+
+    <div class="rqcall">
+      <div>
+        <b>محتار وتبي جواب سريع؟</b>
+        <span>الاستشارة السريعة · ٧٠ د.ك</span>
+      </div>
+      <a href="${rqLink("sarie")}">احجز استشارة سريعة</a>
+    </div>
+
+    <a class="wa" href="${waLink(sc)}" target="_blank" rel="noopener">${WA_ICON}<span>${WA_TEXT}</span></a>
+  </section>`;
+}
+
 function goBook(){
   const L=window.__LEAD||{};
   const qs=new URLSearchParams({product:PRODUCT, name:L.name||"", email:L.email||"", phone:L.phone||""}).toString();
