@@ -528,7 +528,6 @@
     <button data-tab="bookings">المواعيد</button>
     <button data-tab="careers">التوظيف</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
-    <button data-tab="bookq">أسئلة الكتاب</button>
     <button data-tab="courses">الدورات</button>
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="target">هدف المبيعات</button>
@@ -1019,11 +1018,6 @@
     <div class="tbl" id="subTbl"></div>
   </div>
 
-  <div class="sec" id="bookqSec" data-panel="bookq" hidden>
-    <h2><span></span> أسئلة الكتاب</h2>
-    <div class="kpis" id="bqKpis"></div>
-    <div class="tbl" id="bqTbl"></div>
-  </div>
   </div><!-- /shellbody -->
   </div><!-- /shell -->
 </div></div>
@@ -2165,7 +2159,7 @@ document.addEventListener("click", e=>{
 });
 
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers(); renderBookQ(); renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
+  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers();  renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
   renderPayoutNudge();
   const crBox=$("#crAddBox");
   if(crBox) crBox.hidden = !(DATA && (DATA.role==="all" || DATA.role==="sales"));
@@ -2175,7 +2169,7 @@ function render(){
 }
 
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","bookq","courses","composer","feedback","tasks","target","profit","books","reports"];
+const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","courses","composer","feedback","tasks","target","profit","books","reports"];
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 /* Tabs a role is allowed anywhere near. The server already refuses the data
@@ -2197,7 +2191,7 @@ function panelAvailable(k){
   if(k==="target") return !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
   if(k==="profit") return !!(DATA && DATA.profitMember);
   if(k==="books")  return !!(DATA && DATA.seesBooks);
-  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="bookq"||k==="clients") return !el.hidden;
+  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="clients") return !el.hidden;
   return true;
 }
 function showPanel(k){
@@ -2227,7 +2221,7 @@ function showPanel(k){
 }
 /* An icon per section, so a collapsed rail is still navigable. */
 const TAB_ICON={sales:"💳",clients:"👥",quiz:"📝",events:"🎟️",live:"🔴",bookings:"📅",
-  careers:"🧑‍💼",subscribers:"✉️",bookq:"❓",courses:"🎓",composer:"📣",feedback:"⭐",tasks:"✅",
+  careers:"🧑‍💼",subscribers:"✉️",courses:"🎓",composer:"📣",feedback:"⭐",tasks:"✅",
   target:"🎯",profit:"💰",books:"📊",reports:"📄"};
 
 /* Labels are wrapped once so collapsing can hide the text without losing it,
@@ -2417,21 +2411,7 @@ function renderSubscribers(){
       <td class="num">${dt(r.when)}</td><td class="num">${esc(r.email)||"—"}</td></tr>`).join("")+`</tbody></table>`;
 }
 
-function renderBookQ(){
-  const B = DATA.bookQuestions;
-  const sec = $("#bookqSec");
-  if(!B || !B.list || !B.list.length){ if(sec) sec.hidden=true; return; }
-  sec.hidden=false;
-  const t=B.totals||{};
-  $("#bqKpis").innerHTML=`
-    <div class="kpi"><div class="n">${fmt(t.count||0)}</div><div class="l">إجمالي الأسئلة</div></div>`;
-  $("#bqTbl").innerHTML=`<table><thead><tr>
-      <th>التاريخ</th><th>الاسم</th><th>الجوال</th><th>البريد</th><th>الأسئلة</th></tr></thead><tbody>`+
-    B.list.map(r=>`<tr>
-      <td class="num">${dt(r.when)}</td><td>${esc(r.name)||"—"}</td>
-      <td class="num">${esc(r.phone)||"—"}</td><td class="num">${esc(r.email)||"—"}</td>
-      <td style="white-space:normal;max-width:340px">${esc(r.questions)||"—"}</td></tr>`).join("")+`</tbody></table>`;
-}
+
 
 /* ================= WHICH EVENT AM I LOOKING AT ================= */
 /* the newest event is the one staff care about day to day, so it opens
