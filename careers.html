@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>التوظيف | Cash Clinic</title>
-<meta name="description" content="انضم لفريق كاش كلينك. وظائف في خدمة العملاء، المبيعات، السوشل ميديا، التصميم والتصوير.">
+<meta name="description" content="انضم لفريق كاش كلينك. وظائف في المبيعات، السوشل ميديا، التصميم والتصوير والمحاسبة.">
 <link rel="icon" href="brand/mark/mark-purple.png">
 <link rel="stylesheet" href="assets/ds/fonts/fonts.css">
 <link rel="stylesheet" href="assets/ds/tokens/colors.css">
@@ -93,8 +93,6 @@
       <h2>الوظيفة اللي تناسبك</h2>
       <p class="hint">اختر وحدة، وعبّي بياناتك تحت.</p>
       <div class="roles">
-        <label><input type="radio" name="role" value="خدمة عملاء">
-          <div class="box"><span class="ic">🎧</span><span class="nm">خدمة عملاء</span></div></label>
         <label><input type="radio" name="role" value="فريق مبيعات">
           <div class="box"><span class="ic">📈</span><span class="nm">فريق مبيعات</span></div></label>
         <label><input type="radio" name="role" value="ماركتينق (تسويق)">
@@ -118,7 +116,7 @@
       </div>
 
       <div class="fld" id="jScopeWrap" hidden>
-        <label>تشتغل مع؟</label>
+        <label>تشتغل مع؟ <span style="color:#962E37">*</span></label>
         <div class="roles" style="margin-top:8px">
           <label><input type="radio" name="roleScope" value="أفراد">
             <div class="box"><span class="ic">🙍</span><span class="nm">أفراد</span></div></label>
@@ -227,7 +225,11 @@ function take(f){
   $("#jErr").style.display="none";
   const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
   if(!isPdf) return fail("لازم يكون الملف PDF");
-  if(f.size > MAX) return fail("حجم الملف أكبر من 4 ميجا، صغّره وحاول مرة ثانية");
+  /* naming the actual size turns "it won't upload" into something the
+     applicant can act on — a scanned CV with certificates is often 8–12 MB */
+  if(f.size > MAX) return fail(
+    `حجم ملفك ${(f.size/1048576).toFixed(1)} ميجا، والحد ٤ ميجا. `+
+    `لو فيه شهادات ممسوحة، صغّر الملف أو أرسل السيرة بدونها.`);
   CV = f;
   $("#jCvName").textContent = f.name;
   $("#jCvSize").textContent = (f.size/1048576).toFixed(1) + " ميجا";
