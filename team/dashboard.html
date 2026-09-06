@@ -2314,7 +2314,17 @@ function renderPayoutNudge(){
       <p style="margin:10px 0 0"><button class="pfbtn go" id="nudgeGo">افتح حسابات الشركة</button></p>
     </div>`;
   if(box) box.innerHTML=html;
-  if(top) top.innerHTML = ACTIVE_PANEL==="books" ? "" : html;
+  /* The floating reminder is for panels that say nothing about payouts. Two
+     now carry it themselves — حسابات الشركة has it inline, and الرئيسية has
+     the yellow line under the cards — so on those it would be the same
+     message twice on one screen.
+
+     It also has to be re-run on every panel change. It used to be called
+     only from render(), so ACTIVE_PANEL was still whatever it was at boot
+     and the books check never fired: opening حسابات الشركة left the red box
+     sitting above an identical one. */
+  const carriesItself = ACTIVE_PANEL==="books" || ACTIVE_PANEL==="home";
+  if(top) top.innerHTML = carriesItself ? "" : html;
 }
 document.addEventListener("click", e=>{
   if(e.target && e.target.id==="nudgeGo"){ showPanel("books"); if(!BK) loadBooks(); }
@@ -2586,6 +2596,7 @@ function showPanel(k){
   /* panels that fetch their own data do it the first time they open */
   if(def.load) def.load();
   if(k==="home") renderHome();
+  renderPayoutNudge();
 }
 
 /* the pills at the top of a merged family: اللقاءات (events · live) and
