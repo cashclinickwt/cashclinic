@@ -608,6 +608,7 @@
       <button data-mv="done">تم التحويل</button>
     </div>
     <div class="flt" id="bkPersonFlt"></div>
+    <div id="bkSettled"></div>
     <div class="flt" id="bkKind"></div>
     <div class="pfsend" id="bkSendBar" hidden>
       <span id="bkSelInfo"></span>
@@ -1670,11 +1671,35 @@ function renderBooks(){
   const tabs=$("#bkTab");
   if(tabs){
     const nOpen=scoped.filter(l=>!doneFor(l)).length, nDone=scoped.filter(l=>doneFor(l)).length;
+    /* Under الكل a line is finished only when EVERY person on it has been
+       paid, so «تم التحويل» sits at zero until the last person is settled —
+       accurate, and read by everyone as "the transfer did not register".
+       Saying "0 من 105" makes the denominator visible, and the note below
+       names who is actually finished, which is the question being asked. */
     tabs.querySelectorAll("button").forEach(b=>{
       const k=b.dataset.mv;
       b.classList.toggle("on", k===BKMV);
-      b.textContent = (k==="done" ? "تم التحويل" : "تحت التحويل") + " · " + fmt(k==="done"?nDone:nOpen);
+      const n = k==="done" ? nDone : nOpen;
+      b.textContent = (k==="done" ? "تم التحويل" : "تحت التحويل") + " · " + fmt(n)
+        + (BKPERSON==="all" ? " من " + fmt(scoped.length) : "");
     });
+  }
+
+  /* Who is fully settled this month, stated plainly. Without it the only
+     signal was a zero on a tab, and a zero reads as failure. */
+  const noteBox=$("#bkSettled");
+  if(noteBox){
+    const ppl=[...new Set(allLines.flatMap(l=>(l.people||[])
+      .filter(x=>x.id!=="company").map(x=>x.id)))];
+    const settled=ppl.filter(id=>allLines
+      .filter(l=>(l.people||[]).some(x=>x.id===id))
+      .every(l=>((l.people||[]).find(x=>x.id===id)||{}).transferred));
+    const nameOf=id=>((BK.members||[]).find(m=>m.id===id)||{}).name||id;
+    noteBox.innerHTML = (BKPERSON==="all" && settled.length)
+      ? `<div class="pfnote" style="border-right-color:#128C4A">✅ <b>خلصت تحويلاتهم:</b> ${
+          settled.map(id=>esc(nameOf(id))).join("، ")
+        }. سطر ما ينعد «تم التحويل» إلا لين كل اللي عليه ينحوّلون — اضغط اسم الشخص فوق عشان تشوف سطوره هو.</div>`
+      : "";
   }
 
   const DELIV_OPTS=[["pending","لم تنتهي حتى الآن"],["done","خلّص جلساته"],["voucher","ألغى وأخذ رصيد"]];
@@ -1937,7 +1962,14 @@ $("#bkDue") && $("#bkDue").addEventListener("click", e=>{
 $("#bkDue") && $("#bkDue").addEventListener("click", async e=>{
   const b=e.target.closest("button[data-pay]"); if(!b) return;
   const who=b.dataset.pay;
-  const paid=((BK.payout&&BK.payout.people)||{})[who];
+  /* The row above decides "paid" by whether paidAt is set. This used to test
+     whether an entry merely EXISTS, and رجّعه غير مدفوع left behind an entry
+     with paidAt null — so the row correctly drew as unpaid while this handler
+     read it as paid and sent paid:false, un-paying an unpaid person. The
+     button did nothing, no matter how many times it was pressed, and it
+     skipped its own confirmation dialog on the way. Both places must ask the
+     same question. */
+  const paid=!!(((BK.payout&&BK.payout.people)||{})[who]||{}).paidAt;
   const nm=((BK.members||[]).find(m=>m.id===who)||{}).name||who;
   if(!paid && !confirm(`تأكيد: حوّلت ${kwd(b.dataset.amount)} لـ ${nm} عن ${monthLabel(BKMONTH)}؟`)) return;
   b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
