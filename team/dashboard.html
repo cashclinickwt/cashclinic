@@ -3395,6 +3395,7 @@ function bkEditOpen(b){
   $("#bePhone").value=b.phone||"";
   $("#beAmount").value=b.amount||0;
   $("#beNotes").value=b.notes||"";
+  if($("#beNotify")) $("#beNotify").checked=true;
   $("#beMsg").className="addmsg"; $("#beMsg").textContent="";
   document.getElementById("bkEditOvl").classList.add("on");
 }
@@ -3414,11 +3415,17 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
       consultantId:$("#beConsultant").value, mode:$("#beMode").value,
       startIso: (dt&&tm) ? nbIso(dt,tm) : undefined,
       name, email, phone:$("#bePhone").value.trim(),
-      amount:$("#beAmount").value, notes:$("#beNotes").value.trim()
+      amount:$("#beAmount").value, notes:$("#beNotes").value.trim(),
+      notify: !$("#beNotify") || $("#beNotify").checked
     });
     bkEditClose();
     const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
-    bkMsg((r.data&&r.data.moved)?"انحفظ التعديل، وانتقل الموعد لوقته الجديد.":"انحفظ التعديل.",true);
+    /* say whether the consultant was actually told — an edit that mails
+       nobody looks identical to one that does, and that is how a session
+       ends up moved in our books and not in theirs */
+    const rd=(r&&r.data)||{};
+    bkMsg((rd.moved?"انحفظ التعديل، وانتقل الموعد لوقته الجديد.":"انحفظ التعديل.")
+          +(rd.notified?" وانرسل إيميل للاستشاري 📩":""),true);
   }catch(e){
     $("#beMsg").textContent=(e&&e.message)||"تعذّر الحفظ"; $("#beMsg").className="addmsg err";
   }finally{ btn.disabled=false; btn.textContent=t; }
@@ -4397,6 +4404,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
         <select id="beConsultant">
           <option value="ghalia">غالية النويف</option>
           <option value="sara">سارة الهندي</option>
+          <option value="hasan">حسن أكبر</option>
         </select></div>
       <div class="addf"><label>الطريقة</label>
         <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
@@ -4409,6 +4417,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
     </div>
     <div class="addf" style="margin-top:12px"><label>ملاحظات</label><input id="beNotes" type="text"></div>
     <div class="addrow">
+      <label><input type="checkbox" id="beNotify" checked> بلّغ الاستشاري بالتعديل</label>
       <button class="addbtn" id="beSave">احفظ التعديل</button>
     </div>
     <div class="addmsg" id="beMsg"></div>
