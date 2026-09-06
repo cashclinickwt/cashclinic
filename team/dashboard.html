@@ -33,7 +33,19 @@
   .lo{padding:9px 18px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-family:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
   .sec{margin-bottom:34px}
   .sec h2{font-size:19px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
-  .sec h2 span{width:8px;height:20px;border-radius:3px;background:var(--gold)}
+  /* Only the marker. This used to be `.sec h2 span`, which caught every span
+     inside a heading — so «اللي على غالية النويف» and the name beside أرباحي
+     were each crammed into an 8px-wide gold block and wrapped one letter per
+     line. The marker is always the first child; anything after it is text. */
+  .sec h2 > span:first-child{width:8px;height:20px;border-radius:3px;background:var(--gold);flex:0 0 auto}
+  /* a name sitting in a heading reads as a chip, in every section — this was
+     scoped to #bookingsSec, so أرباحي and مهامي never got it */
+  .sec h2 span.whoname{display:inline-block;width:auto;height:auto;
+    background:var(--acc);color:#fff;border-radius:999px;
+    padding:4px 14px;font-size:12.5px;font-weight:700;margin-inline-start:8px;vertical-align:middle}
+  .sec h2 span.whoname:empty{display:none}
+  /* headings hold a name that can be long: let it wrap as a block, not a column */
+  .sec h2{flex-wrap:wrap}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
   .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
   .kpi .n{font-size:28px;font-weight:800;direction:ltr;text-align:right}
@@ -399,6 +411,10 @@
   /* profit + company books */
   .pfbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:16px}
   .pfbar .f{display:flex;flex-direction:column;gap:5px}
+  /* display:flex above outranks the browser's [hidden]{display:none}, so a
+     field marked hidden was showing anyway — which is how الشخص appeared as
+     an empty dropdown nobody had filled */
+  .pfbar .f[hidden]{display:none}
   .pfbar label{font-size:12.5px;font-weight:700;color:var(--muted)}
   .pfbar select,.pfbar input{border:1.5px solid var(--line);border-radius:11px;padding:9px 12px;
     font-size:14px;font-family:inherit;color:var(--ink);background:#fff}
@@ -1489,6 +1505,27 @@ function renderProfit(){
   /* the personal block, which now rides along with the company payload too */
   const M=PF.mine||{};
   const who=$("#pfWho"); if(who) who.textContent=M.name||PF.name||"";
+
+  /* The picker existed in the markup and had a change listener, and the
+     server has always accepted `who` and returned the member list — nothing
+     ever filled the <select>, so full access saw an empty dropdown and could
+     only ever read their own figures. */
+  const pp=$("#pfPerson"), ppWrap=pp&&pp.closest(".f");
+  if(pp&&ppWrap){
+    const ppl=M.people||[];
+    if(M.canSeeAll&&ppl.length){
+      ppWrap.hidden=false;
+      const cur=M.subject||PFPERSON||"";
+      const want=ppl.map(x=>x.id).join(",");
+      /* only rebuild when the roster actually changes, so the open dropdown
+         does not slam shut while somebody is choosing */
+      if(pp.dataset.roster!==want){
+        pp.dataset.roster=want;
+        pp.innerHTML=ppl.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+      }
+      pp.value=cur; PFPERSON=cur;
+    } else { ppWrap.hidden=true; }
+  }
   const t=M.totals||{};
 
   $("#pfKpis").innerHTML=
