@@ -158,6 +158,58 @@
   }
   .sec[data-panel]{display:none}
   .sec[data-panel].pon{display:block}
+  /* An element that says hidden is hidden. Any class with its own display
+     rule — .pfbar .f{display:flex}, for one — outranks the browser's
+     [hidden]{display:none}, which is how a field nobody had filled sat on the
+     أرباحي page as an empty dropdown. Panels are excluded on purpose: their
+     hidden attribute is the role gate read by panelAvailable(), and .pon is
+     what actually shows them. */
+  [hidden]:not(.sec[data-panel]){display:none !important}
+  /* a section that failed to paint says so in place, and the others carry on */
+  .secfail{margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#FDE5E9;
+    border:1px solid #F0B9C2;color:#7A1F2B;font-size:13px}
+  /* ---- shell: groups, home, search, sub-tabs ---- */
+  .navgrp{font-size:11.5px;font-weight:700;color:var(--muted);padding:14px 14px 4px;letter-spacing:.2px}
+  .navgrp[hidden]{display:none}
+  .shell.mini .navgrp{padding:10px 0 2px;text-align:center;font-size:0}
+  .shell.mini .navgrp::before{content:"";display:block;height:1px;background:var(--line);margin:0 10px}
+  #dashTabs button .cnt{margin-inline-start:auto;background:var(--gold);color:var(--auber);border-radius:999px;
+    padding:1px 8px;font-size:11px;font-weight:800;line-height:1.6}
+  .shell.mini #dashTabs button .cnt{display:none}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 14px}
+  .subtabs:empty{display:none}
+  .subtabs button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px;
+    font:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer}
+  .subtabs button.on{background:var(--auber);border-color:var(--auber);color:#fff}
+  .gsearch{position:relative;flex:1 1 220px;max-width:420px;margin:0 14px}
+  .gsearch input{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px;
+    font:inherit;font-size:13.5px;background:#fff}
+  .gsearch input:focus{outline:none;border-color:var(--auber)}
+  .gsdrop{position:absolute;top:calc(100% + 6px);right:0;left:0;background:#fff;border:1px solid var(--line);
+    border-radius:14px;box-shadow:0 12px 32px rgba(47,23,72,.14);z-index:60;overflow:hidden;max-height:380px;overflow-y:auto}
+  .gsrow{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line);font-size:13.5px}
+  .gsrow:last-child{border-bottom:0}
+  .gsrow:hover,.gsrow.on{background:#F6F3FA}
+  .gsrow b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gsrow .num{color:var(--muted);font-size:12px}
+  .gstag{background:#EDEAF2;color:var(--auber);border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700}
+  .gsempty{padding:12px 14px;color:var(--muted);font-size:13px}
+  .hmhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .hmgrid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;margin-top:6px}
+  .hmcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .hmt{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .hmlink{border:0;background:none;color:var(--auber);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:0}
+  .hmrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .hmrow .t{font-variant-numeric:tabular-nums;color:var(--muted);min-width:46px;font-size:12.5px}
+  .hmrow .n{flex:1;min-width:0}
+  .hmrow .n span{color:var(--muted)}
+  .hmrow .pill{border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;color:#fff}
+  .hmrow .who{font-size:11.5px;color:var(--muted)}
+  .hmempty{padding:14px 0 6px;color:var(--muted);font-size:13px}
+  .hmnudge{display:flex;align-items:center;gap:10px;margin-top:14px;background:#FFF4DA;border:1px solid #F1D9A0;color:#6B4A00;
+    border-radius:12px;padding:11px 14px;font-size:13.5px}
+  .hmnudge .go{margin-inline-start:auto;border:0;background:none;color:#6B4A00;font:inherit;font-weight:800;cursor:pointer}
+  @media (max-width:760px){ .hmgrid{grid-template-columns:1fr} .gsearch{order:3;flex:1 1 100%;margin:8px 0 0} .top{flex-wrap:wrap} }
   /* all clients */
   .clbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
   .clbar input{flex:1 1 260px;border:1.5px solid var(--line);border-radius:999px;padding:11px 18px;
@@ -524,9 +576,15 @@
 <div id="dash"><div class="wrap">
   <div class="top">
     <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span></div>
+    <div class="gsearch" id="gSearch" hidden>
+      <input type="search" id="gsInput" placeholder="ابحث باسم أو رقم أو إيميل عميل" autocomplete="off">
+      <div class="gsdrop" id="gsDrop" hidden></div>
+    </div>
     <button class="lo" id="logoutBtn">تسجيل الخروج</button>
   </div>
 
+  <!-- if the data never arrives, say so where it can be seen, with a way back -->
+  <div id="bootErr" class="secfail" hidden></div>
   <!-- the payout reminder rides on top of whatever tab she lands on -->
   <div id="topNudge"></div>
 
@@ -536,24 +594,44 @@
   <div class="navscrim" id="navScrim"></div>
   <nav class="tabs" id="dashTabs">
     <button class="navtoggle" id="navToggle" type="button">⇄ <span>طيّ القائمة</span></button>
-    <button data-tab="sales" class="on">المبيعات</button>
+    <button data-tab="home" class="on">الرئيسية</button>
+    <div class="navgrp" data-grp="sales">المبيعات</div>
+    <button data-tab="sales">المبيعات</button>
     <button data-tab="clients">كل العملاء</button>
-    <button data-tab="quiz">الاختبارات</button>
-    <button data-tab="events">معلومات اللقاء</button>
-    <button data-tab="live">البث المباشر</button>
+    <div class="navgrp" data-grp="clients">العملاء</div>
     <button data-tab="bookings">المواعيد</button>
-    <button data-tab="careers">التوظيف</button>
-    <button data-tab="subscribers">المشتركين بالنشرة</button>
-    <button data-tab="courses">الدورات</button>
-    <button data-tab="composer">مراسلة العملاء</button>
-    <button data-tab="target">هدف المبيعات</button>
-    <button data-tab="profit">أرباحي</button>
-    <button data-tab="books">حسابات الشركة</button>
+    <button data-tab="quiz">الاختبارات</button>
     <button data-tab="feedback">تقييم الجلسات</button>
+    <div class="navgrp" data-grp="events">الفعاليات</div>
+    <button data-tab="events" data-family="meet">اللقاءات والبث</button>
+    <button data-tab="live" data-child="meet" hidden>البث المباشر</button>
+    <button data-tab="courses">الدورات</button>
+    <div class="navgrp" data-grp="comms">التواصل</div>
+    <button data-tab="composer">مراسلة العملاء</button>
+    <button data-tab="subscribers">المشتركين بالنشرة</button>
+    <div class="navgrp" data-grp="team">الفريق</div>
     <button data-tab="tasks">مهامي</button>
+    <button data-tab="profit" data-family="money">المال</button>
+    <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
+    <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
+    <button data-tab="careers">التوظيف</button>
     <button data-tab="reports">التقارير</button>
   </nav>
   <div class="shellbody">
+
+  <!-- ===== الرئيسية — what needs me today ===== -->
+  <div class="sec" id="homeSec" data-panel="home" hidden>
+    <div class="hmhead">
+      <div><h2 style="margin:0"><span></span> <span id="hmGreet">صباح الخير</span></h2>
+        <div class="muted" id="hmDate" style="font-size:12.5px;margin-top:4px"></div></div>
+    </div>
+    <div class="kpis" id="hmKpis"></div>
+    <div class="hmgrid">
+      <div class="hmcard"><div class="hmt"><b>مواعيد اليوم</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
+      <div class="hmcard"><div class="hmt"><b>مهام عليّ</b><button type="button" class="hmlink" data-go="tasks">كل المهام</button></div><div id="hmTasks"></div></div>
+    </div>
+    <div id="hmNudge"></div>
+  </div>
 
   <!-- ===== تقييم الجلسات ===== -->
   <div class="sec" id="fbSec" data-panel="feedback" hidden>
@@ -585,12 +663,14 @@
 
   <!-- ===== هدف المبيعات ===== -->
   <div class="sec" id="targetSec" data-panel="target" hidden>
+    <div class="subtabs" data-fam="money"></div>
     <h2><span></span> هدف المبيعات</h2>
     <div id="tgList"></div>
   </div>
 
   <!-- ===== أرباحي — every member sees only their own column ===== -->
   <div class="sec" id="profitSec" data-panel="profit" hidden>
+    <div class="subtabs" data-fam="money"></div>
     <h2><span></span> أرباحي <span class="whoname" id="pfWho"></span></h2>
     <div class="pfbar">
       <div class="f"><label>الشهر</label><select id="pfMonth"></select></div>
@@ -603,6 +683,7 @@
 
   <!-- ===== حسابات الشركة — غالية وعبدالله فقط ===== -->
   <div class="sec" id="booksSec" data-panel="books" hidden>
+    <div class="subtabs" data-fam="money"></div>
     <h2><span></span> حسابات الشركة</h2>
     <div id="bkNudge"></div>
     <div class="pfbar">
@@ -787,6 +868,7 @@
   </div>
 
   <div class="sec" id="eventsSec" data-panel="events" hidden>
+    <div class="subtabs" data-fam="meet"></div>
     <h2><span></span> تسجيلات اللقاء</h2>
     <div class="flt" id="evPick"></div>
     <div class="kpis" id="eventKpis"></div>
@@ -811,6 +893,7 @@
   </div>
 
   <div class="sec" id="liveSec" data-panel="live">
+    <div class="subtabs" data-fam="meet"></div>
     <h2><span></span> البث المباشر</h2>
 
     <div class="lvmsg" id="lvMsg"></div>
@@ -1165,6 +1248,7 @@ onAuthStateChanged(auth, async (user)=>{
   if(!user){ $("#dash").style.display="none"; $("#login").style.display="flex"; DATA=null; return; }
   $("#login").style.display="none"; $("#dash").style.display="block";
   $("#uName").textContent=user.email;
+  const _be=$("#bootErr"); if(_be) _be.hidden=true;
   try{
     const r=await getDashboard(); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
@@ -1175,10 +1259,19 @@ onAuthStateChanged(auth, async (user)=>{
     if(_rl==="personal"||_rl==="all") $("#rptNasReports").hidden=false;
     if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden) $("#reportsSec").hidden=false;
     render();
+    if(!TK) loadTasks();
   }catch(e){
+    /* This used to write the error into #salesTbl — the sales table, on a
+       tab the person may never open — so a failed load looked like an empty
+       dashboard with nothing to click. The banner sits above every panel. */
+    console.error("dashboard load failed:", e);
     const msg=(e&&e.message)||"تعذّر تحميل البيانات";
-    $("#salesTbl").innerHTML=`<div class="empty">${esc(msg)}</div>`;
-    $("#quizTbl").innerHTML="";
+    const be=$("#bootErr");
+    if(be){
+      be.innerHTML=`تعذّر تحميل البيانات: ${esc(msg)} <button type="button" id="bootRetry" style="margin-inline-start:10px;padding:4px 12px;border-radius:8px;border:1px solid #7A1F2B;background:#fff;color:#7A1F2B;font:inherit;cursor:pointer">أعد المحاولة</button>`;
+      be.hidden=false;
+      const rb=$("#bootRetry"); if(rb) rb.addEventListener("click", ()=>location.reload());
+    }
     if((e&&e.code)==="functions/permission-denied"){ setTimeout(()=>signOut(auth),2500); }
   }
 });
@@ -1332,7 +1425,7 @@ let TKVIEW="";
 async function loadTasks(){
   const box=$("#tkMine"); if(!box) return;
   box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
-  try{ const r=await listTasks(TKVIEW?{who:TKVIEW}:{}); TK=r.data||null; renderTasks(); }
+  try{ const r=await listTasks(TKVIEW?{who:TKVIEW}:{}); TK=r.data||null; renderTasks(); renderHome(); syncTabs(); }
   catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 function tkMsg(m,ok){ const el=$("#tkMsg"); if(!el) return; el.className="addmsg "+(ok?"ok":"err"); el.textContent=m; }
@@ -2227,9 +2320,45 @@ document.addEventListener("click", e=>{
   if(e.target && e.target.id==="nudgeGo"){ showPanel("books"); if(!BK) loadBooks(); }
 });
 
+/* One renderer failing must not take the other fifteen with it. Each paints
+   its own section; if it throws, that section gets a visible notice and the
+   rest carry on. Before this, a single missing field in one payload blanked
+   the entire dashboard and the message went into the sales table, where the
+   person looking at أرباحي would never see it. The stack stays in the console
+   for whoever is fixing it. */
+function safe(panel, fn){
+  const el=panel ? document.querySelector('.sec[data-panel="'+panel+'"]') : null;
+  try{
+    fn();
+    const old=el && el.querySelector(":scope > .secfail"); if(old) old.remove();
+  }catch(e){
+    console.error("render "+(panel||fn.name)+" failed:", e);
+    if(!el) return;
+    let box=el.querySelector(":scope > .secfail");
+    if(!box){ box=document.createElement("div"); box.className="secfail";
+      const h=el.querySelector(":scope > h2"); el.insertBefore(box, h ? h.nextSibling : el.firstChild); }
+    box.textContent="تعذّر عرض هذا القسم: "+((e&&e.message)||"خطأ غير متوقع");
+  }
+}
 function render(){
-  buildFilters(); renderSales(); renderQuiz(); renderCourses(); renderEvents(); renderSubscribers();  renderLive(); renderRatings(); renderBookings(); renderCareers(); renderSalesFix(); renderAddSale(); renderClients(); renderNasBooking(); renderNewsletters();
-  renderPayoutNudge();
+  safe("quiz",        buildFilters);
+  safe("sales",       renderSales);
+  safe("quiz",        renderQuiz);
+  safe("courses",     renderCourses);
+  safe("events",      renderEvents);
+  safe("subscribers", renderSubscribers);
+  safe("live",        renderLive);
+  safe("events",      renderRatings);
+  safe("bookings",    renderBookings);
+  safe("careers",     renderCareers);
+  safe("sales",       renderSalesFix);
+  safe("sales",       renderAddSale);
+  safe("clients",     renderClients);
+  safe("bookings",    renderNasBooking);
+  safe("composer",    renderNewsletters);
+  safe(null,          renderPayoutNudge);
+  safe("home",        renderHome);
+  const gs=$("#gSearch"); if(gs) gs.hidden = !DATA;
   const crBox=$("#crAddBox");
   if(crBox) crBox.hidden = !(DATA && (DATA.role==="all" || DATA.role==="sales"));
   const _subOpt=document.querySelector('#cmpAud option[value="subscribers"]');
@@ -2237,39 +2366,213 @@ function render(){
   syncTabs();
 }
 
+/* ================= SECTION-SCOPED REFRESH =================
+   getDashboard() accepts `sections`; anything not named comes back empty.
+   Merge only what was asked for, so a light refresh never wipes the parts
+   it did not fetch. */
+const SECTION_KEYS = {
+  sales:["sales","catalog","salesFix","courses"], quiz:["quiz"], events:["events"],
+  subscribers:["subscribers","bookQuestions"], careers:["careers"],
+  bookings:["bookings","nasPackages","riyadaPackages"], ratings:["ratings"], live:["live"], clients:["clients"],
+};
+async function refreshSections(list){
+  const r=await getDashboard({ sections:list });
+  const d=(r&&r.data)||{};
+  if(!DATA){ DATA=d; return d; }
+  list.forEach(sec=>(SECTION_KEYS[sec]||[]).forEach(k=>{ if(k in d) DATA[k]=d[k]; }));
+  if("payoutNudge" in d) DATA.payoutNudge=d.payoutNudge;
+  return d;
+}
+
+/* ================= HOME ================= */
+function myName(){
+  if(DATA&&DATA.name) return String(DATA.name).split(" ")[0];
+  const cons=((DATA&&DATA.bookings)||{}).consultants||[];
+  const me=cons.find(c=>c.id===(DATA&&DATA.profitMember));
+  if(me) return me.name.split(" ")[0];
+  if(PF&&PF.mine&&PF.mine.name) return PF.mine.name.split(" ")[0];
+  return String((DATA&&DATA.email)||"").split("@")[0];
+}
+/* a consultant sees her own diary; sales and full access see everyone's */
+function hmMyDiary(){
+  const role=(DATA&&DATA.role)||"";
+  if(role==="all"||role==="sales") return null;
+  return (DATA&&DATA.profitMember)||null;
+}
+function hmTodayRows(list){
+  const n=bkNowKw(), key=bkKey(n.y,n.m,n.d), mine=hmMyDiary();
+  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key
+      && (!mine || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(mine)!==-1))
+    .sort((a,b)=>a.startMs-b.startMs);
+}
+function renderHome(){
+  if(!DATA || !$("#homeSec")) return;
+  const n=bkNowKw();
+  $("#hmGreet").textContent=(n.hh<12?"صباح الخير":"مساء الخير")+"، "+myName();
+  $("#hmDate").textContent=`${BK_DAYS[n.w]} ${n.d} ${BK_MON[n.m]} ${n.y}`;
+
+  const today=hmTodayRows((DATA.bookings||{}).list||[]);
+  const tasks=((TK&&TK.mine)||[]).filter(t=>!t.done);
+  const orders=((DATA.sales||{}).orders||[]).filter(o=>inThisMonth(o.when));
+  const rev=orders.reduce((a,o)=>a+Number(o.amount||0),0);
+  const nudge=DATA.payoutNudge;
+  const kp=[];
+  kp.push(`<div class="kpi"><div class="n">${fmt(today.length)}</div><div class="l">مواعيد اليوم</div></div>`);
+  kp.push(`<div class="kpi"><div class="n">${TK?fmt(tasks.length):"…"}</div><div class="l">مهام عليّ</div></div>`);
+  if(seesMoney() && DATA.sales) kp.push(`<div class="kpi"><div class="n">${money(rev)}</div><div class="l">مبيعات ${esc(BK_MON[n.m])}</div></div>`);
+  if(nudge && !nudge.done && (nudge.owed||[]).length)
+    kp.push(`<div class="kpi"><div class="n" style="color:#962E37">${kwd(nudge.total)}</div><div class="l">تحويلات ${esc(monthLabel(nudge.month))} ما طلعت</div></div>`);
+  else if(PF&&PF.mine&&PF.mine.totals&&PF.mine.totals.due>0)
+    kp.push(`<div class="kpi"><div class="n" style="color:#962E37">${kwd(PF.mine.totals.due)}</div><div class="l">باقي لك عن ${esc(monthLabel(PF.month))}</div></div>`);
+  $("#hmKpis").innerHTML=kp.join("");
+
+  const mine=hmMyDiary();
+  $("#hmToday").innerHTML = today.length ? today.map(b=>{
+    const p=bkParts(b.startIso);
+    const who = mine ? "" : ` <span>· ${esc(b.consultantName||"")}</span>`;
+    return `<div class="hmrow" data-bk="${esc(b.id)}"><span class="t">${bkPad2(p.hh)}:${bkPad2(p.mm)}</span>
+      <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span>${who}</span>
+      <span class="pill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span></div>`;
+  }).join("") : `<div class="hmempty">ما في مواعيد اليوم.</div>`;
+
+  $("#hmTasks").innerHTML = !TK ? `<div class="hmempty">جارٍ التحميل…</div>`
+    : tasks.length ? tasks.slice(0,6).map(t=>`<div class="hmrow"><span class="n">${esc(t.text)}
+        <div class="who">من ${esc(String(t.from||"").split("@")[0])}${t.due?" · "+esc(t.due):""}</div></span></div>`).join("")
+    : `<div class="hmempty">ما عليك مهام مفتوحة.</div>`;
+
+  $("#hmNudge").innerHTML = (nudge && !nudge.done && (nudge.owed||[]).length && panelAvailable("books"))
+    ? `<div class="hmnudge">💸 باقي ${fmt(nudge.owed.length)} شخص ما استلموا مستحقات ${esc(monthLabel(nudge.month))}، بمجموع ${kwd(nudge.total)}.
+       <button type="button" class="go" data-go="books">افتح حسابات الشركة ←</button></div>` : "";
+}
+$("#homeSec") && $("#homeSec").addEventListener("click", e=>{
+  const g=e.target.closest("[data-go]"); if(g){ showPanel(g.dataset.go); window.scrollTo({top:0,behavior:"smooth"}); return; }
+  const row=e.target.closest(".hmrow[data-bk]");
+  if(row){ const b=((DATA.bookings||{}).list||[]).find(x=>x.id===row.dataset.bk); if(b&&mayEdit()){ showPanel("bookings"); bkEditOpen(b); } }
+});
+
+/* ================= SEARCH =================
+   One box for the question everyone asks a dozen times a day: who is this
+   person and what have they done with us. The client index already merges
+   every email and phone a person has used, so it is the index; anyone
+   without it — a consultant — searches their own diary instead. */
+function gsRows(q){
+  const s=q.trim().toLowerCase(), digits=s.replace(/\D/g,"");
+  if(s.length<2) return [];
+  const hit=(name,emails,phones)=>{
+    if((name||"").toLowerCase().indexOf(s)!==-1) return true;
+    if((emails||[]).some(e=>String(e||"").toLowerCase().indexOf(s)!==-1)) return true;
+    return !!digits && digits.length>=4 && (phones||[]).some(p=>String(p||"").replace(/\D/g,"").indexOf(digits)!==-1);
+  };
+  const out=[];
+  const cl=(DATA&&DATA.clients)||[];
+  if(cl.length){
+    cl.forEach(c=>{ if(hit(c.name,c.emails,c.phones)) out.push({kind:"client",id:c.id,name:c.name,sub:(c.emails||[])[0]||(c.phones||[])[0]||"",tag:Object.keys(c.counts||{}).length+" تعامل"}); });
+  }else{
+    const seen={};
+    (((DATA&&DATA.bookings)||{}).list||[]).forEach(b=>{
+      const key=(b.email||b.phone||b.name||"").toLowerCase(); if(seen[key]) return;
+      if(hit(b.name,[b.email],[b.phone])){ seen[key]=1; out.push({kind:"booking",id:b.id,name:b.name,sub:b.email||b.phone||"",tag:bkWhen(b.startIso)}); }
+    });
+  }
+  return out.slice(0,8);
+}
+let GS_SEL=-1;
+function gsPaint(rows){
+  const box=$("#gsDrop"); if(!box) return;
+  const q=($("#gsInput").value||"").trim();
+  if(q.length<2){ box.hidden=true; box.innerHTML=""; return; }
+  box.hidden=false;
+  box.innerHTML = rows.length ? rows.map((r,i)=>`<div class="gsrow${i===GS_SEL?" on":""}" data-i="${i}">
+      <b>${esc(r.name)||"(بدون اسم)"}</b><span class="num">${esc(r.sub)}</span><span class="gstag">${esc(r.tag)}</span></div>`).join("")
+    : `<div class="gsempty">ما لقينا أحد بهذا الاسم أو الرقم.</div>`;
+}
+function gsOpen(r){
+  if(!r) return;
+  $("#gsDrop").hidden=true; $("#gsInput").value="";
+  if(r.kind==="client"){ const c=(DATA.clients||[]).find(x=>x.id===r.id); if(c) openClient(c); }
+  else { const b=((DATA.bookings||{}).list||[]).find(x=>x.id===r.id); if(b){ showPanel("bookings"); if(mayEdit()) bkEditOpen(b); } }
+}
+(function(){
+  const inp=$("#gsInput"), drop=$("#gsDrop"); if(!inp||!drop) return;
+  let rows=[];
+  inp.addEventListener("input", ()=>{ GS_SEL=-1; rows=gsRows(inp.value); gsPaint(rows); });
+  inp.addEventListener("focus", ()=>{ rows=gsRows(inp.value); gsPaint(rows); });
+  inp.addEventListener("keydown", e=>{
+    if(e.key==="ArrowDown"){ GS_SEL=Math.min(rows.length-1,GS_SEL+1); gsPaint(rows); e.preventDefault(); }
+    else if(e.key==="ArrowUp"){ GS_SEL=Math.max(0,GS_SEL-1); gsPaint(rows); e.preventDefault(); }
+    else if(e.key==="Enter"){ gsOpen(rows[GS_SEL>=0?GS_SEL:0]); }
+    else if(e.key==="Escape"){ drop.hidden=true; inp.blur(); }
+  });
+  drop.addEventListener("mousedown", e=>{ const r=e.target.closest(".gsrow"); if(r){ e.preventDefault(); gsOpen(rows[Number(r.dataset.i)]); } });
+  document.addEventListener("click", e=>{ if(!e.target.closest("#gSearch")) drop.hidden=true; });
+})();
+
 /* ---------- section tabs ---------- */
-const PANEL_ORDER=["sales","clients","quiz","events","live","bookings","careers","subscribers","courses","composer","feedback","tasks","target","profit","books","reports"];
+/* ================= THE PANEL REGISTRY =================
+   One table, one place. Adding a panel used to mean editing a nav button, a
+   section div, PANEL_ORDER, panelAvailable(), a lazy-load branch inside
+   showPanel(), the render() call, and TAB_ICON — seven places, and missing
+   one produced a half-working tab. Everything the shell needs to know about
+   a panel now sits on its row here.
+
+     id       the data-tab / data-panel key
+     group    which sidebar heading it sits under
+     icon     what a collapsed rail shows
+     allowed  whether this role may see it (the server enforces the data;
+              this only stops empty tabs appearing)
+     load     fetched the first time the tab opens, if the panel has one
+     family   sub-tabs it shares a sidebar entry with (اللقاءات, المال)
+     count    a live number for the sidebar badge, if it has one
+
+   The roles: sales work people — the client list, the diary, the لقاء, the
+   newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
+   البث or التقارير. Consultants see their own diary, their own feedback,
+   their own money. Full access sees everything. */
+const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","tasks","target","profit"];
+const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
+const PANELS = [
+  { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
+  { id:"sales",       group:"sales",  icon:"💳", allowed:()=>true },
+  { id:"clients",     group:"sales",  icon:"👥", allowed:()=>gated("clients") },
+  { id:"bookings",    group:"clients",icon:"📅", allowed:()=>true,
+    count:()=>{ const B=(DATA&&DATA.bookings)||{}; return hmTodayRows(B.list||[]).length; } },
+  { id:"quiz",        group:"clients",icon:"📝", allowed:()=>true },
+  { id:"feedback",    group:"clients",icon:"⭐", allowed:()=>true, load:()=>{ if(!FB) loadFeedback(); } },
+  { id:"events",      group:"events", icon:"🎟️", family:"meet", allowed:()=>gated("events") },
+  { id:"live",        group:"events", icon:"🔴", family:"meet", allowed:()=>true },
+  { id:"courses",     group:"events", icon:"🎓", allowed:()=>gated("courses") },
+  { id:"composer",    group:"comms",  icon:"📣", allowed:()=>true },
+  { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
+  { id:"tasks",       group:"team",   icon:"✅", allowed:()=>true, load:()=>{ if(!TK) loadTasks(); },
+    count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
+  { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
+  { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
+  { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
+  { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
+  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports") },
+];
+const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
+const PANEL_ORDER = PANELS.map(p=>p.id);
+const panelDef = (k) => PANELS.find(p=>p.id===k);
 let ACTIVE_PANEL=null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
-/* Tabs a role is allowed anywhere near. The server already refuses the data
-   and the actions; this only stops empty tabs appearing. Sales work people —
-   the client list, the diary, the لقاء, the newsletter and the courses —
-   and never see المبيعات، الاختبارات، التوظيف، البث، أسئلة الكتاب or التقارير. */
-const ROLE_PANELS = {
-  sales: ["clients","bookings","events","subscribers","courses","composer","feedback","tasks","target","profit"],
-};
 function panelAvailable(k){
-  const el=panelEl(k); if(!el) return false;
-  const allow = ROLE_PANELS[(DATA&&DATA.role)||""];
-  if(allow && allow.indexOf(k)===-1) return false;
-  /* the target belongs to Nora and to whoever watches her numbers;
-     أرباحي to anyone with a share; the company books to غالية and عبدالله */
-  if(k==="tasks")  return true;   /* everyone with a login has a task list */
-  /* consultants see their own feedback; admins and sales see all of it */
-  if(k==="feedback") return true;
-  if(k==="target") return !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
-  if(k==="profit") return !!(DATA && DATA.profitMember);
-  if(k==="books")  return !!(DATA && DATA.seesBooks);
-  if(k==="reports"||k==="courses"||k==="events"||k==="subscribers"||k==="clients") return !el.hidden;
-  return true;
+  const p=panelDef(k); if(!p || !panelEl(k)) return false;
+  const role=(DATA&&DATA.role)||"";
+  if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
+  return !!p.allowed();
 }
 function showPanel(k){
   if(!panelAvailable(k)) return;
   document.querySelectorAll('.sec[data-panel]').forEach(s=>s.classList.remove("pon"));
   document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>b.classList.remove("on"));
   const el=panelEl(k); if(el) el.classList.add("pon");
-  const tab=document.querySelector('#dashTabs button[data-tab="'+k+'"]'); if(tab) tab.classList.add("on");
+  /* a child of a family lights its family's sidebar entry */
+  const def=panelDef(k)||{};
+  const headK = def.family ? (PANELS.find(p=>p.family===def.family && panelAvailable(p.id))||def).id : k;
+  const tab=document.querySelector('#dashTabs button[data-tab="'+headK+'"]'); if(tab) tab.classList.add("on");
   ACTIVE_PANEL=k;
+  paintSubtabs(def.family);
   /* on a phone the rail covers the page, so choosing a section closes it */
   const sh=$("#shell");
   if(sh){
@@ -2280,18 +2583,28 @@ function showPanel(k){
   /* keep the moderation queue fresh only while the live tab is the one on screen */
   if(LIVE_TIMER){ clearInterval(LIVE_TIMER); LIVE_TIMER=null; }
   if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
-  /* a month is worked out from every order in the account, so it is fetched
-     when the tab is actually opened rather than on every dashboard load */
-  if(k==="feedback" && !FB) loadFeedback();
-  if(k==="tasks"  && !TK) loadTasks();
-  if(k==="target" && !TG) loadTarget();
-  if(k==="profit" && !PF) loadProfit();
-  if(k==="books"  && !BK) loadBooks();
+  /* panels that fetch their own data do it the first time they open */
+  if(def.load) def.load();
+  if(k==="home") renderHome();
 }
+
+/* the pills at the top of a merged family: اللقاءات (events · live) and
+   المال (profit · books · target). Only the tabs this role may see. */
+function paintSubtabs(fam){
+  if(!fam) return;
+  const kids=PANELS.filter(p=>p.family===fam && panelAvailable(p.id));
+  document.querySelectorAll('.subtabs[data-fam="'+fam+'"]').forEach(box=>{
+    box.innerHTML = kids.length>1
+      ? kids.map(p=>`<button type="button" data-sub="${p.id}"${p.id===ACTIVE_PANEL?' class="on"':''}>${esc(FAMILY_LABEL[p.id]||p.id)}</button>`).join("")
+      : "";
+  });
+}
+document.addEventListener("click", e=>{
+  const b=e.target.closest(".subtabs button[data-sub]"); if(!b) return;
+  showPanel(b.dataset.sub);
+});
 /* An icon per section, so a collapsed rail is still navigable. */
-const TAB_ICON={sales:"💳",clients:"👥",quiz:"📝",events:"🎟️",live:"🔴",bookings:"📅",
-  careers:"🧑‍💼",subscribers:"✉️",courses:"🎓",composer:"📣",feedback:"⭐",tasks:"✅",
-  target:"🎯",profit:"💰",books:"📊",reports:"📄"};
+const TAB_ICON = Object.fromEntries(PANELS.map(p=>[p.id,p.icon]));
 
 /* Labels are wrapped once so collapsing can hide the text without losing it,
    and so a live count (مهامي · 2) can be rewritten without eating the icon. */
@@ -2307,8 +2620,29 @@ function decorateTabs(){
 
 function syncTabs(){
   decorateTabs();
-  document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>{ b.hidden = !panelAvailable(b.dataset.tab); });
-  if(!ACTIVE_PANEL || !panelAvailable(ACTIVE_PANEL)) ACTIVE_PANEL = PANEL_ORDER.find(panelAvailable) || "sales";
+  document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>{
+    const k=b.dataset.tab, p=panelDef(k)||{};
+    /* a family child never has its own sidebar entry; its family head
+       stands for it — unless the head itself is not allowed, in which case
+       the first allowed child steps up */
+    let show = panelAvailable(k);
+    if(show && b.dataset.child){
+      const fam=b.dataset.child;
+      show = !PANELS.some(x=>x.family===fam && x.id!==k && panelAvailable(x.id) && PANEL_ORDER.indexOf(x.id)<PANEL_ORDER.indexOf(k));
+    }
+    b.hidden = !show;
+    /* the live number on the badge */
+    const cnt = p.count ? p.count() : 0;
+    let badge=b.querySelector(".cnt");
+    if(cnt>0){ if(!badge){ badge=document.createElement("span"); badge.className="cnt"; b.appendChild(badge); } badge.textContent=fmt(cnt); }
+    else if(badge) badge.remove();
+  });
+  /* a heading with nothing under it is noise */
+  document.querySelectorAll('#dashTabs .navgrp').forEach(g=>{
+    const kids=PANELS.filter(p=>p.group===g.dataset.grp).map(p=>document.querySelector('#dashTabs button[data-tab="'+p.id+'"]'));
+    g.hidden = !kids.some(b=>b && !b.hidden);
+  });
+  if(!ACTIVE_PANEL || !panelAvailable(ACTIVE_PANEL)) ACTIVE_PANEL = PANEL_ORDER.find(panelAvailable) || "home";
   showPanel(ACTIVE_PANEL);
 }
 /* Open on a wide screen, and it remembers being collapsed. */
@@ -2736,7 +3070,7 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
       nbMsg("انحجز الموعد للعميل ✅ أرسل له الرابط عشان يدفع ويتأكد الحجز.","ok");
     }
     ["#nbName","#nbEmail","#nbPhone","#nbNotes"].forEach(id=>{ $(id).value=""; });
-    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+    await refreshSections(["bookings","clients"]); render();
   }catch(e){
     nbMsg((e&&e.message)||"تعذّر تجهيز الحجز","err");
   }finally{ btn.disabled=false; btn.textContent=t; }
@@ -2921,7 +3255,7 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
     else if(d.deliverError)  asMsg("انضافت العملية، بس تعذّر إرسال الكتاب: "+d.deliverError,"warn");
     else                     asMsg("انضافت العملية ✅ بدون إرسال.","ok");
     ["#asName","#asEmail","#asPhone","#asNote","#asDate"].forEach(id=>{ $(id).value=""; });
-    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+    await refreshSections(["sales","clients"]); render();
   }catch(e){ asMsg((e&&e.message)||"تعذّر إضافة العملية","err"); }
   finally{ btn.disabled=false; btn.textContent=t; }
 });
@@ -3008,7 +3342,7 @@ $("#fixList") && $("#fixList").addEventListener("click", async e=>{
       fixMsg("انرسلت النسخة ✅ والطلب صار يبين بالمبيعات.", true);
       DATA.salesFix = (DATA.salesFix||[]).filter(x=>x.id!==id);
       renderSalesFix();
-      const rr = await getDashboard(); if(rr && rr.data){ DATA = rr.data; render(); }
+      await refreshSections(["sales","clients"]); render();
     }else{
       fixMsg((d.message || "ما تم الدفع فعلياً، فما في نسخة تنرسل.") +
              " تقدر تشيله من القائمة بعلامة × فوق.", false);
@@ -3488,7 +3822,7 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
       notify: !$("#beNotify") || $("#beNotify").checked
     });
     bkEditClose();
-    const rr=await getDashboard(); if(rr&&rr.data){ DATA=rr.data; render(); }
+    await refreshSections(["bookings","clients"]); render();
     /* say whether the consultant was actually told — an edit that mails
        nobody looks identical to one that does, and that is how a session
        ends up moved in our books and not in theirs */
@@ -4094,7 +4428,9 @@ $("#lvQList") && $("#lvQList").addEventListener("click", async e=>{
 });
 
 async function refreshLive(){
-  try{ const r=await getDashboard(); if(r&&r.data){ DATA=r.data; renderLive(); renderEvents(); } }
+  /* every twenty seconds while the tab is open — this used to re-run the
+     entire dashboard, thirteen collection reads, to refresh one queue */
+  try{ await refreshSections(["live"]); renderLive(); }
   catch(e){}
 }
 
