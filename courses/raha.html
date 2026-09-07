@@ -67,7 +67,27 @@
   .crs-phone{display:flex;gap:8px;direction:ltr}
   .crs-phone select{flex:0 0 auto;max-width:46%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 8px;font-size:14px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
   .crs-phone select:focus{outline:0;border-color:var(--cc-purple)}
-  .crs-phone input{flex:1 1 auto;width:auto}
+  /* A flex item defaults to min-width:auto, which refuses to shrink below the
+     input's intrinsic size — about 349px. On any phone that pushed the number
+     field roughly 200px past the edge of the card, on the page where somebody
+     is about to type their number and pay. min-width:0 lets it shrink. */
+  .crs-phone input{flex:1 1 auto;width:auto;min-width:0}
+  .crs-phone select{min-width:0}
+  /* gift code: a quiet row until it is used, then it states the saving */
+  .crs-code{display:flex;gap:8px}
+  .crs-code input{flex:1 1 auto;min-width:0;width:auto;text-transform:uppercase;letter-spacing:.06em}
+  .crs-code button{flex:0 0 auto;border:2px solid var(--cc-purple);background:var(--cc-white);
+    color:var(--cc-purple);border-radius:12px;padding:0 20px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+  .crs-code button:hover{background:var(--cc-purple);color:var(--cc-white)}
+  .crs-code button:disabled{opacity:.55;cursor:default}
+  .crs-codemsg{margin-top:8px;font-size:13.5px;font-weight:700;display:none}
+  .crs-codemsg.ok{display:block;color:#1B7A43}
+  .crs-codemsg.bad{display:block;color:#B02A37}
+  .crs-total{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin:4px 0 16px;padding:14px 16px;background:var(--cc-purple-050);border-radius:14px}
+  .crs-total .l{font-size:14px;color:var(--cc-grey-600);font-weight:700}
+  .crs-total .v{font-size:24px;font-weight:700;color:var(--cc-ink)}
+  .crs-total .was{font-size:15px;color:var(--cc-grey-500);text-decoration:line-through;margin-inline-end:8px;font-weight:500}
   .crs-modes{display:flex;gap:12px}
   .crs-mode{flex:1;border:2px solid var(--cc-grey-200);border-radius:14px;padding:14px;text-align:center;cursor:pointer;font-weight:700;color:var(--cc-ink);transition:.15s}
   .crs-mode.on{border-color:var(--cc-olive);background:#F6F7EE}
@@ -249,6 +269,15 @@
           <div class="crs-mode mode" id="mOnsite" data-mode="onsite">حضوري<small>25 مقعد فقط</small></div>
         </div>
       </div>
+      <div class="crs-fld"><label>كود الخصم <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
+        <div class="crs-code">
+          <input id="cCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="اكتب الكود">
+          <button type="button" id="codeBtn">فعّل</button>
+        </div>
+        <div class="crs-codemsg" id="codeMsg"></div>
+      </div>
+      <div class="crs-total"><span class="l">المبلغ المطلوب</span>
+        <span class="v" id="cTotal">—</span></div>
       <button class="crs-pay" id="payBtn">احجز وادفع</button>
       <div class="crs-err" id="regErr"></div>
       <div class="crs-alt">تحب تسجّل عن طريق واتساب؟ <a href="https://wa.me/96569954849?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%AC%D9%84%20%D8%A8%D9%88%D8%B1%D8%B4%D8%A9%20%D8%B1%D8%A7%D8%AD%D8%AA%D9%83%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9" target="_blank" rel="noopener">راسلنا على 69954849</a></div>
@@ -317,6 +346,45 @@ document.querySelectorAll(".mode").forEach(m=>m.addEventListener("click",()=>{
   document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("on",x===m));
 }));
 
+/* The applied gift code, and the price the server says it produces. The page
+   never works the price out for itself — it asks, and the charge asks again,
+   so a code that expires between the two is refused where money moves. */
+let CODE="", PRICE=null;
+function paintTotal(){
+  const box=$("#cTotal"); if(!box) return;
+  if(!PRICE){ box.textContent="—"; return; }
+  const full=PRICE.fullPrice||PRICE.amount;
+  box.innerHTML = (PRICE.amount<full ? `<span class="was">${full} د.ك</span>` : "")
+    + `${PRICE.amount} د.ك`;
+}
+function codeMsg(t, ok){
+  const m=$("#codeMsg"); if(!m) return;
+  m.textContent=t||""; m.className="crs-codemsg"+(t?(ok?" ok":" bad"):"");
+}
+async function applyCode(){
+  const raw=($("#cCode").value||"").trim().toUpperCase();
+  $("#cCode").value=raw;
+  const btn=$("#codeBtn"), t=btn.textContent;
+  btn.disabled=true; btn.textContent="لحظة…";
+  try{
+    const r=await httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCoursePublic")({courseId:"raha", code:raw});
+    const d=(r&&r.data)||{};
+    if(raw && d.codeError){ CODE=""; codeMsg(d.codeError,false); }
+    else if(raw && d.code){ CODE=d.code; codeMsg((d.codeLabel||"انطبق الكود")+" — صار "+d.amount+" د.ك ✅", true); }
+    else { CODE=""; codeMsg("",true); }
+    PRICE=d; paintTotal();
+  }catch(e){ CODE=""; codeMsg((e&&e.message)||"تعذّر التحقق من الكود", false); }
+  finally{ btn.disabled=false; btn.textContent=t; }
+}
+window.__ccSeedPrice=(d)=>{ if(!PRICE && d && d.amount){ PRICE=d; paintTotal(); } };
+$("#codeBtn") && $("#codeBtn").addEventListener("click", applyCode);
+$("#cCode") && $("#cCode").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); applyCode(); } });
+/* retyping invalidates what was applied, so the total can never show a
+   discount for a code that is no longer in the box */
+$("#cCode") && $("#cCode").addEventListener("input", ()=>{
+  if(CODE && ($("#cCode").value||"").trim().toUpperCase()!==CODE){ CODE=""; codeMsg("",true); applyCode(); }
+});
+
 $("#payBtn").addEventListener("click", async ()=>{
   const err=$("#regErr"); err.style.display="none";
   const name=$("#cName").value.trim(), email=$("#cEmail").value.trim(), phone=$("#cPhone").value.trim();
@@ -331,7 +399,7 @@ $("#payBtn").addEventListener("click", async ()=>{
   const fullPhone="+"+cc+local;
   $("#payBtn").disabled=true; $("#payBtn").textContent="جارٍ التحويل للدفع…";
   try{
-    const r=await createCourseCharge({ courseId:"raha", name, email, phone:fullPhone, mode:MODE });
+    const r=await createCourseCharge({ courseId:"raha", name, email, phone:fullPhone, mode:MODE, code:CODE });
     if(r.data && r.data.url){ window.location.href=r.data.url; return; }
     showErr("تعذّر إنشاء الدفعة، حاول مرة ثانية");
   }catch(e){
@@ -358,6 +426,9 @@ try{
   const fns=getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
   const r=await httpsCallable(fns,"getCoursePublic")({courseId:"raha"});
   const d=r.data||{};
+  /* the same payload seeds the running total, so the box under the form
+     shows the real standing price from the first paint rather than a dash */
+  if(window.__ccSeedPrice) window.__ccSeedPrice(d);
   const box=document.getElementById("rahaPrices");
   if(box && d.amount){
     const seats = (d.seatsLeft!=null && d.seatsLeft<=5 && d.seatsLeft>0)

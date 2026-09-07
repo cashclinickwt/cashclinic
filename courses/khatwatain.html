@@ -87,7 +87,12 @@
   .crs-fld > select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;
     font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
   .crs-fld > select:focus{outline:0;border-color:var(--cc-purple)}
-  .crs-phone input{flex:1 1 auto;width:auto}
+  /* A flex item defaults to min-width:auto, which refuses to shrink below the
+     input's intrinsic size — about 349px. On any phone that pushed the number
+     field roughly 200px past the edge of the card, on the page where somebody
+     is about to type their number and pay. min-width:0 lets it shrink. */
+  .crs-phone input{flex:1 1 auto;width:auto;min-width:0}
+  .crs-phone select{min-width:0}
   .crs-modes{display:flex;gap:12px}
   .crs-mode{flex:1;border:2px solid var(--cc-grey-200);border-radius:14px;padding:14px;text-align:center;cursor:pointer;font-weight:700;color:var(--cc-ink);transition:.15s}
   .crs-mode.on{border-color:var(--cc-olive);background:#F6F7EE}
