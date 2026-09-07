@@ -209,6 +209,23 @@
   .hmnudge{display:flex;align-items:center;gap:10px;margin-top:14px;background:#FFF4DA;border:1px solid #F1D9A0;color:#6B4A00;
     border-radius:12px;padding:11px 14px;font-size:13.5px}
   .hmnudge .go{margin-inline-start:auto;border:0;background:none;color:#6B4A00;font:inherit;font-weight:800;cursor:pointer}
+  .hmsep{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:11.5px;font-weight:700;color:var(--muted)}
+  .hmsep::after{content:"";flex:1;height:1px;background:var(--line)}
+  .hmpies{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .hmpie{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .hmpie h4{margin:0 0 2px;font-size:14px}
+  .hmpie .tot{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .hmpiewrap{display:flex;align-items:center;gap:14px}
+  .hmpiewrap svg{flex:0 0 auto;cursor:pointer}
+  .hmpie .lg{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+  .hmpie .lg div{display:flex;align-items:center;gap:7px;font-size:12.5px;cursor:pointer;border-radius:6px;padding:1px 3px}
+  .hmpie .lg div:hover,.hmpie .lg div.on{background:#F6F3FA}
+  .hmpie .lg i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+  .hmpie .lg b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .hmpie .lg span{color:var(--muted);font-variant-numeric:tabular-nums}
+  .hmpie .none{color:var(--muted);font-size:13px;padding:16px 0}
+  .hmslice{transition:opacity .12s}
+  @media (max-width:760px){ .hmpies{grid-template-columns:1fr} }
   @media (max-width:760px){ .hmgrid{grid-template-columns:1fr} .gsearch{order:3;flex:1 1 100%;margin:8px 0 0} .top{flex-wrap:wrap} }
   /* all clients */
   .clbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
@@ -627,10 +644,11 @@
     </div>
     <div class="kpis" id="hmKpis"></div>
     <div class="hmgrid">
-      <div class="hmcard"><div class="hmt"><b>مواعيد اليوم</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
+      <div class="hmcard"><div class="hmt"><b>مواعيد اليوم والقادمة</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
       <div class="hmcard"><div class="hmt"><b>مهام عليّ</b><button type="button" class="hmlink" data-go="tasks">كل المهام</button></div><div id="hmTasks"></div></div>
     </div>
     <div id="hmNudge"></div>
+    <div class="hmpies" id="hmPies"></div>
   </div>
 
   <!-- ===== تقييم الجلسات ===== -->
@@ -2409,11 +2427,21 @@ function hmMyDiary(){
   if(role==="all"||role==="sales") return null;
   return (DATA&&DATA.profitMember)||null;
 }
+function hmOnMyDiary(b){
+  const mine=hmMyDiary();
+  return !mine || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(mine)!==-1;
+}
 function hmTodayRows(list){
-  const n=bkNowKw(), key=bkKey(n.y,n.m,n.d), mine=hmMyDiary();
-  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key
-      && (!mine || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(mine)!==-1))
+  const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
+  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key && hmOnMyDiary(b))
     .sort((a,b)=>a.startMs-b.startMs);
+}
+/* the next two after today. A day with nothing in it still has a tomorrow,
+   and an empty card told you nothing you could act on. */
+function hmNextRows(list){
+  const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
+  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)>key && hmOnMyDiary(b))
+    .sort((a,b)=>a.startMs-b.startMs).slice(0,2);
 }
 function renderHome(){
   if(!DATA || !$("#homeSec")) return;
@@ -2437,23 +2465,141 @@ function renderHome(){
   $("#hmKpis").innerHTML=kp.join("");
 
   const mine=hmMyDiary();
-  $("#hmToday").innerHTML = today.length ? today.map(b=>{
+  const next=hmNextRows((DATA.bookings||{}).list||[]);
+  const row=(b,withDay)=>{
     const p=bkParts(b.startIso);
     const who = mine ? "" : ` <span>· ${esc(b.consultantName||"")}</span>`;
-    return `<div class="hmrow" data-bk="${esc(b.id)}"><span class="t">${bkPad2(p.hh)}:${bkPad2(p.mm)}</span>
+    const when = withDay ? bkWhen(b.startIso) : `${bkPad2(p.hh)}:${bkPad2(p.mm)}`;
+    return `<div class="hmrow" data-bk="${esc(b.id)}"><span class="t"${withDay?' style="min-width:auto"':""}>${esc(when)}</span>
       <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span>${who}</span>
       <span class="pill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span></div>`;
-  }).join("") : `<div class="hmempty">ما في مواعيد اليوم.</div>`;
+  };
+  $("#hmToday").innerHTML =
+    (today.length ? today.map(b=>row(b,false)).join("") : `<div class="hmempty">ما في مواعيد اليوم.</div>`)
+    + (next.length ? `<div class="hmsep">الجاي</div>` + next.map(b=>row(b,true)).join("")
+       : (today.length ? "" : `<div class="hmempty" style="padding-top:0">ولا مواعيد قادمة.</div>`));
 
   $("#hmTasks").innerHTML = !TK ? `<div class="hmempty">جارٍ التحميل…</div>`
     : tasks.length ? tasks.slice(0,6).map(t=>`<div class="hmrow"><span class="n">${esc(t.text)}
         <div class="who">من ${esc(String(t.from||"").split("@")[0])}${t.due?" · "+esc(t.due):""}</div></span></div>`).join("")
     : `<div class="hmempty">ما عليك مهام مفتوحة.</div>`;
 
+  renderPies();
+
   $("#hmNudge").innerHTML = (nudge && !nudge.done && (nudge.owed||[]).length && panelAvailable("books"))
     ? `<div class="hmnudge">💸 باقي ${fmt(nudge.owed.length)} شخص ما استلموا مستحقات ${esc(monthLabel(nudge.month))}، بمجموع ${kwd(nudge.total)}.
        <button type="button" class="go" data-go="books">افتح حسابات الشركة ←</button></div>` : "";
 }
+/* ---- the two profit pies ----
+   أرباحي answers "what am I owed"; these answer "where did it come from",
+   for this month and the one before it, side by side. Drawn as SVG rather
+   than pulled from a chart library: it is two donuts, and the page loads no
+   scripts of its own today.
+
+   PFPIE holds the two months' `mine` payloads, fetched once. getProfit is
+   already scoped to the caller on the server, so this shows a consultant her
+   own numbers and nobody else's without any extra gate here. */
+let PFPIE = null;
+const PIE_COLORS = ["#2F8789","#D3A146","#614588","#962E37","#505632","#3EADAD","#B35661","#7E8455"];
+
+function pieSvg(cats, total, key){
+  const R=52, r=31, C=64;
+  const ring = `<circle cx="${C}" cy="${C}" r="${(R+r)/2}" fill="none" stroke="var(--line)" stroke-width="${R-r}"></circle>`;
+  if(!(total>0)) return `<svg viewBox="0 0 128 128" width="112" height="112" aria-hidden="true">${ring}</svg>`;
+
+  /* Real arc geometry, one filled path per slice.
+     The first version drew each slice as a full circle with a dash pattern —
+     simpler to write, and it looked right. But a browser hit-tests the whole
+     stroke and ignores the dash gaps, so every slice sat under the last one
+     painted and only that one ever responded to the mouse. A path bounded by
+     its own arcs is hoverable exactly where it is drawn. */
+  const pt=(ang,rad)=>[ (C+rad*Math.cos(ang)).toFixed(2), (C+rad*Math.sin(ang)).toFixed(2) ];
+  let acc=0;
+  const parts=cats.map((c,i)=>{
+    const frac=c.share/total;
+    const a0=-Math.PI/2 + 2*Math.PI*acc;
+    acc+=frac;
+    const a1=-Math.PI/2 + 2*Math.PI*acc;
+    const col=PIE_COLORS[i%PIE_COLORS.length];
+    const tip=`<title>${esc(c.label)} · ${kwd(c.share)} · ${Math.round(frac*100)}%</title>`;
+    /* a lone category is a whole ring: an arc from a point back to itself has
+       no direction a renderer can follow, and draws nothing */
+    if(frac>0.999) return `<circle class="hmslice" data-i="${i}" cx="${C}" cy="${C}" r="${(R+r)/2}"
+      fill="none" stroke="${col}" stroke-width="${R-r}">${tip}</circle>`;
+    const big=frac>0.5?1:0;
+    const [ox0,oy0]=pt(a0,R), [ox1,oy1]=pt(a1,R), [ix1,iy1]=pt(a1,r), [ix0,iy0]=pt(a0,r);
+    return `<path class="hmslice" data-i="${i}" fill="${col}"
+      d="M ${ox0} ${oy0} A ${R} ${R} 0 ${big} 1 ${ox1} ${oy1} L ${ix1} ${iy1} A ${r} ${r} 0 ${big} 0 ${ix0} ${iy0} Z">${tip}</path>`;
+  }).join("");
+  return `<svg viewBox="0 0 128 128" width="112" height="112" data-pie="${esc(key)}" role="img"
+    aria-label="توزيع أرباح ${esc(monthLabel(key))}">${parts}</svg>`;
+}
+
+function pieCard(key, mine){
+  const cats=(mine&&mine.categories||[]).filter(c=>c.share>0).sort((a,b)=>b.share-a.share);
+  const total=cats.reduce((a,c)=>a+c.share,0);
+  const body = cats.length
+    ? `<div class="hmpiewrap">${pieSvg(cats,total,key)}
+        <div class="lg">${cats.map((c,i)=>`<div data-i="${i}" data-pie="${esc(key)}">
+          <i style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></i>
+          <b>${esc(c.label)}</b><span>${kwd(c.share)}</span></div>`).join("")}</div></div>`
+    : `<div class="none">ما في أرباح مسجّلة بهذا الشهر.</div>`;
+  return `<div class="hmpie" data-month="${esc(key)}">
+    <h4>${esc(monthLabel(key))}</h4>
+    <div class="tot">${cats.length?`المجموع ${kwd(total)}`:"—"}</div>${body}</div>`;
+}
+
+function renderPies(){
+  const box=$("#hmPies"); if(!box) return;
+  if(!(DATA&&DATA.profitMember)){ box.innerHTML=""; return; }
+  if(!PFPIE){ box.innerHTML=`<div class="hmpie"><div class="none">جارٍ تحميل الأرباح…</div></div>
+                             <div class="hmpie"><div class="none">جارٍ تحميل الأرباح…</div></div>`; return; }
+  box.innerHTML = PFPIE.months.map(m=>pieCard(m, PFPIE.by[m])).join("");
+}
+
+/* the current month and the one before it, in the YYYY-MM the server uses */
+function prevMonthKey(k){
+  const [y,m]=String(k).split("-").map(Number);
+  return m>1 ? `${y}-${String(m-1).padStart(2,"0")}` : `${y-1}-12`;
+}
+async function loadPies(){
+  if(PFPIE) return;
+  const n=bkNowKw(), cur=`${n.y}-${String(n.m+1).padStart(2,"0")}`, prev=prevMonthKey(cur);
+  const months=[cur,prev];
+  PFPIE={ months, by:{} };
+  /* both at once; a failure on one month must not blank the other */
+  await Promise.all(months.map(async m=>{
+    try{ const r=await getProfit({ month:m }); PFPIE.by[m]=(r&&r.data&&r.data.mine)||null; }
+    catch(e){ console.error("pie "+m+" failed:",e); PFPIE.by[m]=null; }
+  }));
+  renderPies();
+}
+
+$("#hmPies") && $("#hmPies").addEventListener("mouseover", e=>{
+  const t=e.target.closest("[data-i]"); if(!t) return;
+  const card=t.closest(".hmpie"); if(!card) return;
+  card.querySelectorAll(".hmslice").forEach(sl=>{ sl.style.opacity = sl.dataset.i===t.dataset.i ? "1" : ".35"; });
+  card.querySelectorAll(".lg div").forEach(d=>d.classList.toggle("on", d.dataset.i===t.dataset.i));
+});
+$("#hmPies") && $("#hmPies").addEventListener("mouseout", e=>{
+  const card=e.target.closest(".hmpie"); if(!card || card.contains(e.relatedTarget)) return;
+  card.querySelectorAll(".hmslice").forEach(sl=>{ sl.style.opacity="1"; });
+  card.querySelectorAll(".lg div").forEach(d=>d.classList.remove("on"));
+});
+$("#hmPies") && $("#hmPies").addEventListener("click", e=>{
+  const card=e.target.closest(".hmpie"); if(!card) return;
+  /* Straight into أرباحي on that month, which is the next question anyone
+     asks. The month has to be handed to loadProfit rather than poked into
+     the <select>: the options are built by renderProfit from the payload, so
+     on a first visit they do not exist yet, and showPanel's own lazy load is
+     already in flight with no month at all. Passing it means whichever call
+     lands last still lands on the right month. */
+  const m=card.dataset.month;
+  showPanel("profit");
+  loadProfit(m);
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
 $("#homeSec") && $("#homeSec").addEventListener("click", e=>{
   const g=e.target.closest("[data-go]"); if(g){ showPanel(g.dataset.go); window.scrollTo({top:0,behavior:"smooth"}); return; }
   const row=e.target.closest(".hmrow[data-bk]");
@@ -2595,7 +2741,7 @@ function showPanel(k){
   if(k==="live") LIVE_TIMER=setInterval(refreshLive, 20000);
   /* panels that fetch their own data do it the first time they open */
   if(def.load) def.load();
-  if(k==="home") renderHome();
+  if(k==="home"){ renderHome(); if(DATA&&DATA.profitMember) loadPies(); }
   renderPayoutNudge();
 }
 
