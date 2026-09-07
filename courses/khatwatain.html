@@ -49,6 +49,21 @@
   .crs-day li{position:relative;padding-inline-start:18px;font-size:15px;color:var(--cc-grey-900);line-height:1.6}
   .crs-day li::before{content:"";position:absolute;inset-inline-start:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--cc-olive)}
   @media(max-width:640px){.crs-day ul{grid-template-columns:1fr}}
+  /* The two-column list above is built for the workshop's twelve short
+     items. These cards carry a few long lines each, so in two columns every
+     item wrapped to one or two words. One column, and the steps lead. */
+  .kh-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:840px;margin:0 auto}
+  .crs-day.kh-step{position:relative;padding-top:30px}
+  .crs-day.kh-step::before{content:attr(data-n);position:absolute;inset-inline-end:28px;top:26px;
+    width:36px;height:36px;border-radius:50%;background:var(--cc-olive);color:var(--cc-white);
+    display:grid;place-items:center;font-weight:700;font-size:17px;line-height:1}
+  .crs-day.kh-step h3{padding-inline-end:48px}
+  .crs-day.kh-step ul{grid-template-columns:1fr;gap:11px}
+  .crs-day.kh-who{max-width:840px;margin:16px auto 0;background:var(--cc-purple-050);border-color:var(--cc-purple-100)}
+  .crs-day.kh-who h3{color:var(--cc-purple)}
+  .crs-day.kh-who li::before{background:var(--cc-purple)}
+  .crs-day.kh-who ul{grid-template-columns:repeat(3,1fr);gap:11px 26px}
+  @media(max-width:760px){.kh-steps{grid-template-columns:1fr}.crs-day.kh-who ul{grid-template-columns:1fr}}
 
   .crs-flyers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:0 auto}
   .crs-flyers figure{margin:0}
@@ -67,6 +82,11 @@
   .crs-phone{display:flex;gap:8px;direction:ltr}
   .crs-phone select{flex:0 0 auto;max-width:46%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 8px;font-size:14px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
   .crs-phone select:focus{outline:0;border-color:var(--cc-purple)}
+  /* the country code select is styled inside .crs-phone only; the audience
+     question sits on its own, so it needs the same box as a text field */
+  .crs-fld > select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;
+    font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
+  .crs-fld > select:focus{outline:0;border-color:var(--cc-purple)}
   .crs-phone input{flex:1 1 auto;width:auto}
   .crs-modes{display:flex;gap:12px}
   .crs-mode{flex:1;border:2px solid var(--cc-grey-200);border-radius:14px;padding:14px;text-align:center;cursor:pointer;font-weight:700;color:var(--cc-ink);transition:.15s}
@@ -150,10 +170,11 @@
 
 <section class="crs-sec" style="background:var(--cc-grey-050);padding-top:52px;">
   <div class="cc-wrap">
-    <h2 class="crs-sec-t">وش نتكلم عنه؟</h2>
-    <p class="crs-sec-sub">ساعة واحدة، خطوتين، وتطبيق تقدر تبدي فيه من نفس الليلة.</p>
-    <div class="crs-days" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
-      <div class="crs-day">
+    <h2 class="crs-sec-t">شنو نتكلم عنه؟</h2>
+    <p class="crs-sec-sub">ساعة وحدة · خطوتين · وتطبيق تقدر تبدي فيه من نفس الليلة.</p>
+
+    <div class="kh-steps">
+      <div class="crs-day kh-step" data-n="١">
         <h3>الخطوة الأولى</h3>
         <div class="d">من وين تبدي</div>
         <ul>
@@ -162,24 +183,25 @@
           <li>أول خطوة تسويها بدون ما تغيّر دخلك</li>
         </ul>
       </div>
-      <div class="crs-day">
+      <div class="crs-day kh-step" data-n="٢">
         <h3>الخطوة الثانية</h3>
         <div class="d">شلون تلتزم فيها</div>
         <ul>
           <li>الالتزام اللي يخلي الخطوة تشتغل</li>
           <li>شلون تتابع نفسك بدون تعقيد</li>
-          <li>وش يصير لو التزمت شهر واحد بس</li>
+          <li>شنو يصير لو التزمت شهر واحد بس</li>
         </ul>
       </div>
-      <div class="crs-day">
-        <h3>لمين هذا اللقاء؟</h3>
-        <div class="d">مجاني للجميع</div>
-        <ul>
-          <li>أي شخص يحس إن فلوسه تروح وما يدري وين</li>
-          <li>اللي جرّب يوفر وما استمر</li>
-          <li>اللي يبي يبدي بس ما يعرف من وين</li>
-        </ul>
-      </div>
+    </div>
+
+    <div class="crs-day kh-who">
+      <h3>لمن هذا اللقاء؟</h3>
+      <div class="d">مجاني للجميع · أونلاين</div>
+      <ul>
+        <li>اللي يحس إن فلوسه تروح وما يدري وين</li>
+        <li>اللي جرّب يوفر وما استمر</li>
+        <li>اللي يبي يبدي بس ما يعرف من وين</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -231,9 +253,15 @@
           <input id="cPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" style="direction:ltr;text-align:right">
         </div>
       </div>
-      <div class="crs-fld"><label>وش يوصفك أكثر؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
-        <input id="cAud" type="text" placeholder="مثال: موظف، صاحب مشروع، طالب"></div>
-      <div class="crs-fld"><label>وش تتمنى تطلع فيه من اللقاء؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
+      <div class="crs-fld"><label>شنو يوصفك أكثر؟</label>
+        <select id="cAud" aria-label="شنو يوصفك أكثر؟">
+          <option value="" selected disabled>اختر…</option>
+          <option value="عميل جديد">عميل جديد</option>
+          <option value="عميل سابق من استشارات">عميل سابق من استشارات</option>
+          <option value="عميل سابق حاصل على الكتيّب المالي">عميل سابق حاصل على الكتيّب المالي</option>
+          <option value="عميل سابق من دورات">عميل سابق من دورات</option>
+        </select></div>
+      <div class="crs-fld"><label>شنو تتمنى تطلع فيه من اللقاء؟ <span style="font-weight:400;color:var(--cc-grey-500)">(اختياري)</span></label>
         <input id="cGoal" type="text" placeholder="اكتب هدفك بسطر"></div>
       <button class="crs-pay" id="payBtn">سجّل مقعدي مجاناً</button>
       <div class="crs-err" id="regErr"></div>
@@ -311,6 +339,9 @@ $("#payBtn").addEventListener("click", async ()=>{
   const _fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
   if(_fix){ if(window.ccEmailCheck) window.ccEmailCheck($("#cEmail")); return showErr("تأكد من إيميلك، هل تقصد "+_fix+"؟"); }
   if(local.length<7) return showErr("اكتب رقم واتساب صحيح");
+  /* the التوظيف/اللقاء donut counts these four exactly, so a blank or a
+     free-typed answer would sit outside every slice */
+  if(!($("#cAud").value||"").trim()) return showErr("اختر شنو يوصفك");
   showErr("");
   const btn=$("#payBtn"), t=btn.textContent;
   btn.disabled=true; btn.textContent="جارٍ التسجيل…";
