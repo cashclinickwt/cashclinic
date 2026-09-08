@@ -628,6 +628,7 @@
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <div class="navgrp" data-grp="team">الفريق</div>
     <button data-tab="tasks">مهامي</button>
+    <button data-tab="meetings">اجتماعاتي</button>
     <button data-tab="profit" data-family="money">المال</button>
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
     <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
@@ -658,6 +659,28 @@
     <div class="flt" id="fbWhoFlt"></div>
     <div id="fbBars"></div>
     <div id="fbList"></div>
+  </div>
+
+  <!-- ===== اجتماعاتي ===== -->
+  <div class="sec" id="meetingsSec" data-panel="meetings" hidden>
+    <h2><span></span> اجتماعاتي</h2>
+    <div class="pfbar">
+      <div class="f" id="mtOwnerF" hidden><label>لمن؟</label><select id="mtOwner"></select></div>
+      <div class="f" style="flex:1 1 240px"><label>عنوان الاجتماع</label>
+        <input id="mtTitle" type="text" placeholder="مثال: اجتماع مع بنك الخليج"></div>
+      <div class="f"><label>مع مين من الفريق</label><select id="mtWith"></select></div>
+      <div class="f" style="flex:1 1 200px"><label>أو مع مين من برّا</label>
+        <input id="mtWithName" type="text" placeholder="اسم الشخص أو الجهة"></div>
+      <div class="f"><label>التاريخ</label><input id="mtDate" type="date"></div>
+      <div class="f"><label>الوقت</label><input id="mtTime" type="time"></div>
+      <div class="f"><label>المدة (دقيقة)</label><input id="mtMin" type="number" value="60" min="15" step="15"></div>
+      <div class="f" style="flex:1 1 220px"><label>المكان</label>
+        <input id="mtPlace" type="text" placeholder="المكتب، زوم، مقهى…"></div>
+      <div class="f" style="flex:1 1 100%"><label>ملاحظات (اختياري)</label><input id="mtNote" type="text"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="mtAdd">أضف الاجتماع</button></div>
+    </div>
+    <div class="addmsg" id="mtMsg"></div>
+    <div id="mtList"></div>
   </div>
 
   <!-- ===== مهامي ===== -->
@@ -780,6 +803,7 @@
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
       <a class="report-btn" id="rptNas" href="https://cashclinickw.github.io/cashclinicslides/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير اللجنة الخيرية ←</a>
       <a class="report-btn" id="rptNasReports" href="reports/index.html" hidden>تقارير كاش ناس ←</a>
+      <a class="report-btn" id="rptHiring" href="reports/hiring.html" hidden>نظام المقابلة المهيكلة ←</a>
     </div>
   </div>
 
@@ -1117,6 +1141,7 @@
       <button data-c="booking">حجزوا استشارة</button>
       <button data-c="quiz">سوّوا اختبار</button>
       <button data-c="course">دورات</button>
+      <button data-c="event">سجّلوا بلقاء</button>
       <button data-c="paid">دفعوا لنا</button>
     </div>
     <div id="clList"></div>
@@ -1275,7 +1300,11 @@ onAuthStateChanged(auth, async (user)=>{
     if(_rl==="personal"||_rl==="all") $("#rptNas").hidden=false;
     /* Cash Nas reports live on this site now, behind the same staff login */
     if(_rl==="personal"||_rl==="all") $("#rptNasReports").hidden=false;
-    if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden) $("#reportsSec").hidden=false;
+    /* the server refuses anyone else outright; this only keeps the button
+       from appearing where it would always fail */
+    const HIRE_OK=["ghalia.n@cashclinic.net","sarah.h@cashclinic.net","abdullah.a@cashclinic.net"];
+    if(HIRE_OK.indexOf(String((DATA&&DATA.email)||"").toLowerCase())!==-1) $("#rptHiring").hidden=false;
+    if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden||!$("#rptHiring").hidden) $("#reportsSec").hidden=false;
     render();
     if(!TK) loadTasks();
   }catch(e){
@@ -1338,6 +1367,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
+let MT = null;
 let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, FB = null,
     FBWHO = "all", BKMV = "open", BKKIND = "all", BKPERSON = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
@@ -2490,6 +2520,92 @@ function renderHome(){
     ? `<div class="hmnudge">💸 باقي ${fmt(nudge.owed.length)} شخص ما استلموا مستحقات ${esc(monthLabel(nudge.month))}، بمجموع ${kwd(nudge.total)}.
        <button type="button" class="go" data-go="books">افتح حسابات الشركة ←</button></div>` : "";
 }
+/* ---- اجتماعاتي ----
+   The team's own diary. A client booking carries a package, a payment and a
+   consultant; a meeting carries none of those and the other side is usually
+   not in the team at all, so it lives in its own collection rather than
+   putting a bank manager into the consultant dropdown. */
+function mtNext(n){
+  const now=Date.now();
+  return ((MT&&MT.list)||[]).filter(m=>m.startMs>=now).slice(0, n||99);
+}
+function mtWhoLabel(m){
+  if(m.withName) return m.withName;
+  if(m.withStaff){ const p=((MT&&MT.people)||[]).find(x=>x.email===m.withStaff); return (p&&p.name)||m.withStaff; }
+  return "";
+}
+function mtOwnerLabel(e){
+  const p=((MT&&MT.people)||[]).find(x=>x.email===e); return (p&&p.name)||String(e||"").split("@")[0];
+}
+async function loadMeetings(){
+  const box=$("#mtList"); if(box) box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{
+    const r=await listMeetings({}); MT=r.data||null; renderMeetings(); paintBadges();
+    renderHome();
+  }catch(e){ if(box) box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+function renderMeetings(){
+  if(!MT || !$("#mtList")) return;
+  const meSel=$("#mtWith");
+  if(meSel && !meSel.options.length){
+    meSel.innerHTML='<option value="">— لا أحد من الفريق —</option>'+
+      (MT.people||[]).map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+  }
+  const own=$("#mtOwner");
+  if(MT.canBookForOthers){
+    $("#mtOwnerF").hidden=false;
+    if(own && !own.options.length){
+      own.innerHTML=(MT.people||[]).map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+      own.value=MT.me;
+    }
+  } else if($("#mtOwnerF")) $("#mtOwnerF").hidden=true;
+
+  const now=Date.now();
+  const up=(MT.list||[]).filter(m=>m.startMs>=now);
+  const past=(MT.list||[]).filter(m=>m.startMs<now).reverse().slice(0,20);
+  const row=(m)=>{
+    const who=mtWhoLabel(m);
+    const mine=m.owner===MT.me;
+    return `<div class="hmrow" data-mt="${esc(m.id)}" style="align-items:flex-start">
+      <span class="t" style="min-width:auto">${esc(bkWhen(new Date(m.startMs).toISOString()))}</span>
+      <span class="n"><b>${esc(m.title)}</b>
+        ${who?`<span>· مع ${esc(who)}</span>`:""}
+        ${m.place?`<span>· ${esc(m.place)}</span>`:""}
+        ${!mine?`<span>· ${esc(mtOwnerLabel(m.owner))}</span>`:""}
+        ${m.note?`<div class="muted" style="font-size:12.5px">${esc(m.note)}</div>`:""}</span>
+      <span class="pill" style="background:#614588">${fmt(m.minutes)} د</span>
+      <button class="pfbtn" data-mtdel="${esc(m.id)}" style="padding:4px 10px;font-size:12px">حذف</button>
+    </div>`;
+  };
+  $("#mtList").innerHTML =
+    (up.length?`<div class="hmsep">القادمة</div>`+up.map(row).join(""):`<div class="hmempty">ما في اجتماعات قادمة.</div>`)+
+    (past.length?`<div class="hmsep">سابقة</div>`+past.map(row).join(""):"");
+}
+$("#mtAdd") && $("#mtAdd").addEventListener("click", async ()=>{
+  const b=$("#mtAdd"), m=$("#mtMsg");
+  const pay={ title:($("#mtTitle").value||"").trim(), date:$("#mtDate").value, time:$("#mtTime").value,
+    withEmail:$("#mtWith").value||"", withName:($("#mtWithName").value||"").trim(),
+    place:($("#mtPlace").value||"").trim(), note:($("#mtNote").value||"").trim(),
+    minutes:Number($("#mtMin").value)||60 };
+  if(MT&&MT.canBookForOthers&&$("#mtOwner")) pay.owner=$("#mtOwner").value;
+  if(pay.title.length<2){ m.textContent="اكتب عنوان الاجتماع"; m.className="addmsg bad"; return; }
+  if(!pay.date||!pay.time){ m.textContent="اختر التاريخ والوقت"; m.className="addmsg bad"; return; }
+  b.disabled=true; m.textContent="لحظة…"; m.className="addmsg";
+  try{
+    await addMeeting(pay);
+    ["mtTitle","mtWithName","mtPlace","mtNote"].forEach(k=>$("#"+k).value="");
+    m.textContent="انضاف الاجتماع ✅ وانرسل إيميل 📩"; m.className="addmsg ok";
+    MT=null; await loadMeetings();
+  }catch(e){ m.textContent=(e&&e.message)||"تعذّر الإضافة"; m.className="addmsg bad"; }
+  finally{ b.disabled=false; }
+});
+$("#mtList") && $("#mtList").addEventListener("click", async e=>{
+  const d=e.target.closest("[data-mtdel]"); if(!d) return;
+  if(!confirm("تحذف هذا الاجتماع؟")) return;
+  try{ await deleteMeeting({id:d.dataset.mtdel}); MT=null; await loadMeetings(); }
+  catch(err){ alert((err&&err.message)||"تعذّر الحذف"); }
+});
+
 /* ---- the two profit pies ----
    أرباحي answers "what am I owed"; these answer "where did it come from",
    for this month and the one before it, side by side. Drawn as SVG rather
@@ -2602,6 +2718,8 @@ $("#hmPies") && $("#hmPies").addEventListener("click", e=>{
 
 $("#homeSec") && $("#homeSec").addEventListener("click", e=>{
   const g=e.target.closest("[data-go]"); if(g){ showPanel(g.dataset.go); window.scrollTo({top:0,behavior:"smooth"}); return; }
+  const mtr=e.target.closest(".hmrow[data-mt]");
+  if(mtr){ showPanel("meetings"); return; }
   const row=e.target.closest(".hmrow[data-bk]");
   if(row){ const b=((DATA.bookings||{}).list||[]).find(x=>x.id===row.dataset.bk); if(b&&mayEdit()){ showPanel("bookings"); bkEditOpen(b); } }
 });
@@ -2684,7 +2802,7 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","tasks","target","profit"];
+const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","tasks","meetings","target","profit"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
@@ -2701,6 +2819,8 @@ const PANELS = [
   { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
   { id:"tasks",       group:"team",   icon:"✅", allowed:()=>true, load:()=>{ if(!TK) loadTasks(); },
     count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
+  { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
+    count:()=>mtNext(2).length },
   { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
@@ -4499,7 +4619,10 @@ $("#lvQFlt") && $("#lvQFlt").addEventListener("click",e=>{ const b=e.target.clos
 $("#lvMode") && $("#lvMode").addEventListener("change", syncLiveMode);
 $("#lvEvent") && $("#lvEvent").addEventListener("change", ()=>{
   lvMsg("جارٍ تحميل بيانات اللقاء…", true);
-  lvApply(null, $("#lvSave"), ()=> lvMsg("انتقلنا للقاء المختار ✅ العنوان والأسئلة والحضور كلها تخصه الحين.", true));
+  /* switchOnly: move the room, do not write this form onto it — the fields
+     still show the لقاء we are leaving */
+  lvApply({switchOnly:true}, $("#lvSave"),
+    ()=> lvMsg("انتقلنا للقاء المختار ✅ العنوان والأسئلة والحضور كلها تخصه الحين.", true));
 });
 
 $("#lvCopy") && $("#lvCopy").addEventListener("click", async ()=>{

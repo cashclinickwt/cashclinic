@@ -87,6 +87,11 @@
   .crs-fld > select{width:100%;border:2px solid var(--cc-grey-200);border-radius:12px;padding:13px 14px;
     font-size:16px;font-family:inherit;color:var(--cc-ink);background:var(--cc-white)}
   .crs-fld > select:focus{outline:0;border-color:var(--cc-purple)}
+  /* opens in a new tab on purpose: they buy the booklet and come back to a
+     registration form that is still filled in */
+  .crs-vipbuy{display:inline-block;margin-top:12px;background:var(--cc-purple);color:var(--cc-white);
+    border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:700;text-decoration:none}
+  .crs-vipbuy:hover{background:var(--cc-purple-700)}
   /* A flex item defaults to min-width:auto, which refuses to shrink below the
      input's intrinsic size — about 349px. On any phone that pushed the number
      field roughly 200px past the edge of the card, on the page where somebody
@@ -165,9 +170,10 @@
         <div class="n">مقاعد أونلاين غير محدودة</div>
       </div>
       <div class="crs-pcard">
-        <div class="lbl">مفاجأة حصرية</div>
+        <div class="lbl">لقاء VIP</div>
         <div class="amt" style="font-size:20px;">ساعة إضافية</div>
         <div class="n">لحاملي كتيّب أهدافي المالية — سجّل بنفس إيميل الشراء</div>
+        <a class="crs-vipbuy" href="../quiz/checkout.html?product=ahdafi" target="_blank" rel="noopener">اشترِ الكتيّب · 25 د.ك ←</a>
       </div>
     </div>
   </div>
