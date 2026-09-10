@@ -311,6 +311,10 @@
         <li>تقدر تأجّل الموعد مرة وحدة لكل حجز.</li>
         <li>لو تأخرت أكثر من ١٠ دقائق أو ما حضرت بدون إشعار، تنحسب الجلسة مستهلكة.</li>
       </ul>
+      <label style="margin-top:10px">
+        <input type="checkbox" id="termsChk">
+        <span>إتمام الدفع يعتبر موافقة على جميع الشروط والسياسات الخاصة بكاش كلينيك.</span>
+      </label>
     </div>
 
     <div class="paygrid">
@@ -757,6 +761,11 @@ function readForm(){
     $("#agreeBox").classList.add("bad");
     $("#agreeBox").scrollIntoView({ behavior:"smooth", block:"center" });
     return fail("لازم توافق على سياسة المواعيد قبل ما تكمل");
+  }
+  if(!$("#termsChk").checked){
+    $("#agreeBox").classList.add("bad");
+    $("#agreeBox").scrollIntoView({ behavior:"smooth", block:"center" });
+    return fail("لازم توافق على الشروط والسياسات قبل الدفع");
   }
 
   const cc = $("#bCC").value;

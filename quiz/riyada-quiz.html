@@ -62,6 +62,11 @@ img{max-width:100%;display:block}
 
 .intro{padding:26px 0 8px}
 .intro-grid{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:center}
+.intro-photos{display:flex;gap:14px}
+.pcard{flex:1;min-width:0;text-align:center}
+.pcard img{width:100%;border-radius:16px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.32)}
+.pcard .pname{margin-top:9px;font-weight:800;font-size:14px}
+.pcard .prole{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.5}
 .intro-photo img{width:100%;border-radius:20px;border:1px solid var(--line);
   box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .intro-photos{display:flex;gap:14px}
@@ -215,6 +220,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
   .intro-grid{grid-template-columns:1fr;gap:22px}
   .intro-photo{max-width:260px;margin:0 auto}
   .intro-photos{gap:10px}
+  .intro-photos{gap:10px}
   .pcard .pname{font-size:13px}
   .pcard .prole{font-size:11px}
   .axes-grid,.mgrid{grid-template-columns:1fr}
@@ -237,11 +243,18 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
 
     <section class="intro">
       <div class="intro-grid">
-        <div class="intro-photo"><img src="hasan.jpg" alt="حسن أكبر · مستشار كاش ريادة"/></div>
+        <div class="intro-photos">
+          <div class="pcard"><img src="hasan.jpg" alt="حسن أكبر"/>
+            <div class="pname">حسن أكبر</div>
+            <div class="prole">مستشار كاش ريادة · معدّ الفحص</div></div>
+          <div class="pcard"><img src="ghaliya.jpg" alt="غالية النويف"/>
+            <div class="pname">غالية النويف</div>
+            <div class="prole">مؤسسة كاش كلينيك · محاسبة الأفراد والمشاريع</div></div>
+        </div>
         <div class="intro-txt">
           <h2>اختبار تشخيصي عملي لكل صاحب مشروع في الخليج</h2>
           <p class="lead">اعرف وين القوة ووين التسريبات في مشروعك خلال دقائق وبدون تعقيد.</p>
-          <p class="body">الفحص يغطي 6 محاور أساسية تحدد صحة كاش مشروعك: الكاش والمالية، التسعير، المبيعات والتسويق، المنتج، العمليات، والاستراتيجية. بعد ما تخلص، توصلك نتيجة واضحة لكل محور مع تشخيص عملي يعطيك أول خطوة تشتغل عليها. الفحص مبني على خبرة حسن أكبر مع أصحاب المشاريع في الخليج.</p>
+          <p class="body">الفحص يغطي 6 محاور أساسية تحدد صحة كاش مشروعك: الكاش والمالية، التسعير، المبيعات والتسويق، المنتج، العمليات، والاستراتيجية. بعد ما تخلص، توصلك نتيجة واضحة لكل محور مع تشخيص عملي يعطيك أول خطوة تشتغل عليها. الفحص مبني على خبرة حسن أكبر مع أصحاب المشاريع في الخليج، وعلى منهج غالية النويف في التشخيص المحاسبي.</p>
           <button class="btn teal" onclick="startQuiz()">ابدأ اختبار صحة كاش مشروعك</button>
         </div>
       </div>
@@ -311,6 +324,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
         <input id="g-phone" type="tel" placeholder="9xxxxxxx" inputmode="tel"/>
       </div>
       <div class="err">دخل رقم صحيح</div></div>
+    <div id="g-err" style="display:none;color:#962E37;font-size:13.5px;font-weight:700;margin:0 0 10px;line-height:1.7"></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -683,8 +697,24 @@ async function submitGate(){
   const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone,
     source:QUIZ_SOURCE, score:LAST_SCORE?LAST_SCORE.overall:null, createdAt:new Date().toISOString(), ...extra };
   let leadId=null;
-  try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }
-  catch(e){ console.warn("lead save",e); }
+  /* Saved through the server, not written from the browser. The direct write
+     was refused silently — the visitor saw their result and we recorded
+     nothing — which is how Cash Riyada went quiet from 10 August while Cash
+     Nas carried on. If this fails now it says so instead of vanishing. */
+  try{
+    if(fns){
+      const _r = await fns.httpsCallable("saveLead")(lead);
+      leadId = (_r && _r.data && _r.data.leadId) || null;
+    }
+  }catch(e){
+    console.error("lead save failed", e);
+    try{ const _b=document.getElementById("g-err");
+      if(_b){ _b.textContent="تعذّر حفظ بياناتك، حاول مرة ثانية"; _b.style.display="block"; }
+    }catch(_){}
+    const _btn=document.getElementById("g-btn");
+    if(_btn){ _btn.disabled=false; _btn.textContent="شوف نتيجتي"; }
+    return;   /* never show a result we failed to record */
+  }
   /* email the result to the customer (fire-and-forget: never blocks showing the result) */
   try{
     if(fns && leadId){

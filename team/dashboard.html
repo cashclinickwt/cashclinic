@@ -629,6 +629,7 @@
     <div class="navgrp" data-grp="team">الفريق</div>
     <button data-tab="tasks">مهامي</button>
     <button data-tab="meetings">اجتماعاتي</button>
+    <button data-tab="ideas">أفكارنا</button>
     <button data-tab="profit" data-family="money">المال</button>
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
     <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
@@ -659,6 +660,31 @@
     <div class="flt" id="fbWhoFlt"></div>
     <div id="fbBars"></div>
     <div id="fbList"></div>
+  </div>
+
+  <!-- ===== تقييم الكتيّبات ===== -->
+  <div class="sec" id="brSec" data-panel="bookrate" hidden>
+    <h2><span></span> تقييم الكتيّبات</h2>
+    <div class="kpis" id="brKpis"></div>
+    <div class="flt" id="brFlt"></div>
+    <div id="brList"></div>
+  </div>
+
+  <!-- ===== أفكارنا ===== -->
+  <div class="sec" id="idSec" data-panel="ideas" hidden>
+    <h2><span></span> أفكارنا</h2>
+    <div class="pfbar">
+      <div class="f" style="flex:1 1 260px"><label>الفكرة</label>
+        <input id="idTitle" type="text" placeholder="عنوان قصير للفكرة"></div>
+      <div class="f"><label>المجال</label>
+        <input id="idArea" type="text" placeholder="تسويق، خدمة عملاء، منتج…"></div>
+      <div class="f" style="flex:1 1 100%"><label>اشرحها بسطرين (اختياري)</label>
+        <input id="idBody" type="text" placeholder="ليش تستاهل نجربها؟"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="idAdd">شارك الفكرة</button></div>
+    </div>
+    <div class="addmsg" id="idMsg"></div>
+    <div class="flt" id="idFlt"></div>
+    <div id="idList"></div>
   </div>
 
   <!-- ===== اجتماعاتي ===== -->
@@ -1119,6 +1145,7 @@
       <button data-bk="upcoming" class="on">القادمة</button>
       <button data-bk="past">السابقة</button>
       <button data-bk="cancelled">الملغية</button>
+      <button data-bk="unpaid">بانتظار الدفع</button>
       <button data-bk="all">الكل</button>
     </div>
     <div id="bkList"></div>
@@ -1190,6 +1217,13 @@ const addCourseRegistration=httpsCallable(getFunctions(app,CONFIG.functionsRegio
 const getSessionFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSessionFeedback");
 const addTask=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addTask");
 const listTasks=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listTasks");
+const listMeetings=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listMeetings");
+const listIdeas=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listIdeas");
+const addIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addIdea");
+const updateIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateIdea");
+const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteIdea");
+const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
+const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
@@ -1367,7 +1401,7 @@ function inThisMonth(ms){ if(!ms)return false; const d=new Date(ms),n=new Date()
    the dashboard payload, so opening the dashboard does not cost a scan of
    every order in the account.
    ========================================= */
-let MT = null;
+let MT = null, ID = null, IDFLT = "";
 let PF = null, PFMONTH = "", BK = null, BKMONTH = "", TG = null, TK = null, FB = null,
     FBWHO = "all", BKMV = "open", BKKIND = "all", BKPERSON = "all";
 const kwd = (n) => fmt(Math.round((Number(n)||0)*1000)/1000) + " د.ك";
@@ -2407,6 +2441,7 @@ function render(){
   safe("subscribers", renderSubscribers);
   safe("live",        renderLive);
   safe("events",      renderRatings);
+  safe("bookrate",    renderBookRatings);
   safe("bookings",    renderBookings);
   safe("careers",     renderCareers);
   safe("sales",       renderSalesFix);
@@ -2504,10 +2539,21 @@ function renderHome(){
       <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span>${who}</span>
       <span class="pill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span></div>`;
   };
+  /* team meetings sit in the same card as client appointments — they answer
+     the same question ("what is next") — but carry their own pill so a meeting
+     with a bank is never mistaken for a paid consultation */
+  const mtRow=(m)=>{
+    const who=mtWhoLabel(m);
+    return `<div class="hmrow" data-mt="${esc(m.id)}"><span class="t" style="min-width:auto">${esc(bkWhen(new Date(m.startMs).toISOString()))}</span>
+      <span class="n"><b>${esc(m.title)}</b>${who?` <span>· مع ${esc(who)}</span>`:""}${m.place?` <span>· ${esc(m.place)}</span>`:""}</span>
+      <span class="pill" style="background:#614588">اجتماع</span></div>`;
+  };
+  const mtUp=(typeof mtNext==="function") ? mtNext(2) : [];
   $("#hmToday").innerHTML =
     (today.length ? today.map(b=>row(b,false)).join("") : `<div class="hmempty">ما في مواعيد اليوم.</div>`)
     + (next.length ? `<div class="hmsep">الجاي</div>` + next.map(b=>row(b,true)).join("")
-       : (today.length ? "" : `<div class="hmempty" style="padding-top:0">ولا مواعيد قادمة.</div>`));
+       : (today.length || mtUp.length ? "" : `<div class="hmempty" style="padding-top:0">ولا مواعيد قادمة.</div>`))
+    + (mtUp.length ? `<div class="hmsep">اجتماعات الفريق</div>` + mtUp.map(mtRow).join("") : "");
 
   $("#hmTasks").innerHTML = !TK ? `<div class="hmempty">جارٍ التحميل…</div>`
     : tasks.length ? tasks.slice(0,6).map(t=>`<div class="hmrow"><span class="n">${esc(t.text)}
@@ -2520,6 +2566,117 @@ function renderHome(){
     ? `<div class="hmnudge">💸 باقي ${fmt(nudge.owed.length)} شخص ما استلموا مستحقات ${esc(monthLabel(nudge.month))}، بمجموع ${kwd(nudge.total)}.
        <button type="button" class="go" data-go="books">افتح حسابات الشركة ←</button></div>` : "";
 }
+/* ---- أفكارنا ----
+   Everyone on the team writes; everyone reads the whole board. An idea only
+   its author can see is a suggestion box, and suggestion boxes go quiet. */
+async function loadIdeas(){
+  const box=$("#idList"); if(box) box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{ const r=await listIdeas({}); ID=r.data||null; renderIdeas(); }
+  catch(e){ if(box) box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+const ID_TONE={ "جديدة":"#614588", "قيد الدراسة":"#D3A146", "منفذة":"#2F8789", "مؤجلة":"#6B6577" };
+function renderIdeas(){
+  if(!ID || !$("#idList")) return;
+  const list=ID.list||[], st=ID.statuses||[];
+  const by={}; list.forEach(x=>{ by[x.status]=(by[x.status]||0)+1; });
+  $("#idFlt").innerHTML=`<button${IDFLT?"":' class="on"'} data-idf="">الكل · ${fmt(list.length)}</button>`+
+    st.map(k=>`<button${IDFLT===k?' class="on"':""} data-idf="${esc(k)}">${esc(k)} · ${fmt(by[k]||0)}</button>`).join("");
+  const rows=list.filter(x=>!IDFLT||x.status===IDFLT);
+  $("#idList").innerHTML = rows.length ? rows.map(x=>{
+    const mine=x.by===ID.me, may=ID.canDecide||mine;
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px">
+        <b>${esc(x.title)}</b>
+        <span class="pill" style="background:${ID_TONE[x.status]||"#614588"}">${esc(x.status)}</span>
+        ${x.area?`<span class="muted" style="font-size:12.5px">· ${esc(x.area)}</span>`:""}
+        <span class="muted" style="margin-inline-start:auto;font-size:12px">${esc(x.byName)} · ${esc(x.when?bkWhen(new Date(x.when).toISOString()):"")}</span>
+      </div>
+      ${x.body?`<div style="font-size:13.5px;line-height:1.85">${esc(x.body)}</div>`:""}
+      ${(x.notes||[]).map(n=>`<div class="muted" style="font-size:12.5px;line-height:1.7;margin-top:4px">${esc(n.byName)}: ${esc(n.note)}</div>`).join("")}
+      ${may?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
+        ${st.filter(k=>k!==x.status).map(k=>`<button class="pfbtn" data-idst="${esc(x.id)}" data-v="${esc(k)}" style="padding:4px 11px;font-size:12px">${esc(k)}</button>`).join("")}
+        <button class="pfbtn" data-idnote="${esc(x.id)}" style="padding:4px 11px;font-size:12px">علّق</button>
+        <button class="pfbtn" data-iddel="${esc(x.id)}" style="padding:4px 11px;font-size:12px">حذف</button>
+      </div>`:""}
+    </div>`;
+  }).join("") : `<div class="hmempty">ما في أفكار بهذي الحالة.</div>`;
+}
+$("#idAdd") && $("#idAdd").addEventListener("click", async ()=>{
+  const b=$("#idAdd"), m=$("#idMsg");
+  const title=($("#idTitle").value||"").trim();
+  if(title.length<3){ m.textContent="اكتب عنوان الفكرة"; m.className="addmsg bad"; return; }
+  b.disabled=true; m.textContent="لحظة…"; m.className="addmsg";
+  try{
+    await addIdea({ title, area:($("#idArea").value||"").trim(), body:($("#idBody").value||"").trim() });
+    ["idTitle","idArea","idBody"].forEach(k=>$("#"+k).value="");
+    m.textContent="انضافت فكرتك ✅ ووصلت للفريق 📩"; m.className="addmsg ok";
+    ID=null; await loadIdeas();
+  }catch(e){ m.textContent=(e&&e.message)||"تعذّر الحفظ"; m.className="addmsg bad"; }
+  finally{ b.disabled=false; }
+});
+document.addEventListener("click", async e=>{
+  const f=e.target.closest("#idFlt [data-idf]");
+  if(f){ IDFLT=f.dataset.idf; renderIdeas(); return; }
+  const st=e.target.closest("[data-idst]");
+  if(st){ try{ await updateIdea({id:st.dataset.idst,status:st.dataset.v}); ID=null; await loadIdeas(); }
+          catch(err){ alert((err&&err.message)||"تعذّر التغيير"); } return; }
+  const nt=e.target.closest("[data-idnote]");
+  if(nt){ const t=prompt("تعليقك على الفكرة:"); if(!t) return;
+          try{ await updateIdea({id:nt.dataset.idnote,note:t}); ID=null; await loadIdeas(); }
+          catch(err){ alert((err&&err.message)||"تعذّر الحفظ"); } return; }
+  const dl=e.target.closest("[data-iddel]");
+  if(dl){ if(!confirm("تحذف هذي الفكرة؟")) return;
+          try{ await deleteIdea({id:dl.dataset.iddel}); ID=null; await loadIdeas(); }
+          catch(err){ alert((err&&err.message)||"تعذّر الحذف"); } return; }
+});
+
+/* ---- تقييم الكتيّبات ----
+   Kept apart from تقييم الجلسات on purpose: the questions are different, so a
+   single average over both would be an average of two unlike things. */
+let BRBOOK="";
+const BOOK_LABEL={ dalil:"دليل الوفرة المالية", ahdafi:"أهدافي المالية", riyada:"كاش ريادة" };
+function renderBookRatings(){
+  const R=(DATA&&DATA.bookRatings)||null; if(!$("#brList")) return;
+  if(!R){ $("#brList").innerHTML=`<div class="hmempty">ما في تقييمات بعد.</div>`; return; }
+  const T=R.totals||{}, list=R.list||[];
+  const good=(T.byRating||{})["مفيد وممتاز"]||0;
+  $("#brKpis").innerHTML=[
+    ["التقييمات", fmt(T.count||0)],
+    ["مفيد وممتاز", `${fmt(good)}${T.count?` · ${Math.round(good*100/T.count)}%`:""}`],
+    ["يوصّون فيه", fmt(T.recommend||0)],
+    ["نقدر ننشره", fmt(T.publishable||0)],
+  ].map(([k,v])=>`<div class="kpi"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join("");
+
+  const by=T.byBook||{};
+  $("#brFlt").innerHTML=`<button${BRBOOK?"":' class="on"'} data-br="">الكل · ${fmt(T.count||0)}</button>`+
+    Object.keys(by).map(k=>`<button${BRBOOK===k?' class="on"':""} data-br="${esc(k)}">${esc(BOOK_LABEL[k]||k)} · ${fmt(by[k])}</button>`).join("");
+
+  const rows=list.filter(r=>!BRBOOK||r.productKey===BRBOOK);
+  const tone=(r)=>r==="مفيد وممتاز"?"#2F8789":r==="متوسط"?"#D3A146":"#962E37";
+  $("#brList").innerHTML = rows.length ? rows.map(r=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px">
+        <b>${esc(r.name)||"—"}</b>
+        <span class="pill" style="background:${tone(r.rating)}">${esc(r.rating)||"—"}</span>
+        <span class="muted" style="font-size:12.5px">${esc(BOOK_LABEL[r.productKey]||r.bookName||"")}</span>
+        ${r.applied?`<span class="muted" style="font-size:12.5px">· ${esc(r.applied)}</span>`:""}
+        ${r.recommend==="نعم"?`<span class="muted" style="font-size:12.5px">· يوصّي فيه</span>`:""}
+        ${r.publish&&r.publish!=="لا"?`<span class="pill" style="background:#614588">${esc(r.publish)}</span>`:""}
+        <span class="muted" style="margin-inline-start:auto;font-size:12px">${esc(r.when?bkWhen(new Date(r.when).toISOString()):"")}</span>
+      </div>
+      ${!r.arrived?`<div style="color:#962E37;font-size:13px">ما وصله بدون مشاكل${r.arrivedIssue?` · ${esc(r.arrivedIssue)}`:""}</div>`:""}
+      ${r.ratingReason?`<div style="font-size:13.5px;line-height:1.8">${esc(r.ratingReason)}</div>`:""}
+      ${r.mostUseful?`<div class="muted" style="font-size:13px;line-height:1.8">أكثر شي استفاد منه: ${esc(r.mostUseful)}</div>`:""}
+      ${r.wish?`<div class="muted" style="font-size:13px;line-height:1.8">يتمنى: ${esc(r.wish)}</div>`:""}
+      ${r.recommendWhy?`<div class="muted" style="font-size:13px;line-height:1.8">${esc(r.recommendWhy)}</div>`:""}
+      <div class="muted" style="font-size:12px;margin-top:4px">${esc(r.email||"")}</div>
+    </div>`).join("") : `<div class="hmempty">ما في تقييمات لهذا الكتيّب.</div>`;
+}
+document.addEventListener("click", e=>{
+  const b=e.target.closest("#brFlt [data-br]"); if(!b) return;
+  BRBOOK=b.dataset.br; renderBookRatings();
+});
+
 /* ---- اجتماعاتي ----
    The team's own diary. A client booking carries a package, a payment and a
    consultant; a meeting carries none of those and the other side is usually
@@ -2540,8 +2697,12 @@ function mtOwnerLabel(e){
 async function loadMeetings(){
   const box=$("#mtList"); if(box) box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
   try{
-    const r=await listMeetings({}); MT=r.data||null; renderMeetings(); paintBadges();
-    renderHome();
+    const r=await listMeetings({}); MT=r.data||null;
+    /* the badge refresher is syncTabs; the earlier name did not exist, so it
+       threw here — after MT was set but before the pickers were filled — and
+       the catch below hid the error in the list box. That is why the team
+       dropdown was empty with no visible reason. */
+    renderMeetings(); syncTabs(); renderHome();
   }catch(e){ if(box) box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 function renderMeetings(){
@@ -2802,7 +2963,11 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","tasks","meetings","target","profit"];
+const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit"];
+/* عبدالعزيز — his own work and the shared board, nothing else */
+const CONSULTANT_PANELS = ["home","bookings","composer","tasks","meetings","ideas"];
+/* عبدالرحمن — the reach sales has, minus the diary and every price */
+const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
@@ -2812,6 +2977,8 @@ const PANELS = [
     count:()=>{ const B=(DATA&&DATA.bookings)||{}; return hmTodayRows(B.list||[]).length; } },
   { id:"quiz",        group:"clients",icon:"📝", allowed:()=>true },
   { id:"feedback",    group:"clients",icon:"⭐", allowed:()=>true, load:()=>{ if(!FB) loadFeedback(); } },
+  { id:"bookrate",    group:"clients",icon:"📖", allowed:()=>true,
+    count:()=>((DATA&&DATA.bookRatings&&DATA.bookRatings.totals&&DATA.bookRatings.totals.count)||0) },
   { id:"events",      group:"events", icon:"🎟️", family:"meet", allowed:()=>gated("events") },
   { id:"live",        group:"events", icon:"🔴", family:"meet", allowed:()=>true },
   { id:"courses",     group:"events", icon:"🎓", allowed:()=>gated("courses") },
@@ -2821,6 +2988,7 @@ const PANELS = [
     count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
   { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
     count:()=>mtNext(2).length },
+  { id:"ideas",       group:"team",   icon:"💡", allowed:()=>true, load:()=>{ if(!ID) loadIdeas(); } },
   { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
@@ -2836,6 +3004,8 @@ function panelAvailable(k){
   const p=panelDef(k); if(!p || !panelEl(k)) return false;
   const role=(DATA&&DATA.role)||"";
   if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
+  if(role==="consultant" && CONSULTANT_PANELS.indexOf(k)===-1) return false;
+  if(role==="marketing" && MARKETING_PANELS.indexOf(k)===-1) return false;
   return !!p.allowed();
 }
 function showPanel(k){
@@ -3778,6 +3948,7 @@ function renderBookings(){
     `<div class="kpi"><div class="n">${fmt(t.upcoming||0)}</div><div class="l">مواعيد قادمة</div></div>`+
     `<div class="kpi"><div class="n">${fmt(t.past||0)}</div><div class="l">مواعيد سابقة</div></div>`+
     `<div class="kpi"><div class="n">${fmt(t.cancelled||0)}</div><div class="l">ملغية</div></div>`+
+    (t.awaiting?`<div class="kpi"><div class="n">${fmt(t.awaiting)}</div><div class="l">بانتظار الدفع${t.payExpired?` · ${fmt(t.payExpired)} انتهت مهلتهم`:""}</div></div>`:"")+
     (seesMoney()?`<div class="kpi"><div class="n">${fmt(t.revenue||0)} <span style="font-size:14px">د.ك</span></div><div class="l">إيراد الاستشارات</div></div>`:"");
 
   /* the same accents used on each consultant's public profile page */
@@ -3977,9 +4148,13 @@ $("#bkSave") && $("#bkSave").addEventListener("click",async()=>{
 function renderBkList(){
   const B=DATA.bookings||{}; const all=(B.list||[]).filter(bkOnDiary);
   const now=Date.now();
-  const rows = BKFILTER==="all" ? all
-    : BKFILTER==="upcoming" ? all.filter(x=>x.status!=="cancelled"&&x.startMs>=now)
-    : BKFILTER==="past"     ? all.filter(x=>x.status!=="cancelled"&&x.startMs<now)
+  /* An unpaid checkout is a person who tried to book and did not finish, so it
+     belongs on its own list rather than mixed into the diary — otherwise the
+     day looks fuller than it is. */
+  const rows = BKFILTER==="all"    ? all
+    : BKFILTER==="unpaid"   ? all.filter(x=>x.status==="pending")
+    : BKFILTER==="upcoming" ? all.filter(x=>x.status!=="cancelled"&&x.status!=="pending"&&x.startMs>=now)
+    : BKFILTER==="past"     ? all.filter(x=>x.status!=="cancelled"&&x.status!=="pending"&&x.startMs<now)
     : all.filter(x=>x.status==="cancelled");
   const box=$("#bkList");
   if(!rows.length){ box.innerHTML='<div class="empty">ما في مواعيد بهذي القائمة.</div>'; return; }
@@ -3999,6 +4174,8 @@ function renderBkList(){
         ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
         ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
         ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
+        ${b.status==="pending"&&!b.payExpired?'<span class="bkpill" style="background:#D3A146">بانتظار الدفع</span>':""}
+        ${b.status==="pending"&&b.payExpired?'<span class="bkpill" style="background:#962E37">انتهت مهلة الدفع</span>':""}
         <span class="num">${esc(b.email)}</span>
         ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(b.phone)}</a>`:""}
         ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}

@@ -126,8 +126,12 @@
         <div class="f"><label>الحالة الوظيفية</label>
           <select id="f_job"><option value="">—</option><option>موظف حكومي</option><option>موظف قطاع خاص</option>
             <option>أعمال حرة</option><option>متقاعد</option><option>عاطل عن العمل</option>
-            <option>طالب</option><option>ربة منزل</option></select>
+            <option>طالب</option><option>ربة منزل</option><option>أخرى</option></select>
         </div>
+        <!-- only asked once «أخرى» is chosen; it saves like any other f_ field,
+             so it prints and reloads with the rest of the report -->
+        <div class="f" id="jobOtherWrap" style="display:none"><label>اذكرها</label>
+          <input type="text" id="f_jobOther" placeholder="اكتب الحالة الوظيفية"></div>
         <div class="f"><label>عدد الأبناء</label><input type="number" id="f_kids" placeholder="0" min="0"></div>
         <div class="f"><label>دخل إضافي <em>· اختياري · د.ك</em></label><input type="number" id="f_otherIncome" placeholder="0" min="0"></div>
       </div>
@@ -496,6 +500,24 @@ function recalc() {
 }
 
 /* ---------------- لقطة واسترجاع ---------------- */
+/* the free-text box follows the picker, and is cleared when it is not in use
+   so a stale answer never prints under a different choice */
+(function () {
+  var sel = document.getElementById('f_job');
+  var wrap = document.getElementById('jobOtherWrap');
+  var box = document.getElementById('f_jobOther');
+  if (!sel || !wrap) return;
+  function sync() {
+    var on = sel.value === 'أخرى';
+    wrap.style.display = on ? '' : 'none';
+    if (!on && box) box.value = '';
+  }
+  sel.addEventListener('change', sync);
+  /* also on load, so reopening a saved report shows the box already filled */
+  document.addEventListener('DOMContentLoaded', sync);
+  sync();
+})();
+
 function statics() {
   var out = {};
   document.querySelectorAll('#doc [id^="f_"]').forEach(function (el) { out[el.id] = el.value; });

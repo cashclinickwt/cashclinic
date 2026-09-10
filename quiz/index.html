@@ -330,6 +330,7 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
         <input id="g-phone" type="tel" placeholder="9xxxxxxx" inputmode="tel"/>
       </div>
       <div class="err">دخل رقم صحيح</div></div>
+    <div id="g-err" style="display:none;color:#962E37;font-size:13.5px;font-weight:700;margin:0 0 10px;line-height:1.7"></div>
     <button class="btn teal" id="g-btn" onclick="submitGate()">شوف نتيجتي</button>
     <div class="note">🔒 معلوماتك محفوظة وما تنشر لأي جهة.</div>
   </div>
@@ -690,8 +691,24 @@ async function submitGate(){
     const lead={ name:name.trim(), email:email.trim().toLowerCase(), phone:_fullPhone, priority:_priority, notes:_notes,
     source:QUIZ_SOURCE, score:LAST_SCORE?LAST_SCORE.overall:null, createdAt:new Date().toISOString(), ...extra };
   let leadId=null;
-  try{ if(db){ const ref=await db.collection("leads").add({...lead, ts:firebase.firestore.FieldValue.serverTimestamp()}); leadId=ref.id; } }
-  catch(e){ console.warn("lead save",e); }
+  /* Saved through the server, not written from the browser. The direct write
+     was refused silently — the visitor saw their result and we recorded
+     nothing — which is how Cash Riyada went quiet from 10 August while Cash
+     Nas carried on. If this fails now it says so instead of vanishing. */
+  try{
+    if(fns){
+      const _r = await fns.httpsCallable("saveLead")(lead);
+      leadId = (_r && _r.data && _r.data.leadId) || null;
+    }
+  }catch(e){
+    console.error("lead save failed", e);
+    try{ const _b=document.getElementById("g-err");
+      if(_b){ _b.textContent="تعذّر حفظ بياناتك، حاول مرة ثانية"; _b.style.display="block"; }
+    }catch(_){}
+    const _btn=document.getElementById("g-btn");
+    if(_btn){ _btn.disabled=false; _btn.textContent="شوف نتيجتي"; }
+    return;   /* never show a result we failed to record */
+  }
   /* email the result to the customer (fire-and-forget: never blocks showing the result) */
   try{
     if(fns && leadId){
