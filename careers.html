@@ -26,6 +26,14 @@
   .jb-card{background:var(--cc-white);border:1px solid var(--cc-grey-200);border-radius:24px;padding:30px 26px;box-shadow:0 18px 50px rgba(47,23,72,.10)}
   .jb-card h2{font-size:19px;font-weight:700;color:var(--cc-purple);margin:0 0 6px}
   .jb-card .hint{font-size:14.5px;color:var(--cc-grey-700);line-height:1.85;margin:0 0 20px}
+  .jb-closed{text-align:center;padding:26px 8px 12px}
+  .jb-closed .ic{font-size:42px;display:block;margin-bottom:14px}
+  .jb-closed h2{font-size:21px;font-weight:700;color:var(--cc-purple);margin:0 0 12px}
+  .jb-closed p{font-size:15px;color:var(--cc-grey-700);line-height:1.9;margin:0 auto 22px;max-width:460px}
+  /* styled here rather than relying on cc-btn, which this page does not load */
+  .jb-closed a{display:inline-block;background:var(--cc-purple);color:var(--cc-white);
+    border-radius:999px;padding:12px 30px;font-size:15px;font-weight:700;text-decoration:none}
+  .jb-closed a:hover{background:var(--cc-purple-700)}
 
   .roles{display:grid;gap:10px;margin-bottom:24px}
   .roles label{cursor:pointer}
@@ -82,14 +90,26 @@
   <div class="cc-wrap">
     <span class="jb-badge">التوظيف</span>
     <h1>انضم لفريق كاش كلينك</h1>
-    <p>نبني عيادة الصحة المالية الأولى بالكويت، وندوّر على ناس يحبون الشغل المتقن. إذا شفت نفسك بوحدة من الوظائف تحت، رسّل لنا سيرتك.</p>
+    <p>نبني عيادة الصحة المالية الأولى بالكويت، وندوّر على ناس يحبون الشغل المتقن.</p>
   </div>
   <img class="mark" src="brand/mark/mark-cream.png" alt="">
 </section>
 
 <div class="jb-wrap">
   <div class="jb-card">
-    <div id="jbForm">
+    <!-- Hiring is closed. The form is not merely hidden: it is not on the
+         page at all, so there is nothing to fill in, nothing to submit, and
+         no half-finished application sitting in somebody's browser. The
+         server refuses every role as well. -->
+    <div id="jbClosed">
+      <div class="jb-closed">
+        <span class="ic">🌱</span>
+        <h2>تم الاكتفاء من التوظيف بالوقت الحالي</h2>
+        <p>شكرا لكل من رسّل لنا سيرته .. كل الطلبات اللي وصلتنا محفوظة عندنا وبنرجع لها أول ما نفتح شواغر جديدة.</p>
+        <a href="index.html">رجوع للرئيسية</a>
+      </div>
+    </div>
+    <div id="jbForm" hidden style="display:none">
       <h2>الوظيفة اللي تناسبك</h2>
       <p class="hint">اختر وحدة، وعبّي بياناتك تحت.</p>
       <div class="roles">
