@@ -2964,8 +2964,9 @@ function gsOpen(r){
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
 const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit"];
-/* عبدالعزيز — his own work and the shared board, nothing else */
-const CONSULTANT_PANELS = ["home","bookings","composer","tasks","meetings","ideas"];
+/* عبدالعزيز — his own work, writing to the list, and the shared board.
+   No diary: he takes no bookings. */
+const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
 const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
@@ -3561,7 +3562,11 @@ function clMatches(c){
 function renderClients(){
   const sec=$("#clientsSec"); if(!sec) return;
   const all=DATA.clients||[];
-  if(!all.length && DATA.role!=="all" && DATA.role!=="sales"){ sec.hidden=true; return; }
+  /* The tab is hidden only from roles that are never given the client index
+     at all. Marketing is given it, so an empty list must read as «no clients
+     yet» rather than making the tab disappear on a quiet day. */
+  const MAY_SEE_CLIENTS = ["all","sales","marketing"];
+  if(!all.length && MAY_SEE_CLIENTS.indexOf(DATA.role)===-1){ sec.hidden=true; return; }
   sec.hidden=false;
 
   const paid=all.filter(c=>c.spent>0);
@@ -5176,7 +5181,10 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
   finally{ $("#cmpSend").disabled=false; }
 });
 
-const GROUP_COLOR={ "مشروع جديد":"#2F8789", "مشروع منزلي":"#505632", "مشروع صغير أو متوسط":"#962E37" };
+/* the last entry is what leads recorded before صغير and متوسط were split;
+   kept so older rows still render with a colour rather than falling to grey */
+const GROUP_COLOR={ "مشروع جديد":"#2F8789", "مشروع منزلي":"#505632",
+  "مشروع صغير":"#D3A146", "مشروع متوسط":"#962E37", "مشروع صغير أو متوسط":"#6B6577" };
 let GFILTER="all", QZQ="";
 
 /* search across whatever this member of staff is actually allowed to see:
