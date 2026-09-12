@@ -1252,6 +1252,8 @@ const addBookingNote=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"add
 const setSubscriptionStart=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setSubscriptionStart");
 const addManualBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualBooking");
 const cancelBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelBooking");
+const bookingToVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"bookingToVoucher");
+const extendVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"extendVoucher");
 const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setBookingLive");
 const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
@@ -1285,6 +1287,13 @@ function bkIsMonthly(b){
 
 /* A subscription sold in one month may not start until the next, so the
    window is stated rather than assumed from the booking date. */
+/* a voucher's end date, written the way the rest of the diary writes dates */
+function vchUntil(ms){
+  if(!ms) return "";
+  const d=new Date(Number(ms));
+  return (Number(ms)<Date.now()?"انتهت ":"تنتهي ")+
+    d.toLocaleDateString("ar-KW",{day:"numeric",month:"short",year:"numeric"});
+}
 function bkSubLine(b){
   if(!bkIsMonthly(b)) return "";
   if(!b.subStart) return `<div class="bknote" style="background:#FFF6E2;border-color:#E8D6A8">
@@ -1340,7 +1349,7 @@ onAuthStateChanged(auth, async (user)=>{
     const r=await getDashboard(); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
     var _rl=DATA.role;
-    if(_rl==="riyada"||_rl==="all") $("#rptRiyada").hidden=false;
+    if(_rl==="riyada"||_rl==="riyada_c"||_rl==="all") $("#rptRiyada").hidden=false;
     if(_rl==="personal"||_rl==="all") $("#rptNas").hidden=false;
     /* Cash Nas reports live on this site now, behind the same staff login */
     if(_rl==="personal"||_rl==="all") $("#rptNasReports").hidden=false;
@@ -3064,6 +3073,8 @@ function panelAvailable(k){
   if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
   if(role==="consultant" && CONSULTANT_PANELS.indexOf(k)===-1) return false;
   if(role==="marketing" && MARKETING_PANELS.indexOf(k)===-1) return false;
+  /* إسماعيل works كاش ريادة like حسن, but sells no booklet — so no sales tab */
+  if(role==="riyada_c" && k==="sales") return false;
   return !!p.allowed();
 }
 function showPanel(k){
@@ -3423,7 +3434,13 @@ function nbAll(){ return (DATA.nasPackages||[]).concat(DATA.riyadaPackages||[]);
 
 /* which clinic a consultant belongs to — حسن runs Cash Riyada, the rest
    run Cash Nas */
-function nbClinicOf(id){ return id==="hasan" ? "riyada" : "nas"; }
+/* read from the consultant record the server sends, not from a hardcoded
+   name — otherwise every new كاش ريادة consultant is filed under كاش ناس */
+function nbClinicOf(id){
+  const c=(((DATA||{}).bookings||{}).consultants||[]).find(x=>x.id===id);
+  if(c && c.clinic) return String(c.clinic).indexOf("ريادة")!==-1 ? "riyada" : "nas";
+  return id==="hasan" ? "riyada" : "nas";      // fallback for an older payload
+}
 
 /* The box follows whoever is picked at the top of the tab: حسن sells the
    Riyada packages, غالية and سارة sell the Cash Nas ones. A package from
@@ -4233,11 +4250,14 @@ function renderBkList(){
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
         ${b.paymentMethod==="deema"?'<span class="bkpill" style="background:#962E37">ديمة</span>':""}
         ${b.paymentMethod==="cash"?'<span class="bkpill" style="background:#505632">مدفوع مسبقاً</span>':""}
+        ${b.paymentMethod==="online"&&b.status==="paid"?'<span class="bkpill" style="background:#2F8789">مدفوع أونلاين</span>':""}
+        ${b.voucher?`<span class="bkpill" style="background:#614588">قسيمة ${esc(b.voucher.code)}</span>`:""}
         ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
         ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
         ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
         ${b.status==="pending"&&!b.payExpired?'<span class="bkpill" style="background:#D3A146">بانتظار الدفع</span>':""}
         ${b.status==="pending"&&b.payExpired?'<span class="bkpill" style="background:#962E37">انتهت مهلة الدفع</span>':""}
+        ${b.voucher?`<span class="bkpill" style="background:#614588">قسيمة ${esc(b.voucher.code)} · ${esc(vchUntil(b.voucher.until))}</span>`:""}
         <span class="num">${esc(b.email)}</span>
         ${wa?`<a class="num" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener" style="color:#128C4A">${esc(b.phone)}</a>`:""}
         ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}
@@ -4245,8 +4265,10 @@ function renderBkList(){
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
       ${bkSubLine(b)}
       ${bkNotesBlock(b)}
+      ${b.voucher?`<div class="bkacts"><button data-vext="${esc(b.id)}">مدّد القسيمة</button></div>`:""}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
         <button data-note="${esc(b.id)}">أضف ملاحظة</button>
         ${bkIsMonthly(b)&&mayEdit()?`<button data-sub="${esc(b.id)}">${b.subStart?"عدّل تاريخ البداية":"حدّد تاريخ البداية"}</button>`:""}
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
@@ -4393,6 +4415,33 @@ async function bkRowAction(e){
   if(ed){ const row=(DATA.bookings.list||[]).find(x=>x.id===ed.dataset.edit); if(row) bkEditOpen(row); return; }
   const sc=e.target.closest("button[data-second]");
   if(sc){ const row=(DATA.bookings.list||[]).find(x=>x.id===sc.dataset.second); if(row) bkAddSecond(row); return; }
+  const vch=e.target.closest("button[data-vch]");
+  if(vch){
+    const m=prompt("القسيمة صالحة كم شهر؟","3");
+    if(m===null) return;
+    const months=Math.max(1,Math.min(24,Number(m)||3));
+    if(!confirm(`تحوّل الحجز لقسيمة صالحة ${months} شهر؟\nالموعد بيرجع متاح لعميل ثاني، والفلوس تبقى عندنا.`)) return;
+    vch.disabled=true;
+    try{
+      const r=await bookingToVoucher({orderId:vch.dataset.vch,months});
+      const d=(r&&r.data)||{};
+      await refreshSections(["bookings"]); renderBookings();
+      bkMsg(`صارت قسيمة ${d.code} — ${vchUntil(d.until)}. الموعد رجع متاح.`,true);
+    }catch(err){ bkMsg((err&&err.message)||"تعذّر التحويل",false); vch.disabled=false; }
+    return;
+  }
+  const vex=e.target.closest("button[data-vext]");
+  if(vex){
+    const m=prompt("تمدّد القسيمة كم شهر إضافي؟","3");
+    if(m===null) return;
+    vex.disabled=true;
+    try{
+      const r=await extendVoucher({orderId:vex.dataset.vext,months:Math.max(1,Math.min(24,Number(m)||3))});
+      await refreshSections(["bookings"]); renderBookings();
+      bkMsg("تمددت القسيمة — "+vchUntil(((r&&r.data)||{}).until),true);
+    }catch(err){ bkMsg((err&&err.message)||"تعذّر التمديد",false); vex.disabled=false; }
+    return;
+  }
   const b=e.target.closest("button[data-cx]"); if(!b) return;
   if(!confirm("متأكد تبي تلغي هذا الموعد؟ الوقت بيرجع متاح للحجز.")) return;
   b.disabled=true;
