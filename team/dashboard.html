@@ -678,8 +678,17 @@
         <input id="idTitle" type="text" placeholder="عنوان قصير للفكرة"></div>
       <div class="f"><label>المجال</label>
         <input id="idArea" type="text" placeholder="تسويق، خدمة عملاء، منتج…"></div>
-      <div class="f" style="flex:1 1 100%"><label>اشرحها بسطرين (اختياري)</label>
-        <input id="idBody" type="text" placeholder="ليش تستاهل نجربها؟"></div>
+      <div class="f" style="flex:1 1 100%"><label>اشرح فكرتك</label>
+        <textarea id="idBody" rows="7" placeholder="شنو الفكرة بالضبط؟ ليش تستاهل نجربها؟ شنو اللي تحتاجه عشان تمشي؟"
+          style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;
+                 font:inherit;font-size:14px;line-height:1.9;resize:vertical;min-height:150px"></textarea>
+        <div class="muted" style="font-size:12px;margin-top:4px" id="idCount">0 حرف</div></div>
+      <div class="f" style="flex:1 1 220px"><label>تذكر أحد من الفريق؟</label>
+        <select id="idWho" multiple size="4" style="width:100%"></select>
+        <div class="muted" style="font-size:12px;margin-top:4px">اضغط Ctrl أو Cmd لاختيار أكثر من واحد · بيوصلهم إيميل</div></div>
+      <div class="f" style="flex:1 1 220px"><label>مرفقات (اختياري)</label>
+        <input id="idFiles" type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,text/plain">
+        <div class="muted" style="font-size:12px;margin-top:4px">حتى 4 ملفات · 5 ميجا للملف</div></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="idAdd">شارك الفكرة</button></div>
     </div>
     <div class="addmsg" id="idMsg"></div>
@@ -1222,6 +1231,7 @@ const listIdeas=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listIdea
 const addIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addIdea");
 const updateIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateIdea");
 const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteIdea");
+const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIdeaFile");
 const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
 const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -2578,6 +2588,11 @@ const ID_TONE={ "جديدة":"#614588", "قيد الدراسة":"#D3A146", "من
 function renderIdeas(){
   if(!ID || !$("#idList")) return;
   const list=ID.list||[], st=ID.statuses||[];
+  const who=$("#idWho");
+  if(who && !who.options.length){
+    who.innerHTML=(ID.people||[]).filter(p=>p.email!==ID.me)
+      .map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+  }
   const by={}; list.forEach(x=>{ by[x.status]=(by[x.status]||0)+1; });
   $("#idFlt").innerHTML=`<button${IDFLT?"":' class="on"'} data-idf="">الكل · ${fmt(list.length)}</button>`+
     st.map(k=>`<button${IDFLT===k?' class="on"':""} data-idf="${esc(k)}">${esc(k)} · ${fmt(by[k]||0)}</button>`).join("");
@@ -2591,7 +2606,12 @@ function renderIdeas(){
         ${x.area?`<span class="muted" style="font-size:12.5px">· ${esc(x.area)}</span>`:""}
         <span class="muted" style="margin-inline-start:auto;font-size:12px">${esc(x.byName)} · ${esc(x.when?bkWhen(new Date(x.when).toISOString()):"")}</span>
       </div>
-      ${x.body?`<div style="font-size:13.5px;line-height:1.85">${esc(x.body)}</div>`:""}
+      ${x.body?`<div style="font-size:13.5px;line-height:1.9;white-space:pre-wrap">${esc(x.body)}</div>`:""}
+      ${(x.mentionNames||[]).length?`<div class="muted" style="font-size:12.5px;margin-top:6px">ذكر: ${(x.mentionNames||[]).map(esc).join("، ")}</div>`:""}
+      ${(x.files||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+        ${(x.files||[]).map((f,i)=>`<button class="pfbtn" data-idfile="${esc(x.id)}" data-i="${i}"
+          style="padding:4px 11px;font-size:12px">📎 ${esc(f.name||"ملف")}</button>`).join("")}
+      </div>`:""}
       ${(x.notes||[]).map(n=>`<div class="muted" style="font-size:12.5px;line-height:1.7;margin-top:4px">${esc(n.byName)}: ${esc(n.note)}</div>`).join("")}
       ${may?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
         ${st.filter(k=>k!==x.status).map(k=>`<button class="pfbtn" data-idst="${esc(x.id)}" data-v="${esc(k)}" style="padding:4px 11px;font-size:12px">${esc(k)}</button>`).join("")}
@@ -2607,14 +2627,51 @@ $("#idAdd") && $("#idAdd").addEventListener("click", async ()=>{
   if(title.length<3){ m.textContent="اكتب عنوان الفكرة"; m.className="addmsg bad"; return; }
   b.disabled=true; m.textContent="لحظة…"; m.className="addmsg";
   try{
-    await addIdea({ title, area:($("#idArea").value||"").trim(), body:($("#idBody").value||"").trim() });
+    /* files are read here and sent with the idea, so one call either saves
+       everything or saves nothing — no idea left pointing at a missing file */
+    const picked=Array.from(($("#idFiles")||{}).files||[]).slice(0,4);
+    const files=[];
+    for(const f of picked){
+      if(f.size>5*1024*1024){ throw new Error(`«${f.name}» أكبر من 5 ميجا`); }
+      const b64=await new Promise((res,rej)=>{ const r=new FileReader();
+        r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=()=>rej(new Error("تعذّر قراءة الملف"));
+        r.readAsDataURL(f); });
+      files.push({ name:f.name, type:f.type, base64:b64 });
+    }
+    const mentions=Array.from(($("#idWho")||{}).selectedOptions||[]).map(o=>o.value).filter(Boolean);
+    await addIdea({ title, area:($("#idArea").value||"").trim(),
+      body:($("#idBody").value||"").trim(), mentions, files });
     ["idTitle","idArea","idBody"].forEach(k=>$("#"+k).value="");
+    if($("#idFiles")) $("#idFiles").value="";
+    if($("#idWho")) Array.from($("#idWho").options).forEach(o=>o.selected=false);
+    if($("#idCount")) $("#idCount").textContent="0 حرف";
     m.textContent="انضافت فكرتك ✅ ووصلت للفريق 📩"; m.className="addmsg ok";
     ID=null; await loadIdeas();
   }catch(e){ m.textContent=(e&&e.message)||"تعذّر الحفظ"; m.className="addmsg bad"; }
   finally{ b.disabled=false; }
 });
+/* a live count, so nobody wonders whether a long idea is still being kept */
+$("#idBody") && $("#idBody").addEventListener("input", ()=>{
+  const n=($("#idBody").value||"").length;
+  if($("#idCount")) $("#idCount").textContent=`${fmt(n)} حرف${n>20000?" · الحد 20,000":""}`;
+});
 document.addEventListener("click", async e=>{
+  const fl=e.target.closest("[data-idfile]");
+  if(fl){
+    const btn=fl, was=btn.textContent; btn.disabled=true; btn.textContent="جارٍ التحميل…";
+    try{
+      const r=await getIdeaFile({id:fl.dataset.idfile,index:Number(fl.dataset.i)||0});
+      const d=(r&&r.data)||{};
+      const bin=atob(d.base64||""); const arr=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      const url=URL.createObjectURL(new Blob([arr],{type:d.type||"application/octet-stream"}));
+      const a=document.createElement("a"); a.href=url; a.download=d.name||"file";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+    }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
+    finally{ btn.disabled=false; btn.textContent=was; }
+    return;
+  }
   const f=e.target.closest("#idFlt [data-idf]");
   if(f){ IDFLT=f.dataset.idf; renderIdeas(); return; }
   const st=e.target.closest("[data-idst]");
