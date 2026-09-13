@@ -1273,6 +1273,16 @@ const updateStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),
 const listNewsletters=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listNewsletters");
 const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastNewsletter");
 const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
+/* The whole draft feature was calling these three without ever wiring them,
+   so «أرسل الرسالة» died on «saveCampaignDraft is not defined» and the draft
+   list silently swallowed its own error. */
+const saveCampaignDraft=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveCampaignDraft");
+const listCampaignDrafts=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listCampaignDrafts");
+const deleteCampaignDraft=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteCampaignDraft");
+/* Same omission, two more places: marking course attendance and moving a job
+   application along both called a callable that was never created. */
+const setCourseAttendance=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCourseAttendance");
+const setApplicationStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setApplicationStatus");
 
 const $=s=>document.querySelector(s);
 const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة",sales:"فريق المبيعات"};
