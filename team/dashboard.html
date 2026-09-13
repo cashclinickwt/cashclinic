@@ -1059,7 +1059,7 @@
           </select></div>
         <div class="addf"><label>التاريخ</label><input id="nbDate" type="date"></div>
         <div class="addf"><label>الوقت</label><select id="nbTime" class="timesel" data-step="15"></select></div>
-        <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
         <div class="addf"><label>اسم العميل</label><input id="nbName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل</label><input id="nbEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
         <div class="addf"><label>الجوال</label><input id="nbPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
@@ -1122,7 +1122,7 @@
           <div class="bkf"><label>التاريخ</label><input id="exDate" type="date"></div>
           <div class="bkf"><label>الساعة</label><select id="exTime" class="timesel" data-step="30"></select></div>
         </div>
-        <div class="bkf"><label>الطريقة</label><select id="exMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <div class="bkf"><label>الطريقة</label><select id="exMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
         <button class="bkday" id="exAdd" type="button" style="border-color:var(--auber);color:var(--auber)">أضف الموعد</button>
         <div class="bkchips" id="exList" style="margin-top:10px"></div>
       </div>
@@ -1507,7 +1507,7 @@ function renderFeedback(){
             <span class="pfrule" style="margin-inline-start:auto">${esc(dt(r.when))}</span>
           </div>
           <div style="font-size:14px"><b>${esc(r.name)||"—"}</b>
-            <span class="pfrule"> · ${esc(r.packageName)||"جلسة"}${r.consultant?" · "+esc(r.consultant):""}${r.mode?" · "+(r.mode==="present"?"حضوري":"أونلاين"):""}</span></div>
+            <span class="pfrule"> · ${esc(r.packageName)||"جلسة"}${r.consultant?" · "+esc(r.consultant):""}${r.mode?" · "+modeAr(r.mode):""}</span></div>
           ${r.learned?`<div class="bknoteitem" style="margin-top:8px"><span class="w">شنو تعلم</span><div>${esc(r.learned)}</div></div>`:""}
           ${r.improve?`<div class="bknoteitem" style="margin-top:6px"><span class="w">شنو نحسّن</span><div>${esc(r.improve)}</div></div>`:""}
           ${r.notes?`<div class="bknoteitem" style="margin-top:6px"><span class="w">ملاحظات</span><div>${esc(r.notes)}</div></div>`:""}
@@ -1944,7 +1944,7 @@ function renderBooks(){
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}${
-            l.mode?` · ${l.mode==="present"?"حضوري":"أونلاين"}`:""}</div></td>
+            l.mode?` · ${modeAr(l.mode)}`:""}</div></td>
         <td class="num">${kwd(l.amount)}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}
           ${canEdit?`<div><button class="pfbtn" style="padding:3px 9px;font-size:11.5px;margin-top:4px"
@@ -2556,7 +2556,7 @@ function renderHome(){
     const when = withDay ? bkWhen(b.startIso) : `${bkPad2(p.hh)}:${bkPad2(p.mm)}`;
     return `<div class="hmrow" data-bk="${esc(b.id)}"><span class="t"${withDay?' style="min-width:auto"':""}>${esc(when)}</span>
       <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span>${who}</span>
-      <span class="pill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span></div>`;
+      <span class="pill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span></div>`;
   };
   /* team meetings sit in the same card as client appointments — they answer
      the same question ("what is next") — but carry their own pill so a meeting
@@ -3073,8 +3073,9 @@ function panelAvailable(k){
   if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
   if(role==="consultant" && CONSULTANT_PANELS.indexOf(k)===-1) return false;
   if(role==="marketing" && MARKETING_PANELS.indexOf(k)===-1) return false;
-  /* إسماعيل works كاش ريادة like حسن, but sells no booklet — so no sales tab */
-  if(role==="riyada_c" && k==="sales") return false;
+  /* إسماعيل works كاش ريادة like حسن, but sells no booklet, does not run the
+     broadcast and does not read job applications */
+  if(role==="riyada_c" && ["sales","live","careers"].indexOf(k)!==-1) return false;
   return !!p.allowed();
 }
 function showPanel(k){
@@ -3464,16 +3465,13 @@ function renderNasBooking(){
   const cl=$("#nbClinic");
   if(cl) cl.textContent = nbClinicOf(BKWHO||"ghalia")==="riyada" ? "· كاش ريادة" : "· كاش ناس";
 
-  /* Sales put appointments in the diary; they do not price them and they do
-     not decide anything is paid. The server applies the package price and
-     always issues a payment link, so these controls would only be misleading. */
+  /* Sales do not price a booking — the server applies the package price — so
+     the amount stays hidden. How it was paid is a different question: نورة
+     takes ديمة payments over WhatsApp, and with no way to say so the booking
+     was saved with no payment method at all, showed nothing beside the name,
+     and never reached the company books. */
   const money = seesMoney();
   const aw=$("#nbAmountWrap"); if(aw) aw.hidden = !money;
-  const pw=$("#nbPayWrap");    if(pw) pw.hidden = !money;
-  if(!money){
-    const link=document.querySelector('input[name="nbPay"][value="link"]');
-    if(link) link.checked = true;
-  }
   const sel=$("#nbPkg");
   if(!sel) return;
   /* switching consultant swaps the whole list, and the count alone can
@@ -3996,6 +3994,11 @@ function bkParts(iso){
   const k=new Date(Date.parse(iso)+KWOFF*60000);
   return {y:k.getUTCFullYear(),m:k.getUTCMonth(),d:k.getUTCDate(),w:k.getUTCDay(),hh:k.getUTCHours(),mm:k.getUTCMinutes()};
 }
+/* a session can be أونلاين, حضوري, or a مكالمة we place — one place to say
+   so, rather than a ternary in every row that renders a booking */
+const MODE_AR={online:"أونلاين",present:"حضوري",call:"مكالمة"};
+const modeAr=(m)=>MODE_AR[m]||MODE_AR.online;
+
 function bkWhen(iso){
   if(!iso) return "—";
   /* 24-hour clock: staff read these next to the schedule fields, which are
@@ -4133,7 +4136,7 @@ function paintSchedule(){
     return `<span class="bkchip">${esc(label)}${days}<button type="button" data-blkrun="${esc(r.dates.join(","))}">×</button></span>`;
   }).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
   $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
-    `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${x.mode==="present"?"حضوري":"أونلاين"}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
+    `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${modeAr(x.mode)}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
   renderBkCal();
   syncSchedulePerms();
 }
@@ -4245,7 +4248,7 @@ function renderBkList(){
       <div class="bkwhen">${bkWhen(b.startIso)}</div>
       <div class="bkh">
         <b>${esc(b.name)||"—"}</b>
-        <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
+        <span class="bkpill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span>
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
         ${b.paymentMethod==="deema"?'<span class="bkpill" style="background:#962E37">ديمة</span>':""}
@@ -4335,6 +4338,8 @@ function bkEditOpen(b){
   $("#beEmail").value=b.email||"";
   $("#bePhone").value=b.phone||"";
   $("#beAmount").value=b.amount||0;
+  if($("#bePay"))  $("#bePay").value  = b.paymentMethod || "online";
+  if($("#bePaid")) $("#bePaid").checked = b.status==="paid";
   $("#beNotes").value=b.notes||"";
   if($("#beNotify")) $("#beNotify").checked=true;
   $("#beMsg").className="addmsg"; $("#beMsg").textContent="";
@@ -4357,6 +4362,8 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
       startIso: (dt&&tm) ? nbIso(dt,tm) : undefined,
       name, email, phone:$("#bePhone").value.trim(),
       amount:$("#beAmount").value, notes:$("#beNotes").value.trim(),
+      paymentMethod: $("#bePay") ? $("#bePay").value : undefined,
+      paid: $("#bePaid") ? $("#bePaid").checked : undefined,
       notify: !$("#beNotify") || $("#beNotify").checked
     });
     bkEditClose();
@@ -4605,7 +4612,7 @@ function renderBkCalDay(){
 
   const slots = open.length
     ? `<div class="bkcal-slots">`+open.map(s=>{
-        const lbl=s.modes.map(m=>m==="present"?"حضوري":"أونلاين").join(" · ");
+        const lbl=s.modes.map(modeAr).join(" · ");
         return `<button type="button" class="bkcal-slot" data-slot="${esc(s.time)}" data-mode="${esc(s.modes[0])}">`
              + `${esc(s.time)}<small>${esc(lbl)}</small></button>`;
       }).join("")+`</div>` : "";
@@ -4618,7 +4625,7 @@ function renderBkCalDay(){
       <div class="bkwhen">${bkPad2(pt.hh)}:${bkPad2(pt.mm)}<span style="font-size:12.5px;font-weight:400;color:var(--muted)"> · ${Number(b.minutes)||60} دقيقة</span></div>
       <div class="bkh">
         <b>${esc(b.name)||"—"}</b>
-        <span class="bkpill" style="background:${b.mode==="present"?"#614588":"#2F8789"}">${b.mode==="present"?"حضوري":"أونلاين"}</span>
+        <span class="bkpill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span>
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
         ${(b.withNames&&b.withNames.length)?`<span class="bkpill" style="background:#962E37">مع ${esc(b.withNames.join(" + "))}</span>`:""}
@@ -5383,13 +5390,24 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
           <option value="hasan">حسن أكبر</option>
         </select></div>
       <div class="addf"><label>الطريقة</label>
-        <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option></select></div>
+        <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
       <div class="addf"><label>التاريخ</label><input id="beDate" type="date"></div>
       <div class="addf"><label>الوقت</label><select id="beTime" class="timesel" data-step="15"></select></div>
       <div class="addf"><label>اسم العميل</label><input id="beName" type="text"></div>
       <div class="addf"><label>الإيميل</label><input id="beEmail" type="email" style="direction:ltr;text-align:left"></div>
       <div class="addf"><label>الجوال</label><input id="bePhone" type="text" style="direction:ltr;text-align:left"></div>
       <div class="addf"><label>المبلغ</label><input id="beAmount" type="number" min="0" step="1"></div>
+      <!-- correcting these after the fact is how the bookings already entered
+           without a payment method get put right, and into the company books -->
+      <div class="addf"><label>طريقة الدفع</label>
+        <select id="bePay">
+          <option value="online">رابط دفع أونلاين</option>
+          <option value="deema">ديمة</option>
+          <option value="cash">مدفوع مسبقاً</option>
+        </select></div>
+      <div class="addf"><label>&nbsp;</label>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px">
+          <input id="bePaid" type="checkbox"> دفع فعلاً · يدخل حسابات الشركة</label></div>
     </div>
     <div class="addf" style="margin-top:12px"><label>ملاحظات</label><input id="beNotes" type="text"></div>
     <div class="addrow">

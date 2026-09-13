@@ -669,7 +669,12 @@ function applyConsultant(){
   if(!C.modes.online.enabled && C.modes.present.enabled){ pr.checked = true; MODE = "present"; }
   else if(C.modes.online.enabled && !pr.checked){ on.checked = true; MODE = "online"; }
 
-  show("#cardMode", true);
+  /* A package that opens with a call has nothing to choose here: غالية (or
+     whoever takes it) rings the client. Showing the step would ask a question
+     whose answer is already fixed. */
+  const callOnly = !!(PKG && PKG.firstMode === "call");
+  if(callOnly){ MODE = "call"; }
+  show("#cardMode", !callOnly);
   show("#cardSlot", true);
   show("#cardForm", false);
   loadSlots();
