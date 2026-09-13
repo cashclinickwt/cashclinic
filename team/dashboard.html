@@ -203,6 +203,11 @@
   .hmrow .t{font-variant-numeric:tabular-nums;color:var(--muted);min-width:46px;font-size:12.5px}
   .hmrow .n{flex:1;min-width:0}
   .hmrow .n span{color:var(--muted)}
+  /* The pill was only ever styled inside .hmrow, so the same markup used in
+     the ideas list and the diary rendered as an unstyled span: a raw colour
+     block with the page's dark text on it. This is the base every pill gets. */
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;
+        font-weight:700;color:#fff;line-height:1.7;white-space:nowrap}
   .hmrow .pill{border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;color:#fff}
   .hmrow .who{font-size:11.5px;color:var(--muted)}
   .hmempty{padding:14px 0 6px;color:var(--muted);font-size:13px}
@@ -502,6 +507,10 @@
   .pftab .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
   .pfrule{font-size:12px;color:var(--muted)}
   .pfwarn td{background:#FDECEC}
+  /* an excluded line stays on the page, greyed and struck through, so it can
+     be put back — deleting it outright would leave nobody able to undo it */
+  .pfout td{opacity:.55}
+  .pfout td:nth-child(3), .pfout td:nth-child(4){text-decoration:line-through}
   .pfsub{width:100%;border-collapse:collapse;font-size:12.5px}
   .pfsub td{padding:5px 8px;border:0;border-top:1px dashed var(--line);vertical-align:middle}
   .pfsub tr:first-child td{border-top:0}
@@ -1235,6 +1244,7 @@ const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIde
 const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
 const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
+const replyTask=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"replyTask");
 const getSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTarget");
 const markPayout=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"markPayout");
 const saveProfitItem=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"saveProfitItem");
@@ -1537,16 +1547,30 @@ function tkName(email){
 function tkTable(rows, mineSide){
   if(!rows.length) return `<div class="muted" style="font-size:13px;padding:10px">ما في شي هني.</div>`;
   return `<table class="pftab"><thead><tr><th>المهمة</th><th>${mineSide?"من":"إلى"}</th><th>الموعد</th><th>الحالة</th><th></th></tr></thead><tbody>`+
-    rows.map(t=>`<tr${t.done?' style="opacity:.55"':''}>
+    rows.map(t=>{
+      /* whose turn it is, so a task waiting on you is not read as "open" and
+         left sitting while each side thinks the other has it */
+      const onMe = !t.done && ((mineSide && t.awaiting==="to") || (!mineSide && t.awaiting==="from"));
+      const onThem = !t.done && t.awaiting && !onMe;
+      return `<tr${t.done?' style="opacity:.55"':''}>
       <td><b style="${t.done?"text-decoration:line-through":""}">${esc(t.text)}</b>
-          <div class="pfrule">${esc(dt(t.when))}</div></td>
+          ${t.edited&&t.originalText?`<div class="pfrule">الأصل: ${esc(t.originalText)}</div>`:""}
+          <div class="pfrule">${esc(dt(t.when))}</div>
+          ${(t.replies||[]).map(rp=>`<div class="pfrule" style="border-inline-start:3px solid var(--line);
+             padding-inline-start:8px;margin-top:5px;line-height:1.7"><b>${esc(rp.byName)}</b>: ${esc(rp.text)}</div>`).join("")}</td>
       <td>${esc(tkName(mineSide?t.from:t.to))}</td>
       <td class="num">${t.due?esc(t.due):"—"}</td>
       <td>${t.done?'<span style="color:#128C4A;font-weight:700">خلصت ✅</span>'
+            :onMe?'<span style="color:#D3A146;font-weight:700">ردّك مطلوب</span>'
+            :onThem?'<span style="color:#614588;font-weight:700">بانتظار الطرف الثاني</span>'
                   :'<span style="color:#962E37;font-weight:700">مفتوحة</span>'}</td>
-      <td>${mineSide
+      <td style="white-space:nowrap">
+        ${!t.done?`<button class="pfbtn" data-tkreply="${esc(t.id)}" data-mine="${mineSide?1:0}"
+           data-text="${esc(t.text)}">رد</button> `:""}
+        ${mineSide
             ? `<button class="pfbtn ${t.done?"":"go"}" data-tk="${esc(t.id)}" data-done="${t.done?"0":"1"}">${t.done?"رجّعها مفتوحة":"خلّصتها"}</button>`
-            : `<button class="pfbtn" data-tkdel="${esc(t.id)}">احذف</button>`}</td></tr>`).join("")+
+            : `<button class="pfbtn" data-tkdel="${esc(t.id)}">احذف</button>`}</td></tr>`;
+    }).join("")+
     `</tbody></table>`;
 }
 function renderTasks(){
@@ -1628,6 +1652,25 @@ $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
 });
 
 document.addEventListener("click", async e=>{
+  /* Replying, and correcting the wording. Whoever is doing the task can say
+     what they did or what they understood differently; it goes back to
+     whoever set it before anyone ticks it closed. */
+  const rp=e.target.closest("button[data-tkreply]");
+  if(rp){
+    const reply=prompt("ردك على المهمة:","");
+    if(reply===null || !reply.trim()) return;
+    let text;
+    if(rp.dataset.mine==="1"){
+      const nt=prompt("تعدّل نص المهمة؟ (اتركه مثل ما هو إذا مو محتاج)", rp.dataset.text||"");
+      if(nt!==null && nt.trim() && nt.trim()!==rp.dataset.text) text=nt.trim();
+    }
+    rp.disabled=true;
+    try{
+      await replyTask({ id:rp.dataset.tkreply, reply:reply.trim(), text });
+      await loadTasks(); tkMsg("انرسل ردك ✅ ووصل إشعار للطرف الثاني 📩", true);
+    }catch(err){ tkMsg((err&&err.message)||"تعذّر الإرسال", false); rp.disabled=false; }
+    return;
+  }
   const d=e.target.closest("button[data-tk]");
   if(d){
     d.disabled=true;
@@ -1693,6 +1736,9 @@ async function loadProfit(month){
   }catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 
+/* which income sources are opened out; kept across a refresh so ticking a
+   transfer does not collapse what you were reading */
+const PFOPEN=new Set();
 function renderProfit(){
   if(!PF || !$("#pfKpis")) return;
   fillMonths($("#pfMonth"), PF.months, PF.month);
@@ -1737,12 +1783,27 @@ function renderProfit(){
   const cats=M.categories||[];
   $("#pfList").innerHTML = cats.length
     ? `<table class="pftab"><thead><tr><th>البند</th><th>العدد</th><th>لك</th><th>تحوّل</th><th>باقي</th></tr></thead><tbody>`+
-      cats.map(c=>`<tr>
-        <td><b>${esc(c.label)}</b></td>
+      cats.map(c=>{
+        const open=PFOPEN.has(c.key), has=(c.items||[]).length>0;
+        return `<tr${has?' class="pfcat" data-pfcat="'+esc(c.key)+'" style="cursor:pointer"':""}>
+        <td><b>${has?`<span style="color:var(--auber)">${open?"▾":"▸"}</span> `:""}${esc(c.label)}</b></td>
         <td class="num">${c.key==="salary"||c.key==="bonus"?"—":fmt(c.count)}</td>
         <td class="num">${kwd(c.share)}</td>
         <td class="num" style="color:#128C4A">${c.sent?kwd(c.sent):"—"}</td>
-        <td class="num" style="color:${c.owed?"#962E37":"var(--muted)"}">${c.owed?kwd(c.owed):"—"}</td></tr>`).join("")+
+        <td class="num" style="color:${c.owed?"#962E37":"var(--muted)"}">${c.owed?kwd(c.owed):"—"}</td></tr>`+
+        (open&&has?`<tr><td colspan="5" style="padding:0 0 10px">
+          <table class="pfsub" style="width:100%">
+            <thead><tr><th>التاريخ</th><th>العميل</th><th>البند</th><th>المبلغ</th><th>حصتك</th><th></th></tr></thead>
+            <tbody>${(c.items||[]).map(it=>`<tr${it.excluded?' style="opacity:.5;text-decoration:line-through"':""}>
+              <td class="num">${dt(it.when)}</td>
+              <td>${esc(it.client)||"—"}</td>
+              <td>${esc(it.what)||"—"}</td>
+              <td class="num">${kwd(it.amount)}</td>
+              <td class="num"><b>${kwd(it.share)}</b></td>
+              <td>${it.sent?'<span style="color:#128C4A;font-size:12px">تحوّل</span>'
+                           :'<span style="color:#962E37;font-size:12px">باقي</span>'}</td>
+            </tr>`).join("")}</tbody></table></td></tr>`:"");
+      }).join("")+
       `<tr style="background:var(--bg)"><td><b>المجموع</b></td><td></td>
         <td class="num"><b>${kwd(t.total)}</b></td>
         <td class="num"><b>${kwd(t.sent)}</b></td>
@@ -1750,6 +1811,13 @@ function renderProfit(){
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في شي لك بهذا الشهر.</div>`;
 }
+
+$("#pfList") && $("#pfList").addEventListener("click", e=>{
+  const row=e.target.closest("tr[data-pfcat]"); if(!row) return;
+  const k=row.dataset.pfcat;
+  if(PFOPEN.has(k)) PFOPEN.delete(k); else PFOPEN.add(k);
+  renderProfit();
+});
 
 $("#pfPerson") && $("#pfPerson").addEventListener("change", e=>{
   PFPERSON=e.target.value; loadProfit(PFMONTH);
@@ -1940,12 +2008,21 @@ function renderBooks(){
 
   $("#bkLines").innerHTML = lines.length
     ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>الحصص والتحويل</th></tr></thead><tbody>`+
-      lines.map(l=>`<tr class="${l.ruleId?"":"pfwarn"}">
+      lines.map(l=>`<tr class="${l.excluded?"pfout":(l.ruleId?"":"pfwarn")}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}${
-            l.mode?` · ${modeAr(l.mode)}`:""}</div></td>
-        <td class="num">${kwd(l.amount)}</td>
+            l.mode?` · ${modeAr(l.mode)}`:""}</div>
+          ${l.excluded?`<div class="pfrule" style="color:#962E37;font-weight:700">مستبعد من الحسابات${
+            l.excludedNote?` · ${esc(l.excludedNote)}`:""}</div>`:""}</td>
+        <td class="num">${kwd(l.amount)}
+          ${l.amountEdited&&!l.excluded?`<div class="pfrule">الأصلي ${esc(kwd(l.realAmount))}</div>`:""}
+          ${canEdit&&!String(l.orderId).startsWith("manual:")?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+            <button class="pfbtn" style="padding:3px 9px;font-size:11.5px" data-pfamt="${esc(l.orderId)}"
+              data-cur="${l.amountEdited?l.amount:""}">عدّل المبلغ</button>
+            <button class="pfbtn" style="padding:3px 9px;font-size:11.5px;border-color:#962E37;color:#962E37"
+              data-pfout="${esc(l.orderId)}" data-on="${l.excluded?1:0}">${l.excluded?"رجّعها":"استبعدها"}</button>
+          </div>`:""}</td>
         <td class="num">${l.fee?kwd(l.fee):"—"}
           ${canEdit?`<div><button class="pfbtn" style="padding:3px 9px;font-size:11.5px;margin-top:4px"
              data-cost="${esc(l.orderId)}" data-amount="${l.cost||0}" data-label="${esc(l.costLabel||"")}"
@@ -2364,6 +2441,40 @@ $("#bkBonus") && $("#bkBonus").addEventListener("click", async e=>{
 
 /* the office hours for one session, put on the session */
 $("#bkLines") && $("#bkLines").addEventListener("click", async e=>{
+  /* Taking a line out of the month, and putting it back. The sale itself is
+     never deleted — a real thing that happened stays findable — it simply
+     stops counting, with the reason written beside it. */
+  const out=e.target.closest("button[data-pfout]");
+  if(out){
+    const on=out.dataset.on==="1";
+    let note="";
+    if(!on){
+      note=prompt("ليش تستبعدها من الحسابات؟ (استرجاع، خطأ، إلخ)","")||"";
+      if(!confirm("تستبعد هالسطر من حسابات الشهر؟ البيع نفسه ما ينحذف، بس ما بيحتسب.")) return;
+    }
+    out.disabled=true;
+    try{
+      await setProfitOverride({ orderId:out.dataset.pfout, month:BKMONTH, excluded:!on, note });
+      await loadBooks(BKMONTH, true);
+      pfMsg(on?"رجعت للحسابات ✅":"انستبعدت من الحسابات ✅", true);
+    }catch(err){ pfMsg((err&&err.message)||"تعذّر التغيير", false); out.disabled=false; }
+    return;
+  }
+  /* Correcting a figure — a partial refund, a discount agreed later, or a
+     number typed wrong. Blank restores the real one. */
+  const amt=e.target.closest("button[data-pfamt]");
+  if(amt){
+    const v=prompt("المبلغ المحتسب بالدينار (اتركه فاضي يرجع المبلغ الأصلي):", amt.dataset.cur||"");
+    if(v===null) return;
+    const t=String(v).trim();
+    if(t!=="" && !(Number(t)>=0)) return pfMsg("اكتب مبلغ صحيح", false);
+    amt.disabled=true;
+    try{
+      await setProfitOverride({ orderId:amt.dataset.pfamt, month:BKMONTH, amount: t===""?"":Number(t) });
+      await loadBooks(BKMONTH, true); pfMsg("انحفظ ✅", true);
+    }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); amt.disabled=false; }
+    return;
+  }
   const b=e.target.closest("button[data-cost]"); if(!b) return;
   const cur=Number(b.dataset.amount)||0;
   const v=prompt("مصروف هذا الحجز بالدينار (٠ يشيله):", cur||"");
@@ -2608,14 +2719,17 @@ function renderIdeas(){
   const rows=list.filter(x=>!IDFLT||x.status===IDFLT);
   $("#idList").innerHTML = rows.length ? rows.map(x=>{
     const mine=x.by===ID.me, may=ID.canDecide||mine;
-    return `<div class="card" style="margin-bottom:10px">
+    /* .card is the LOGIN card — 400px wide, centred text, huge padding. An
+       idea reusing it came out centred, which turned a numbered list into a
+       column of centred lines. .bkcard is the panel card the diary uses. */
+    return `<div class="bkcard">
       <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px">
         <b>${esc(x.title)}</b>
         <span class="pill" style="background:${ID_TONE[x.status]||"#614588"}">${esc(x.status)}</span>
         ${x.area?`<span class="muted" style="font-size:12.5px">· ${esc(x.area)}</span>`:""}
         <span class="muted" style="margin-inline-start:auto;font-size:12px">${esc(x.byName)} · ${esc(x.when?bkWhen(new Date(x.when).toISOString()):"")}</span>
       </div>
-      ${x.body?`<div style="font-size:13.5px;line-height:1.9;white-space:pre-wrap">${esc(x.body)}</div>`:""}
+      ${x.body?`<div style="font-size:13.5px;line-height:1.9;white-space:pre-wrap;text-align:start">${esc(x.body)}</div>`:""}
       ${(x.mentionNames||[]).length?`<div class="muted" style="font-size:12.5px;margin-top:6px">ذكر: ${(x.mentionNames||[]).map(esc).join("، ")}</div>`:""}
       ${(x.files||[]).length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
         ${(x.files||[]).map((f,i)=>`<button class="pfbtn" data-idfile="${esc(x.id)}" data-i="${i}"
