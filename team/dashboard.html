@@ -1135,6 +1135,20 @@
         <button class="bkday" id="exAdd" type="button" style="border-color:var(--auber);color:var(--auber)">أضف الموعد</button>
         <div class="bkchips" id="exList" style="margin-top:10px"></div>
       </div>
+      <div class="bkbox">
+        <h4>ساعات مقفلة داخل الدوام</h4>
+        <div style="font-size:12.5px;color:var(--muted);margin:0 0 10px;line-height:1.8">لو دوامك من ١:٠٠ إلى ٨:٠٠ بس مو فاضي من ٢:٠٠ إلى ٣:٠٠ .. أقفل الساعة نفسها هني، بدل ما تقفل اليوم كله.</div>
+        <div style="font-size:12.5px;color:var(--muted);margin:0 0 6px">يتكرر كل أسبوع بهذي الأيام</div>
+        <div class="bkdays" id="brDays"></div>
+        <div style="font-size:12.5px;color:var(--muted);margin:10px 0 6px">أو ليوم واحد بس (التاريخ يغلب الأيام)</div>
+        <div class="bkf"><label>تاريخ محدد — اختياري</label><input id="brDate" type="date"></div>
+        <div class="bktime">
+          <div class="bkf"><label>من</label><select id="brFrom" class="timesel" data-step="30"></select></div>
+          <div class="bkf"><label>إلى</label><select id="brTo" class="timesel" data-step="30"></select></div>
+        </div>
+        <button class="bkday" id="brAdd" type="button" style="border-color:var(--auber);color:var(--auber);margin-top:8px">أقفل هذي الساعة</button>
+        <div class="bkchips" id="brList" style="margin-top:10px"></div>
+      </div>
     </div>
     <button class="bksave" id="bkSave">احفظ الجدول</button>
     </div>
@@ -4259,6 +4273,13 @@ function paintSchedule(){
     const days  = r.dates.length>1 ? ` <span style="opacity:.7">(${r.dates.length} يوم)</span>` : "";
     return `<span class="bkchip">${esc(label)}${days}<button type="button" data-blkrun="${esc(r.dates.join(","))}">×</button></span>`;
   }).join("") || '<span class="muted" style="font-size:12.5px">ما في أيام مقفلة</span>';
+  /* the weekday picker is an INPUT, not saved state, so it is redrawn empty
+     on every repaint — which is also what clears it after an add */
+  dayBtns("#brDays", []);
+  $("#brList").innerHTML=(sc.breaks||[]).map((b,i)=>{
+    const when = b.date ? esc(b.date) : (b.days||[]).map(d=>BK_DAYS[d]).join("، ");
+    return `<span class="bkchip">${when} · ${esc(b.from)} ← ${esc(b.to)}<button type="button" data-brk="${i}">×</button></span>`;
+  }).join("") || '<span class="muted" style="font-size:12.5px">ما في ساعات مقفلة</span>';
   $("#exList").innerHTML=(sc.extra||[]).map((x,i)=>
     `<span class="bkchip">${esc(x.date)} ${esc(x.time)} · ${modeAr(x.mode)}<button type="button" data-ex="${i}">×</button></span>`).join("") || '<span class="muted" style="font-size:12.5px">ما في مواعيد إضافية</span>';
   renderBkCal();
@@ -4326,6 +4347,27 @@ $("#blkList") && $("#blkList").addEventListener("click",e=>{
   BKSCHED.blocked=BKSCHED.blocked.filter(x=>!gone.has(x));
   paintSchedule();
 });
+$("#brDays") && $("#brDays").addEventListener("click",e=>{ const b=e.target.closest(".bkday"); if(b) b.classList.toggle("on"); });
+
+$("#brAdd") && $("#brAdd").addEventListener("click",()=>{
+  if(!BKSCHED) return;
+  const from=$("#brFrom").value, to=$("#brTo").value, date=$("#brDate").value;
+  const days=pickedDays("#brDays");
+  if(!from||!to)                 return bkMsg("حدد من أي ساعة إلى أي ساعة",false);
+  if(bkMinOf(to)<=bkMinOf(from)) return bkMsg("ساعة النهاية لازم تكون بعد ساعة البداية",false);
+  if(!date && !days.length)      return bkMsg("اختر أيام الأسبوع، أو حدد تاريخ لو تبيها ليوم واحد",false);
+  BKSCHED.breaks = BKSCHED.breaks || [];
+  if(BKSCHED.breaks.length>=40)  return bkMsg("وصلت الحد الأقصى للساعات المقفلة .. امسح وحدة قديمة أول",false);
+  BKSCHED.breaks.push(date ? {date,from,to} : {days,from,to});
+  $("#brDate").value=""; $("#brFrom").value=""; $("#brTo").value="";
+  paintSchedule();
+  bkMsg("انقفلت الساعة .. اضغط «احفظ الجدول» عشان تنحفظ.",true);
+});
+$("#brList") && $("#brList").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-brk]"); if(!b||!BKSCHED) return;
+  (BKSCHED.breaks||[]).splice(Number(b.dataset.brk),1); paintSchedule();
+});
+
 $("#exAdd") && $("#exAdd").addEventListener("click",()=>{
   if(!BKSCHED) return;
   const date=$("#exDate").value, time=$("#exTime").value, mode=$("#exMode").value;
@@ -4344,6 +4386,7 @@ $("#bkSave") && $("#bkSave").addEventListener("click",async()=>{
       present:{enabled:$("#prEn").checked,days:pickedDays("#prDays"),start:$("#prStart").value,end:$("#prEnd").value},
       meetUrl:$("#onMeet").value.trim(), location:$("#prLoc").value.trim(),
       blocked:(BKSCHED&&BKSCHED.blocked)||[], extra:(BKSCHED&&BKSCHED.extra)||[],
+      breaks:(BKSCHED&&BKSCHED.breaks)||[],
     });
     if(r.data&&r.data.ok){ DATA.bookings.schedules[BKWHO]=r.data.schedule; BKSCHED=r.data.schedule; paintSchedule();
       bkMsg("انحفظ الجدول ✅ صفحة الحجز تحدثت على طول.",true); }
@@ -4636,6 +4679,14 @@ function bkCalDayRows(key){
 
 function bkCalBlocked(key){ return ((BKSCHED&&BKSCHED.blocked)||[]).indexOf(key)!==-1; }
 
+/* mirrors breaksOn() on the server: the hours inside this day that are not
+   on offer, either standing every week or set for this one date */
+function bkBreaksOn(key){
+  const w=bkWeekday(key);
+  return ((BKSCHED&&BKSCHED.breaks)||[]).filter(b=>
+    b.date ? b.date===key : (b.days||[]).indexOf(w)!==-1);
+}
+
 function bkCalWorks(key){
   if(!BKSCHED) return false;
   const w=bkWeekday(key);
@@ -4647,11 +4698,15 @@ function bkCalWorks(key){
 function bkCalFree(key){
   if(!BKSCHED || bkCalBlocked(key)) return [];
   const step=Math.max(15,bkCalMinutes()), w=bkWeekday(key), seen={}, out=[];
+  const brk=bkBreaksOn(key);
   ["online","present"].forEach(mode=>{
     const r=BKSCHED[mode];
     if(!r || r.enabled===false || (r.days||[]).indexOf(w)===-1) return;
     const a=bkMinOf(r.start), b=bkMinOf(r.end);
     for(let m=a; m+step<=b; m+=step){
+      /* overlap, same as the server: a 90-minute session starting 13:30
+         runs into a 14:00 break and is not free */
+      if(brk.some(x=> m < bkMinOf(x.to) && (m+step) > bkMinOf(x.from))) continue;
       const t=bkHHMM(m);
       if(seen[t]){ if(seen[t].modes.indexOf(mode)===-1) seen[t].modes.push(mode); continue; }
       seen[t]={time:t,min:m,modes:[mode]}; out.push(seen[t]);
@@ -4733,6 +4788,12 @@ function renderBkCalDay(){
   else if(key<today)     sub=rows.length?`${rows.length} موعد راح.`:"يوم راح وما كان فيه مواعيد.";
   else if(!bkCalWorks(key)) sub="خارج أيام الدوام. تقدر تضيفه من «موعد خارج الجدول» فوق.";
   else sub=`${rows.length} محجوز · ${open.length} فاضي · الجلسة ${bkCalMinutes()} دقيقة`;
+
+  /* staff are NOT blocked by a break — they can still book over it on
+     purpose — so it is shown rather than enforced */
+  const dayBrk=bkBreaksOn(key);
+  if(dayBrk.length && !blocked && key>=today)
+    sub += ` · مقفل ${dayBrk.map(b=>b.from+"–"+b.to).join("، ")}`;
 
   const slots = open.length
     ? `<div class="bkcal-slots">`+open.map(s=>{
