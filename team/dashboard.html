@@ -1317,6 +1317,7 @@ const savePushDevice=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sav
 const getNotifySettings=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getNotifySettings");
 const setNotifyPrefs=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setNotifyPrefs");
 const sendTestPush=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendTestPush");
+const pushDiagnostics=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"pushDiagnostics");
 const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
 const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -1903,8 +1904,13 @@ function renderNotify(){
             الإشعارات شغّالة على ${fmt(NF.devices)} جهاز ✅
           </div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="pfbtn" id="nfTest">أرسل إشعار تجربة</button>
+            <button class="pfbtn go" id="nfTest">أرسل إشعار تجربة</button>
+            <button class="pfbtn" id="nfDiag">افحص الإعدادات</button>
             <button class="pfbtn" id="nfOff">وقّف على هذا الجهاز</button>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.9">
+            لاحظ: الإشعار ما يطلع كبانر وانت فاتح التطبيق — هذا سلوك النظام نفسه مو خلل.
+            لما تضغط «تجربة» بيعطيك ٦ ثواني تسكّر فيها التطبيق، وبعدها يوصل الإشعار الحقيقي.
           </div>`;
   }else{
     head=`<div style="margin-bottom:10px"><button class="pfbtn go" id="nfOn">فعّل الإشعارات على هذا الجهاز</button></div>`;
@@ -1951,9 +1957,48 @@ document.addEventListener("click", async e=>{
     return;
   }
   if(e.target.closest("#nfTest")){
-    const b=e.target.closest("#nfTest"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
-    try{ await sendTestPush({}); nfMsg("انرسل — لو ما وصل خلال ثواني، تأكد إن الإشعارات مسموحة بإعدادات الجهاز.",true); }
+    const b=e.target.closest("#nfTest"); b.disabled=true; const t0=b.textContent;
+    /* A push delivered to a page that is in FRONT of you never becomes a
+       system banner — the browser routes it to onMessage instead, which is
+       why the first version of this button appeared to do nothing at all.
+       The countdown is here so the app can be put in the background before
+       it lands, which is the only way the test tests the real thing. */
+    try{
+      for(let i=6;i>0;i--){ b.textContent=`سكّر التطبيق الحين… ${i}`; await new Promise(r=>setTimeout(r,1000)); }
+      b.textContent="جارٍ الإرسال…";
+      await sendTestPush({});
+      nfMsg("انرسل ✅ لو كان التطبيق مسكّر بيوصلك بانر. لو كنت فاتحه، بيطلع شريط بنفسجي تحت بدل البانر.",true);
+    }
     catch(err){ nfMsg((err&&err.message)||"ما وصل",false); }
+    finally{ b.disabled=false; b.textContent=t0; }
+    return;
+  }
+  if(e.target.closest("#nfDiag")){
+    const b=e.target.closest("#nfDiag"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+    try{
+      const reg = ("serviceWorker" in navigator) ? await navigator.serviceWorker.getRegistration("/team/") : null;
+      let token="";
+      try{ token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey,
+             serviceWorkerRegistration: reg || await nfRegister() }); }catch(e2){ token="✗ "+((e2&&e2.message)||e2); }
+      const r=await pushDiagnostics({});
+      const d=(r&&r.data)||{};
+      const line=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)">
+        <span style="color:var(--muted)">${esc(k)}</span><span style="direction:ltr;text-align:left">${esc(v)}</span></div>`;
+      $("#nfList").insertAdjacentHTML("afterbegin",
+        `<div class="tgcard" id="nfDiagOut" style="margin-bottom:14px">
+          <h3>فحص الإشعارات</h3>
+          ${line("الإذن", ("Notification" in window)?Notification.permission:"غير مدعوم")}
+          ${line("مضاف للشاشة الرئيسية", nfStandalone()?"نعم":"لا")}
+          ${line("آيفون", nfIOS()?"نعم":"لا")}
+          ${line("عامل الخدمة", reg?(reg.active?"شغّال":"مسجّل بس مو شغّال"):"غير مسجّل")}
+          ${line("رمز الجهاز", token?(token.startsWith("✗")?token:"…"+token.slice(-10)):"ما في")}
+          ${line("أجهزة مسجّلة بالخادم", String((d.devices||[]).length))}
+          ${line("سويتش «رسالة»", ((d.prefs||{}).message===false)?"مقفول":"مفتوح")}
+          ${line("الدور", String(d.role||""))}
+          <div style="margin-top:10px"><button class="pfbtn" onclick="this.closest('#nfDiagOut').remove()">اخفِ</button></div>
+        </div>`);
+      nfMsg("طلع الفحص فوق — أرسله لعبدالله لو في شي أحمر.",true);
+    }catch(err){ nfMsg((err&&err.message)||"تعذّر الفحص",false); }
     finally{ b.disabled=false; b.textContent=t0; }
     return;
   }
