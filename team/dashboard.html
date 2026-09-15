@@ -41,6 +41,9 @@
   .top .who{font-size:14px;color:var(--muted)}
   .top .who b{color:var(--ink);display:block;font-size:16px}
   .lo{padding:9px 18px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-family:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+  .lo:disabled{opacity:.55;cursor:default}
+  #refreshBtn.spin{animation:ccspin .8s linear infinite}
+  @keyframes ccspin{to{transform:rotate(360deg)}}
   .sec{margin-bottom:34px}
   .sec h2{font-size:19px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
   /* Only the marker. This used to be `.sec h2 span`, which caught every span
@@ -616,7 +619,16 @@
       <input type="search" id="gsInput" placeholder="ابحث باسم أو رقم أو إيميل عميل" autocomplete="off">
       <div class="gsdrop" id="gsDrop" hidden></div>
     </div>
+    <button class="lo" id="refreshBtn" title="حدّث البيانات" aria-label="حدّث البيانات">↻ حدّث</button>
     <button class="lo" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+  <!-- a home-screen app has no address bar, so a new deploy has no way to
+       announce itself. This is that way. -->
+  <div id="newBuild" hidden style="background:#FFE7BC;border:1.5px solid var(--gold);border-radius:12px;
+       padding:11px 14px;margin-bottom:14px;font-size:13.5px;display:flex;align-items:center;
+       justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <span>في نسخة أحدث من اللوحة — حدّثها عشان تشتغل على آخر إصدار.</span>
+    <button class="lo" id="hardReload" style="border-color:var(--gold)">حدّث الحين</button>
   </div>
 
   <!-- if the data never arrives, say so where it can be seen, with a way back -->
@@ -1436,6 +1448,65 @@ function authMsg(e){
 }
 $("#logoutBtn").addEventListener("click", ()=>signOut(auth));
 
+/* ================= refreshing, in an app with no address bar =================
+   Removing the browser chrome removed the reload button with it, and the
+   dashboard fetches its data exactly once at login. In a tab you would hit
+   reload without thinking; from the home screen there was simply no way to
+   ask for today's numbers, which is the one thing the page exists to show.
+
+   Three ways in now: the ↻ button, coming back to the app after it has been
+   away for a minute, and — for a deploy rather than data — the banner. */
+let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
+
+/* the panels that fetch their own data and cache it in a module variable */
+function clearPanelCaches(){
+  MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
+}
+
+async function refreshAll(opt){
+  if(REFRESHING) return;
+  REFRESHING = true;
+  const b=$("#refreshBtn");
+  if(b){ b.disabled=true; b.classList.add("spin"); }
+  try{
+    const r=await getDashboard(); DATA=r.data;
+    /* the build the server is on, against the build this page was served as:
+       different means the file in front of you is older than the deploy */
+    if(DATA && DATA.build){
+      if(!PAGE_BUILD) PAGE_BUILD = DATA.build;
+      const nb=$("#newBuild"); if(nb) nb.hidden = (DATA.build === PAGE_BUILD);
+    }
+    clearPanelCaches();
+    render();
+    if(!TK) loadTasks();
+    /* whatever tab is open reloads its own data too, or the page would look
+       refreshed while the panel in front of you stayed yesterday's */
+    const def = panelDef(ACTIVE_PANEL);
+    if(def && def.load) def.load();
+    LAST_REFRESH = Date.now();
+    if(b && !(opt&&opt.quiet)){ b.textContent="↻ تم"; setTimeout(()=>{ b.textContent="↻ حدّث"; },1400); }
+  }catch(e){
+    if(b) b.textContent="↻ تعذّر";
+    setTimeout(()=>{ if(b) b.textContent="↻ حدّث"; },2000);
+    console.error("refresh failed:",e);
+  }finally{
+    REFRESHING=false;
+    if(b){ b.disabled=false; b.classList.remove("spin"); }
+  }
+}
+
+$("#refreshBtn") && $("#refreshBtn").addEventListener("click", ()=>refreshAll());
+$("#hardReload") && $("#hardReload").addEventListener("click", ()=>location.reload());
+
+/* Coming back to the app should show today, not whatever was on screen when
+   it was put down. A minute's grace so flicking between apps does not refetch
+   the whole dashboard every few seconds. */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden || !DATA) return;
+  if(Date.now() - LAST_REFRESH < 60000) return;
+  refreshAll({quiet:true});
+});
+
 /* ---------- auth state ---------- */
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ $("#dash").style.display="none"; $("#login").style.display="flex"; DATA=null; return; }
@@ -1455,6 +1526,11 @@ onAuthStateChanged(auth, async (user)=>{
     const HIRE_OK=["ghalia.n@cashclinic.net","sarah.h@cashclinic.net","abdullah.a@cashclinic.net"];
     if(HIRE_OK.indexOf(String((DATA&&DATA.email)||"").toLowerCase())!==-1) $("#rptHiring").hidden=false;
     if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden||!$("#rptHiring").hidden) $("#reportsSec").hidden=false;
+    /* the build this page was served as, captured on the first load only:
+       every later refresh compares against it, so a deploy that happens while
+       somebody is sitting in the app is noticed rather than missed */
+    if(!PAGE_BUILD && DATA && DATA.build) PAGE_BUILD = DATA.build;
+    LAST_REFRESH = Date.now();
     render();
     if(!TK) loadTasks();
     /* only listens for a push arriving while the page is open; it asks for no
