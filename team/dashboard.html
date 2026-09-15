@@ -636,7 +636,7 @@
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
     <div class="navgrp" data-grp="team">الفريق</div>
-    <button data-tab="tasks">مهامي</button>
+    <button data-tab="tasks">مراسلات الفريق</button>
     <button data-tab="meetings">اجتماعاتي</button>
     <button data-tab="ideas">أفكارنا</button>
     <button data-tab="profit" data-family="money">المال</button>
@@ -712,7 +712,8 @@
       <div class="f" id="mtOwnerF" hidden><label>لمن؟</label><select id="mtOwner"></select></div>
       <div class="f" style="flex:1 1 240px"><label>عنوان الاجتماع</label>
         <input id="mtTitle" type="text" placeholder="مثال: اجتماع مع بنك الخليج"></div>
-      <div class="f"><label>مع مين من الفريق</label><select id="mtWith"></select></div>
+      <div class="f" style="flex:1 1 220px"><label>مع مين من الفريق (تقدر تختار أكثر من واحد)</label>
+        <select id="mtWith" multiple size="4" style="min-height:96px"></select></div>
       <div class="f" style="flex:1 1 200px"><label>أو مع مين من برّا</label>
         <input id="mtWithName" type="text" placeholder="اسم الشخص أو الجهة"></div>
       <div class="f"><label>التاريخ</label><input id="mtDate" type="date"></div>
@@ -727,20 +728,24 @@
     <div id="mtList"></div>
   </div>
 
-  <!-- ===== مهامي ===== -->
+  <!-- ===== مراسلات الفريق ===== -->
   <div class="sec" id="tasksSec" data-panel="tasks" hidden>
-    <h2><span></span> مهامي</h2>
+    <h2><span></span> مراسلات الفريق</h2>
     <div class="pfbar">
-      <div class="f"><label>لمين؟</label><select id="tkWho"></select></div>
-      <div class="f" style="flex:1 1 280px"><label>المهمة</label><input id="tkText" type="text" placeholder="مثال: راجعي حجوزات الأسبوع الجاي"></div>
+      <div class="f"><label>الى من</label><select id="tkWho"></select></div>
+      <div class="f" style="flex:1 1 100%"><label>الرسالة</label>
+        <textarea id="tkText" rows="5" placeholder="اكتب رسالتك هني .. تقدر تطوّل براحتك"
+          style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;font-family:inherit;line-height:1.9;resize:vertical;min-height:130px;background:#fff"></textarea></div>
+      <div class="f" style="flex:1 1 320px"><label>مرفقات (اختياري) — صور أو PDF، ٥ ميجا للملف</label>
+        <input id="tkFiles" type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,text/plain"></div>
       <div class="f"><label>الموعد (اختياري)</label><input id="tkDue" type="date"></div>
-      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tkAdd">أرسل المهمة</button></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tkAdd">أرسل</button></div>
     </div>
     <div class="addmsg" id="tkMsg"></div>
     <div class="pfbar" id="tkViewBar" hidden>
       <div class="f"><label>اعرض مهام</label><select id="tkView"></select></div>
     </div>
-    <h2 style="font-size:17px;margin-top:20px"><span></span> <span id="tkMineTitle">اللي عليّ</span></h2>
+    <h2 style="font-size:17px;margin-top:20px"><span></span> <span id="tkMineTitle">اللي وصلني</span></h2>
     <div id="tkMine"></div>
     <h2 style="font-size:17px;margin-top:22px"><span></span> اللي أرسلته</h2>
     <div id="tkSent"></div>
@@ -750,6 +755,21 @@
   <div class="sec" id="targetSec" data-panel="target" hidden>
     <div class="subtabs" data-fam="money"></div>
     <h2><span></span> هدف المبيعات</h2>
+    <div class="pfbar" id="tgForm" hidden>
+      <div class="f" style="flex:1 1 200px"><label>اسم الهدف</label>
+        <input id="tgLabel" type="text" placeholder="مثال: هدف بيع الكتيبات"></div>
+      <div class="f"><label>النوع</label><select id="tgKind">
+        <option value="book">كتيّب</option><option value="consult">استشارة</option>
+        <option value="call">اتصال سريع</option><option value="course">ورشة / دورة</option>
+        <option value="contract">عقد</option></select></div>
+      <div class="f"><label>المبلغ (د.ك)</label><input id="tgAmount" type="number" min="1" step="1"></div>
+      <div class="f"><label>يبدأ يوم</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
+      <div class="f"><label>صاحب الهدف</label><select id="tgOwner"></select></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tgAdd">احفظ الهدف</button></div>
+      <div class="f" style="flex:1 1 100%">
+        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. الأهداف ما تنحذف — تنسكّر، عشان الشهر اللي راح يظل مفهوم.</div></div>
+    </div>
+    <div class="addmsg" id="tgMsg"></div>
     <div id="tgList"></div>
   </div>
 
@@ -1255,6 +1275,8 @@ const addIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addIdea");
 const updateIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateIdea");
 const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteIdea");
 const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIdeaFile");
+const getTaskFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTaskFile");
+const setSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setSalesTarget");
 const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
 const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -1570,15 +1592,18 @@ function tkName(email){
 }
 function tkTable(rows, mineSide){
   if(!rows.length) return `<div class="muted" style="font-size:13px;padding:10px">ما في شي هني.</div>`;
-  return `<table class="pftab"><thead><tr><th>المهمة</th><th>${mineSide?"من":"إلى"}</th><th>الموعد</th><th>الحالة</th><th></th></tr></thead><tbody>`+
+  return `<table class="pftab"><thead><tr><th>الرسالة</th><th>${mineSide?"من":"إلى"}</th><th>الموعد</th><th>الحالة</th><th></th></tr></thead><tbody>`+
     rows.map(t=>{
       /* whose turn it is, so a task waiting on you is not read as "open" and
          left sitting while each side thinks the other has it */
       const onMe = !t.done && ((mineSide && t.awaiting==="to") || (!mineSide && t.awaiting==="from"));
       const onThem = !t.done && t.awaiting && !onMe;
       return `<tr${t.done?' style="opacity:.55"':''}>
-      <td><b style="${t.done?"text-decoration:line-through":""}">${esc(t.text)}</b>
+      <td><b style="white-space:pre-wrap;${t.done?"text-decoration:line-through":""}">${esc(t.text)}</b>
           ${t.edited&&t.originalText?`<div class="pfrule">الأصل: ${esc(t.originalText)}</div>`:""}
+          ${(t.files||[]).length?`<div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:6px">`+
+            t.files.map((f,i)=>`<button class="pfbtn" data-tkfile="${esc(t.id)}" data-i="${i}"
+              style="font-size:12px;padding:4px 9px">📎 ${esc(f.name)}</button>`).join("")+`</div>`:""}
           <div class="pfrule">${esc(dt(t.when))}</div>
           ${(t.replies||[]).map(rp=>`<div class="pfrule" style="border-inline-start:3px solid var(--line);
              padding-inline-start:8px;margin-top:5px;line-height:1.7"><b>${esc(rp.byName)}</b>: ${esc(rp.text)}</div>`).join("")}</td>
@@ -1613,7 +1638,7 @@ function renderTasks(){
   }
   const t1=$("#tkMineTitle");
   if(t1) t1.textContent = (TK.viewing && TK.viewing!==TK.me)
-    ? "اللي على "+tkName(TK.viewing) : "اللي عليّ";
+    ? "الوارد لـ "+tkName(TK.viewing) : "اللي وصلني";
 
   const sel=$("#tkWho");
   const ppl=(TK.people||[]).filter(p=>p.email!==TK.me);
@@ -1629,7 +1654,7 @@ function renderTasks(){
   /* the badge is your own workload, not whoever you are currently reading */
   if(tab && (!TK.viewing || TK.viewing===TK.me)){
     const n=(TK.mine||[]).filter(t=>!t.done).length;
-    tab.textContent = "مهامي" + (n?` · ${fmt(n)}`:"");
+    tab.textContent = "مراسلات الفريق" + (n?` · ${fmt(n)}`:"");
   }
 }
 
@@ -1665,14 +1690,40 @@ $("#tkView") && $("#tkView").addEventListener("change", e=>{
 
 $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
   const to=$("#tkWho").value, text=$("#tkText").value.trim();
-  if(text.length<2) return tkMsg("اكتب المهمة", false);
+  if(text.length<2) return tkMsg("اكتب الرسالة", false);
+  const picked=Array.from(($("#tkFiles")&&$("#tkFiles").files)||[]);
+  if(picked.length>4) return tkMsg("أقصى شي ٤ مرفقات بالرسالة الوحدة", false);
+  /* checked here as well as on the server: a 5 MB cap the browser enforces
+     saves the user a slow upload that was always going to be refused */
+  const big=picked.find(f=>f.size>5*1024*1024);
+  if(big) return tkMsg(`«${big.name}» أكبر من ٥ ميجا`, false);
   const b=$("#tkAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
   try{
-    await addTask({ to, text, due:$("#tkDue").value||"" });
+    const files=[];
+    for(const f of picked) files.push({ name:f.name, type:f.type, base64:await readB64(f) });
+    await addTask({ to, text, due:$("#tkDue").value||"", files });
     $("#tkText").value=""; $("#tkDue").value="";
+    if($("#tkFiles")) $("#tkFiles").value="";
     await loadTasks(); tkMsg(`انرسلت لـ ${tkName(to)} ✅ ووصلها إيميل`, true);
   }catch(e){ tkMsg((e&&e.message)||"تعذّر الإرسال", false); }
   finally{ b.disabled=false; b.textContent=t0; }
+});
+
+/* open an attachment: same download dance the ideas board uses */
+document.addEventListener("click", async (e)=>{
+  const fl=e.target.closest("[data-tkfile]"); if(!fl) return;
+  const was=fl.textContent; fl.disabled=true; fl.textContent="…";
+  try{
+    const r=await getTaskFile({id:fl.dataset.tkfile,index:Number(fl.dataset.i)||0});
+    const d=(r&&r.data)||{};
+    const bin=atob(d.base64||""); const arr=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([arr],{type:d.type||"application/octet-stream"}));
+    const a=document.createElement("a"); a.href=url; a.download=d.name||"file";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
+  finally{ fl.disabled=false; fl.textContent=was; }
 });
 
 document.addEventListener("click", async e=>{
@@ -1711,6 +1762,45 @@ document.addEventListener("click", async e=>{
   }
 });
 
+function tgMsg(t,ok){ const m=$("#tgMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
+
+$("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
+  const label=($("#tgLabel").value||"").trim();
+  const amount=Number($("#tgAmount").value)||0;
+  if(label.length<2) return tgMsg("اكتب اسم الهدف",false);
+  if(!(amount>0))    return tgMsg("المبلغ لازم يكون أكبر من صفر",false);
+  const b=$("#tgAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+  try{
+    await setSalesTarget({ id:tgSlug(label), label, kind:$("#tgKind").value,
+      amount, currency:"KWD", cycleDay:Number($("#tgDay").value)||1,
+      owner:$("#tgOwner").value||"", active:true });
+    $("#tgLabel").value=""; $("#tgAmount").value="";
+    TG=null; await loadTarget(); tgMsg("انحفظ الهدف ✅",true);
+  }catch(e){ tgMsg((e&&e.message)||"تعذّر الحفظ",false); }
+  finally{ b.disabled=false; b.textContent=t0; }
+});
+
+document.addEventListener("click", async (e)=>{
+  const ed=e.target.closest("[data-tgedit]");
+  if(ed){
+    const t=((TG&&TG.targets)||[]).find(x=>x.id===ed.dataset.tgedit); if(!t) return;
+    $("#tgLabel").value=t.label||""; $("#tgKind").value=t.kind||"book";
+    $("#tgAmount").value=t.target||""; $("#tgDay").value=t.cycleDay||1;
+    if($("#tgOwner")) $("#tgOwner").value=t.owner||"";
+    $("#tgLabel").scrollIntoView({behavior:"smooth",block:"center"});
+    tgMsg("عدّل اللي تبيه واضغط «احفظ الهدف»",true);
+    return;
+  }
+  const off=e.target.closest("[data-tgoff]");
+  if(off){
+    if(!confirm("تسكّر هذا الهدف؟ ما ينحذف — بس يوقف عن العد.")) return;
+    off.disabled=true;
+    try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انسكّر الهدف",true); }
+    catch(err){ tgMsg((err&&err.message)||"تعذّر",false); }
+    finally{ off.disabled=false; }
+  }
+});
+
 async function loadTarget(){
   const box=$("#tgList"); if(!box) return;
   box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
@@ -1718,8 +1808,28 @@ async function loadTarget(){
   catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 
+function tgSlug(label){
+  /* an Arabic label cannot be a document id, so the id is derived from the
+     label's shape rather than its letters — same label, same row, so saving
+     twice edits instead of piling up duplicates */
+  let h=0; const str=String(label||"").trim();
+  for(let i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; }
+  return "t"+Math.abs(h).toString(36);
+}
+
 function renderTarget(){
   const box=$("#tgList"); if(!box||!TG) return;
+  /* only full access writes a goal: نورة is measured against it, so she does
+     not get to move it */
+  const mayEdit = !!(DATA && DATA.role==="all");
+  const form=$("#tgForm"); if(form) form.hidden=!mayEdit;
+  const osel=$("#tgOwner");
+  if(mayEdit && osel && !osel.options.length){
+    osel.innerHTML='<option value="">— بدون صاحب —</option>'+
+      ((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).map(c=>
+        `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")+
+      '<option value="nora">نورة</option>';
+  }
   const rows=TG.targets||[];
   if(!rows.length){ box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">ما في أهداف مسجّلة.</div>'; return; }
   box.innerHTML=rows.map(t=>{
@@ -1740,6 +1850,9 @@ function renderTarget(){
                     <span>باقي: <b>${kwd(Math.max(0,(t.target||0)-(t.achieved||0)))}</b></span>`:""}
       </div>
       ${t.hit?`<div class="tghit">🎉 وصلنا الهدف! ${TG.money?esc(kwd(t.achieved))+" من "+esc(kwd(t.target)):fmt(t.pct)+"%"}</div>`:""}
+      ${(DATA&&DATA.role==="all")?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="pfbtn" data-tgedit="${esc(t.id)}">عدّل</button>
+        <button class="pfbtn" data-tgoff="${esc(t.id)}">سكّره</button></div>`:""}
       ${TG.money&&(t.byProduct||[]).length?`<table class="pftab" style="margin-top:16px">
         <thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>`+
         t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")+
@@ -2891,9 +3004,11 @@ function mtNext(n){
   return ((MT&&MT.list)||[]).filter(m=>m.startMs>=now).slice(0, n||99);
 }
 function mtWhoLabel(m){
-  if(m.withName) return m.withName;
-  if(m.withStaff){ const p=((MT&&MT.people)||[]).find(x=>x.email===m.withStaff); return (p&&p.name)||m.withStaff; }
-  return "";
+  const ppl=(MT&&MT.people)||[];
+  const named=(m.withStaffs&&m.withStaffs.length ? m.withStaffs : (m.withStaff?[m.withStaff]:[]))
+    .map(e=>{ const p=ppl.find(x=>x.email===e); return (p&&p.name)||e; });
+  if(m.withName) named.push(m.withName);
+  return named.join(" + ");
 }
 function mtOwnerLabel(e){
   const p=((MT&&MT.people)||[]).find(x=>x.email===e); return (p&&p.name)||String(e||"").split("@")[0];
@@ -2913,8 +3028,9 @@ function renderMeetings(){
   if(!MT || !$("#mtList")) return;
   const meSel=$("#mtWith");
   if(meSel && !meSel.options.length){
-    meSel.innerHTML='<option value="">— لا أحد من الفريق —</option>'+
-      (MT.people||[]).map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+    /* no empty option any more: a multi-select says "nobody" by selecting
+       nobody, and a blank row in the list only invites a stray click */
+    meSel.innerHTML=(MT.people||[]).map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
   }
   const own=$("#mtOwner");
   if(MT.canBookForOthers){
@@ -2949,7 +3065,8 @@ function renderMeetings(){
 $("#mtAdd") && $("#mtAdd").addEventListener("click", async ()=>{
   const b=$("#mtAdd"), m=$("#mtMsg");
   const pay={ title:($("#mtTitle").value||"").trim(), date:$("#mtDate").value, time:$("#mtTime").value,
-    withEmail:$("#mtWith").value||"", withName:($("#mtWithName").value||"").trim(),
+    withEmails:Array.from($("#mtWith").selectedOptions||[]).map(o=>o.value).filter(Boolean),
+    withName:($("#mtWithName").value||"").trim(),
     place:($("#mtPlace").value||"").trim(), note:($("#mtNote").value||"").trim(),
     minutes:Number($("#mtMin").value)||60 };
   if(MT&&MT.canBookForOthers&&$("#mtOwner")) pay.owner=$("#mtOwner").value;
@@ -2959,6 +3076,7 @@ $("#mtAdd") && $("#mtAdd").addEventListener("click", async ()=>{
   try{
     await addMeeting(pay);
     ["mtTitle","mtWithName","mtPlace","mtNote"].forEach(k=>$("#"+k).value="");
+    Array.from($("#mtWith").options||[]).forEach(o=>{ o.selected=false; });
     m.textContent="انضاف الاجتماع ✅ وانرسل إيميل 📩"; m.className="addmsg ok";
     MT=null; await loadMeetings();
   }catch(e){ m.textContent=(e&&e.message)||"تعذّر الإضافة"; m.className="addmsg bad"; }
@@ -3745,6 +3863,8 @@ const CL_TYPE = {
   quiz:      { label:"اختبار",   color:"#614588" },
   book:      { label:"كتاب",     color:"#505632" },
   booking:   { label:"استشارة",  color:"#962E37" },
+  /* opened a payment link and never finished — a lead to chase, not a client */
+  attempt:   { label:"حاول يحجز", color:"#8E8899" },
   event:     { label:"لقاء",     color:"#2F8789" },
   course:    { label:"دورة",     color:"#D3A146" },
   question:  { label:"سؤال",     color:"#6B6577" },
@@ -4252,8 +4372,12 @@ $("#bkLaunch") && $("#bkLaunch").addEventListener("click", async e=>{
    refuse. The calendar below it stays: seeing the week is the point. */
 function syncSchedulePerms(){
   const w=$("#bkSchedWrap"); if(!w) return;
-  const may = DATA && DATA.role !== "sales";
-  w.hidden = !may;
+  /* This wrapper holds جدول العمل, the calendar AND the booking list, so
+     hiding it from sales hid the diary itself — which is why نورة could not
+     look at a past booking before adding the second session. Everyone who
+     reaches this tab now sees all of it. Prices are a separate question and
+     are still stripped server-side for her. */
+  w.hidden = false;
 }
 
 function paintSchedule(){
