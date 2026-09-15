@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>لوحة تحكم الفريق | كاش كلينك</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2F1748">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- iOS reads these instead of the manifest: without them «إضافة للشاشة
+     الرئيسية» opens a Safari tab with its address bar rather than an app -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="كاش كلينك">
 <style>
   :root{ --auber:#2F1748; --gold:#D3A146; --teal:#2F8789; --olive:#505632;
          --cream:#FFE7BC; --ink:#2F1748; --muted:#6B6577; --line:#E4E1EA; --bg:#F7F6F9; }
@@ -635,6 +645,7 @@
     <div class="navgrp" data-grp="comms">التواصل</div>
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
+    <button data-tab="notify">الإشعارات</button>
     <div class="navgrp" data-grp="team">الفريق</div>
     <button data-tab="tasks">مراسلات الفريق</button>
     <button data-tab="meetings">اجتماعاتي</button>
@@ -1234,6 +1245,25 @@
     <div id="cvList"></div>
   </div>
 
+  <!-- ===== مركز الإشعارات ===== -->
+  <div class="sec" id="notifySec" data-panel="notify" hidden>
+    <h2><span></span> الإشعارات</h2>
+    <div id="nfState"></div>
+    <div class="addmsg" id="nfMsg"></div>
+    <div id="nfList"></div>
+    <div id="nfHelp" style="margin-top:22px;background:#fff;border:1px solid var(--line);
+         border-radius:14px;padding:16px 18px;font-size:13.5px;line-height:2;color:var(--muted)">
+      <b style="color:var(--ink)">على الآيفون</b><br>
+      لازم تضيف اللوحة للشاشة الرئيسية أول عشان تشتغل الإشعارات — هذا شرط من آبل نفسها مو منّا.
+      افتح اللوحة بـ Safari ← زر المشاركة ← «إضافة إلى الشاشة الرئيسية» ← افتحها من الأيقونة الجديدة ← فعّل الإشعارات من هني.
+      يبي لك iOS 16.4 أو أحدث.<br><br>
+      <b style="color:var(--ink)">على الأندرويد والكمبيوتر</b><br>
+      تشتغل من المتصفح على طول، وتقدر تضيفها للشاشة الرئيسية لو تبي.<br><br>
+      <b style="color:var(--ink)">تسجيل الدخول</b><br>
+      مرة وحدة بس. أول ما تفتحها من الأيقونة بتطلب لك دخول، وبعدها تظل داخل.
+    </div>
+  </div>
+
   <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
     <h2><span></span> المشتركين بالنشرة</h2>
     <div class="kpis" id="subKpis"></div>
@@ -1251,11 +1281,17 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFunctions, httpsCallable }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+import { getMessaging, getToken, onMessage, isSupported as msgSupported }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
 const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
   projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
   messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},
-  functionsRegion:"us-central1"};
+  functionsRegion:"us-central1",
+  /* Firebase Console ← إعدادات المشروع ← Cloud Messaging ← Web Push certificates
+     ← Generate key pair، والصقه هني. مفتاح عام، ما فيه شي سري. بدونه الإشعارات
+     ما تشتغل والمركز بيقول لك كذا بالصريح بدل ما يفشل بصمت. */
+  vapidKey:"BDR3CToqeHTstVQ_SFiBhss6MP71YP_RraIIduWEoGyn2DskVPe--2qzvIJN5qYSJfSEpSTqsOeY5442QOOtP8M"};
 
 const app=initializeApp(CONFIG.firebase);
 const auth=getAuth(app);
@@ -1277,6 +1313,10 @@ const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteI
 const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIdeaFile");
 const getTaskFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTaskFile");
 const setSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setSalesTarget");
+const savePushDevice=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"savePushDevice");
+const getNotifySettings=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getNotifySettings");
+const setNotifyPrefs=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setNotifyPrefs");
+const sendTestPush=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendTestPush");
 const addMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addMeeting");
 const deleteMeeting=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteMeeting");
 const setTaskDone=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setTaskDone");
@@ -1416,6 +1456,9 @@ onAuthStateChanged(auth, async (user)=>{
     if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden||!$("#rptHiring").hidden) $("#reportsSec").hidden=false;
     render();
     if(!TK) loadTasks();
+    /* only listens for a push arriving while the page is open; it asks for no
+       permission and registers no worker, so it is safe to run for everyone */
+    nfForeground();
   }catch(e){
     /* This used to write the error into #salesTbl — the sales table, on a
        tab the person may never open — so a failed load looked like an empty
@@ -1799,6 +1842,159 @@ document.addEventListener("click", async (e)=>{
     catch(err){ tgMsg((err&&err.message)||"تعذّر",false); }
     finally{ off.disabled=false; }
   }
+});
+
+/* ================= مركز الإشعارات =================
+   The three states this screen has to explain, because getting any of them
+   wrong reads as "it is broken":
+     1. this browser cannot do push at all
+     2. it can, but on iOS only once the app is on the Home Screen
+     3. it can and permission has not been asked yet
+   Anything vaguer than that and the person just taps the button again. */
+let NF=null, NFREG=null;
+
+const nfStandalone = () =>
+  window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+const nfIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+function nfMsg(t,ok){ const m=$("#nfMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
+
+/* registered once, reused. The SW lives in /team/ so its scope covers the
+   dashboard and nothing else on the site. */
+async function nfRegister(){
+  if(NFREG) return NFREG;
+  if(!("serviceWorker" in navigator)) return null;
+  NFREG = await navigator.serviceWorker.register("sw.js", { scope: "/team/" });
+  return NFREG;
+}
+
+async function loadNotify(){
+  const box=$("#nfList"), st=$("#nfState");
+  if(!box||!st) return;
+  st.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  try{ const r=await getNotifySettings({}); NF=(r&&r.data)||null; }
+  catch(e){ NF=null; st.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; return; }
+  renderNotify();
+}
+
+function renderNotify(){
+  const box=$("#nfList"), st=$("#nfState"); if(!box||!st||!NF) return;
+
+  const supported = "serviceWorker" in navigator && "Notification" in window && "PushManager" in window;
+  const perm = ("Notification" in window) ? Notification.permission : "unsupported";
+  const needsInstall = nfIOS() && !nfStandalone();
+  const noKey = !CONFIG.vapidKey;
+
+  let head;
+  if(noKey){
+    head=`<div class="clempty">الإشعارات مو مفعّلة بعد على مستوى المشروع — ناقص مفتاح الويب بُش (VAPID).
+          عبدالله يحطه بإعدادات اللوحة وبعدها يشتغل الزر.</div>`;
+  }else if(!supported){
+    head=`<div class="clempty">هذا المتصفح ما يدعم الإشعارات. جرّب Safari على الآيفون أو Chrome على الأندرويد.</div>`;
+  }else if(needsInstall){
+    head=`<div class="clempty">على الآيفون لازم تضيف اللوحة للشاشة الرئيسية أول.
+          اقرأ الخطوات تحت — دقيقة وتخلص.</div>`;
+  }else if(perm==="denied"){
+    head=`<div class="clempty">الإشعارات مرفوضة من إعدادات المتصفح لهذا الموقع.
+          افتح إعدادات الموقع واسمح بالإشعارات، وبعدها ارجع هني.</div>`;
+  }else if(perm==="granted" && NF.devices>0){
+    head=`<div class="clempty" style="border-color:#2F8789;color:#2F8789">
+            الإشعارات شغّالة على ${fmt(NF.devices)} جهاز ✅
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="pfbtn" id="nfTest">أرسل إشعار تجربة</button>
+            <button class="pfbtn" id="nfOff">وقّف على هذا الجهاز</button>
+          </div>`;
+  }else{
+    head=`<div style="margin-bottom:10px"><button class="pfbtn go" id="nfOn">فعّل الإشعارات على هذا الجهاز</button></div>`;
+  }
+  st.innerHTML=head;
+
+  box.innerHTML = (NF.types||[]).length
+    ? `<h2 style="font-size:17px;margin-top:22px"><span></span> وش يوصلني</h2>`+
+      (NF.types||[]).map(t=>`<label class="tgcard" style="display:flex;align-items:center;gap:12px;
+          padding:14px 16px;margin-bottom:8px;cursor:pointer">
+        <input type="checkbox" data-nf="${esc(t.key)}" ${t.on?"checked":""}
+          style="width:20px;height:20px;accent-color:var(--auber);flex:0 0 auto">
+        <span style="font-size:14.5px">${esc(t.label)}</span></label>`).join("")
+    : "";
+}
+
+$("#nfList") && $("#nfList").addEventListener("change", async e=>{
+  const c=e.target.closest("[data-nf]"); if(!c) return;
+  const prefs={}; prefs[c.dataset.nf]=c.checked;
+  c.disabled=true;
+  try{ const r=await setNotifyPrefs({prefs}); if(NF&&r&&r.data){ NF.prefs=r.data.prefs;
+        (NF.types||[]).forEach(t=>{ t.on=!!r.data.prefs[t.key]; }); }
+       nfMsg("انحفظ ✅",true); }
+  catch(err){ c.checked=!c.checked; nfMsg((err&&err.message)||"تعذّر الحفظ",false); }
+  finally{ c.disabled=false; }
+});
+
+document.addEventListener("click", async e=>{
+  if(e.target.closest("#nfOn")){
+    const b=e.target.closest("#nfOn"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+    try{
+      /* asked straight off the tap: iOS refuses a permission prompt that is
+         not inside a user gesture, and fails it silently */
+      const perm=await Notification.requestPermission();
+      if(perm!=="granted") throw new Error("ما أعطيت إذن الإشعارات");
+      if(!(await msgSupported())) throw new Error("هذا المتصفح ما يدعم الإشعارات");
+      const reg=await nfRegister();
+      const token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey, serviceWorkerRegistration:reg });
+      if(!token) throw new Error("ما قدرنا نسجّل الجهاز");
+      await savePushDevice({ token, ua:navigator.userAgent, standalone:nfStandalone() });
+      await loadNotify(); nfMsg("انفعّلت الإشعارات على هذا الجهاز ✅",true);
+    }catch(err){ nfMsg((err&&err.message)||"تعذّر التفعيل",false); }
+    finally{ b.disabled=false; b.textContent=t0; }
+    return;
+  }
+  if(e.target.closest("#nfTest")){
+    const b=e.target.closest("#nfTest"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+    try{ await sendTestPush({}); nfMsg("انرسل — لو ما وصل خلال ثواني، تأكد إن الإشعارات مسموحة بإعدادات الجهاز.",true); }
+    catch(err){ nfMsg((err&&err.message)||"ما وصل",false); }
+    finally{ b.disabled=false; b.textContent=t0; }
+    return;
+  }
+  if(e.target.closest("#nfOff")){
+    const b=e.target.closest("#nfOff"); b.disabled=true;
+    try{
+      const reg=await nfRegister();
+      const token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey, serviceWorkerRegistration:reg });
+      if(token) await savePushDevice({ token, remove:true });
+      await loadNotify(); nfMsg("وقّفنا الإشعارات على هذا الجهاز",true);
+    }catch(err){ nfMsg((err&&err.message)||"تعذّر",false); }
+    finally{ b.disabled=false; }
+  }
+});
+
+/* a push that lands while the dashboard is open in front of you should not
+   become a system banner — the page just says it */
+async function nfForeground(){
+  try{
+    if(!CONFIG.vapidKey || !(await msgSupported())) return;
+    onMessage(getMessaging(app), (payload)=>{
+      const d=(payload&&payload.data)||{};
+      const bar=document.createElement("div");
+      bar.style.cssText="position:fixed;inset-inline:14px;bottom:14px;z-index:9999;background:var(--auber);"+
+        "color:#FFE7BC;border-radius:14px;padding:13px 16px;font-size:14px;line-height:1.7;"+
+        "box-shadow:0 10px 30px rgba(47,23,72,.35);cursor:pointer";
+      bar.innerHTML=`<b>${esc(d.title||"كاش كلينك")}</b><br>${esc(d.body||"")}`;
+      bar.addEventListener("click",()=>bar.remove());
+      document.body.appendChild(bar);
+      setTimeout(()=>bar.remove(),7000);
+    });
+  }catch(e){ console.error("foreground push failed:",e); }
+}
+
+/* tapping a notification focuses the open dashboard; this puts it on the
+   right tab instead of leaving it wherever it was */
+navigator.serviceWorker && navigator.serviceWorker.addEventListener("message", e=>{
+  const m=e.data||{};
+  if(m.cc!=="notification-click") return;
+  const hash=String(m.url||"").split("#")[1];
+  if(hash) try{ showPanel(hash); }catch(err){ console.error("panel switch failed:",err); }
 });
 
 async function loadTarget(){
@@ -3285,12 +3481,12 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit"];
+const SALES_PANELS = ["home","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
-const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas"];
+const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
-const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas"];
+const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
@@ -3307,6 +3503,9 @@ const PANELS = [
   { id:"courses",     group:"events", icon:"🎓", allowed:()=>gated("courses") },
   { id:"composer",    group:"comms",  icon:"📣", allowed:()=>true },
   { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
+  /* everyone with a login gets this one: the point of it is deciding what
+     reaches your own phone */
+  { id:"notify",      group:"team",   icon:"🔔", allowed:()=>true, load:()=>loadNotify() },
   { id:"tasks",       group:"team",   icon:"✅", allowed:()=>true, load:()=>{ if(!TK) loadTasks(); },
     count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
   { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
@@ -3329,8 +3528,9 @@ function panelAvailable(k){
   if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
   if(role==="consultant" && CONSULTANT_PANELS.indexOf(k)===-1) return false;
   if(role==="marketing" && MARKETING_PANELS.indexOf(k)===-1) return false;
-  /* إسماعيل works كاش ريادة like حسن, but sells no booklet, does not run the
-     broadcast and does not read job applications */
+  /* Left standing for a role nobody carries any more — إسماعيل is full access
+     now. It costs nothing and it is the thing that would have to be rewritten
+     from memory if anyone is ever put back on riyada_c. */
   if(role==="riyada_c" && ["sales","live","careers"].indexOf(k)!==-1) return false;
   return !!p.allowed();
 }
