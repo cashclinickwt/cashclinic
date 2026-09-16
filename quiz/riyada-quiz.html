@@ -227,6 +227,13 @@ h1.q{font-size:clamp(21px,4.6vw,29px);font-weight:800;line-height:1.5;margin:0 0
   .lfoot{justify-content:center;text-align:center}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* Same rules box, same words as book.html — reused, not reinvented. */
+  .cc-agree{background:#F4F2F7;border:1.5px solid #E4E1EA;border-radius:14px;padding:14px 16px;margin:0 0 14px;text-align:start}
+  .cc-agree label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;line-height:1.9;color:#2F1749}
+  .cc-agree input{width:19px;height:19px;flex:0 0 auto;margin-top:3px;accent-color:#2F1749;cursor:pointer}
+  .cc-agree a{color:#2F1749;font-weight:700}
+  .cc-agree.bad{border-color:#962E37;background:#FDECEC}
 </style>
 </head>
 <body>
@@ -621,6 +628,7 @@ function rqNext(sc){
       <h4>${e(BOOK_NAME)}</h4>
       <p>${e(CTA_SUB)}</p>
       <div class="price">${PRICE_LABEL}</div>
+      ${CTA==="tap" ? `<div class="cc-agree" id="agreeBox"><label><input type="checkbox" id="termsChk"><span>إتمام الدفع يعتبر موافقة على جميع <a href="../policy.html" target="_blank" rel="noopener">الشروط والسياسات</a> الخاصة بكاش كلينيك.</span></label></div>` : ""}
       <button class="btn gold block" id="cta">${e(CTA_BTN)}</button>
       <div id="ctaErr" style="color:#962E37;margin-top:10px;font-size:14px"></div>
     </div>
@@ -653,11 +661,17 @@ function goBook(){
 }
 async function buyNow(){
   const btn=document.getElementById("cta"), err=document.getElementById("ctaErr");
+  const agree=document.getElementById("agreeBox"), chk=document.getElementById("termsChk");
+  if(chk && !chk.checked){
+    agree.classList.add("bad"); agree.scrollIntoView({behavior:"smooth",block:"center"});
+    err.textContent="لازم توافق على الشروط والسياسات قبل الدفع"; return;
+  }
+  if(agree) agree.classList.remove("bad");
   err.textContent=""; btn.disabled=true; btn.textContent="جاري التحويل للدفع…";
   try{
     if(!fns) throw new Error("no functions");
     const L=window.__LEAD||{};
-    const res=await fns.httpsCallable("createTapCharge")({ leadId:L.leadId||null, name:L.name, email:L.email, phone:L.phone, product:PRODUCT });
+    const res=await fns.httpsCallable("createTapCharge")({ leadId:L.leadId||null, name:L.name, email:L.email, phone:L.phone, product:PRODUCT, agreePolicy:true });
     const url=res.data&&res.data.url; if(!url) throw new Error("no url");
     window.location.href=url;
   }catch(e){ console.error(e);

@@ -50,6 +50,13 @@
   .paidbox p{margin:0;font-size:14.5px;color:var(--muted)}
   .wa{display:inline-block;margin-top:16px;border:1.5px solid var(--teal);color:var(--teal);
     border-radius:999px;padding:9px 20px;font-size:14px;text-decoration:none}
+
+  /* Same rules box, same words as book.html — reused, not reinvented. */
+  .cc-agree{background:#F4F2F7;border:1.5px solid #E4E1EA;border-radius:14px;padding:14px 16px;margin:0 0 14px;text-align:start}
+  .cc-agree label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;line-height:1.9;color:#2F1749}
+  .cc-agree input{width:19px;height:19px;flex:0 0 auto;margin-top:3px;accent-color:#2F1749;cursor:pointer}
+  .cc-agree a{color:#2F1749;font-weight:700}
+  .cc-agree.bad{border-color:#962E37;background:#FDECEC}
 </style>
 </head>
 <body>
@@ -77,6 +84,7 @@
             <span class="l">المبلغ المطلوب</span>
             <span class="a" id="amount">—</span>
           </div>
+          <div class="cc-agree" id="agreeBox"><label><input type="checkbox" id="termsChk"><span>إتمام الدفع يعتبر موافقة على جميع <a href="policy.html" target="_blank" rel="noopener">الشروط والسياسات</a> الخاصة بكاش كلينيك.</span></label></div>
           <button class="pay" id="payBtn">ادفع وأكّد الحجز</button>
           <div class="note">
             الدفع آمن عبر Tap. موعدك محجوز لك، وما يتأكد إلا بعد الدفع.
@@ -174,9 +182,15 @@ async function load(){
 }
 
 $("#payBtn").addEventListener("click", async () => {
+  if(!$("#termsChk").checked){
+    $("#agreeBox").classList.add("bad");
+    $("#agreeBox").scrollIntoView({behavior:"smooth",block:"center"});
+    msg("لازم توافق على الشروط والسياسات قبل الدفع", "err"); return;
+  }
+  $("#agreeBox").classList.remove("bad");
   const b = $("#payBtn"); b.disabled = true; const t = b.textContent; b.textContent = "جارٍ التحويل للدفع…";
   try{
-    const r = await payBookingOffer({ token: TOKEN });
+    const r = await payBookingOffer({ token: TOKEN, agreePolicy: true });
     const url = (r.data||{}).url;
     if(!url) throw new Error("تعذّر إنشاء الدفعة");
     location.href = url;
