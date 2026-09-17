@@ -469,7 +469,10 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
 const CLINIC_ART = {
   "كاش ناس":   { logo:"brand/nas-logo.png",    photo:"assets/img/ghaliya-blob.jpg" },
   "كاش إنفست": { logo:"brand/invest-logo.png", photo:"assets/img/sara-blob.jpg" },
-  "كاش ريادة": { logo:"brand/riyada-logo.png", photo:"assets/img/hasan-blob.jpg" },
+  /* كاش ريادة — paused. The clinic no longer comes back from
+     getBookingOptions, so this entry is unreachable; kept commented so
+     restoring the clinic does not also mean rebuilding its artwork map. */
+  // "كاش ريادة": { logo:"brand/riyada-logo.png", photo:"assets/img/hasan-blob.jpg" },
 };
 const BIOS = {
   ghalia: { role:"مؤسِسة كاش كلينك · مستشارة مالية",
@@ -478,7 +481,7 @@ const BIOS = {
   sara:   { role:"استشارية سلوكيات مالية واستثمار",
             bio:"سارة الهندي، تشتغل على السلوكيات المالية اللي وراء أرقامك، وعلى بناء خطة استثمار واضحة تناسب أهدافك ودرجة تحملك للمخاطر.",
             stats:[["1:1","جلسة خاصة"],["60","دقيقة"]] },
-  hasan:  { role:"استشاري أعمال",   bio:"", stats:[] },
+  // hasan:  { role:"استشاري أعمال",   bio:"", stats:[] },   // paused with كاش ريادة
 };
 
 /* ---------------- clinic chooser ---------------- */

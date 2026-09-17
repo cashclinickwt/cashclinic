@@ -1536,7 +1536,11 @@ onAuthStateChanged(auth, async (user)=>{
     const r=await getDashboard(); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
     var _rl=DATA.role;
-    if(_rl==="riyada"||_rl==="riyada_c"||_rl==="all") $("#rptRiyada").hidden=false;
+    /* كاش ريادة is paused, so its reports system stays hidden for everyone.
+       The line that used to reveal it is kept rather than deleted — bringing
+       the clinic back should be uncommenting one condition, not remembering
+       which roles could see it. */
+    // if(_rl==="riyada"||_rl==="riyada_c"||_rl==="all") $("#rptRiyada").hidden=false;
     if(_rl==="personal"||_rl==="all") $("#rptNas").hidden=false;
     /* Cash Nas reports live on this site now, behind the same staff login */
     if(_rl==="personal"||_rl==="all") $("#rptNasReports").hidden=false;
