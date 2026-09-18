@@ -233,6 +233,9 @@
   .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;
         font-weight:700;color:#fff;line-height:1.7;white-space:nowrap}
   .hmrow .pill{border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;color:#fff}
+  /* the consultant's box: outlined rather than filled, so it reads as a second,
+     quieter fact beside the mode and never competes with it */
+  .hmrow .who2{background:transparent;border:1.5px solid var(--line);color:var(--ink);margin-inline-start:6px;white-space:nowrap}
   .hmrow .who{font-size:11.5px;color:var(--muted)}
   .hmempty{padding:14px 0 6px;color:var(--muted);font-size:13px}
   .hmnudge{display:flex;align-items:center;gap:10px;margin-top:14px;background:#FFF4DA;border:1px solid #F1D9A0;color:#6B4A00;
@@ -1559,6 +1562,9 @@ onAuthStateChanged(auth, async (user)=>{
     /* only listens for a push arriving while the page is open; it asks for no
        permission and registers no worker, so it is safe to run for everyone */
     nfForeground();
+    /* silent, asks for nothing, and repairs a token that rotated while the
+       app was closed — which is the usual reason notifications go quiet */
+    nfSyncToken();
   }catch(e){
     /* This used to write the error into #salesTbl — the sales table, on a
        tab the person may never open — so a failed load looked like an empty
@@ -2054,6 +2060,7 @@ document.addEventListener("click", async e=>{
       const token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey, serviceWorkerRegistration:reg });
       if(!token) throw new Error("ما قدرنا نسجّل الجهاز");
       await savePushDevice({ token, ua:navigator.userAgent, standalone:nfStandalone() });
+      localStorage.setItem("ccPushToken", token);
       await loadNotify(); nfMsg("انفعّلت الإشعارات على هذا الجهاز ✅",true);
     }catch(err){ nfMsg((err&&err.message)||"تعذّر التفعيل",false); }
     finally{ b.disabled=false; b.textContent=t0; }
@@ -2098,6 +2105,7 @@ document.addEventListener("click", async e=>{
           ${line("نسخة عامل الخدمة", await swVersion(reg))}
           ${line("رمز الجهاز", token?(token.startsWith("✗")?token:"…"+token.slice(-10)):"ما في")}
           ${line("أجهزة مسجّلة بالخادم", String((d.devices||[]).length))}
+          ${line("الرمز تغيّر عن المحفوظ", (localStorage.getItem("ccPushToken")||"")===token ? "لا" : "نعم — انزامن الحين")}
           ${line("سويتش «رسالة»", ((d.prefs||{}).message===false)?"مقفول":"مفتوح")}
           ${line("الدور", String(d.role||""))}
           <div style="margin-top:10px"><button class="pfbtn" onclick="this.closest('#nfDiagOut').remove()">اخفِ</button></div>
@@ -2113,6 +2121,7 @@ document.addEventListener("click", async e=>{
       const reg=await nfRegister();
       const token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey, serviceWorkerRegistration:reg });
       if(token) await savePushDevice({ token, remove:true });
+      localStorage.removeItem("ccPushToken");
       await loadNotify(); nfMsg("وقّفنا الإشعارات على هذا الجهاز",true);
     }catch(err){ nfMsg((err&&err.message)||"تعذّر",false); }
     finally{ b.disabled=false; }
@@ -2132,6 +2141,39 @@ function swVersion(reg){
     try{ w.postMessage({cc:"version"}, [ch.port2]); }
     catch(err){ clearTimeout(done); resolve(""); }
   });
+}
+
+/**
+ * Re-check the device token on every launch, and re-register it if it moved.
+ *
+ * This is the actual fix for "notifications stopped arriving". On iOS the FCM
+ * token rotates on its own — Firebase's own tracker has it open as
+ * firebase-js-sdk#8010, "iOS Web Push Device Unregisters Spontaneously" — and
+ * a web push subscription can simply expire after a week or two. The old code
+ * saved the token ONCE, the day somebody pressed «فعّل», and never looked
+ * again. From the moment the token moved, the server was faithfully pushing to
+ * an address nobody lived at any more, forever, and nothing anywhere said so.
+ *
+ * Checking on each launch turns that from permanent into self-healing: the
+ * worst case becomes "the next time they open the app it fixes itself".
+ */
+async function nfSyncToken(){
+  try{
+    if(!CONFIG.vapidKey) return;
+    if(!("Notification" in window) || Notification.permission!=="granted") return;
+    if(!(await msgSupported())) return;
+    const reg=await nfRegister(); if(!reg) return;
+    const token=await getToken(getMessaging(app), { vapidKey:CONFIG.vapidKey, serviceWorkerRegistration:reg });
+    if(!token) return;
+    const seen=localStorage.getItem("ccPushToken")||"";
+    if(seen===token) return;                       // unchanged, nothing to do
+    /* drop the stale one first, so a rotating phone does not leave a trail of
+       dead tokens the send path has to fail against one by one */
+    if(seen){ try{ await savePushDevice({ token:seen, remove:true }); }catch(e){} }
+    await savePushDevice({ token, ua:navigator.userAgent, standalone:nfStandalone() });
+    localStorage.setItem("ccPushToken", token);
+    console.log("push token refreshed");
+  }catch(e){ console.error("token sync failed:", e); }
 }
 
 /* a push that lands while the dashboard is open in front of you should not
@@ -2187,7 +2229,10 @@ function renderTarget(){
   const osel=$("#tgOwner");
   if(mayEdit && osel && !osel.options.length){
     osel.innerHTML='<option value="">— بدون صاحب —</option>'+
-      ((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).map(c=>
+      /* a departed consultant is not somebody a NEW goal can belong to. The
+         diary picker is the one place they stay visible, and only until their
+         remaining sessions have been moved. */
+      ((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).filter(c=>c.active!==false).map(c=>
         `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")+
       '<option value="nora">نورة</option>';
   }
@@ -3124,17 +3169,24 @@ function hmOnMyDiary(b){
   const mine=hmMyDiary();
   return !mine || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(mine)!==-1;
 }
-function hmTodayRows(list){
+/* The counter and the list answer two different questions, so they no longer
+   share a filter. «مواعيد اليوم» counts what is MINE — the number a consultant
+   reads as their own workload today. The list underneath shows the whole
+   clinic's day, because knowing the room is busy at 4 matters even when the
+   4 o'clock is not yours. `onlyMine` is the difference. */
+function hmTodayRows(list, onlyMine){
   const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
-  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key && hmOnMyDiary(b))
+  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key
+      && (!onlyMine || hmOnMyDiary(b)))
     .sort((a,b)=>a.startMs-b.startMs);
 }
 /* the next two after today. A day with nothing in it still has a tomorrow,
    and an empty card told you nothing you could act on. */
-function hmNextRows(list){
+function hmNextRows(list, onlyMine){
   const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
-  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)>key && hmOnMyDiary(b))
-    .sort((a,b)=>a.startMs-b.startMs).slice(0,2);
+  return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)>key
+      && (!onlyMine || hmOnMyDiary(b)))
+    .sort((a,b)=>a.startMs-b.startMs).slice(0,3);
 }
 function renderHome(){
   if(!DATA || !$("#homeSec")) return;
@@ -3142,13 +3194,15 @@ function renderHome(){
   $("#hmGreet").textContent=(n.hh<12?"صباح الخير":"مساء الخير")+"، "+myName();
   $("#hmDate").textContent=`${BK_DAYS[n.w]} ${n.d} ${BK_MON[n.m]} ${n.y}`;
 
-  const today=hmTodayRows((DATA.bookings||{}).list||[]);
+  const bkList=(DATA.bookings||{}).list||[];
+  const today=hmTodayRows(bkList, false);      // the whole clinic's day — the list
+  const todayMine=hmTodayRows(bkList, true);   // only mine — the counter
   const tasks=((TK&&TK.mine)||[]).filter(t=>!t.done);
   const orders=((DATA.sales||{}).orders||[]).filter(o=>inThisMonth(o.when));
   const rev=orders.reduce((a,o)=>a+Number(o.amount||0),0);
   const nudge=DATA.payoutNudge;
   const kp=[];
-  kp.push(`<div class="kpi"><div class="n">${fmt(today.length)}</div><div class="l">مواعيد اليوم</div></div>`);
+  kp.push(`<div class="kpi"><div class="n">${fmt(todayMine.length)}</div><div class="l">مواعيد اليوم</div></div>`);
   kp.push(`<div class="kpi"><div class="n">${TK?fmt(tasks.length):"…"}</div><div class="l">مهام عليّ</div></div>`);
   if(seesMoney() && DATA.sales) kp.push(`<div class="kpi"><div class="n">${money(rev)}</div><div class="l">مبيعات ${esc(BK_MON[n.m])}</div></div>`);
   if(nudge && !nudge.done && (nudge.owed||[]).length)
@@ -3157,15 +3211,19 @@ function renderHome(){
     kp.push(`<div class="kpi"><div class="n" style="color:#962E37">${kwd(PF.mine.totals.due)}</div><div class="l">باقي لك عن ${esc(monthLabel(PF.month))}</div></div>`);
   $("#hmKpis").innerHTML=kp.join("");
 
-  const mine=hmMyDiary();
-  const next=hmNextRows((DATA.bookings||{}).list||[]);
+  const next=hmNextRows(bkList, false);
   const row=(b,withDay)=>{
     const p=bkParts(b.startIso);
-    const who = mine ? "" : ` <span>· ${esc(b.consultantName||"")}</span>`;
     const when = withDay ? bkWhen(b.startIso) : `${bkPad2(p.hh)}:${bkPad2(p.mm)}`;
+    /* The list shows everybody's day now, so whose appointment it is has to be
+       on the row — and as a box beside the أونلاين/حضوري one rather than
+       trailing grey text, because at a glance the question is «مين عنده موعد»
+       and that should not need reading a sentence. */
+    const cn = b.consultantName||"";
+    const whoPill = cn ? `<span class="pill who2">${esc(cn)}</span>` : "";
     return `<div class="hmrow" data-bk="${esc(b.id)}"><span class="t"${withDay?' style="min-width:auto"':""}>${esc(when)}</span>
-      <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span>${who}</span>
-      <span class="pill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span></div>`;
+      <span class="n"><b>${esc(b.name)||"—"}</b> <span>· ${esc(b.packageName||"")}</span></span>
+      <span class="pill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span>${whoPill}</div>`;
   };
   /* team meetings sit in the same card as client appointments — they answer
      the same question ("what is next") — but carry their own pill so a meeting
@@ -4635,6 +4693,11 @@ function bkMsg(m,ok){ const e=$("#bkMsg"); if(!e) return; e.textContent=m; e.cla
 
 function renderBookings(){
   const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;
+  /* Inactive consultants are kept in THIS picker on purpose. bookings.list is
+     scoped to the consultants in this list, so dropping somebody here does not
+     tidy them away — it hides every client still booked with them, including
+     the ones waiting to be moved to somebody else. They come out of the picker
+     once their diary is empty, not before. */
   const cons=B.consultants||[];
   if(!cons.length){ sec.hidden=true; return; }
   sec.hidden=false;
