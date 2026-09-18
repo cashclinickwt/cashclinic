@@ -296,6 +296,14 @@
   #bookingsSec{--acc:#2F1748;--acc-soft:#EDEAF2}
   #bookingsSec .bkbox h4{color:var(--acc)}
   #bookingsSec .bkbox{border-top:3px solid var(--acc)}
+  /* A collapsible box. The toggle sits in the h4 so the whole heading is the
+     hit area on a phone, and the state is remembered per box — a section you
+     folded away should stay folded next time you open the tab, or folding it
+     saved you nothing. */
+  .foldh{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
+  .foldb{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;
+    width:26px;height:26px;line-height:1;font-size:16px;font-weight:700;cursor:pointer;flex:0 0 auto}
+  .folded > *:not(.foldh){display:none}
   #bookingsSec .bksave{background:var(--acc)}
   #bookingsSec #bkWho button.on{background:var(--acc);border-color:var(--acc);color:#fff}
   #bookingsSec .bkday.on{background:var(--acc);border-color:var(--acc);color:#fff}
@@ -1116,6 +1124,7 @@
     <div class="kpis" id="bkKpis"></div>
 
     <div class="flt" id="bkWho"></div>
+    <div class="kpis" id="bkKpis"></div>
 
     <div class="addbox" id="nasBox" hidden>
       <h3>📅 احجز لعميل <span id="nbClinic">· كاش ناس</span></h3>
@@ -1161,7 +1170,7 @@
     <div id="bkSchedWrap">
     <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل <span class="whoname" id="bkWhoName"></span></h2>
     <div class="bkgrid">
-      <div class="bkbox">
+      <div class="bkbox" data-fold="bk-online">
         <h4>أونلاين <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="onEn" checked> مفعّل</label></h4>
         <div class="bkdays" id="onDays"></div>
         <div class="bktime">
@@ -1170,7 +1179,7 @@
         </div>
         <div class="bkf"><label>رابط Google Meet</label><input id="onMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
       </div>
-      <div class="bkbox">
+      <div class="bkbox" data-fold="bk-present">
         <h4>حضوري <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="prEn" checked> مفعّل</label></h4>
         <div class="bkdays" id="prDays"></div>
         <div class="bktime">
@@ -1179,7 +1188,7 @@
         </div>
         <div class="bkf"><label>العنوان</label><input id="prLoc" type="text" placeholder="برج التجارية، الدور ..، مكتب .."></div>
       </div>
-      <div class="bkbox">
+      <div class="bkbox" data-fold="bk-blocked">
         <h4>أيام مقفلة</h4>
         <div class="bkf"><label>أضف يوم إجازة</label><input id="blkDate" type="date"></div>
         <div style="font-size:12.5px;color:var(--muted);margin:10px 0 6px">أو إجازة من تاريخ إلى تاريخ</div>
@@ -1198,7 +1207,7 @@
         <button class="bkday" id="exAdd" type="button" style="border-color:var(--auber);color:var(--auber)">أضف الموعد</button>
         <div class="bkchips" id="exList" style="margin-top:10px"></div>
       </div>
-      <div class="bkbox">
+      <div class="bkbox" data-fold="bk-breaks">
         <h4>ساعات مقفلة داخل الدوام</h4>
         <div style="font-size:12.5px;color:var(--muted);margin:0 0 10px;line-height:1.8">لو دوامك من ١:٠٠ إلى ٨:٠٠ بس مو فاضي من ٢:٠٠ إلى ٣:٠٠ .. أقفل الساعة نفسها هني، بدل ما تقفل اليوم كله.</div>
         <div style="font-size:12.5px;color:var(--muted);margin:0 0 6px">يتكرر كل أسبوع بهذي الأيام</div>
@@ -1253,6 +1262,14 @@
       كل شخص تعامل معنا، وكل شي سواه بمكان واحد. نجمع سجلاته بالإيميل والجوال، فلو استخدم أكثر من إيميل أو رقم يطلع لك كشخص واحد.
     </p>
     <div class="kpis" id="clKpis"></div>
+    <!-- zoo visitors are not clients, so they sit in their own box rather than
+         being mixed into a strip that counts people we actually know -->
+    <div id="clVisits" style="background:#fff;border:1px solid var(--line);border-radius:14px;
+         padding:14px 16px;margin:0 0 14px">
+      <h4 style="margin:0 0 10px;font-size:14px;color:var(--auber)">زوّار الموقع</h4>
+      <div class="kpis" id="clVisitKpis" style="margin:0"></div>
+      <div id="clVisitTop" style="margin-top:10px"></div>
+    </div>
     <div class="clbar">
       <input id="clSearch" type="search" placeholder="دوّر باسم، إيميل، أو رقم…">
       <span class="clcount" id="clCount"></span>
@@ -1265,6 +1282,7 @@
       <button data-c="course">دورات</button>
       <button data-c="event">سجّلوا بلقاء</button>
       <button data-c="paid">دفعوا لنا</button>
+      <button data-c="month">هالشهر</button>
     </div>
     <div id="clList"></div>
   </div>
@@ -1498,6 +1516,7 @@ async function refreshAll(opt){
     }
     clearPanelCaches();
     render();
+    foldInit();
     if(!TK) loadTasks();
     /* whatever tab is open reloads its own data too, or the page would look
        refreshed while the panel in front of you stayed yesterday's */
@@ -1526,6 +1545,36 @@ document.addEventListener("visibilitychange", ()=>{
   if(Date.now() - LAST_REFRESH < 60000) return;
   refreshAll({quiet:true});
 });
+
+/* ================= folding the long sections =================
+   المواعيد and حسابات الشركة stack four or five boxes on top of each other,
+   which on a phone means scrolling past what you are not looking at to reach
+   what you are. Any box with a `data-fold` id gets a — button and remembers
+   whether it was left open. */
+function foldInit(root){
+  (root||document).querySelectorAll("[data-fold]").forEach(box=>{
+    if(box.dataset.foldReady) return;
+    const h=box.querySelector("h4"); if(!h) return;
+    box.dataset.foldReady="1";
+    h.classList.add("foldh");
+    const btn=document.createElement("button");
+    btn.type="button"; btn.className="foldb"; btn.setAttribute("aria-label","طيّ القسم");
+    h.appendChild(btn);
+    const key="ccFold:"+box.dataset.fold;
+    const paint=()=>{ const on=box.classList.contains("folded");
+      btn.textContent = on ? "+" : "−"; btn.title = on ? "افتح" : "اطوِ"; };
+    if(localStorage.getItem(key)==="1") box.classList.add("folded");
+    paint();
+    h.addEventListener("click",(e)=>{
+      /* the «مفعّل» checkbox lives in this heading too, and folding the box
+         every time somebody enables a mode would be maddening */
+      if(e.target.closest("input,select,a")) return;
+      box.classList.toggle("folded");
+      localStorage.setItem(key, box.classList.contains("folded")?"1":"0");
+      paint();
+    });
+  });
+}
 
 /* ---------- auth state ---------- */
 onAuthStateChanged(auth, async (user)=>{
@@ -1558,6 +1607,7 @@ onAuthStateChanged(auth, async (user)=>{
     if(!PAGE_BUILD && DATA && DATA.build) PAGE_BUILD = DATA.build;
     LAST_REFRESH = Date.now();
     render();
+    foldInit();
     if(!TK) loadTasks();
     /* only listens for a push arriving while the page is open; it asks for no
        permission and registers no worker, so it is safe to run for everyone */
@@ -2627,7 +2677,8 @@ function renderBooks(){
               BAS.map(([v,l])=>`<option value="${v}"${v===c.basis?" selected":""}>${l}</option>`).join("")+`</select>`
              :`<span class="pfrule">${isSal?"راتب":"هذا الشهر"}</span>`}</td>
         <td class="num">${kwd(c.kwd)}</td>
-        <td>${isVar?`<button class="pfbtn" data-delvar="${esc(key)}">احذف</button>`:""}</td></tr>`;
+        <td><button class="pfbtn" data-delcost="${esc(key)}" data-what="${what}"
+              title="${isSal?"يوقف الراتب":"يشيل البند من الحساب"}">احذف</button></td></tr>`;
       }).join("")+
       `</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في تكاليف.</div>`;
@@ -2895,11 +2946,20 @@ $("#bkCosts") && $("#bkCosts").addEventListener("change", async e=>{
 });
 
 $("#bkCosts") && $("#bkCosts").addEventListener("click", async e=>{
-  const b=e.target.closest("button[data-delvar]"); if(!b) return;
-  if(!confirm("تحذف هذي التكلفة؟")) return;
-  try{ await saveProfitItem({ what:"varcost", id:b.dataset.delvar, remove:true });
-       await loadBooks(BKMONTH); pfMsg("انحذفت ✅", true); }
-  catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+  /* Removing worked on the server from the start — for costs, salaries and
+     variable lines alike — but the button was only ever drawn on a variable
+     row, so a seeded cost like Octopus could be edited and never switched off.
+     A seeded row is set active:false rather than deleted, or the seeder would
+     helpfully put it back on the next read. */
+  const b=e.target.closest("button[data-delcost]"); if(!b) return;
+  const what=b.dataset.what||"varcost";
+  const ask=what==="salary" ? "توقف هذا الراتب؟ ما راح ينحسب بالشهور الجاية."
+          : "تشيل هذا البند من الحساب؟";
+  if(!confirm(ask)) return;
+  b.disabled=true;
+  try{ await saveProfitItem({ what, id:b.dataset.delcost, remove:true });
+       await loadBooks(BKMONTH); pfMsg("انشال ✅", true); }
+  catch(err){ b.disabled=false; pfMsg((err&&err.message)||"تعذّر الحذف", false); }
 });
 
 /* the live total, so a split that cannot be saved is obvious before trying */
@@ -4297,9 +4357,19 @@ const CL_TYPE = {
 };
 let CLQ="", CLFILTER="all";
 
+/* «هالشهر» is a different KIND of filter from the others: they ask what a
+   person DID, this one asks WHEN. Kept in the same row because that is where
+   the office looks, but matched separately — a month is not a type. */
+function clThisMonth(c){
+  const n=bkNowKw(), t=Number(c.lastSeen||0);
+  if(!t) return false;
+  const d=new Date(t+3*3600*1000);   // Kuwait
+  return d.getUTCFullYear()===n.y && (d.getUTCMonth()+1)===n.m;
+}
 function clMatches(c){
   if(CLFILTER!=="all"){
-    if(CLFILTER==="paid"){ if(!(c.spent>0)) return false; }
+    if(CLFILTER==="month"){ if(!clThisMonth(c)) return false; }
+    else if(CLFILTER==="paid"){ if(!(c.spent>0)) return false; }
     else if(!(c.counts && c.counts[CLFILTER])) return false;
   }
   if(!CLQ) return true;
@@ -4324,13 +4394,37 @@ function renderClients(){
 
   const paid=all.filter(c=>c.spent>0);
   const revenue=all.reduce((a,c)=>a+Number(c.spent||0),0);
-  $("#clKpis").innerHTML=
-    `<div class="kpi"><div class="n">${fmt(all.length)}</div><div class="l">عميل</div></div>`+
-    (seesMoney()?`<div class="kpi"><div class="n">${fmt(paid.length)}</div><div class="l">دفعوا لنا</div></div>`:"")+
-    (seesMoney()?`<div class="kpi"><div class="n">${money(revenue)}</div><div class="l">إجمالي ما صرفوه</div></div>`:"")+
-    `<div class="kpi"><div class="n">${fmt(all.filter(c=>(c.counts&&c.counts.booking)||0).length)}</div><div class="l">حجزوا استشارة</div></div>`;
+  /* page views, which are a different population from the client list: a
+     visitor who never left an email is nobody we can name */
+  const V=(DATA&&DATA.visits)||{};
+  const vk=$("#clVisitKpis");
+  if(vk) vk.innerHTML=
+    `<div class="kpi"><div class="n">${fmt(V.month||0)}</div><div class="l">زيارة هالشهر</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(V.total||0)}</div><div class="l">إجمالي الزيارات</div></div>`;
+  const vt=$("#clVisitTop");
+  if(vt) vt.innerHTML=(V.top||[]).length
+    ? `<div class="pfrule" style="margin-bottom:6px">أكثر الصفحات هالشهر</div>`+
+      (V.top||[]).map(x=>`<span class="clchip" style="background:#6B6577">${esc(x.page)} · ${fmt(x.n)}</span>`).join(" ")
+    : `<div class="pfrule">لسه ما في زيارات مسجّلة هالشهر.</div>`;
 
+  /* The strip now describes WHAT IS ON SCREEN. It used to always describe the
+     whole list, so picking «اشتروا كتاب» filtered the rows underneath and left
+     four numbers above them that were still about everybody — two different
+     answers to one question, stacked. */
   const rows=all.filter(clMatches);
+  const CL_LABEL={ all:"عميل", book:"مشتري كتاب", booking:"حجز استشارة", quiz:"سوّى اختبار",
+                   course:"بالدورات", event:"مسجّل بلقاء", paid:"دفع لنا", month:"عميل هالشهر" };
+  const shownPaid=rows.filter(c=>c.spent>0);
+  const shownRev=rows.reduce((a,c)=>a+Number(c.spent||0),0);
+  const scoped=CLFILTER!=="all";
+  $("#clKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(rows.length)}</div><div class="l">${esc(CL_LABEL[CLFILTER]||"عميل")}</div></div>`+
+    (seesMoney()?`<div class="kpi"><div class="n">${fmt(shownPaid.length)}</div><div class="l">دفعوا لنا</div></div>`:"")+
+    (seesMoney()?`<div class="kpi"><div class="n">${money(shownRev)}</div><div class="l">${scoped?"صرفوا":"إجمالي ما صرفوه"}</div></div>`:"")+
+    (scoped
+      ? `<div class="kpi"><div class="n">${fmt(all.length)}</div><div class="l">من أصل</div></div>`
+      : `<div class="kpi"><div class="n">${fmt(rows.filter(c=>(c.counts&&c.counts.booking)||0).length)}</div><div class="l">حجزوا استشارة</div></div>`);
+
   $("#clCount").textContent = rows.length===all.length ? "" : `${fmt(rows.length)} من ${fmt(all.length)}`;
 
   const box=$("#clList");
@@ -4691,6 +4785,29 @@ function bkWhen(iso){
 function bkMsg(m,ok){ const e=$("#bkMsg"); if(!e) return; e.textContent=m; e.className="bkmsg "+(ok?"ok":"err");
   if(ok) setTimeout(()=>{ e.className="bkmsg"; },4000); }
 
+/* The diary shows one consultant at a time, so the numbers above it should be
+   about that consultant — otherwise switching the name changes the list and
+   leaves the summary describing somebody else. */
+function bkPaintKpis(cons){
+  const box=$("#bkKpis"); if(!box) return;
+  const B=(DATA&&DATA.bookings)||{}, list=B.list||[];
+  const who=BKWHO;
+  const onWho=(b)=>!who || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(who)!==-1;
+  const n=bkNowKw(), todayKey=bkKey(n.y,n.m,n.d);
+  const live=list.filter(b=>b.status!=="cancelled" && onWho(b));
+  const today=live.filter(b=>b.startIso && bkDateKey(b.startIso)===todayKey);
+  const ahead=live.filter(b=>b.startIso && bkDateKey(b.startIso)>todayKey);
+  const month=live.filter(b=>b.startIso && String(bkDateKey(b.startIso)).slice(0,7)===`${n.y}-${bkPad2(n.m)}`);
+  const cancelled=list.filter(b=>b.status==="cancelled" && onWho(b)
+    && b.startIso && String(bkDateKey(b.startIso)).slice(0,7)===`${n.y}-${bkPad2(n.m)}`);
+  const name=((cons||[]).find(c=>c.id===who)||{}).name||"";
+  box.innerHTML=
+    `<div class="kpi"><div class="n">${fmt(today.length)}</div><div class="l">اليوم${name?" · "+esc(name):""}</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(ahead.length)}</div><div class="l">جاي</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(month.length)}</div><div class="l">هالشهر</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(cancelled.length)}</div><div class="l">ملغي هالشهر</div></div>`;
+}
+
 function renderBookings(){
   const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;
   /* Inactive consultants are kept in THIS picker on purpose. bookings.list is
@@ -4702,6 +4819,7 @@ function renderBookings(){
   if(!cons.length){ sec.hidden=true; return; }
   sec.hidden=false;
 
+  bkPaintKpis(cons);
   const wasWho=BKWHO;
   if(!BKWHO || !cons.some(c=>c.id===BKWHO)) BKWHO=cons[0].id;
   if(BKWHO!==wasWho) setTimeout(renderNasBooking,0);
