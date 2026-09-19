@@ -4527,16 +4527,24 @@ function renderClients(){
   const revenue=all.reduce((a,c)=>a+Number(c.spent||0),0);
   /* page views, which are a different population from the client list: a
      visitor who never left an email is nobody we can name */
-  const V=(DATA&&DATA.visits)||{};
-  const vk=$("#clVisitKpis");
-  if(vk) vk.innerHTML=
-    `<div class="kpi"><div class="n">${fmt(V.month||0)}</div><div class="l">زيارة هالشهر</div></div>`+
-    `<div class="kpi"><div class="n">${fmt(V.total||0)}</div><div class="l">إجمالي الزيارات</div></div>`;
-  const vt=$("#clVisitTop");
-  if(vt) vt.innerHTML=(V.top||[]).length
-    ? `<div class="pfrule" style="margin-bottom:6px">أكثر الصفحات هالشهر</div>`+
-      (V.top||[]).map(x=>`<span class="clchip" style="background:#6B6577">${esc(x.page)} · ${fmt(x.n)}</span>`).join(" ")
-    : `<div class="pfrule">لسه ما في زيارات مسجّلة هالشهر.</div>`;
+  /* «ما وصلت بيانات» and «صفر زيارة» are different problems and used to look
+     identical: an old backend sends no `visits` at all, which fell through to
+     0 and read as "nobody visited" — sending you looking in the wrong place. */
+  const V=(DATA&&DATA.visits);
+  const vk=$("#clVisitKpis"), vt=$("#clVisitTop");
+  if(!V){
+    if(vk) vk.innerHTML=`<div class="kpi"><div class="n">—</div><div class="l">ما وصلت بيانات</div></div>`;
+    if(vt) vt.innerHTML=`<div class="pfrule">السيرفر ما يرسل أرقام الزيارات — لازم ينرفع
+      <code>getDashboard</code> من جديد.</div>`;
+  }else{
+    if(vk) vk.innerHTML=
+      `<div class="kpi"><div class="n">${fmt(V.month||0)}</div><div class="l">زيارة هالشهر</div></div>`+
+      `<div class="kpi"><div class="n">${fmt(V.total||0)}</div><div class="l">إجمالي الزيارات</div></div>`;
+    if(vt) vt.innerHTML=(V.top||[]).length
+      ? `<div class="pfrule" style="margin-bottom:6px">أكثر الصفحات هالشهر</div>`+
+        (V.top||[]).map(x=>`<span class="clchip" style="background:#6B6577">${esc(x.page)} · ${fmt(x.n)}</span>`).join(" ")
+      : `<div class="pfrule">وصلت الأرقام بس ما في زيارات مسجّلة هالشهر — يعني الصفحات ما ترسل.</div>`;
+  }
 
   /* The strip now describes WHAT IS ON SCREEN. It used to always describe the
      whole list, so picking «اشتروا كتاب» filtered the rows underneath and left
