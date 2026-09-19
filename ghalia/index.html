@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>غالية النويّف | Cash Clinic</title>
+<meta name="description" content="روابط غالية النويّف — مؤسِسة Cash Clinic · واتساب، إنستغرام، تيك توك، والموقع.">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="canonical" href="https://cashclinic.net/ghalia/">
+
+<!-- a bio link gets shared and previewed far more than an ordinary page -->
+<meta property="og:type" content="profile">
+<meta property="og:title" content="غالية النويّف | Cash Clinic">
+<meta property="og:description" content="محاسبة متخصصة في الميزانيات والديون والأصول الشخصية.">
+<meta property="og:image" content="https://cashclinic.net/assets/img/ghaliya.jpg">
+<meta property="og:url" content="https://cashclinic.net/ghalia/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="../assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="../assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="../assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="../assets/ds/tokens/base.css">
+
+<style>
+  :root{
+    --purple:#2F1749; --royal:#614588; --lav:#D2D3E1;
+    --gold:#D3A146;   --cream:#FFE6BB; --teal:#2F8789; --muted:#6B6577;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+    background:var(--purple); color:var(--cream);
+    min-height:100dvh;
+    padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(36px + env(safe-area-inset-bottom,0px));
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  /* the tangle is the brand's own artwork — faint, so it reads as texture
+     rather than competing with five buttons that all want to be pressed */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:url("../brand/elements/tangle-flower-gradient.png") center top / 620px auto no-repeat;
+    opacity:.07;
+  }
+  .wrap{position:relative; z-index:1; width:100%; max-width:440px; text-align:center}
+
+  .avatar{
+    width:112px; height:112px; border-radius:50%; object-fit:cover;
+    border:3px solid var(--gold); display:block; margin:0 auto 16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  h1{font-size:23px; margin:0 0 6px; font-weight:700; letter-spacing:-.2px}
+  .role{font-size:14px; color:var(--lav); margin:0 0 4px}
+  .blurb{font-size:13px; color:var(--lav); opacity:.82; margin:0 0 26px; line-height:1.8}
+
+  .links{display:flex; flex-direction:column; gap:12px}
+  /* One row, one destination, full width. A bio link is opened one-handed on a
+     phone by somebody who is half paying attention, so every target is the
+     whole row rather than the words inside it, and nothing sits side by side
+     where a thumb could catch the wrong one. */
+  .lnk{
+    display:flex; align-items:center; gap:13px;
+    padding:15px 17px; border-radius:15px; text-decoration:none;
+    background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.14);
+    color:var(--cream); font-size:15px; font-weight:600;
+    transition:transform .14s ease, background .14s ease, border-color .14s ease;
+    min-height:56px;   /* comfortably past the 44px touch minimum */
+  }
+  .lnk:hover,.lnk:focus-visible{
+    background:rgba(255,255,255,.13); border-color:var(--gold); transform:translateY(-2px);
+  }
+  .lnk:focus-visible{outline:3px solid var(--gold); outline-offset:3px}
+  .lnk .ic{width:26px; height:26px; flex:0 0 26px; display:grid; place-items:center}
+  .lnk .ic svg{width:22px; height:22px; fill:currentColor}
+  .lnk .tx{flex:1; text-align:right}
+  .lnk .tx small{display:block; font-weight:400; font-size:11.5px; color:var(--lav); opacity:.75; margin-top:2px}
+  .lnk .go{opacity:.4; font-size:17px}
+
+  /* the primary action reads as primary — everything else is a sibling */
+  .lnk.main{background:var(--gold); border-color:var(--gold); color:#2A1406}
+  .lnk.main .tx small{color:#4A2A08; opacity:.85}
+  .lnk.main .go{opacity:.55}
+  .lnk.main:hover,.lnk.main:focus-visible{background:#E0B25A; border-color:#E0B25A}
+
+  footer{margin-top:30px; font-size:11.5px; color:var(--lav); opacity:.6; line-height:1.9}
+  footer a{color:var(--lav)}
+  @media (prefers-reduced-motion:reduce){ .lnk{transition:none} .lnk:hover{transform:none} }
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <img class="avatar" src="../assets/img/ghaliya.jpg" alt="غالية النويّف">
+  <h1>غالية النويّف</h1>
+  <p class="role">مؤسِسة Cash Clinic</p>
+  <p class="blurb">محاسبة متخصصة في إدارة الميزانيات الشخصية والديون والأصول</p>
+
+  <nav class="links">
+
+    <a class="lnk main" href="https://wa.me/96522260820" target="_blank" rel="noopener">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.12.16 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.28Z"/></svg></span>
+      <span class="tx">واتساب Cash Clinic<small>احجز استشارتك أو اسأل عن الباقات</small></span>
+      <span class="go" aria-hidden="true">‹</span>
+    </a>
+
+    <a class="lnk" href="https://cashclinic.net" target="_blank" rel="noopener">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.93 6h-2.95a15.6 15.6 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8ZM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96ZM4.26 14a7.94 7.94 0 0 1 0-4h3.38a16.6 16.6 0 0 0 0 4H4.26Zm.81 2h2.95c.32 1.25.79 2.45 1.38 3.56A7.99 7.99 0 0 1 5.07 16Zm2.95-8H5.07a7.99 7.99 0 0 1 4.33-3.56A15.6 15.6 0 0 0 8.02 8ZM12 19.96A13.6 13.6 0 0 1 10.09 16h3.82A13.6 13.6 0 0 1 12 19.96ZM14.34 14H9.66a14.7 14.7 0 0 1 0-4h4.68a14.7 14.7 0 0 1 0 4Zm.26 5.56c.59-1.11 1.06-2.31 1.38-3.56h2.95a7.99 7.99 0 0 1-4.33 3.56ZM16.36 14a16.6 16.6 0 0 0 0-4h3.38a7.94 7.94 0 0 1 0 4h-3.38Z"/></svg></span>
+      <span class="tx">موقع Cash Clinic<small>الباقات، الكتيّبات، والحجز</small></span>
+      <span class="go" aria-hidden="true">‹</span>
+    </a>
+
+    <a class="lnk" href="https://www.instagram.com/cash.clinic" target="_blank" rel="noopener">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Zm0 1.98c-3.15 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.17-.06 1.24-.07 1.59-.07 4.74s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.17.4 1.24.06 1.59.07 4.74.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.17.06-1.24.07-1.59.07-4.74s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.17-.4-1.24-.06-1.59-.07-4.74-.07Zm0 3.37a5.49 5.49 0 1 1 0 10.98 5.49 5.49 0 0 1 0-10.98Zm0 9.06a3.57 3.57 0 1 0 0-7.14 3.57 3.57 0 0 0 0 7.14Zm6.99-9.28a1.28 1.28 0 1 1-2.57 0 1.28 1.28 0 0 1 2.57 0Z"/></svg></span>
+      <span class="tx">إنستغرام Cash Clinic<small>@cash.clinic</small></span>
+      <span class="go" aria-hidden="true">‹</span>
+    </a>
+
+    <!--
+      غالية's PERSONAL Instagram.
+      Left out rather than guessed: the site has only @cash.clinic anywhere in
+      it, and a bio link that opens the wrong profile is worse than one link
+      fewer. Put the handle in both places below and delete these comment
+      markers to switch it on.
+    <a class="lnk" href="https://www.instagram.com/HANDLE" target="_blank" rel="noopener">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Z"/></svg></span>
+      <span class="tx">إنستغرام غالية<small>@HANDLE</small></span>
+      <span class="go" aria-hidden="true">‹</span>
+    </a>
+    -->
+
+    <a class="lnk" href="https://www.tiktok.com/@ghalia.alnuwaief" target="_blank" rel="noopener">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.69a5.67 5.67 0 0 0-.77-.05A5.68 5.68 0 1 0 15.54 15.3V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.3 4.3 0 0 1-3.24-1.48Z"/></svg></span>
+      <span class="tx">تيك توك<small>@ghalia.alnuwaief</small></span>
+      <span class="go" aria-hidden="true">‹</span>
+    </a>
+
+  </nav>
+
+  <footer>
+    Cash Clinic · كاش كلينك · الكويت<br>
+    <a href="../policy.html">سياسة الاستشارات</a>
+  </footer>
+</main>
+
+<script src="../assets/js/hit.js" defer></script>
+</body>
+</html>
