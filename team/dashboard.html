@@ -783,7 +783,8 @@
   <div class="sec" id="tasksSec" data-panel="tasks" hidden>
     <h2><span></span> مراسلات الفريق</h2>
     <div class="pfbar">
-      <div class="f"><label>الى من</label><select id="tkWho"></select></div>
+      <div class="f" style="flex:1 1 200px"><label>الى من (تقدر تختار أكثر من واحد)</label>
+        <select id="tkWho" multiple size="4" style="min-height:96px"></select></div>
       <div class="f" style="flex:1 1 100%"><label>الرسالة</label>
         <textarea id="tkText" rows="5" placeholder="اكتب رسالتك هني .. تقدر تطوّل براحتك"
           style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;font-family:inherit;line-height:1.9;resize:vertical;min-height:130px;background:#fff"></textarea></div>
@@ -1168,7 +1169,7 @@
     </div>
 
     <div id="bkSchedWrap">
-    <h2 style="font-size:17px;margin-top:22px"><span></span> جدول العمل <span class="whoname" id="bkWhoName"></span></h2>
+    <h2 data-foldh="bk-sched" style="font-size:17px;margin-top:22px"><span></span> جدول العمل <span class="whoname" id="bkWhoName"></span></h2>
     <div class="bkgrid">
       <div class="bkbox" data-fold="bk-online">
         <h4>أونلاين <label style="font-weight:400;font-size:12.5px;color:var(--ink)"><input type="checkbox" id="onEn" checked> مفعّل</label></h4>
@@ -1225,7 +1226,7 @@
     <button class="bksave" id="bkSave">احفظ الجدول</button>
     </div>
 
-    <h2 style="font-size:17px;margin-top:26px"><span></span> التقويم <span class="whoname" id="bkCalWho"></span></h2>
+    <h2 data-foldh="bk-cal" style="font-size:17px;margin-top:26px"><span></span> التقويم <span class="whoname" id="bkCalWho"></span></h2>
     <div class="bkcal" id="bkCal" hidden>
       <div class="bkcal-top">
         <button type="button" class="bkcal-nav" data-cal="prev">الشهر السابق</button>
@@ -1244,7 +1245,7 @@
       <div class="bkcal-day" id="bkCalDay"></div>
     </div>
 
-    <h2 style="font-size:17px;margin-top:26px"><span></span> الحجوزات</h2>
+    <h2 data-foldh="bk-list" style="font-size:17px;margin-top:26px"><span></span> الحجوزات</h2>
     <div class="flt" id="bkFlt">
       <button data-bk="upcoming" class="on">القادمة</button>
       <button data-bk="past">السابقة</button>
@@ -1517,6 +1518,7 @@ async function refreshAll(opt){
     clearPanelCaches();
     render();
     foldInit();
+    foldSections();
     if(!TK) loadTasks();
     /* whatever tab is open reloads its own data too, or the page would look
        refreshed while the panel in front of you stayed yesterday's */
@@ -1551,6 +1553,43 @@ document.addEventListener("visibilitychange", ()=>{
    which on a phone means scrolling past what you are not looking at to reach
    what you are. Any box with a `data-fold` id gets a — button and remembers
    whether it was left open. */
+/**
+ * Fold a whole SECTION, not a box: the heading carries `data-foldh` and
+ * everything after it — up to the next folding heading — goes with it.
+ *
+ * المواعيد stacks three of these (جدول العمل · التقويم · الحجوزات) and on a
+ * phone that is a long scroll past two things to reach the third, so they
+ * start closed and are opened on purpose.
+ */
+function foldSections(root){
+  (root||document).querySelectorAll("[data-foldh]").forEach(h=>{
+    if(h.dataset.foldReady) return;
+    h.dataset.foldReady="1";
+    const key="ccFoldS:"+h.dataset.foldh;
+    const body=[];
+    for(let n=h.nextElementSibling; n; n=n.nextElementSibling){
+      if(n.hasAttribute&&n.hasAttribute("data-foldh")) break;
+      body.push(n);
+    }
+    h.classList.add("foldh");
+    const btn=document.createElement("button");
+    btn.type="button"; btn.className="foldb";
+    h.appendChild(btn);
+    /* closed unless this person has opened it before — «الافتراضي مطوي» */
+    let open = localStorage.getItem(key)==="1";
+    const paint=()=>{
+      body.forEach(n=>{ n.style.display = open ? "" : "none"; });
+      btn.textContent = open ? "−" : "+";
+      btn.title = open ? "اطوِ" : "افتح";
+    };
+    paint();
+    h.addEventListener("click",(e)=>{
+      if(e.target.closest("input,select,a")) return;
+      open=!open; localStorage.setItem(key, open?"1":"0"); paint();
+    });
+  });
+}
+
 function foldInit(root){
   (root||document).querySelectorAll("[data-fold]").forEach(box=>{
     if(box.dataset.foldReady) return;
@@ -1605,9 +1644,12 @@ onAuthStateChanged(auth, async (user)=>{
        every later refresh compares against it, so a deploy that happens while
        somebody is sitting in the app is noticed rather than missed */
     if(!PAGE_BUILD && DATA && DATA.build) PAGE_BUILD = DATA.build;
+    /* read once at login so the idea-comment buttons know who is looking */
+    window.__ccEmail = (DATA && DATA.email) || "";
     LAST_REFRESH = Date.now();
     render();
     foldInit();
+    foldSections();
     if(!TK) loadTasks();
     /* only listens for a push arriving while the page is open; it asks for no
        permission and registers no worker, so it is safe to run for everyone */
@@ -1806,7 +1848,8 @@ function tkTable(rows, mineSide){
           <div class="pfrule">${esc(dt(t.when))}</div>
           ${(t.replies||[]).map(rp=>`<div class="pfrule" style="border-inline-start:3px solid var(--line);
              padding-inline-start:8px;margin-top:5px;line-height:1.7"><b>${esc(rp.byName)}</b>: ${esc(rp.text)}</div>`).join("")}</td>
-      <td>${esc(tkName(mineSide?t.from:t.to))}</td>
+      <td>${esc(mineSide ? tkName(t.from)
+            : ((t.toList&&t.toList.length?t.toList:[t.to]).map(tkName).join("، ")))}</td>
       <td class="num">${t.due?esc(t.due):"—"}</td>
       <td>${t.done?'<span style="color:#128C4A;font-weight:700">خلصت ✅</span>'
             :onMe?'<span style="color:#D3A146;font-weight:700">ردّك مطلوب</span>'
@@ -1888,7 +1931,9 @@ $("#tkView") && $("#tkView").addEventListener("change", e=>{
 });
 
 $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
-  const to=$("#tkWho").value, text=$("#tkText").value.trim();
+  const toList=Array.from($("#tkWho").selectedOptions||[]).map(o=>o.value).filter(Boolean);
+  const text=$("#tkText").value.trim();
+  if(!toList.length) return tkMsg("اختر شخص أو أكثر من الفريق", false);
   if(text.length<2) return tkMsg("اكتب الرسالة", false);
   const picked=Array.from(($("#tkFiles")&&$("#tkFiles").files)||[]);
   if(picked.length>4) return tkMsg("أقصى شي ٤ مرفقات بالرسالة الوحدة", false);
@@ -1900,10 +1945,11 @@ $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
   try{
     const files=[];
     for(const f of picked) files.push({ name:f.name, type:f.type, base64:await readB64(f) });
-    await addTask({ to, text, due:$("#tkDue").value||"", files });
+    await addTask({ toList, text, due:$("#tkDue").value||"", files });
     $("#tkText").value=""; $("#tkDue").value="";
     if($("#tkFiles")) $("#tkFiles").value="";
-    await loadTasks(); tkMsg(`انرسلت لـ ${tkName(to)} ✅ ووصلها إيميل`, true);
+    Array.from($("#tkWho").options||[]).forEach(o=>{ o.selected=false; });
+    await loadTasks(); tkMsg(`انرسلت لـ ${toList.map(tkName).join("، ")} ✅ ووصلهم إيميل`, true);
   }catch(e){ tkMsg((e&&e.message)||"تعذّر الإرسال", false); }
   finally{ b.disabled=false; b.textContent=t0; }
 });
@@ -1997,6 +2043,33 @@ document.addEventListener("click", async (e)=>{
     try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انسكّر الهدف",true); }
     catch(err){ tgMsg((err&&err.message)||"تعذّر",false); }
     finally{ off.disabled=false; }
+  }
+});
+
+/* the three who may tidy anybody's comment — same list the server enforces,
+   mirrored here only so the buttons are not offered where they would fail */
+const IDEA_BOSS = ["ghalia.n@cashclinic.net","sarah.h@cashclinic.net","abdullah.a@cashclinic.net"]
+  .indexOf(String((window.__ccEmail)||"").toLowerCase()) !== -1;
+
+document.addEventListener("click", async (e)=>{
+  const ed=e.target.closest("[data-noteedit]");
+  if(ed){
+    const cur=ed.previousElementSibling && ed.previousElementSibling.textContent || "";
+    const txt=prompt("عدّل التعليق:", cur.trim());
+    if(txt==null || !txt.trim()) return;
+    ed.disabled=true;
+    try{ await updateIdea({ id:ed.dataset.noteedit, noteAt:Number(ed.dataset.at), editNote:txt.trim() });
+         ID=null; await loadIdeas(); }
+    catch(err){ ed.disabled=false; alert((err&&err.message)||"تعذّر التعديل"); }
+    return;
+  }
+  const dl=e.target.closest("[data-notedel]");
+  if(dl){
+    if(!confirm("تحذف هذا التعليق؟")) return;
+    dl.disabled=true;
+    try{ await updateIdea({ id:dl.dataset.notedel, noteAt:Number(dl.dataset.at), removeNote:true });
+         ID=null; await loadIdeas(); }
+    catch(err){ dl.disabled=false; alert((err&&err.message)||"تعذّر الحذف"); }
   }
 });
 
@@ -3225,6 +3298,21 @@ function hmMyDiary(){
   if(role==="all"||role==="sales") return null;
   return (DATA&&DATA.profitMember)||null;
 }
+/**
+ * Me, as a consultant — whatever my role is.
+ *
+ * hmMyDiary() answers a different question: "whose diary am I allowed to
+ * read", and for full access the answer is everybody's, so it returns null.
+ * Feeding that to the counter is why غالية's «مواعيد اليوم» kept showing the
+ * whole clinic: she has full access, so `mine` was null, so every booking
+ * counted as hers. The counter is asking "how many are MINE", which is a
+ * question about the person, not the permission.
+ */
+function hmMeAsConsultant(){ return (DATA&&DATA.profitMember)||null; }
+function hmIsMine(b){
+  const me=hmMeAsConsultant(); if(!me) return false;
+  return ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(me)!==-1;
+}
 function hmOnMyDiary(b){
   const mine=hmMyDiary();
   return !mine || ((b.participantIds&&b.participantIds.length)?b.participantIds:[b.consultantId]).indexOf(mine)!==-1;
@@ -3237,7 +3325,7 @@ function hmOnMyDiary(b){
 function hmTodayRows(list, onlyMine){
   const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
   return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)===key
-      && (!onlyMine || hmOnMyDiary(b)))
+      && (onlyMine ? hmIsMine(b) : hmOnMyDiary(b)))
     .sort((a,b)=>a.startMs-b.startMs);
 }
 /* the next two after today. A day with nothing in it still has a tomorrow,
@@ -3245,7 +3333,7 @@ function hmTodayRows(list, onlyMine){
 function hmNextRows(list, onlyMine){
   const n=bkNowKw(), key=bkKey(n.y,n.m,n.d);
   return (list||[]).filter(b=>b.status!=="cancelled" && b.startIso && bkDateKey(b.startIso)>key
-      && (!onlyMine || hmOnMyDiary(b)))
+      && (onlyMine ? hmIsMine(b) : hmOnMyDiary(b)))
     .sort((a,b)=>a.startMs-b.startMs).slice(0,3);
 }
 function renderHome(){
@@ -3351,7 +3439,17 @@ function renderIdeas(){
         ${(x.files||[]).map((f,i)=>`<button class="pfbtn" data-idfile="${esc(x.id)}" data-i="${i}"
           style="padding:4px 11px;font-size:12px">📎 ${esc(f.name||"ملف")}</button>`).join("")}
       </div>`:""}
-      ${(x.notes||[]).map(n=>`<div class="muted" style="font-size:12.5px;line-height:1.7;margin-top:4px">${esc(n.byName)}: ${esc(n.note)}</div>`).join("")}
+      ${(x.notes||[]).map(n=>{
+          /* yours to change, or anyone's if you are one of the three */
+          const mine = n.by===(DATA&&DATA.email) || IDEA_BOSS;
+          return `<div class="muted" style="font-size:12.5px;line-height:1.7;margin-top:4px">
+            ${esc(n.byName)}: <span>${esc(n.note)}</span>${n.editedAt?` <span style="opacity:.6">(معدّل)</span>`:""}
+            ${mine?` <button class="pfbtn" data-noteedit="${esc(x.id)}" data-at="${Number(n.at)||0}"
+                       style="font-size:11px;padding:2px 7px">عدّل</button>
+                     <button class="pfbtn" data-notedel="${esc(x.id)}" data-at="${Number(n.at)||0}"
+                       style="font-size:11px;padding:2px 7px">احذف</button>`:""}
+          </div>`;
+        }).join("")}
       ${may?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
         ${st.filter(k=>k!==x.status).map(k=>`<button class="pfbtn" data-idst="${esc(x.id)}" data-v="${esc(k)}" style="padding:4px 11px;font-size:12px">${esc(k)}</button>`).join("")}
         <button class="pfbtn" data-idnote="${esc(x.id)}" style="padding:4px 11px;font-size:12px">علّق</button>
