@@ -471,10 +471,10 @@
 <div class="cc-ad-overlay" id="ccAd" hidden aria-hidden="true">
   <div class="cc-ad-modal" role="dialog" aria-label="إعلان" id="ccAdModal">
     <button class="cc-ad-x" id="ccAdX" aria-label="إغلاق">✕</button>
-    <a class="cc-ad-imgwrap" href="courses/khatwatain.html" id="ccAdLink">
-      <img id="ccAdImg" src="courses/img/khatwatain-promo.jpg" alt="لقاء مجاني: شلون يصير عندك فلوس بخطوتين؟" width="1080" height="1347" loading="eager">
+    <a class="cc-ad-imgwrap" href="courses/raha.html" id="ccAdLink">
+      <img id="ccAdImg" src="courses/img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية" width="1080" height="1350" loading="eager">
     </a>
-    <a class="cc-ad-cta" href="courses/khatwatain.html" id="ccAdCta">سجّل مقعدك مجاناً · السبت ١٩ سبتمبر ←</a>
+    <a class="cc-ad-cta" href="courses/raha.html" id="ccAdCta">احجز مقعدك · ٢١–٢٣ سبتمبر ←</a>
   </div>
 </div>
 <script>
@@ -489,10 +489,9 @@
      rather than advertising something that has already happened.
      Dates are Kuwait time, which is UTC+3 with no daylight saving. */
   var ADS=[
-    { until:"2026-09-20T00:00:00+03:00", href:"courses/khatwatain.html",
-      img:"courses/img/khatwatain-promo.jpg", w:1080, h:1347,
-      alt:"لقاء مجاني: شلون يصير عندك فلوس بخطوتين؟",
-      cta:"سجّل مقعدك مجاناً · السبت ١٩ سبتمبر ←" },
+    /* the لقاء of 19/9 has been delivered — taken out by hand rather than
+       left to expire at midnight, because a poster for something that already
+       happened is worse than no poster for the few hours in between */
     { until:"2026-09-24T00:00:00+03:00", href:"courses/raha.html",
       img:"courses/img/raha-promo.jpg", w:1080, h:1350,
       alt:"ورشة كيف تصنع راحتك المالية",
@@ -577,5 +576,6 @@ try{
   }
 }catch(e){}
 </script>
+<script src="assets/js/hit.js" defer></script>
 </body>
 </html>
