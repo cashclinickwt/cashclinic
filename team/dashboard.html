@@ -748,7 +748,7 @@
         <div class="muted" style="font-size:12px;margin-top:4px">اضغط Ctrl أو Cmd لاختيار أكثر من واحد · بيوصلهم إيميل</div></div>
       <div class="f" style="flex:1 1 220px"><label>مرفقات (اختياري)</label>
         <input id="idFiles" type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,text/plain">
-        <div class="muted" style="font-size:12px;margin-top:4px">حتى 4 ملفات · 5 ميجا للملف</div></div>
+        <div class="muted" style="font-size:12px;margin-top:4px">حتى 4 ملفات · 100 ميجا للملف</div></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="idAdd">شارك الفكرة</button></div>
     </div>
     <div class="addmsg" id="idMsg"></div>
@@ -788,7 +788,7 @@
       <div class="f" style="flex:1 1 100%"><label>الرسالة</label>
         <textarea id="tkText" rows="5" placeholder="اكتب رسالتك هني .. تقدر تطوّل براحتك"
           style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;font-family:inherit;line-height:1.9;resize:vertical;min-height:130px;background:#fff"></textarea></div>
-      <div class="f" style="flex:1 1 320px"><label>مرفقات (اختياري) — صور أو PDF، ٥ ميجا للملف</label>
+      <div class="f" style="flex:1 1 320px"><label>مرفقات (اختياري) — حتى ١٠٠ ميجا للملف</label>
         <input id="tkFiles" type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,text/plain"></div>
       <div class="f"><label>الموعد (اختياري)</label><input id="tkDue" type="date"></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tkAdd">أرسل</button></div>
@@ -1328,6 +1328,8 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getStorage, ref as sRef, uploadBytesResumable }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFunctions, httpsCallable }
@@ -1363,6 +1365,46 @@ const updateIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateI
 const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteIdea");
 const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIdeaFile");
 const getTaskFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTaskFile");
+const STORE=getStorage(app);
+const BIG_MAX=100*1024*1024;
+
+/**
+ * Put a file in Storage and hand back the path.
+ *
+ * Attachments used to be base64'd into the callable, which capped them at
+ * 5 MB — a limit of the pipe, not a decision. The browser writes straight to
+ * Storage now: no ceiling worth naming, a real progress figure, and it picks
+ * up where it left off if the connection drops halfway through 90 MB.
+ *
+ * It lands in this person's own folder, which is the only place the storage
+ * rule lets them write, and the server moves it somewhere permanent once the
+ * message is actually saved.
+ */
+function ccUpload(file, onPct){
+  return new Promise((resolve,reject)=>{
+    const uid=(auth.currentUser&&auth.currentUser.uid)||"";
+    if(!uid) return reject(new Error("سجّل دخولك أول"));
+    const safe=String(file.name||"file").replace(/[^\w.\-]+/g,"_").slice(-80);
+    const path=`teamFiles/${uid}/${Date.now()}-${Math.random().toString(36).slice(2,8)}-${safe}`;
+    const task=uploadBytesResumable(sRef(STORE,path), file, { contentType:file.type||"application/octet-stream" });
+    task.on("state_changed",
+      (sn)=>{ if(onPct && sn.totalBytes) onPct(Math.round(sn.bytesTransferred/sn.totalBytes*100)); },
+      (err)=>reject(new Error((err&&err.message)||"تعذّر رفع الملف")),
+      ()=>resolve({ name:String(file.name||"file").slice(0,160), type:file.type||"", size:file.size, path }));
+  });
+}
+
+/* a link now, not bytes — a 100 MB file cannot come back through a callable */
+async function ccOpenFile(call, args, btn){
+  const was=btn.textContent; btn.disabled=true; btn.textContent="…";
+  try{
+    const r=await call(args); const d=(r&&r.data)||{};
+    if(!d.url) throw new Error("المرفق غير موجود");
+    const a=document.createElement("a"); a.href=d.url; a.rel="noopener";
+    a.download=d.name||"file"; document.body.appendChild(a); a.click(); a.remove();
+  }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
+  finally{ btn.disabled=false; btn.textContent=was; }
+}
 const setSalesTarget=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setSalesTarget");
 const savePushDevice=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"savePushDevice");
 const getNotifySettings=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getNotifySettings");
@@ -1939,12 +1981,18 @@ $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
   if(picked.length>4) return tkMsg("أقصى شي ٤ مرفقات بالرسالة الوحدة", false);
   /* checked here as well as on the server: a 5 MB cap the browser enforces
      saves the user a slow upload that was always going to be refused */
-  const big=picked.find(f=>f.size>5*1024*1024);
-  if(big) return tkMsg(`«${big.name}» أكبر من ٥ ميجا`, false);
+  const big=picked.find(f=>f.size>BIG_MAX);
+  if(big) return tkMsg(`«${big.name}» أكبر من ١٠٠ ميجا`, false);
   const b=$("#tkAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
   try{
     const files=[];
-    for(const f of picked) files.push({ name:f.name, type:f.type, base64:await readB64(f) });
+    for(let i=0;i<picked.length;i++){
+      const f=picked[i];
+      files.push(await ccUpload(f,(pct)=>{
+        b.textContent=`رفع ${i+1}/${picked.length} · ${pct}%`;
+      }));
+    }
+    b.textContent="يحفظ…";
     await addTask({ toList, text, due:$("#tkDue").value||"", files });
     $("#tkText").value=""; $("#tkDue").value="";
     if($("#tkFiles")) $("#tkFiles").value="";
@@ -1959,14 +2007,7 @@ document.addEventListener("click", async (e)=>{
   const fl=e.target.closest("[data-tkfile]"); if(!fl) return;
   const was=fl.textContent; fl.disabled=true; fl.textContent="…";
   try{
-    const r=await getTaskFile({id:fl.dataset.tkfile,index:Number(fl.dataset.i)||0});
-    const d=(r&&r.data)||{};
-    const bin=atob(d.base64||""); const arr=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-    const url=URL.createObjectURL(new Blob([arr],{type:d.type||"application/octet-stream"}));
-    const a=document.createElement("a"); a.href=url; a.download=d.name||"file";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    await ccOpenFile(getTaskFile,{id:fl.dataset.tkfile,index:Number(fl.dataset.i)||0},fl);
   }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
   finally{ fl.disabled=false; fl.textContent=was; }
 });
@@ -3468,13 +3509,12 @@ $("#idAdd") && $("#idAdd").addEventListener("click", async ()=>{
        everything or saves nothing — no idea left pointing at a missing file */
     const picked=Array.from(($("#idFiles")||{}).files||[]).slice(0,4);
     const files=[];
-    for(const f of picked){
-      if(f.size>5*1024*1024){ throw new Error(`«${f.name}» أكبر من 5 ميجا`); }
-      const b64=await new Promise((res,rej)=>{ const r=new FileReader();
-        r.onload=()=>res(String(r.result).split(",")[1]||""); r.onerror=()=>rej(new Error("تعذّر قراءة الملف"));
-        r.readAsDataURL(f); });
-      files.push({ name:f.name, type:f.type, base64:b64 });
+    for(let i=0;i<picked.length;i++){
+      const f=picked[i];
+      if(f.size>BIG_MAX){ throw new Error(`«${f.name}» أكبر من ١٠٠ ميجا`); }
+      files.push(await ccUpload(f,(pct)=>{ b.textContent=`رفع ${i+1}/${picked.length} · ${pct}%`; }));
     }
+    b.textContent="يحفظ…";
     const mentions=Array.from(($("#idWho")||{}).selectedOptions||[]).map(o=>o.value).filter(Boolean);
     await addIdea({ title, area:($("#idArea").value||"").trim(),
       body:($("#idBody").value||"").trim(), mentions, files });
@@ -3497,14 +3537,7 @@ document.addEventListener("click", async e=>{
   if(fl){
     const btn=fl, was=btn.textContent; btn.disabled=true; btn.textContent="جارٍ التحميل…";
     try{
-      const r=await getIdeaFile({id:fl.dataset.idfile,index:Number(fl.dataset.i)||0});
-      const d=(r&&r.data)||{};
-      const bin=atob(d.base64||""); const arr=new Uint8Array(bin.length);
-      for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-      const url=URL.createObjectURL(new Blob([arr],{type:d.type||"application/octet-stream"}));
-      const a=document.createElement("a"); a.href=url; a.download=d.name||"file";
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      await ccOpenFile(getIdeaFile,{id:fl.dataset.idfile,index:Number(fl.dataset.i)||0},btn);
     }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
     finally{ btn.disabled=false; btn.textContent=was; }
     return;
