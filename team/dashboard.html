@@ -674,6 +674,7 @@
     <div class="navgrp" data-grp="sales">المبيعات</div>
     <button data-tab="sales">المبيعات</button>
     <button data-tab="clients">كل العملاء</button>
+    <button data-tab="salesteam">فريق المبيعات</button>
     <div class="navgrp" data-grp="clients">العملاء</div>
     <button data-tab="bookings">المواعيد</button>
     <button data-tab="quiz">الاختبارات</button>
@@ -690,6 +691,7 @@
     <button data-tab="tasks">مراسلات الفريق</button>
     <button data-tab="meetings">اجتماعاتي</button>
     <button data-tab="ideas">أفكارنا</button>
+    <button data-tab="followup">متابعة الفريق</button>
     <button data-tab="profit" data-family="money">المال</button>
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
     <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
@@ -709,6 +711,8 @@
       <div class="hmcard"><div class="hmt"><b>مواعيد اليوم والقادمة</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
       <div class="hmcard"><div class="hmt"><b>مهام عليّ</b><button type="button" class="hmlink" data-go="tasks">كل المهام</button></div><div id="hmTasks"></div></div>
     </div>
+    <div id="hmSalesPie"></div>
+    <div id="hmPrio"></div>
     <div id="hmNudge"></div>
     <div class="hmpies" id="hmPies"></div>
   </div>
@@ -752,8 +756,38 @@
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="idAdd">شارك الفكرة</button></div>
     </div>
     <div class="addmsg" id="idMsg"></div>
+    <!-- Promoted ideas, in the order the team wants them done. It sits above
+         the board because an order you have to scroll to find is an order
+         nobody reads. -->
+    <div id="prioBox" style="background:#fff;border:1px solid var(--line);border-radius:14px;
+         padding:14px 16px;margin:0 0 16px">
+      <h4 data-foldh="id-prio" style="margin:0 0 10px;font-size:14px;color:var(--auber)">الأولويات</h4>
+      <div id="prioList"></div>
+    </div>
     <div class="flt" id="idFlt"></div>
     <div id="idList"></div>
+  </div>
+
+  <!-- ===== فريق المبيعات ===== -->
+  <div class="sec" id="stSec" data-panel="salesteam" hidden>
+    <h2><span></span> فريق المبيعات</h2>
+    <div class="flt" id="stTabs">
+      <button class="on" data-st="leads">متابعة العملاء</button>
+      <button data-st="vouchers">القسائم</button>
+    </div>
+    <div class="addmsg" id="stMsg"></div>
+    <div id="stBody"></div>
+  </div>
+
+  <!-- ===== متابعة الفريق (للصلاحية الكاملة فقط) ===== -->
+  <div class="sec" id="fuSec" data-panel="followup" hidden>
+    <h2><span></span> متابعة الفريق</h2>
+    <div class="pfbar">
+      <div class="f"><label>الشهر</label><input id="fuMonth" type="month"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn" id="fuGo">اعرض</button></div>
+    </div>
+    <div class="addmsg" id="fuMsg"></div>
+    <div id="fuBody"></div>
   </div>
 
   <!-- ===== اجتماعاتي ===== -->
@@ -1148,7 +1182,7 @@
         <div class="addf" id="nbAmountWrap"><label>المبلغ</label><input id="nbAmount" type="number" min="0" step="1"></div>
       </div>
       <div class="addrow" style="margin-top:4px" id="nbPayWrap">
-        <label><input type="radio" name="nbPay" value="link" checked> أرسل له رابط دفع</label>
+        <label><input type="radio" name="nbPay" value="link"> أرسل له رابط دفع</label>
         <label><input type="radio" name="nbPay" value="cash"> مدفوع مسبقاً</label>
         <label><input type="radio" name="nbPay" value="deema"> دفع بـ ديمة</label>
       </div>
@@ -1365,6 +1399,13 @@ const updateIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateI
 const deleteIdea=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"deleteIdea");
 const getIdeaFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIdeaFile");
 const getTaskFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTaskFile");
+const touchStaff=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"touchStaff");
+const setPriorities=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setPriorities");
+const getSalesTeam=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTeam");
+const sendToSales=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendToSales");
+const updateSalesLead=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateSalesLead");
+const editVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editVoucher");
+const getTeamFollowUp=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTeamFollowUp");
 const STORE=getStorage(app);
 const BIG_MAX=100*1024*1024;
 
@@ -1542,6 +1583,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
+  ST=null; FU=null;
 }
 
 async function refreshAll(opt){
@@ -1688,6 +1730,8 @@ onAuthStateChanged(auth, async (user)=>{
     if(!PAGE_BUILD && DATA && DATA.build) PAGE_BUILD = DATA.build;
     /* read once at login so the idea-comment buttons know who is looking */
     window.__ccEmail = (DATA && DATA.email) || "";
+    /* one stamp per sign-in; it must never be able to delay the dashboard */
+    touchStaff({}).catch(()=>{});
     LAST_REFRESH = Date.now();
     render();
     foldInit();
@@ -2113,6 +2157,201 @@ document.addEventListener("click", async (e)=>{
     catch(err){ dl.disabled=false; alert((err&&err.message)||"تعذّر الحذف"); }
   }
 });
+
+/* ================= الأولويات =================
+   An order over ideas that already exist. Reordering writes the whole list in
+   one go rather than a rank per idea, so two people pressing ↑ at the same
+   moment cannot leave the queue half-renumbered. */
+function prioIds(){ return (ID && Array.isArray(ID.priorities)) ? ID.priorities.slice() : []; }
+
+function renderPriorities(){
+  const box=$("#prioList"); if(!box) return;
+  const ids=prioIds(), byId={};
+  ((ID&&ID.list)||[]).forEach(x=>{ byId[x.id]=x; });
+  if(!ids.length){
+    box.innerHTML=`<div class="pfrule">ما في أولويات بعد — اضغط «أولوية» على أي فكرة تحت.</div>`;
+    return;
+  }
+  box.innerHTML = ids.map((id,i)=>{
+    const x=byId[id]; if(!x) return "";
+    return `<div class="hmrow" style="align-items:center;gap:8px">
+      <span class="pill" style="background:var(--gold);color:#2A1406;font-weight:700">${i+1}</span>
+      <span style="flex:1;font-weight:600">${esc(x.title||"—")}</span>
+      <span class="pill">${esc(x.status||"")}</span>
+      <button class="pfbtn" data-prio-up="${esc(id)}" ${i===0?"disabled":""} title="فوق">↑</button>
+      <button class="pfbtn" data-prio-dn="${esc(id)}" ${i===ids.length-1?"disabled":""} title="تحت">↓</button>
+      <button class="pfbtn" data-prio-rm="${esc(id)}" title="شيله من الأولويات">✕</button>
+    </div>`;
+  }).join("");
+}
+
+async function savePriorities(ids){
+  const was = prioIds();
+  if(ID) ID.priorities = ids;         // optimistic: the list must feel instant
+  renderPriorities();
+  try{ await setPriorities({ ids }); }
+  catch(err){
+    if(ID) ID.priorities = was; renderPriorities();
+    alert((err&&err.message)||"تعذّر الحفظ");
+  }
+}
+
+document.addEventListener("click", async (e)=>{
+  const up=e.target.closest("[data-prio-up]"), dn=e.target.closest("[data-prio-dn]"),
+        rm=e.target.closest("[data-prio-rm]"), add=e.target.closest("[data-prio-add]");
+  if(!up && !dn && !rm && !add) return;
+  const ids=prioIds();
+  if(add){
+    const id=add.dataset.prioAdd;
+    if(ids.indexOf(id)!==-1) return;
+    ids.push(id);
+  }
+  if(rm){ const i=ids.indexOf(rm.dataset.prioRm); if(i===-1) return; ids.splice(i,1); }
+  if(up){ const i=ids.indexOf(up.dataset.prioUp); if(i<=0) return; ids.splice(i-1,0,ids.splice(i,1)[0]); }
+  if(dn){ const i=ids.indexOf(dn.dataset.prioDn); if(i===-1||i===ids.length-1) return; ids.splice(i+1,0,ids.splice(i,1)[0]); }
+  await savePriorities(ids);
+});
+
+/* the top three on the home page, so the order is seen without going looking */
+function renderHomePrio(){
+  const box=$("#hmPrio"); if(!box) return;
+  const top=(DATA&&DATA.topPriorities)||[];
+  box.innerHTML = top.length
+    ? `<div class="hmcard" style="margin-top:14px"><div class="hmt"><b>أولوياتنا</b>
+         <button type="button" class="hmlink" data-go="ideas">كل الأفكار</button></div>`+
+      top.map(x=>`<div class="hmrow" style="align-items:center;gap:8px">
+        <span class="pill" style="background:var(--gold);color:#2A1406;font-weight:700">${x.rank}</span>
+        <span style="flex:1;font-weight:600">${esc(x.title||"—")}</span>
+        <span class="pill">${esc(x.status||"")}</span></div>`).join("")+`</div>`
+    : "";
+}
+
+/* ================= فريق المبيعات ================= */
+let STTAB="leads";
+function stMsg(t,ok){ const m=$("#stMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
+
+async function loadSalesTeam(){
+  try{ const r=await getSalesTeam({}); ST=(r&&r.data)||{leads:[],vouchers:[]}; renderSalesTeam(); paintNav(); }
+  catch(err){ stMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+
+function stDate(ms){ if(!ms) return "—"; const d=new Date(ms); 
+  return `${d.getUTCFullYear()}-${bkPad2(d.getUTCMonth()+1)}-${bkPad2(d.getUTCDate())}`; }
+
+function renderSalesTeam(){
+  const box=$("#stBody"); if(!box || !ST) return;
+  if(STTAB==="leads"){
+    const rows=(ST.leads||[]);
+    box.innerHTML = rows.length ? rows.map(l=>`
+      <div class="hmcard" style="margin-bottom:10px">
+        <div class="hmt"><b>${esc(l.name||l.email)}</b>
+          <span class="pill">${esc(l.state)}</span></div>
+        <div class="muted" style="font-size:12.5px;line-height:1.9">
+          ${esc(l.email)}${l.phone?" · "+esc(l.phone):""}<br>
+          حوّله ${esc(l.sentByName||l.sentBy||"—")} · ${esc(stDate(l.sentMs))}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select class="pfbtn" data-lead-state="${esc(l.id)}">
+            ${(ST.states||[]).map(x=>`<option${x===l.state?" selected":""}>${esc(x)}</option>`).join("")}
+          </select>
+          <input class="pfbtn" data-lead-note="${esc(l.id)}" value="${esc(l.note||"")}"
+                 placeholder="ملاحظة" style="flex:1 1 200px;min-width:160px">
+          <button class="pfbtn" data-lead-rm="${esc(l.id)}">شيله</button>
+        </div>
+      </div>`).join("")
+      : `<div class="pfrule">ما في عملاء للمتابعة — ارسلهم من «كل العملاء».</div>`;
+  }else{
+    const rows=(ST.vouchers||[]);
+    const today=Date.now();
+    box.innerHTML = rows.length ? rows.map(v=>{
+      const lapsed = !v.redeemedMs && v.until && v.until < today;
+      return `<div class="hmcard" style="margin-bottom:10px">
+        <div class="hmt"><b>${esc(v.name||v.email)}</b>
+          <span class="pill" style="background:${v.redeemedMs?"var(--olive)":(lapsed?"#962E37":"var(--teal)")}">
+            ${v.redeemedMs?"استُخدمت":(lapsed?"منتهية":"سارية")}</span></div>
+        <div class="muted" style="font-size:12.5px;line-height:1.9">
+          ${esc(v.email)}${v.phone?" · "+esc(v.phone):""} · ${kwd(v.amount)}<br>
+          أصدرها ${esc(v.issuedByName||v.issuedBy||"—")}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input class="pfbtn" data-v-code="${esc(v.id)}" value="${esc(v.code)}" placeholder="الكود" style="width:120px">
+          <input class="pfbtn" data-v-months="${esc(v.id)}" value="${v.months}" type="number" min="0" max="60"
+                 placeholder="شهور" style="width:90px">
+          <input class="pfbtn" data-v-until="${esc(v.id)}" value="${esc(stDate(v.until))}" type="date" style="width:160px">
+          <input class="pfbtn" data-v-note="${esc(v.id)}" value="${esc(v.note||"")}" placeholder="ملاحظة"
+                 style="flex:1 1 180px;min-width:150px">
+          <button class="pfbtn go" data-v-save="${esc(v.id)}">احفظ</button>
+        </div>
+      </div>`;
+    }).join("") : `<div class="pfrule">ما في قسائم.</div>`;
+  }
+}
+
+$("#stTabs") && $("#stTabs").addEventListener("click", e=>{
+  const b=e.target.closest("[data-st]"); if(!b) return;
+  STTAB=b.dataset.st;
+  $("#stTabs").querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+  renderSalesTeam();
+});
+
+document.addEventListener("change", async (e)=>{
+  const st=e.target.closest("[data-lead-state]");
+  if(st){ try{ await updateSalesLead({ id:st.dataset.leadState, state:st.value }); await loadSalesTeam(); stMsg("انحفظ ✅", true); }
+          catch(err){ stMsg((err&&err.message)||"تعذّر", false); } }
+});
+document.addEventListener("click", async (e)=>{
+  const rm=e.target.closest("[data-lead-rm]");
+  if(rm){ if(!confirm("تشيله من المتابعة؟")) return;
+    try{ await updateSalesLead({ id:rm.dataset.leadRm, remove:true }); await loadSalesTeam(); }
+    catch(err){ stMsg((err&&err.message)||"تعذّر", false); } return; }
+  const sv=e.target.closest("[data-v-save]");
+  if(sv){
+    const id=sv.dataset.vSave, q=(k)=>document.querySelector(`[data-v-${k}="${id}"]`);
+    sv.disabled=true;
+    try{
+      await editVoucher({ id, code:q("code").value, months:Number(q("months").value),
+                          until:q("until").value, note:q("note").value });
+      await loadSalesTeam(); stMsg("انحفظت القسيمة ✅", true);
+    }catch(err){ sv.disabled=false; stMsg((err&&err.message)||"تعذّر الحفظ", false); }
+  }
+});
+
+/* ================= متابعة الفريق ================= */
+function fuMsg(t,ok){ const m=$("#fuMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
+
+async function loadFollowUp(){
+  const n=bkNowKw(), cur=`${n.y}-${bkPad2(n.m)}`;
+  const inp=$("#fuMonth"); if(inp && !inp.value) inp.value=cur;
+  try{ const r=await getTeamFollowUp({ month:(inp&&inp.value)||cur }); FU=(r&&r.data)||null; renderFollowUp(); }
+  catch(err){ fuMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+
+function fuAgo(ms){
+  if(!ms) return "ما دخل أبداً";
+  const mins=Math.floor((Date.now()-ms)/60000);
+  if(mins<60) return `قبل ${mins} دقيقة`;
+  const hrs=Math.floor(mins/60); if(hrs<24) return `قبل ${hrs} ساعة`;
+  const days=Math.floor(hrs/24); return `قبل ${days} يوم`;
+}
+
+function renderFollowUp(){
+  const box=$("#fuBody"); if(!box || !FU) return;
+  box.innerHTML=(FU.list||[]).map(p=>`
+    <div class="hmcard" style="margin-bottom:10px">
+      <div class="hmt"><b>${esc(p.name)}</b>
+        <span class="pill">${esc(ROLE_AR[p.role]||p.role)}</span></div>
+      <div class="kpis" style="margin:8px 0 0">
+        <div class="kpi"><div class="n">${fmt(p.bookings)}</div><div class="l">مواعيد</div></div>
+        <div class="kpi"><div class="n">${fmt(p.meetings)}</div><div class="l">اجتماعات</div></div>
+        <div class="kpi"><div class="n">${fmt(p.ideas)}</div><div class="l">أفكار</div></div>
+        <div class="kpi"><div class="n">${fmt(p.messagesSent)}</div><div class="l">رسائل أرسلها</div></div>
+      </div>
+      <div class="muted" style="font-size:12.5px;margin-top:8px">
+        مهام مفتوحة عليه: ${fmt(p.messagesOpen)} · آخر دخول: ${esc(fuAgo(p.lastSeenMs))}
+      </div>
+    </div>`).join("") || `<div class="pfrule">ما في بيانات.</div>`;
+}
+$("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp(); });
 
 /* ================= مركز الإشعارات =================
    The three states this screen has to explain, because getting any of them
@@ -3393,12 +3632,17 @@ function renderHome(){
   const kp=[];
   kp.push(`<div class="kpi"><div class="n">${fmt(todayMine.length)}</div><div class="l">مواعيد اليوم</div></div>`);
   kp.push(`<div class="kpi"><div class="n">${TK?fmt(tasks.length):"…"}</div><div class="l">مهام عليّ</div></div>`);
-  if(seesMoney() && DATA.sales) kp.push(`<div class="kpi"><div class="n">${money(rev)}</div><div class="l">مبيعات ${esc(BK_MON[n.m])}</div></div>`);
+  /* مبيعات الشهر used to be a single number here. It is a pie below now,
+     split by product — the total on its own never answered the question
+     anybody was actually asking, which is what the money came from. */
   if(nudge && !nudge.done && (nudge.owed||[]).length)
     kp.push(`<div class="kpi"><div class="n" style="color:#962E37">${kwd(nudge.total)}</div><div class="l">تحويلات ${esc(monthLabel(nudge.month))} ما طلعت</div></div>`);
   else if(PF&&PF.mine&&PF.mine.totals&&PF.mine.totals.due>0)
     kp.push(`<div class="kpi"><div class="n" style="color:#962E37">${kwd(PF.mine.totals.due)}</div><div class="l">باقي لك عن ${esc(monthLabel(PF.month))}</div></div>`);
   $("#hmKpis").innerHTML=kp.join("");
+
+  renderSalesPie(orders, rev);
+  renderHomePrio();
 
   const next=hmNextRows(bkList, false);
   const row=(b,withDay)=>{
@@ -3494,6 +3738,9 @@ function renderIdeas(){
       ${may?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
         ${st.filter(k=>k!==x.status).map(k=>`<button class="pfbtn" data-idst="${esc(x.id)}" data-v="${esc(k)}" style="padding:4px 11px;font-size:12px">${esc(k)}</button>`).join("")}
         <button class="pfbtn" data-idnote="${esc(x.id)}" style="padding:4px 11px;font-size:12px">علّق</button>
+        ${prioIds().indexOf(x.id)===-1
+          ? `<button class="pfbtn" data-prio-add="${esc(x.id)}" style="padding:4px 11px;font-size:12px">أولوية</button>`
+          : `<span class="pill" style="background:var(--gold);color:#2A1406;font-weight:700">أولوية ${prioIds().indexOf(x.id)+1}</span>`}
         <button class="pfbtn" data-iddel="${esc(x.id)}" style="padding:4px 11px;font-size:12px">حذف</button>
       </div>`:""}
     </div>`;
@@ -3758,6 +4005,45 @@ function pieCard(key, mine){
     <div class="tot">${cats.length?`المجموع ${kwd(total)}`:"—"}</div>${body}</div>`;
 }
 
+/**
+ * مبيعات الشهر, split by product.
+ *
+ * It was a single total in the KPI strip. A total tells you the month was
+ * good or bad and nothing about why, which is the only thing you can act on —
+ * so it is the same number broken into where it came from, drawn with the
+ * pie the profit cards already use so the page keeps one visual language.
+ */
+function renderSalesPie(orders, rev){
+  const box=$("#hmSalesPie"); if(!box) return;
+  if(!(seesMoney() && DATA.sales)){ box.innerHTML=""; return; }
+
+  /* productKey is what an order reliably carries; the readable name comes
+     from byProduct when it is there and falls back to the key, so a new
+     product that nobody has labelled yet still shows up rather than vanishing
+     into a blank slice */
+  const nameOf={};
+  ((DATA.sales.byProduct)||[]).forEach(p=>{ if(p.productKey) nameOf[p.productKey]=p.product; });
+  const by={};
+  (orders||[]).forEach(o=>{
+    const k=o.productKey||"other";
+    by[k]=(by[k]||0)+Number(o.amount||0);
+  });
+  const cats=Object.keys(by).map(k=>({ label:nameOf[k]||BOOK_LABEL[k]||k, share:by[k] }))
+    .filter(c=>c.share>0).sort((a,b)=>b.share-a.share);
+  const n=bkNowKw();
+
+  box.innerHTML = `<div class="hmpie" style="margin-top:14px">
+    <h4>مبيعات ${esc(BK_MON[n.m])}</h4>
+    <div class="tot">${cats.length?`المجموع ${kwd(rev)}`:"—"}</div>
+    ${cats.length
+      ? `<div class="hmpiewrap">${pieSvg(cats, rev, "sales")}
+          <div class="lg">${cats.map((c,i)=>`<div data-i="${i}" data-pie="sales">
+            <i style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></i>
+            <b>${esc(c.label)}</b><span>${kwd(c.share)}</span></div>`).join("")}</div></div>`
+      : `<div class="none">ما في مبيعات مسجّلة هالشهر.</div>`}
+  </div>`;
+}
+
 function renderPies(){
   const box=$("#hmPies"); if(!box) return;
   if(!(DATA&&DATA.profitMember)){ box.innerHTML=""; return; }
@@ -3925,12 +4211,20 @@ const PANELS = [
   { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
     count:()=>mtNext(2).length },
   { id:"ideas",       group:"team",   icon:"💡", allowed:()=>true, load:()=>{ if(!ID) loadIdeas(); } },
+  /* worked by sales and by full access — the two roles that touch it */
+  { id:"salesteam",   group:"sales",  icon:"🤝", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")),
+    load:()=>{ if(!ST) loadSalesTeam(); },
+    count:()=>((ST&&ST.leads)||[]).filter(l=>l.state==="جديد").length },
+  /* full access only: the four who can already read every other number */
+  { id:"followup",    group:"team",   icon:"📋", allowed:()=>!!(DATA&&DATA.role==="all"),
+    load:()=>{ if(!FU) loadFollowUp(); } },
   { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
   { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports") },
 ];
+let ST=null, FU=null;
 const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
@@ -4325,7 +4619,11 @@ function nbPkgs(){
     (p.sessions||[]).some(x => x.consultantId===who || (x.with||[]).indexOf(who)!==-1));
 }
 function nbCurrent(){ return nbAll().find(p=>p.key===($("#nbPkg")||{}).value); }
-function nbPayMode(){ const el=document.querySelector('input[name="nbPay"]:checked'); return el?el.value:"link"; }
+/* Returns "" when nothing is ticked, and the caller refuses to save.
+   It used to fall back to "link", which meant a booking could be created
+   without anybody deciding how it was paid — and since the server then forced
+   sales to "link" anyway, the money simply never arrived anywhere. */
+function nbPayMode(){ const el=document.querySelector('input[name="nbPay"]:checked'); return el?el.value:""; }
 
 function renderNasBooking(){
   const box=$("#nasBox"); if(!box) return;
@@ -4429,7 +4727,13 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
   const dt=$("#nbDate").value, tm=$("#nbTime").value;
   if(!dt||!tm) return nbMsg("حدد تاريخ ووقت الجلسة","err");
 
-  const method = nbPayMode();
+  /* asked for, never assumed — a booking with no stated method is the exact
+     hole the money was falling through */
+  const pay = nbPayMode();
+  if(!pay){ $("#nbPayWrap").style.outline="2px solid #962E37"; $("#nbPayWrap").style.borderRadius="10px";
+            return nbMsg("اختر طريقة الدفع","err"); }
+  $("#nbPayWrap").style.outline="";
+  const method = pay;
   const paid = method !== "link";
   const how = method==="deema" ? "بـ ديمة" : "مسبقاً";
   if(paid && seesMoney() && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
@@ -4442,7 +4746,7 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
       startIso:nbIso(dt,tm), mode:$("#nbMode").value,
       name, email, phone, amount:$("#nbAmount").value,
       notes:$("#nbNotes").value.trim(),
-      paymentMethod: nbPayMode()
+      paymentMethod: pay
     });
     const d=r.data||{};
     if(d.paid){
@@ -4581,9 +4885,26 @@ function renderClients(){
         ${seesMoney()&&c.spent>0?`<span class="clspent">${money(c.spent)}</span>`:""}
       </div>
       <div class="clchips">${chips}<span class="clchip" style="background:#EDEAF2;color:var(--muted)">آخر نشاط ${dt(c.lastSeen)}</span></div>
+      <div style="margin-top:9px"><button class="pfbtn" data-tosales="${esc((c.emails||[])[0]||"")}"
+        data-name="${esc(c.name||"")}" data-phone="${esc((c.phones||[])[0]||"")}"
+        style="padding:4px 11px;font-size:12px">أرسله لفريق المبيعات</button></div>
     </div>`;
   }).join("") + (rows.length>400?`<div class="clempty">تظهر أول 400 .. ضيّق البحث للباقي.</div>`:"");
 }
+
+/* handing a client over is a deliberate act, so it is a button on their row
+   rather than a filter that sweeps people into a queue behind your back */
+document.addEventListener("click", async (e)=>{
+  const b=e.target.closest("[data-tosales]"); if(!b) return;
+  const email=b.dataset.tosales;
+  if(!email) return alert("ما عنده إيميل مسجّل");
+  b.disabled=true; const was=b.textContent; b.textContent="…";
+  try{
+    const r=await sendToSales({ email, name:b.dataset.name, phone:b.dataset.phone });
+    b.textContent = (r&&r.data&&r.data.already) ? "موجود عندهم ✓" : "انرسل ✓";
+    ST=null;
+  }catch(err){ b.disabled=false; b.textContent=was; alert((err&&err.message)||"تعذّر"); }
+});
 
 $("#clSearch") && $("#clSearch").addEventListener("input", e=>{ CLQ=e.target.value.trim(); renderClients(); });
 $("#clFlt") && $("#clFlt").addEventListener("click", e=>{
