@@ -471,10 +471,11 @@
 <div class="cc-ad-overlay" id="ccAd" hidden aria-hidden="true">
   <div class="cc-ad-modal" role="dialog" aria-label="إعلان" id="ccAdModal">
     <button class="cc-ad-x" id="ccAdX" aria-label="إغلاق">✕</button>
-    <a class="cc-ad-imgwrap" href="courses/raha.html" id="ccAdLink">
-      <img id="ccAdImg" src="courses/img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية" width="1080" height="1350" loading="eager">
+    <!-- empty until an entry in ADS fills it; no src, so nothing is downloaded -->
+    <a class="cc-ad-imgwrap" href="#" id="ccAdLink">
+      <img id="ccAdImg" alt="" width="1080" height="1350">
     </a>
-    <a class="cc-ad-cta" href="courses/raha.html" id="ccAdCta">احجز مقعدك · ٢١–٢٣ سبتمبر ←</a>
+    <a class="cc-ad-cta" href="#" id="ccAdCta"></a>
   </div>
 </div>
 <script>
@@ -488,15 +489,14 @@
      لقاء, and once the ورشة is over the popup simply stops appearing
      rather than advertising something that has already happened.
      Dates are Kuwait time, which is UTC+3 with no daylight saving. */
-  var ADS=[
-    /* the لقاء of 19/9 has been delivered — taken out by hand rather than
-       left to expire at midnight, because a poster for something that already
-       happened is worse than no poster for the few hours in between */
-    { until:"2026-09-24T00:00:00+03:00", href:"courses/raha.html",
-      img:"courses/img/raha-promo.jpg", w:1080, h:1350,
-      alt:"ورشة كيف تصنع راحتك المالية",
-      cta:"احجز مقعدك · ٢١–٢٣ سبتمبر ←" }
-  ];
+  /* Empty on purpose: the homepage has no pop-up right now.
+     The overlay is `hidden` in the markup and only this list can open it, so
+     an empty list means nothing ever shows — with or without JavaScript.
+     To run one again, add a single entry:
+       { until:"YYYY-MM-DDT00:00:00+03:00", href:"…", img:"…", w:1080, h:1350,
+         alt:"…", cta:"… ←" }
+     and it retires itself at `until`. */
+  var ADS=[];
   var now=Date.now(), ad=null;
   for(var i=0;i<ADS.length;i++){ if(now < Date.parse(ADS[i].until)){ ad=ADS[i]; break; } }
   if(!ad) return;                      /* everything promoted has passed */
@@ -557,25 +557,6 @@ if(fnlBtn){ fnlBtn.addEventListener("click", async ()=>{
 }); }
 </script>
 
-<script type="module">
-/* The popup used to promise early booking in fixed text, so it kept selling
-   a discount that had already closed. It asks now. */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
-const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
-  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
-  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
-try{
-  const fns=getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
-  const d=(await httpsCallable(fns,"getCoursePublic")({courseId:"raha"})).data||{};
-  const cta=document.getElementById("ccAdCta");
-  if(cta && d.amount){
-    cta.textContent = d.earlyOpen
-      ? `سجّل بالتسجيل المبكر · ${d.amount} د.ك ←`
-      : `احجز مقعدك · ${d.amount} د.ك · ٢١–٢٣ سبتمبر ←`;
-  }
-}catch(e){}
-</script>
 <script src="assets/js/hit.js" defer></script>
 </body>
 </html>

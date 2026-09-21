@@ -1440,7 +1440,11 @@ async function ccOpenFile(call, args, btn){
   const was=btn.textContent; btn.disabled=true; btn.textContent="…";
   try{
     const r=await call(args); const d=(r&&r.data)||{};
-    if(!d.url) throw new Error("المرفق غير موجود");
+    /* This said «المرفق غير موجود» — the same words the server uses when a
+       file is genuinely missing, and the same words the old server used when
+       it failed to make a link. Three different failures, one sentence, so a
+       screenshot could never say which had happened. Each now has its own. */
+    if(!d.url) throw new Error("وصل رد بدون رابط (F3) — بلّغ عبدالله");
     const a=document.createElement("a"); a.href=d.url; a.rel="noopener";
     a.download=d.name||"file"; document.body.appendChild(a); a.click(); a.remove();
   }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }

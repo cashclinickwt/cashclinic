@@ -84,14 +84,28 @@
 
 <div class="cc-wrap">
   <div class="crs-tabs" id="crsTabs" role="tablist">
-    <button class="crs-tab on" type="button" data-grid="now" role="tab" aria-selected="true">الحالية<span class="n">1</span></button>
-    <button class="crs-tab" type="button" data-grid="past" role="tab" aria-selected="false">السابقة<span class="n">3</span></button>
+    <button class="crs-tab on" type="button" data-grid="now" role="tab" aria-selected="true">الحالية<span class="n">0</span></button>
+    <button class="crs-tab" type="button" data-grid="past" role="tab" aria-selected="false">السابقة<span class="n">4</span></button>
   </div>
 
   <div class="crs-grid" id="gridNow">
-    <a class="crs-card" href="raha.html">
+    <!-- shown only while nothing is current; delete it when the next card goes in -->
+    <div class="crs-empty" style="grid-column:1/-1;text-align:center;padding:44px 18px;
+         border:1.5px dashed var(--cc-grey-200,#ddd);border-radius:18px;line-height:2">
+      <b style="font-size:17px">ما في فعالية مفتوحة الحين</b><br>
+      <span style="color:var(--cc-grey-700,#555)">نخبرك بأول ما ننزل الجديد —
+        <a href="../index.html#newsletter">اشترك بالنشرة</a></span>
+    </div>
+  </div>
+
+  <!-- بعد ما ينتهي أي لقاء: انقل بطاقته من gridNow لهني، ضيف class="past"
+       على الرابط و<span class="crs-donechip">انتهى</span> جوّه crs-card-media،
+       وبدّل crs-go بـ crs-watch عشان تودّي لصفحة التسجيل. وعدّل أرقام التبويبات فوق. -->
+  <div class="crs-grid" id="gridPast" hidden>
+    <a class="crs-card past" href="raha.html">
       <div class="crs-card-media">
         <img src="img/raha-promo.jpg" alt="ورشة كيف تصنع راحتك المالية">
+        <span class="crs-donechip">انتهى التسجيل</span>
         <span class="crs-brandchip"><img src="../brand/nas-logo.png" alt="">كاش ناس</span>
       </div>
       <div class="crs-card-body">
@@ -106,15 +120,9 @@
         <div class="crs-price" id="rahaCardPrice">
           <span class="now">148 د.ك</span>
         </div>
-        <span class="crs-go">التفاصيل والتسجيل ←</span>
+        <span class="crs-watch">التفاصيل ←</span>
       </div>
     </a>
-  </div>
-
-  <!-- بعد ما ينتهي أي لقاء: انقل بطاقته من gridNow لهني، ضيف class="past"
-       على الرابط و<span class="crs-donechip">انتهى</span> جوّه crs-card-media،
-       وبدّل crs-go بـ crs-watch عشان تودّي لصفحة التسجيل. وعدّل أرقام التبويبات فوق. -->
-  <div class="crs-grid" id="gridPast" hidden>
     <a class="crs-card past" href="khatwatain.html">
       <div class="crs-card-media">
         <img src="img/khatwatain-promo.jpg" alt="لقاء مجاني: شلون يصير عندك فلوس بخطوتين؟">
@@ -242,8 +250,12 @@
     if(b) show(b.dataset.grid, true);
   });
 
-  show(location.hash === "#past" ? "past" : "now", false);
-  window.addEventListener("hashchange", function(){ show(location.hash === "#past" ? "past" : "now", false); });
+  /* with nothing current, the page opens on what has happened instead of an
+     empty grid — somebody arriving from a bio link should see something */
+  var nowEmpty = !grids.now.querySelector(".crs-card");
+  var pick = function(){ return (location.hash === "#past" || nowEmpty) ? "past" : "now"; };
+  show(pick(), false);
+  window.addEventListener("hashchange", function(){ show(pick(), false); });
 })();
 </script>
 <script src="../assets/js/nav.js"></script>
