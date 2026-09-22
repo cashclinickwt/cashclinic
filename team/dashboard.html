@@ -683,6 +683,7 @@
     <button data-tab="events" data-family="meet">اللقاءات والبث</button>
     <button data-tab="live" data-child="meet" hidden>البث المباشر</button>
     <button data-tab="courses">الدورات</button>
+    <button data-tab="bassma">بصمتك المالية</button>
     <div class="navgrp" data-grp="comms">التواصل</div>
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
@@ -766,6 +767,22 @@
     </div>
     <div class="flt" id="idFlt"></div>
     <div id="idList"></div>
+  </div>
+
+  <!-- ===== بصمتك المالية (pilot on the راحة workshop) ===== -->
+  <div class="sec" id="bsSec" data-panel="bassma" hidden>
+    <h2><span></span> بصمتك المالية</h2>
+    <p class="muted" style="margin:-4px 0 12px;font-size:13px;line-height:1.8">
+      Cash Clinic Financial Check-up — ورشة «كيف تصنع راحتك المالية». الخطوة المقترحة اقتراح بس:
+      ما ينرسل شي للعميل إلا بعد ما تثبّتونها وتضغطون «أرسل النتيجة».</p>
+    <div class="flt" id="bsFlt">
+      <button class="on" data-bsf="all">الكل</button>
+      <button data-bsf="contact">يبون تواصل</button>
+      <button data-bsf="video">وافقوا على فيديو</button>
+      <button data-bsf="unsent">ما انرسلت نتيجتهم</button>
+    </div>
+    <div class="addmsg" id="bsMsg"></div>
+    <div id="bsBody"></div>
   </div>
 
   <!-- ===== فريق المبيعات ===== -->
@@ -1406,6 +1423,9 @@ const sendToSales=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendTo
 const updateSalesLead=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateSalesLead");
 const editVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editVoucher");
 const getTeamFollowUp=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTeamFollowUp");
+const getCheckups=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCheckups");
+const setCheckupNextStep=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCheckupNextStep");
+const sendCheckupResult=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCheckupResult");
 const STORE=getStorage(app);
 const BIG_MAX=100*1024*1024;
 
@@ -1587,7 +1607,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null;
+  ST=null; FU=null; BS=null;
 }
 
 async function refreshAll(opt){
@@ -2356,6 +2376,100 @@ function renderFollowUp(){
     </div>`).join("") || `<div class="pfrule">ما في بيانات.</div>`;
 }
 $("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp(); });
+
+/* ================= بصمتك المالية ================= */
+let BSFLT="all";
+function bsMsg(t,ok){ const m=$("#bsMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
+async function loadBassma(){
+  try{ const r=await getCheckups({}); BS=(r&&r.data)||null; renderBassma(); }
+  catch(err){ bsMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+function bsTally(obj){
+  const keys=Object.keys(obj||{}).sort((a,b)=>obj[b]-obj[a]);
+  return keys.length ? keys.map(k=>`<span class="clchip" style="background:#6B6577">${esc(k)} · ${fmt(obj[k])}</span>`).join(" ")
+                     : `<span class="muted">—</span>`;
+}
+function renderBassma(){
+  const box=$("#bsBody"); if(!box || !BS) return;
+  const S=BS.summary||{}, A=S.answered||{}, T=S.attendance||{}, C=S.confidence||{};
+  const lbl={}; (BS.steps||[]).forEach(x=>{ lbl[x.key]=x.label; });
+  const kpi=(n,l)=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  const stepsNamed={}; Object.keys(S.nextSteps||{}).forEach(k=>{ stepsNamed[lbl[k]||k]=S.nextSteps[k]; });
+
+  const head = `
+    <div class="kpis">${kpi(fmt(S.registered||0),"مسجّلين بالورشة")}
+      ${kpi(`${fmt(T.d1||0)} · ${fmt(T.d2||0)} · ${fmt(T.d3||0)}`,"الحضور يوم ١ · ٢ · ٣")}
+      ${kpi(`${fmt(A.d1||0)} · ${fmt(A.d2||0)} · ${fmt(A.d3||0)}`,"جاوبوا يوم ١ · ٢ · ٣")}
+      ${kpi(`${C.d1||"—"} ← ${C.d3||"—"}`,"الثقة بإدارة الفلوس (من ٥)")}</div>
+    <div class="kpis">${kpi(fmt(S.businessOwners||0),"أصحاب مشاريع")}
+      ${kpi(fmt(S.wantConsult||0),"مهتمين باستشارة خاصة")}
+      ${kpi(fmt(S.followUps||0),"فرص متابعة")}
+      ${kpi(fmt(S.testimonials||0),"موافقين على فيديو")}
+      ${kpi(S.rating||"—","تقييم الورشة (من ٥)")}</div>
+    <div class="hmcard" style="margin-bottom:14px;line-height:2.2">
+      <div><b>أبرز التحديات</b><br>${bsTally(S.challenges)}</div>
+      <div style="margin-top:8px"><b>الدعم المطلوب</b><br>${bsTally(S.support)}</div>
+      <div style="margin-top:8px"><b>الخطوات الجاية</b><br>${bsTally(stepsNamed)}</div>
+    </div>`;
+
+  const rows=(BS.list||[]).filter(p=>
+    BSFLT==="contact" ? (p.d3&&p.d3.contact==="إي") :
+    BSFLT==="video"   ? (p.d3&&p.d3.video==="إي") :
+    BSFLT==="unsent"  ? !p.resultSentMs : true);
+
+  const card=(p)=>{
+    const d1=p.d1||{}, d2=p.d2||{}, d3=p.d3||{};
+    const dayChip=(ok,n)=>`<span class="pill" style="${ok?"":"opacity:.35"}">يوم ${n} ${ok?"✓":"—"}</span>`;
+    const chosen=p.nextStep||p.suggested;
+    return `<div class="hmcard" style="margin-bottom:10px">
+      <div class="hmt"><b>${esc(p.name||p.email)}</b>
+        <span>${dayChip(!!p.d1,1)} ${dayChip(!!p.d2,2)} ${dayChip(!!p.d3,3)}</span></div>
+      <div class="muted" style="font-size:12.5px;line-height:1.9">${esc(p.email)} · ${esc(p.phone)}
+        · ${p.orderId?"مسجّل بالورشة ✓":'<span style="color:#962E37">ما لقينا تسجيله</span>'}</div>
+      <div style="font-size:13px;line-height:1.95;margin-top:6px">
+        ${p.d1?`<div><b>يوم ١:</b> ${esc(d1.kind)} · التحدي «${esc(d1.challenge)}» · الهدف «${esc(d1.goal)}» · الخطة: ${esc(d1.plan)} · يحتاج: ${esc(d1.help)} · يهمه: ${esc(d1.support)} · الثقة ${d1.confidence}/5</div>`:""}
+        ${p.d2?`<div><b>يوم ٢:</b> استفاد: «${esc(d2.takeaway)}» · بيطبّق: «${esc(d2.step)}» · للحين يحتاج: ${esc(d2.need)}</div>`:""}
+        ${p.d3?`<div><b>يوم ٣:</b> التقييم ${d3.rating}/5 · الثقة ${d3.confidence}/5 · تواصل: ${esc(d3.contact)} · فيديو: ${esc(d3.video)}</div>`:""}
+      </div>
+      <div style="margin-top:9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span class="muted" style="font-size:12.5px">المقترح: <b>${esc(lbl[p.suggested]||p.suggested)}</b></span>
+        <select class="pfbtn" data-bs-step="${esc(p.id)}">
+          ${(BS.steps||[]).map(x=>`<option value="${esc(x.key)}"${x.key===chosen?" selected":""}>${esc(x.label)}</option>`).join("")}
+        </select>
+        <button class="pfbtn" data-bs-set="${esc(p.id)}">${p.nextStep?"حدّث الخطوة":"ثبّت الخطوة"}</button>
+        <button class="pfbtn go" data-bs-send="${esc(p.id)}" ${p.nextStep?"":'disabled title="ثبّت الخطوة أول"'}>
+          ${p.resultSentMs?"أرسلها مرة ثانية":"أرسل النتيجة"}</button>
+        ${p.nextStep?`<span class="pill">مثبّتة: ${esc(lbl[p.nextStep]||p.nextStep)}</span>`:""}
+        ${p.resultSentMs?`<span class="pill" style="background:var(--teal);color:#fff">انرسلت ✓</span>`:""}
+      </div>
+    </div>`;
+  };
+  box.innerHTML = head + (rows.length ? rows.map(card).join("")
+    : `<div class="pfrule">ما في إجابات هني للحين — تبدأ توصل أول ما يسكّنون الـQR.</div>`);
+}
+$("#bsFlt") && $("#bsFlt").addEventListener("click", e=>{
+  const b=e.target.closest("[data-bsf]"); if(!b) return;
+  BSFLT=b.dataset.bsf;
+  $("#bsFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+  renderBassma();
+});
+document.addEventListener("click", async (e)=>{
+  const set=e.target.closest("[data-bs-set]");
+  if(set){
+    const id=set.dataset.bsSet, sel=document.querySelector(`[data-bs-step="${id}"]`);
+    set.disabled=true;
+    try{ await setCheckupNextStep({ id, step: sel ? sel.value : "" }); await loadBassma(); bsMsg("انثبّتت الخطوة ✅", true); }
+    catch(err){ set.disabled=false; bsMsg((err&&err.message)||"تعذّر الحفظ", false); }
+    return;
+  }
+  const snd=e.target.closest("[data-bs-send]");
+  if(snd){
+    if(!confirm("ترسل النتيجة للعميل على إيميله؟")) return;
+    snd.disabled=true;
+    try{ await sendCheckupResult({ id: snd.dataset.bsSend }); await loadBassma(); bsMsg("انرسلت النتيجة ✅", true); }
+    catch(err){ snd.disabled=false; bsMsg((err&&err.message)||"تعذّر الإرسال", false); }
+  }
+});
 
 /* ================= مركز الإشعارات =================
    The three states this screen has to explain, because getting any of them
@@ -4219,6 +4333,9 @@ const PANELS = [
   { id:"salesteam",   group:"sales",  icon:"🤝", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")),
     load:()=>{ if(!ST) loadSalesTeam(); },
     count:()=>((ST&&ST.leads)||[]).filter(l=>l.state==="جديد").length },
+  /* نورة runs the pilot, so sales sees it alongside full access */
+  { id:"bassma",      group:"events", icon:"🧭", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")),
+    load:()=>{ if(!BS) loadBassma(); } },
   /* full access only: the four who can already read every other number */
   { id:"followup",    group:"team",   icon:"📋", allowed:()=>!!(DATA&&DATA.role==="all"),
     load:()=>{ if(!FU) loadFollowUp(); } },
@@ -4228,7 +4345,7 @@ const PANELS = [
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
   { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports") },
 ];
-let ST=null, FU=null;
+let ST=null, FU=null, BS=null;
 const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);

@@ -321,7 +321,7 @@
       <button class="pay" id="payBtn" type="button">ادفع كامل واحجز</button>
       <button class="pay alt" id="deemaBtn" type="button">قسّطها مع ديمة</button>
     </div>
-    <p class="pay-note">الدفع الكامل يتم أونلاين بالبطاقة ويتأكد حجزك على طول. مع ديمة نحجز لك الموعد ونكمل التقسيط معك بالواتساب.</p>
+    <p class="pay-note">الدفع الكامل يتم أونلاين بالبطاقة ويتأكد حجزك على طول. مع ديمة نكمل معك بالواتساب أول، ونثبّت موعدك بعد ما نأكّد التقسيط.</p>
     <div class="err" id="bErr"></div>
     <p class="muted">الدفع آمن عبر Tap. الحجز يتأكد فور نجاح الدفع.</p>
   </div>
@@ -351,7 +351,6 @@ const fns = getFunctions(app, CONFIG.functionsRegion);
 const getBookingOptions   = httpsCallable(fns,"getBookingOptions");
 const getAvailableSlots   = httpsCallable(fns,"getAvailableSlots");
 const createBookingCharge = httpsCallable(fns,"createBookingCharge");
-const createDeemaBooking  = httpsCallable(fns,"createDeemaBooking");
 const getBookingByToken   = httpsCallable(fns,"getBookingByToken");
 const rescheduleBooking   = httpsCallable(fns,"rescheduleBooking");
 
@@ -793,13 +792,41 @@ function payBusy(which, on){
   else { a.textContent = PAY_LABEL.pay; b.textContent = PAY_LABEL.deema; }
 }
 
+/* Deema no longer books anything from here. It used to lock the slot and
+   file an unpaid order, which then showed in the client's file as a real
+   استشارة. Now the client's details and the time they picked go to the team
+   on WhatsApp, and نورة books it from the dashboard once the instalments are
+   agreed — so nothing is held for somebody who may never follow through. */
+function deemaWhatsApp(p){
+  const when = (() => {
+    try{ return new Date(p.startIso).toLocaleString("ar-KW",{ timeZone:"Asia/Kuwait",
+      weekday:"long", day:"numeric", month:"numeric", hour:"numeric", minute:"2-digit" }); }
+    catch(e){ return p.startIso; }
+  })();
+  const lines = [
+    "السلام عليكم، أبي أحجز استشارة وأقسّطها مع ديمة",
+    "الاسم: " + p.name,
+    "الجوال: " + p.phone,
+    "الإيميل: " + p.email,
+    "الباقة: " + ((PKG && (PKG.name || PKG.label)) || p.packageId),
+    "مع: " + ((C && (C.name || C.label)) || p.consultantId),
+    "الموعد اللي يناسبني: " + when + " · " + (p.mode === "onsite" ? "حضوري" : "أونلاين"),
+  ];
+  if(p.notes) lines.push("ملاحظة: " + p.notes);
+  window.open("https://wa.me/96522260820?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
+  const m=$("#bErr");
+  m.textContent="فتحنا لك الواتساب — نورة بتكمل معك التقسيط وتثبّت موعدك. الموعد ما يتثبت إلا بعد تأكيدها.";
+  m.style.display="block"; m.style.background="#E9F7EF"; m.style.color="#1B7A43";
+}
+
 async function submitBooking(which){
   $("#bErr").style.display="none";
   const payload = readForm();
   if(!payload) return;
+  if(which==="deema"){ deemaWhatsApp(payload); return; }
   payBusy(which, true);
   try{
-    const call = which==="deema" ? createDeemaBooking : createBookingCharge;
+    const call = createBookingCharge;
     const r = await call(payload);
     const url = r.data && r.data.url;
     if(!url) throw new Error("no url");
@@ -869,5 +896,6 @@ $("#reschedBtn").addEventListener("click", async () => {
   }
 });
 </script>
+<script src="assets/js/hit.js" defer></script>
 </body>
 </html>

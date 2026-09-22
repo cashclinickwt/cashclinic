@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>بصمتك المالية | Cash Clinic</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<style>
+  :root{ --ink:#2F1749; --royal:#614588; --lav:#D2D3E1; --gold:#D3A146; --cream:#FFE6BB;
+         --teal:#2F8789; --muted:#6B6577; --line:#E4E1EA; --ice:#F4FAFC; --wine:#962E37; }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--ice);color:var(--ink);
+       padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+  .wrap{max-width:560px;margin:0 auto}
+  header{text-align:center;margin-bottom:18px}
+  header img{width:150px;height:auto}
+  .brand{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:.02em}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 18px;
+        box-shadow:0 8px 24px rgba(47,23,73,.07)}
+  .day{display:inline-block;background:var(--ink);color:var(--cream);font-size:13px;font-weight:600;
+       border-radius:999px;padding:5px 14px}
+  h1{font-size:23px;line-height:1.5;margin:12px 0 4px}
+  .sub{color:var(--muted);font-size:14px;line-height:1.8;margin:0 0 16px}
+  .f{margin:0 0 14px}
+  .f label{display:block;font-size:14px;font-weight:600;margin:0 0 7px}
+  .f input,.f textarea{width:100%;font:inherit;font-size:16px;border:1.5px solid var(--line);
+       border-radius:12px;padding:12px 13px;background:#fff;color:var(--ink)}
+  .f textarea{min-height:78px;resize:vertical}
+  .q{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+  .q .t{font-size:15.5px;font-weight:700;margin:0 0 10px;line-height:1.7}
+  /* one tap per answer, big enough to hit with a thumb in a workshop room */
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font:inherit;font-size:14.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);
+       border-radius:999px;padding:10px 15px;cursor:pointer;min-height:44px}
+  .opt.on{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+  .scale .opt{width:48px;height:48px;padding:0;border-radius:50%;font-weight:700;font-size:17px}
+  .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px;max-width:288px}
+  .q.miss .t{color:var(--wine)}
+  .btn{display:block;width:100%;font:inherit;font-size:17px;font-weight:700;border:0;border-radius:14px;
+       padding:15px;margin-top:22px;background:var(--gold);color:#2A1406;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .msg{display:none;margin-top:12px;border-radius:12px;padding:11px 13px;font-size:14px;line-height:1.8}
+  .msg.err{display:block;background:#FDECEC;color:#8A1F28}
+  .priv{font-size:12px;color:var(--muted);line-height:1.8;margin-top:14px;text-align:center}
+  .done{text-align:center;padding:26px 8px}
+  .done .big{font-size:44px}
+  .done h2{font-size:21px;margin:10px 0 8px}
+  .done p{color:var(--muted);line-height:1.9;margin:0}
+  .pick a{display:block;text-align:center;text-decoration:none;background:#fff;border:1.5px solid var(--line);
+          border-radius:14px;padding:14px;margin:10px 0;color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="../brand/logo/logo-primary.png" alt="Cash Clinic — كاش كلينك">
+    <div class="brand">بصمتك المالية · Cash Clinic Financial Check-up</div>
+  </header>
+  <main class="card" id="app"></main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
+const submitCheckup = httpsCallable(getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion), "submitCheckup");
+
+/* Must match CHECKUP in the backend exactly — the suite fails if it drifts,
+   because an answer the server does not recognise is refused. */
+const HELP = ["الميزانية", "الديون", "الادخار", "الاستثمار", "فلوس المشروع"];
+const DAYS = {
+  1: { tag:"اليوم ١ — التشخيص", title:"وين واقف ماليًا اليوم؟",
+       sub:"سبع أسئلة سريعة — ما تاخذ دقيقتين.",
+       done:"شكراً! هالإجابات تساعدنا نفهم احتياجك من أول يوم.",
+       q:[ ["kind","أنت:", ["فرد","صاحب مشروع","الثنين"]],
+           ["challenge","أكبر تحدي مالي عندك الحين؟", ["الديون والأقساط","المصاريف أكثر من الدخل","ما أعرف وين تروح فلوسي","ما أقدر أدّخر","خلط فلوسي بفلوس المشروع"]],
+           ["goal","هدفك المالي الحين؟", ["أسدد ديوني","أبني مدخرات","أبدأ أستثمر","بيت أو سيارة","أنظّم مشروعي"]],
+           ["plan","عندك خطة مالية واضحة؟", ["إي ومكتوبة","بالراس بس","لا"]],
+           ["help","أكثر جانب تحتاج فيه مساعدة؟", HELP],
+           ["support","نوع الدعم اللي يهمك؟", ["استشارة خاصة","ورشة","كتيّب","محتوى مجاني"]],
+           ["confidence","شكثر واثق بإدارة فلوسك؟", "scale"] ] },
+  2: { tag:"اليوم ٢ — التطبيق", title:"شنو أخذت من الورشة؟",
+       sub:"ثلاث أسئلة — جاوب من راسك، ما في جواب غلط.",
+       done:"شكراً! نشوفك بكرة باليوم الأخير.",
+       q:[ ["takeaway","أهم شي استفدته لين الحين؟", "text"],
+           ["step","أول خطوة ناوي تطبقها؟", "text"],
+           ["need","شنو للحين تحتاج فيه مساعدة؟", HELP] ] },
+  3: { tag:"اليوم ٣ — النتيجة", title:"نتيجة رحلتك وخطوتك الجاية",
+       sub:"آخر أربع أسئلة — وبعدها توصلك نتيجتك.",
+       done:"شكراً لأنك كنت معانا! بتوصلك «نتيجة رحلتك المالية وخطوتك القادمة» على إيميلك قريب.",
+       q:[ ["rating","تقييمك للورشة؟", "scale"],
+           ["confidence","شكثر صرت واثق بإدارة فلوسك؟", "scale"],
+           ["contact","تبينا نتواصل معك بخصوص خطوتك الجاية؟", ["إي","لا"]],
+           ["video","توافق نصوّرك فيديو قصير عن تجربتك؟", ["إي","لا"]] ] },
+};
+
+const app = document.getElementById("app");
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const day = Number(new URLSearchParams(location.search).get("d"));
+const D = DAYS[day];
+
+if(!D){
+  app.innerHTML = `<h1 style="text-align:center">بصمتك المالية</h1>
+    <p class="sub" style="text-align:center">اختر يوم الورشة:</p>
+    <div class="pick">${[1,2,3].map((n) => `<a href="?d=${n}">${esc(DAYS[n].tag)}</a>`).join("")}</div>`;
+} else {
+  /* the three days line up by email, so the details are remembered on this
+     phone — day 2 and 3 are then a few taps, not a form */
+  let me = {};
+  try{ me = JSON.parse(localStorage.getItem("ccBassma") || "{}") || {}; }catch(e){}
+  const ans = {};
+
+  const qHtml = ([k, label, kind]) => {
+    let body;
+    if(kind === "text") body = `<div class="f" style="margin:0"><textarea data-k="${k}" maxlength="300"></textarea></div>`;
+    else if(kind === "scale") body = `<div class="opts scale">${[1,2,3,4,5].map((n) =>
+        `<button type="button" class="opt" data-k="${k}" data-v="${n}">${n}</button>`).join("")}</div>
+        <div class="ends"><span>قليل</span><span>وايد</span></div>`;
+    else body = `<div class="opts">${kind.map((o) =>
+        `<button type="button" class="opt" data-k="${k}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+    return `<div class="q" data-q="${k}"><p class="t">${esc(label)}</p>${body}</div>`;
+  };
+
+  app.innerHTML = `<span class="day">${esc(D.tag)}</span>
+    <h1>${esc(D.title)}</h1><p class="sub">${esc(D.sub)}</p>
+    <div class="f"><label for="nm">الاسم</label><input id="nm" autocomplete="name" value="${esc(me.name||"")}"></div>
+    <div class="f"><label for="ph">رقم الواتساب</label><input id="ph" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" value="${esc(me.phone||"")}" style="direction:ltr;text-align:right"></div>
+    <div class="f"><label for="em">الإيميل اللي سجّلت فيه بالورشة</label><input id="em" type="email" autocomplete="email" value="${esc(me.email||"")}" style="direction:ltr;text-align:right"></div>
+    ${D.q.map(qHtml).join("")}
+    <button class="btn" id="go">أرسل</button>
+    <div class="msg" id="msg"></div>
+    <p class="priv">إجاباتك تستخدمها Cash Clinic بس عشان نفهم احتياجك ونوجّهك للخطوة المناسبة — ما تنشر ولا تنعطى لأحد.</p>`;
+
+  app.addEventListener("click", (e) => {
+    const b = e.target.closest(".opt[data-k]"); if(!b) return;
+    const k = b.dataset.k;
+    app.querySelectorAll(`.opt[data-k="${k}"]`).forEach((x) => x.classList.toggle("on", x === b));
+    const kind = (D.q.find((q) => q[0] === k) || [])[2];
+    ans[k] = kind === "scale" ? Number(b.dataset.v) : b.dataset.v;
+    const box = app.querySelector(`.q[data-q="${k}"]`); if(box) box.classList.remove("miss");
+  });
+
+  const fail = (t) => { const m = document.getElementById("msg"); m.textContent = t; m.className = "msg err"; };
+
+  document.getElementById("go").addEventListener("click", async () => {
+    app.querySelectorAll("textarea[data-k]").forEach((t) => { ans[t.dataset.k] = t.value.trim(); });
+    const name = document.getElementById("nm").value.trim();
+    const email = document.getElementById("em").value.trim().toLowerCase();
+    let phone = document.getElementById("ph").value.replace(/\D/g, "").replace(/^0+/, "");
+    if(phone.length === 8) phone = "965" + phone;             // a Kuwaiti number typed without the code
+    if(name.length < 2) return fail("اكتب اسمك");
+    if(phone.length < 7) return fail("اكتب رقم الواتساب");
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("اكتب إيميل صحيح");
+    const missing = D.q.filter(([k, , kind]) => kind === "text" ? !(ans[k] && ans[k].length >= 2) : !ans[k]);
+    if(missing.length){
+      missing.forEach(([k]) => { const b = app.querySelector(`.q[data-q="${k}"]`); if(b) b.classList.add("miss"); });
+      const first = app.querySelector(`.q[data-q="${missing[0][0]}"]`);
+      if(first) first.scrollIntoView({ behavior:"smooth", block:"center" });
+      return fail("باقي أسئلة ما جاوبتها — معلّمة بالأحمر");
+    }
+    const btn = document.getElementById("go"); btn.disabled = true; btn.textContent = "لحظة…";
+    try{
+      await submitCheckup({ day, name, email, phone: "+" + phone, answers: ans });
+      try{ localStorage.setItem("ccBassma", JSON.stringify({ name, email, phone })); }catch(e){}
+      app.innerHTML = `<div class="done"><div class="big">🌿</div><h2>وصلتنا إجاباتك</h2><p>${esc(D.done)}</p></div>`;
+      window.scrollTo({ top:0, behavior:"smooth" });
+    }catch(err){
+      btn.disabled = false; btn.textContent = "أرسل";
+      fail((err && err.message) || "صار خطأ، حاول مرة ثانية");
+    }
+  });
+}
+</script>
+<script src="../assets/js/hit.js" defer></script>
+</body>
+</html>
