@@ -542,6 +542,11 @@
   .pftab .num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
   .pfrule{font-size:12px;color:var(--muted)}
   .pfwarn td{background:#FDECEC}
+  /* a booking whose session has not happened yet: the money on it is held,
+     so the row is tinted rather than the reader having to remember which is
+     which. The row also says it in words — colour alone is not information
+     to somebody who cannot tell these two tints apart. */
+  .pfpend td{background:#F1ECF7}
   /* an excluded line stays on the page, greyed and struck through, so it can
      be put back — deleting it outright would leave nobody able to undo it */
   .pfout td{opacity:.55}
@@ -3072,11 +3077,12 @@ function renderBooks(){
 
   $("#bkLines").innerHTML = lines.length
     ? `<table class="pftab"><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>الرسوم</th>${canEdit?"<th>القاعدة</th>":""}<th>الحصص والتحويل</th></tr></thead><tbody>`+
-      lines.map(l=>`<tr class="${l.excluded?"pfout":(l.ruleId?"":"pfwarn")}">
+      lines.map(l=>`<tr class="${l.excluded?"pfout":(l.ruleId?(l.pending?"pfpend":""):"pfwarn")}">
         <td class="num">${dt(l.when)}</td>
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}${
-            l.mode?` · ${modeAr(l.mode)}`:""}</div>
+            l.mode?` · ${modeAr(l.mode)}`:""}${
+            l.pending?` · <b style="color:#614588">الجلسة ما صارت — الفلوس محجوزة</b>`:""}</div>
           ${l.excluded?`<div class="pfrule" style="color:#962E37;font-weight:700">مستبعد من الحسابات${
             l.excludedNote?` · ${esc(l.excludedNote)}`:""}</div>`:""}</td>
         <td class="num">${kwd(l.amount)}
@@ -3183,7 +3189,9 @@ function renderBooks(){
      accepted at exactly 100% — the server checks it too, so a bad total can
      never reach a payout. */
   const RULE_KINDS=[["book","كتيّب"],["consult","استشارة"],["call","اتصال سريع"],["course","ورشة / دورة"],["contract","عقد"]];
-  const RULE_WHO=["ghalia","sara","hasan","external"];
+  /* who a rule can be written for. حسن is out of the books; عبدالعزيز and
+     إسماعيل are in, so both get a checkbox and a % field on every rule. */
+  const RULE_WHO=["ghalia","sara","aziz","ismail","external"];
   const whoName=(k)=>k==="external"?"مستشار خارجي":(((BK.members||[]).find(x=>x.id===k)||{}).name||k);
   const ruleCard=(r,isNew)=>{
     const m=r.match||{}, sp=r.split||{};
