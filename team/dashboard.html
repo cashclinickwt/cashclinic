@@ -4781,7 +4781,8 @@ function renderNasBooking(){
       /* غالية sits in the Riyada joint sessions, so those show on her list
          too — tagged, so it is never a surprise which clinic she is selling */
       const tag = p.clinic!==home ? (p.clinic==="riyada" ? " · كاش ريادة" : " · كاش ناس") : "";
-      const price = seesMoney() ? ` · ${fmt(p.amount)} ${esc(p.currency)}${p.monthly?" / شهر":""}` : "";
+      const online = Number(p.amountOnline) > 0 ? ` / ${fmt(p.amountOnline)} أونلاين` : "";
+      const price = seesMoney() ? ` · ${fmt(p.amount)}${online} ${esc(p.currency)}${p.monthly?" / شهر":""}` : "";
       return `<option value="${esc(p.key)}">${esc(p.name)}${price}${tag}</option>`;
     }).join("");
     nbSyncPkg();
@@ -4815,7 +4816,12 @@ function nbSyncSession(){
      is already covered, so it defaults to zero and to "already paid" —
      otherwise staff would accidentally charge the client twice. */
   const later = i>0;
-  $("#nbAmount").value = later ? 0 : p.amount;
+  /* أونلاين and حضوري can carry different prices, so the box has to follow
+     the طريقة — otherwise staff read 120 off the screen for a session the
+     server correctly bills at 100, and the two disagree */
+  const mode = ($("#nbMode")||{}).value;
+  const listed = (mode==="online" && Number(p.amountOnline) > 0) ? Number(p.amountOnline) : Number(p.amount);
+  $("#nbAmount").value = later ? 0 : listed;
   if(later){ const r=document.querySelector('input[name="nbPay"][value="cash"]'); if(r) r.checked=true; }
   nbHint();
 }
@@ -4837,6 +4843,7 @@ function nbHint(){
 }
 $("#nbPkg") && $("#nbPkg").addEventListener("change", nbSyncPkg);
 $("#nbSession") && $("#nbSession").addEventListener("change", nbSyncSession);
+$("#nbMode") && $("#nbMode").addEventListener("change", nbSyncSession);
 document.querySelectorAll('input[name="nbPay"]').forEach(r=>r.addEventListener("change", nbHint));
 
 /* Kuwait is UTC+3, so a local date+time maps straight onto an ISO instant */
