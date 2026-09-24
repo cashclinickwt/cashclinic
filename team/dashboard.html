@@ -819,9 +819,9 @@
       <div class="f" id="mtOwnerF" hidden><label>لمن؟</label><select id="mtOwner"></select></div>
       <div class="f" style="flex:1 1 240px"><label>عنوان الاجتماع</label>
         <input id="mtTitle" type="text" placeholder="مثال: اجتماع مع بنك الخليج"></div>
-      <div class="f" style="flex:1 1 220px"><label>مع مين من الفريق (تقدر تختار أكثر من واحد)</label>
+      <div class="f" style="flex:1 1 220px"><label>مع منو من الفريق (تقدر تختار أكثر من واحد)</label>
         <select id="mtWith" multiple size="4" style="min-height:96px"></select></div>
-      <div class="f" style="flex:1 1 200px"><label>أو مع مين من برّا</label>
+      <div class="f" style="flex:1 1 200px"><label>أو مع منو من برّا</label>
         <input id="mtWithName" type="text" placeholder="اسم الشخص أو الجهة"></div>
       <div class="f"><label>التاريخ</label><input id="mtDate" type="date"></div>
       <div class="f"><label>الوقت</label><input id="mtTime" type="time"></div>
@@ -1058,6 +1058,13 @@
 
   <div class="sec" id="coursesSec" data-panel="courses" hidden>
     <h2><span></span> تسجيلات الدورات</h2>
+    <!-- the survey lives with the workshop it is about. The switch only shows
+         for full access and sales — the replies carry leads, which are theirs -->
+    <div class="flt" id="crSub" hidden>
+      <button class="on" data-crsub="list">التسجيلات</button>
+      <button data-crsub="fb">رأي المشاركين 💜</button>
+    </div>
+    <div id="crMain">
     <div class="kpis" id="courseKpis"></div>
 
     <div class="addbox" id="crAddBox">
@@ -1079,6 +1086,16 @@
     </div>
 
     <div class="tbl" id="courseTbl"></div>
+    </div>
+
+    <div id="rfWrap" hidden>
+      <p class="muted" style="margin:0 0 12px;font-size:13px;line-height:1.8">
+        ورشة «كيف تصنع راحتك المالية». كل من اشترى الورشة يوصله رابط خاص فيه بالإيميل؛ والـ QR يربط الرد بالمشتري
+        من رقمه اللي سجّل فيه. اللي يرشّح أحد، واللي يقول «نعم تواصلوا معي»، يروحون على طول لفريق المبيعات.</p>
+      <div id="rfActs" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px"></div>
+      <div class="addmsg" id="rfMsg"></div>
+      <div id="rfBody"></div>
+    </div>
   </div>
 
   <div class="sec" id="eventsSec" data-panel="events" hidden>
@@ -1115,7 +1132,7 @@
     <div class="lvbar">
       <div class="f"><label>اللقاء</label>
         <select id="lvEvent"></select></div>
-      <div class="f"><label>مين يقدر يدخل</label>
+      <div class="f"><label>منو يقدر يدخل</label>
         <select id="lvAudience">
           <option value="all">كل المسجّلين</option>
           <option value="vip">عملاء الكتيّب فقط (VIP)</option>
@@ -1429,6 +1446,8 @@ const updateSalesLead=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"up
 const editVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editVoucher");
 const getTeamFollowUp=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTeamFollowUp");
 const getCheckups=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCheckups");
+const getRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getRahaFeedback");
+const sendRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendRahaFeedback");
 const setCheckupNextStep=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCheckupNextStep");
 const sendCheckupResult=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCheckupResult");
 const STORE=getStorage(app);
@@ -1612,7 +1631,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null; BS=null;
+  ST=null; FU=null; BS=null; RF=null;
 }
 
 async function refreshAll(opt){
@@ -2382,6 +2401,76 @@ function renderFollowUp(){
 }
 $("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp(); });
 
+/* ================= رأي المشاركين — ورشة الراحة ================= */
+function rfMsg(t,ok){ const m=$("#rfMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
+async function loadRahaFb(){
+  try{ const r=await getRahaFeedback({}); RF=(r&&r.data)||null; renderRahaFb(); }
+  catch(err){ rfMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+function renderRahaFb(){
+  const box=$("#rfBody"); if(!box || !RF) return;
+  const full = !!(DATA && DATA.role==="all");
+  /* both counts come from the server, per person: somebody who answered on
+     the QR is not «ما وصلهم» just because no email went out */
+  const unsent = RF.unsent||0, waiting = RF.waiting||0;
+  $("#rfActs").innerHTML = full
+    ? `<button class="pfbtn go" id="rfSend"${unsent?"":" disabled"}>أرسل الاستبيان (${fmt(unsent)})</button>
+       <button class="pfbtn" id="rfRemind"${waiting?"":" disabled"}>ذكّر اللي ما ردّوا (${fmt(waiting)})</button>
+       <button class="pfbtn" id="rfReload">↻ حدّث</button>`
+    : `<button class="pfbtn" id="rfReload">↻ حدّث</button>`;
+  const kpi=(n,l)=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  const stars=(v)=>v?`${v} ★`:"—";
+  const chips=(obj)=>{ const k=Object.keys(obj||{}).sort((a,b)=>obj[b]-obj[a]);
+    return k.length?k.map(x=>`<span class="clchip" style="background:#6B6577">${esc(x)} · ${fmt(obj[x])}</span>`).join(" "):`<span class="muted">—</span>`; };
+  const A=RF.avg||{}, T=RF.tally||{};
+  const rows=(RF.rows||[]).map(x=>{
+    const who = x.name ? esc(x.name) : `<span class="muted">—</span>`;
+    const bits=[];
+    if(x.liked) bits.push(`<div><b>عجبه:</b> ${esc(x.liked)}</div>`);
+    if(x.topic) bits.push(`<div><b>يبي موضوع:</b> ${esc(x.topic)}</div>`);
+    if(x.ideas) bits.push(`<div><b>اقتراح:</b> ${esc(x.ideas)}</div>`);
+    if(x.refName) bits.push(`<div><b>رشّح:</b> ${esc(x.refName)}${x.refPhone?` · ${esc(x.refPhone)}`:""}</div>`);
+    const lead=(x.leads||[]).length?`<span class="clchip" style="background:#2F8789">راح للمبيعات</span>`:"";
+    return `<div class="card" style="padding:12px 14px;margin:8px 0">
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div><b>${who}</b> <span class="muted" style="font-size:12px">${x.via==="email"?"من الإيميل":"من الـ QR"}</span> ${lead}</div>
+        <div class="num" style="font-size:13px">التجربة ${stars(x.overall)} · المحتوى ${stars(x.content)} · التقديم ${stars(x.delivery)}</div></div>
+      <div style="font-size:13px;line-height:1.9;margin-top:6px">${bits.join("")||`<span class="muted">ما كتب شي إضافي</span>`}
+        <div class="muted" style="font-size:12px">وضوح: ${esc(x.clarity||"—")} · يرشّح: ${esc(x.recommend||"—")} · تواصل: ${esc(x.contact||"—")} · عرف عنّا: ${esc(x.heard||"—")}${x.heardOther?` (${esc(x.heardOther)})`:""}</div></div></div>`;
+  }).join("");
+  box.innerHTML = `
+    <div class="kpis">${kpi(fmt(RF.buyers||0),"اشتروا الورشة")}${kpi(fmt(RF.sent||0),"انرسل لهم")}${kpi(fmt(RF.answered||0),"ردّوا")}${kpi(fmt(waiting),"ما ردّوا للحين")}</div>
+    <div class="kpis">${kpi(stars(A.overall),"التجربة")}${kpi(stars(A.content),"المحتوى")}${kpi(stars(A.delivery),"التقديم")}</div>
+    <div style="font-size:13px;line-height:2.2;margin:6px 0 10px">
+      <div><b>الوضوح بعد الورشة:</b> ${chips(T.clarity)}</div>
+      <div><b>يرشّحون الورشة:</b> ${chips(T.recommend)}</div>
+      <div><b>يبون نتواصل معهم:</b> ${chips(T.contact)}</div>
+      <div><b>عرفوا عنّا من:</b> ${chips(T.heard)}</div></div>
+    ${rows || `<div class="muted" style="font-size:13px;padding:10px">ما في ردود للحين.</div>`}`;
+}
+$("#crSub") && $("#crSub").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-crsub]"); if(!b) return;
+  const fb = b.dataset.crsub==="fb";
+  document.querySelectorAll("#crSub button").forEach(x=>x.classList.toggle("on", x===b));
+  $("#crMain").hidden = fb; $("#rfWrap").hidden = !fb;
+  if(fb && !RF) loadRahaFb();
+});
+$("#rfActs") && $("#rfActs").addEventListener("click", async e=>{
+  const b=e.target.closest("button"); if(!b || b.disabled) return;
+  if(b.id==="rfReload"){ RF=null; return loadRahaFb(); }
+  const remind = b.id==="rfRemind";
+  const n = remind ? (RF.waiting||0) : (RF.unsent||0);
+  if(!confirm(remind
+      ? `بيوصل تذكير لـ ${n} شخص انرسل لهم الاستبيان وما ردّوا. أكمل؟`
+      : `بيوصل الاستبيان بالإيميل لـ ${n} شخص اشتروا الورشة وما وصلهم. أكمل؟`)) return;
+  b.disabled=true; const t=b.textContent; b.textContent="جارٍ الإرسال…";
+  try{
+    const r=(await sendRahaFeedback({ remind })).data||{};
+    rfMsg(`انرسل لـ ${fmt(r.sent||0)} ✅${r.failed?` · ما وصل لـ ${fmt(r.failed)}`:""}`, !r.failed);
+    RF=null; await loadRahaFb();
+  }catch(err){ rfMsg((err&&err.message)||"تعذّر الإرسال", false); b.disabled=false; b.textContent=t; }
+});
+
 /* ================= بصمتك المالية ================= */
 let BSFLT="all";
 function bsMsg(t,ok){ const m=$("#bsMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
@@ -2952,7 +3041,10 @@ function renderBooks(){
   /* who is owed what, and whether it has gone out */
   const paid=(BK.payout&&BK.payout.people)||{};
   const due=BK.due||{};
-  const people=Object.keys(due).filter(k=>due[k]>0 || paid[k]);
+  const cb=BK.costsBy||{};
+  /* somebody whose costs outran their share still belongs on the list —
+     dropping a negative row would hide exactly the case worth seeing */
+  const people=Object.keys(due).filter(k=>due[k]>0 || paid[k] || cb[k]>0);
   $("#bkDue").innerHTML = people.length
     ? `<table class="pftab"><thead><tr><th>الشخص</th><th>المستحق</th><th>الحالة</th><th></th></tr></thead><tbody>`+
       people.map(k=>{
@@ -2962,7 +3054,8 @@ function renderBooks(){
         const hl=(BK.held||{})[k]||0;
         return `<tr>
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
-          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}</td>
+          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}${
+            cb[k]>0?`<div class="pfrule" style="color:#962E37">بعد خصم ${esc(kwd(cb[k]))} تكاليف عليه</div>`:""}</td>
           <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
           <td>${canEdit?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`
               +(!done&&(BK.owing||{})[k]>0?` <button class="pfbtn" data-payall="${esc(k)}">حدّد كل حصصه</button>`:"")
@@ -3136,7 +3229,7 @@ function renderBooks(){
   const costs=BK.costs||[];
   const CUR=["KWD","USD"], BAS=[["monthly","شهري"],["yearly","سنوي"]];
   $("#bkCosts").innerHTML = costs.length
-    ? `<table class="pftab"><thead><tr><th>البند</th><th>المبلغ</th><th>العملة</th><th>الدورة</th><th>بالدينار / شهر</th><th></th></tr></thead><tbody>`+
+    ? `<table class="pftab"><thead><tr><th>البند</th><th>المبلغ</th><th>العملة</th><th>الدورة</th><th>على منو</th><th>بالدينار / شهر</th><th></th></tr></thead><tbody>`+
       costs.map(c=>{
         const id=String(c.id);
         const isVar=id.indexOf("var:")===0, isSal=id.indexOf("salary:")===0;
@@ -3153,6 +3246,12 @@ function renderBooks(){
         <td>${fixed?`<select class="pfbas" data-what="${what}" data-key="${esc(key)}">`+
               BAS.map(([v,l])=>`<option value="${v}"${v===c.basis?" selected":""}>${l}</option>`).join("")+`</select>`
              :`<span class="pfrule">${isSal?"راتب":"هذا الشهر"}</span>`}</td>
+        <td>${isSal
+             ? `<span class="pfrule">الشركة</span>`
+             : `<select class="pffrom" data-what="${what}" data-key="${esc(key)}">`+
+               [{id:"company",name:"الشركة"}].concat((BK.members||[]).filter(m=>m.id!=="company"))
+                 .map(m=>`<option value="${esc(m.id)}"${m.id===(c.from||"company")?" selected":""}>${esc(m.name)}</option>`).join("")+
+               `</select>`}</td>
         <td class="num">${kwd(c.kwd)}</td>
         <td><button class="pfbtn" data-delcost="${esc(key)}" data-what="${what}"
               title="${isSal?"يوقف الراتب":"يشيل البند من الحساب"}">احذف</button></td></tr>`;
@@ -3207,7 +3306,7 @@ function renderBooks(){
         <div class="f"><label>التنظيم</label><select class="rorg"><option value="">—</option>`+
           RULE_WHO.filter(w=>w!=="external").map(w=>`<option value="${w}"${w===m.organiser?" selected":""}>${esc(whoName(w))}</option>`).join("")+`</select></div>
       </div>
-      <div style="margin:4px 0 10px"><span class="pfrule">مين يدخل بالقاعدة:</span>
+      <div style="margin:4px 0 10px"><span class="pfrule">منو يدخل بالقاعدة:</span>
         ${RULE_WHO.map(w=>`<label style="margin-inline-start:12px;font-size:13.5px">
           <input type="checkbox" class="rwho" value="${w}"${(m.who||[]).indexOf(w)!==-1?" checked":""}> ${esc(whoName(w))}</label>`).join("")}</div>
       <div class="pfbar" style="margin-bottom:8px">
@@ -3410,7 +3509,7 @@ $("#bkVcAdd") && $("#bkVcAdd").addEventListener("click", async ()=>{
 
 /* one handler for the amount, the currency and the cycle */
 $("#bkCosts") && $("#bkCosts").addEventListener("change", async e=>{
-  const el=e.target.closest(".pfamt,.pfcur,.pfbas"); if(!el) return;
+  const el=e.target.closest(".pfamt,.pfcur,.pfbas,.pffrom"); if(!el) return;
   const what=el.dataset.what, id=el.dataset.key, row={};
   if(el.classList.contains("pfamt")){
     const v=Number(el.value);
@@ -3418,6 +3517,7 @@ $("#bkCosts") && $("#bkCosts").addEventListener("change", async e=>{
     row.amount=v;
   }
   else if(el.classList.contains("pfcur")) row.currency=el.value;
+  else if(el.classList.contains("pffrom")) row.from=el.value;
   else row.basis=el.value;
   el.disabled=true;
   try{ await saveProfitItem({ what, id, row }); await loadBooks(BKMONTH); pfMsg("انحفظ ✅", true); }
@@ -4353,7 +4453,7 @@ const PANELS = [
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
   { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports") },
 ];
-let ST=null, FU=null, BS=null;
+let ST=null, FU=null, BS=null, RF=null;
 const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
@@ -4499,6 +4599,7 @@ function renderSales(){
 }
 
 function renderCourses(){
+  const sub=$("#crSub"); if(sub) sub.hidden = !(DATA && (DATA.role==="all"||DATA.role==="sales"));
   const C = DATA.courses;
   const sec = $("#coursesSec");
   if(!C || !C.regs || !C.regs.length){ if(sec) sec.hidden=true; return; }
