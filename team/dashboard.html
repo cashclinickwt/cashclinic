@@ -556,6 +556,22 @@
     padding:8px 11px;margin:0;font-size:14px;font-weight:500;cursor:pointer;min-height:42px;line-height:1.4}
   .whopick input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#614588;cursor:pointer}
   .whopick label:has(input:checked){background:#F1ECF7;border-color:#614588}
+  /* ادخل العملية */
+  .pxbox{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+  .pxl{font-size:13px;font-weight:700;margin:8px 0 6px}
+  /* the session pickers and share boxes sit outside .pfbar, so they take its
+     look explicitly — otherwise they render as the browser's bare controls */
+  .pxsess select,.pxfix input{border:1.5px solid var(--line);border-radius:11px;padding:9px 12px;
+    font-size:14px;font-family:inherit;color:var(--ink);background:#fff;min-width:170px}
+  #pxBox .pfbar .f{flex:1 1 170px}
+  .pxsess{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  .pxsess span{font-size:13.5px;min-width:180px}
+  .pxmode{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 4px;font-size:14px;font-weight:600}
+  .pxmode label,.pxpaid{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .pxpaid{font-size:13.5px;margin-top:10px}
+  .pxfix{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  .pxfix span{min-width:120px;font-size:13.5px}
+  .pxwarn{background:#FFF4DB;border:1px solid #D3A146;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.8;margin-top:10px}
   /* an excluded line stays on the page, greyed and struck through, so it can
      be put back — deleting it outright would leave nobody able to undo it */
   .pfout td{opacity:.55}
@@ -953,13 +969,42 @@
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkFcAdd">أضف تكلفة ثابتة</button></div>
     </div>
 
-    <h2 style="font-size:17px;margin-top:22px"><span></span> دخل يدوي — العقود وغيرها</h2>
-    <div class="pfbar">
-      <div class="f"><label>الوصف</label><input id="bkMnLabel" type="text" placeholder="عقد شركة ..."></div>
-      <div class="f"><label>المبلغ</label><input id="bkMnAmount" type="number" step="0.001" min="0" style="width:110px"></div>
-      <div class="f"><label>تكاليف تُخصم</label><input id="bkMnCosts" type="number" step="0.001" min="0" style="width:110px"></div>
-      <div class="f"><label>القاعدة</label><select id="bkMnRule"></select></div>
-      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="bkMnAdd">أضف</button></div>
+    <h2 style="font-size:17px;margin-top:22px"><span></span> ادخل العملية — المبيعات السابقة والعقود</h2>
+    <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">أي عملية صارت قبل النظام، أو عقد:
+      تنحسب بشهر تاريخها، وتنقسم بالنسبة حسب القواعد أو بمبالغ ثابتة، وتطلع بملف العميل بكل العملاء.</p>
+    <div class="pxbox" id="pxBox">
+      <div class="pfbar">
+        <div class="f"><label>التاريخ</label><input id="pxDate" type="date"></div>
+        <div class="f"><label>النوع</label><select id="pxType">
+          <option value="">— اختر —</option><option value="package">استشارة / باقة</option><option value="book">كتيّب</option>
+          <option value="course">ورشة / دورة</option><option value="call">اتصال سريع</option>
+          <option value="contract">عقد</option><option value="other">غير</option></select></div>
+        <div class="f" id="pxPkgF" hidden><label>الباقة</label><select id="pxPkg"></select></div>
+        <div class="f" id="pxLabelF" hidden><label>الوصف (اختياري)</label><input id="pxLabel" type="text" maxlength="120"></div>
+        <div class="f" id="pxOrgF" hidden><label>المنظّم (اختياري)</label><select id="pxOrg"></select></div>
+      </div>
+      <div id="pxSessions"></div>
+      <div id="pxCastF" hidden><div class="pxl">منو قدّمها</div><div class="whopick" id="pxCast" role="group" aria-label="منو قدّمها"></div></div>
+      <div class="pfbar">
+        <div class="f"><label>اسم العميل</label><input id="pxName" type="text" maxlength="120"></div>
+        <div class="f"><label>رقمه</label><input id="pxPhone" type="tel" inputmode="tel" maxlength="40" style="direction:ltr;text-align:right"></div>
+        <div class="f"><label>أو إيميله</label><input id="pxEmail" type="email" maxlength="200" style="direction:ltr;text-align:right"></div>
+      </div>
+      <div class="pfbar">
+        <div class="f"><label>المبلغ اللي دفعه (د.ك)</label><input id="pxAmount" type="number" step="0.001" min="0" style="width:140px"></div>
+        <div class="f"><label>مصاريف (اختياري)</label><input id="pxCosts" type="number" step="0.001" min="0" style="width:120px"></div>
+      </div>
+      <div class="pxmode" role="radiogroup" aria-label="طريقة التقسيم">
+        <label><input type="radio" name="pxMode" value="rule" checked> نسبة حسب القواعد</label>
+        <label><input type="radio" name="pxMode" value="fixed"> مبالغ ثابتة</label>
+      </div>
+      <div id="pxFixed" hidden></div>
+      <label class="pxpaid"><input type="checkbox" id="pxPaid" checked> انصرفت الحصص — العملية قديمة وانحاسبنا عليها</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="pfbtn" id="pxPreview">شوف التقسيم</button>
+        <button class="pfbtn go" id="pxSave" disabled>احفظ العملية</button>
+      </div>
+      <div id="pxOut"></div>
     </div>
     <div id="bkManual"></div>
 
@@ -1460,6 +1505,7 @@ const editVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editVo
 const getTeamFollowUp=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTeamFollowUp");
 const getCheckups=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCheckups");
 const getRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getRahaFeedback");
+const addPastTransaction=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastTransaction");
 const sendRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendRahaFeedback");
 const setCheckupNextStep=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCheckupNextStep");
 const sendCheckupResult=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCheckupResult");
@@ -2463,6 +2509,143 @@ function renderFollowUp(){
 }
 $("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp(); });
 
+/* ================= ادخل العملية =================
+   A past sale entered as if it happened then. «شوف التقسيم» asks the server
+   to split it exactly the way the books will — same rules, same rounding —
+   and «احفظ» only unlocks once what is on screen is what was previewed, so
+   nothing is saved on a split nobody looked at. */
+/* history only — mirrors HISTORY_MEMBERS on the server, a test holds them together */
+const PX_HISTORY=[{id:"hasan",name:"حسن أكبر"}];
+let PX_LAST="";
+function pxPeople(){
+  return (BK&&BK.members||[]).filter(m=>m.id!=="company")
+    .concat([{id:"external",name:"مستشار خارجي"}], PX_HISTORY)
+    .filter((m,i,a)=>a.findIndex(x=>x.id===m.id)===i);
+}
+function pxPkgs(){ return ((DATA&&DATA.nasPackages)||[]).concat((DATA&&DATA.riyadaPackages)||[]); }
+function pxToday(){ return new Date(Date.now()+180*60000).toISOString().slice(0,10); }
+function pxInit(){
+  const d=$("#pxDate"); if(!d) return;
+  d.max=pxToday();
+  if(!d.value) d.value = (BKMONTH && BKMONTH < pxToday().slice(0,7)) ? BKMONTH+"-01" : pxToday();
+  const ps=$("#pxPkg"), all=pxPkgs(), keys=all.map(x=>x.key).join("|");
+  if(ps && ps.dataset.keys!==keys){
+    ps.dataset.keys=keys;
+    ps.innerHTML=`<option value="">— اختر الباقة —</option>`+all.map(x=>
+      `<option value="${esc(x.key)}">${esc(x.name)} · ${fmt(x.amount)} د.ك</option>`).join("");
+  }
+  const og=$("#pxOrg");
+  if(og && !og.options.length) og.innerHTML=`<option value="">—</option>`+pxPeople().map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("");
+  whoFill($("#pxCast"), pxPeople().map(m=>({email:m.id, name:m.name})));
+}
+function pxCastNow(){
+  if($("#pxType").value==="package")
+    return [...new Set(Array.from(document.querySelectorAll("#pxSessions select")).map(x=>x.value).filter(Boolean))];
+  return whoVals($("#pxCast"));
+}
+function pxRenderSessions(){
+  const box=$("#pxSessions"), pkg=pxPkgs().find(x=>x.key===$("#pxPkg").value);
+  if(!box) return;
+  if(!pkg || $("#pxType").value!=="package"){ box.innerHTML=""; return; }
+  const opts=(sel)=>pxPeople().map(m=>`<option value="${esc(m.id)}"${m.id===sel?" selected":""}>${esc(m.name)}</option>`).join("");
+  box.innerHTML=`<div class="pxl">منو قدّم كل جلسة</div>`+(pkg.sessions||[]).map((x,i)=>
+    `<div class="pxsess"><span>${esc(x.label||("الجلسة "+(i+1)))}</span><select data-sess="${i}">${opts(x.consultantId)}</select></div>`).join("");
+  if(!$("#pxAmount").value) $("#pxAmount").value=pkg.amount;
+}
+function pxRenderFixed(){
+  const box=$("#pxFixed"), fixed=document.querySelector('input[name="pxMode"]:checked').value==="fixed";
+  box.hidden=!fixed; if(!fixed){ box.innerHTML=""; return; }
+  const was={}; box.querySelectorAll("input[data-fx]").forEach(i=>{ was[i.dataset.fx]=i.value; });
+  const cast=pxCastNow(), name=(id)=>(pxPeople().find(m=>m.id===id)||{}).name||id;
+  box.innerHTML=`<div class="pxl">حصة كل واحد (د.ك) — الشركة تاخذ الباقي</div>`+
+    (cast.length?cast.map(id=>`<div class="pxfix"><span>${esc(name(id))}</span>
+      <input data-fx="${esc(id)}" type="number" step="0.001" min="0" style="width:120px" value="${esc(was[id]||"")}"></div>`).join("")
+      :`<div class="muted" style="font-size:13px">اختر منو قدّم العملية أول.</div>`)+
+    `<div class="pxfix"><span><b>الشركة</b></span><b id="pxRest">—</b></div>`;
+  pxRest();
+}
+function pxRest(){
+  const el=$("#pxRest"); if(!el) return;
+  const net=(Number($("#pxAmount").value)||0)-(Number($("#pxCosts").value)||0);
+  let sum=0; document.querySelectorAll("#pxFixed input[data-fx]").forEach(i=>{ sum+=Number(i.value)||0; });
+  const rest=Math.round((net-sum)*1000)/1000;
+  el.textContent = rest<0 ? `الحصص أكثر من الصافي بـ ${fmt(-rest)} د.ك` : `${fmt(rest)} د.ك`;
+  el.style.color = rest<0 ? "#962E37" : "";
+}
+function pxPayload(){
+  const type=$("#pxType").value, fixed=document.querySelector('input[name="pxMode"]:checked').value==="fixed";
+  const f={}; document.querySelectorAll("#pxFixed input[data-fx]").forEach(i=>{ f[i.dataset.fx]=Number(i.value)||0; });
+  return {
+    date:$("#pxDate").value, type, packageId: type==="package"?$("#pxPkg").value:"",
+    sessions: Array.from(document.querySelectorAll("#pxSessions select")).map(x=>[x.value]),
+    cast: type==="package"?[]:whoVals($("#pxCast")),
+    label:$("#pxLabel").value.trim(), organiser: type==="course"?$("#pxOrg").value:"",
+    name:$("#pxName").value.trim(), phone:$("#pxPhone").value.trim(), email:$("#pxEmail").value.trim(),
+    amount:Number($("#pxAmount").value)||0, costs:Number($("#pxCosts").value)||0,
+    mode: fixed?"fixed":"rule", fixed: fixed?f:{}, paid:$("#pxPaid").checked,
+  };
+}
+function pxShowType(){
+  const t=$("#pxType").value;
+  $("#pxPkgF").hidden = t!=="package";
+  $("#pxCastF").hidden = !t || t==="package";
+  $("#pxLabelF").hidden = !t || t==="package";
+  $("#pxOrgF").hidden = t!=="course";
+  pxRenderSessions(); pxRenderFixed();
+}
+/* anything touched after a preview unlocks nothing until it is previewed again */
+function pxDirty(){ PX_LAST=""; const b=$("#pxSave"); if(b) b.disabled=true; }
+$("#pxBox") && $("#pxBox").addEventListener("change", e=>{
+  if(e.target.id==="pxType") pxShowType();
+  else if(e.target.id==="pxPkg"){ $("#pxAmount").value=""; pxRenderSessions(); pxRenderFixed(); }
+  else if(e.target.name==="pxMode" || e.target.closest("#pxSessions") || e.target.closest("#pxCast")) pxRenderFixed();
+  pxDirty();
+});
+$("#pxBox") && $("#pxBox").addEventListener("input", e=>{
+  if(e.target.matches("#pxAmount,#pxCosts,#pxFixed input")) pxRest();
+  pxDirty();
+});
+$("#pxPreview") && $("#pxPreview").addEventListener("click", async ()=>{
+  const body=pxPayload(), out=$("#pxOut");
+  try{
+    const r=(await addPastTransaction({...body, dryRun:true})).data||{};
+    const rows=(r.shares||[]).map(x=>`<tr><td>${esc(x.name)}</td><td class="num">${fmt(x.amount)} د.ك</td></tr>`).join("");
+    out.innerHTML = `<div style="margin-top:12px;font-size:13.5px;line-height:1.9">
+      <b>شهر ${esc(r.month)}</b> · الصافي ${fmt(r.net)} د.ك ·
+      ${body.mode==="rule" ? (r.rule?`القاعدة: <b>${esc(r.rule.label)}</b>`:`<b style="color:#962E37">ما انطبقت أي قاعدة — اختر «مبالغ ثابتة»</b>`) : "مبالغ ثابتة"}
+      ${r.paid?" · الحصص مسجّلة كمنصرفة":" · الحصص بتطلع كمستحقة"}</div>`+
+      (rows?`<table class="pftab" style="margin-top:6px"><tbody>${rows}</tbody></table>`:"")+
+      ((r.dupes||[]).length?`<div class="pxwarn">⚠️ نفس العميل ونفس المبلغ موجودين بهالشهر:<br>${
+        r.dupes.map(x=>`${esc(stDate(x.when))} · ${esc(x.what||"")} · ${fmt(x.amount)} د.ك${x.past?" (مدخلة يدوياً)":""}`).join("<br>")
+      }<br>تأكد إنها مو نفس العملية قبل ما تحفظ.</div>`:"");
+    const ok = body.mode==="fixed" || !!r.rule;
+    PX_LAST = ok ? JSON.stringify(body) : "";
+    $("#pxSave").disabled = !ok;
+    $("#pxSave").dataset.dupes = (r.dupes||[]).length;
+  }catch(err){ out.innerHTML=`<div class="pxwarn" style="background:#FDECEC;border-color:#962E37">${esc((err&&err.message)||"تعذّر")}</div>`; pxDirty(); }
+});
+$("#pxSave") && $("#pxSave").addEventListener("click", async ()=>{
+  const body=pxPayload();
+  if(JSON.stringify(body)!==PX_LAST) return pxDirty();          // changed since the preview
+  if(Number($("#pxSave").dataset.dupes)>0 && !confirm("في عملية بنفس العميل ونفس المبلغ بهالشهر. متأكد إنها عملية ثانية؟")) return;
+  $("#pxSave").disabled=true;
+  try{
+    const r=(await addPastTransaction(body)).data||{};
+    ["#pxName","#pxPhone","#pxEmail","#pxAmount","#pxCosts","#pxLabel"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
+    whoClear($("#pxCast")); $("#pxOut").innerHTML=""; PX_LAST="";
+    /* show it where it landed, which may not be the month on screen */
+    await loadBooks(r.month||BKMONTH, true);
+    pfMsg(`انحفظت العملية بشهر ${r.month} ✅`, true);
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); $("#pxSave").disabled=false; }
+});
+/* a hand-entered line can be taken out — kept for the trail, counted for nothing */
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("[data-mndel]"); if(!b) return;
+  if(!confirm("تحذف هالعملية من الحسابات؟ بتطلع من الشهر ومن ملف العميل.")) return;
+  try{ await saveProfitItem({ what:"manual", id:b.dataset.mndel, remove:true }); await loadBooks(BKMONTH, true); pfMsg("انحذفت", true); }
+  catch(err){ pfMsg((err&&err.message)||"تعذّر الحذف", false); }
+});
+
 /* ================= a checkbox in front of each name =================
    Shared by المهام and الأفكار. Filling again with the same people keeps what
    was ticked — the panels re-render on refresh, and a half-written message
@@ -3101,8 +3284,9 @@ function renderBooks(){
      buttons off the screen that would only ever return "ما عندك صلاحية" */
   const canEdit = BK.canEdit !== false;
   ["#bkFx","#bkFxSave","#bkVcLabel","#bkVcAmount","#bkVcAdd","#bkFcLabel","#bkFcAmount",
-   "#bkFcCur","#bkFcBasis","#bkFcAdd","#bkMnLabel","#bkMnAmount","#bkMnCosts","#bkMnRule",
-   "#bkMnAdd","#bkRuleNew"].forEach(sel=>{ const el=$(sel); if(el) el.disabled=!canEdit; });
+   "#bkFcCur","#bkFcBasis","#bkFcAdd","#bkRuleNew"].forEach(sel=>{ const el=$(sel); if(el) el.disabled=!canEdit; });
+  const pxb=$("#pxBox"); if(pxb) pxb.hidden=!canEdit;
+  if(canEdit) pxInit();
   const rulesH=$("#bkRules"); if(rulesH) rulesH.style.display=canEdit?"":"none";
   const rn=$("#bkRuleNew");  if(rn) rn.style.display=canEdit?"":"none";
   fillMonths($("#bkMonth"), BK.months, BK.month);
@@ -3254,7 +3438,9 @@ function renderBooks(){
         <td>${esc(PF_KIND[l.kind]||l.kind)}</td>
         <td>${esc(l.what)||"—"}<div class="pfrule">${esc(l.client)||""}${
             l.mode?` · ${modeAr(l.mode)}`:""}${
-            l.pending?` · <b style="color:#614588">الجلسة ما صارت — الفلوس محجوزة</b>`:""}</div>
+            l.pending?` · <b style="color:#614588">الجلسة ما صارت — الفلوس محجوزة</b>`:""}${
+            l.past?` · <b style="color:#614588">عملية سابقة</b>`:""}${
+            l.manual&&canEdit?` <button class="pfbtn" data-mndel="${esc(String(l.orderId||"").replace(/^manual:/,""))}" style="font-size:11px;padding:2px 8px">احذف</button>`:""}</div>
           ${l.excluded?`<div class="pfrule" style="color:#962E37;font-weight:700">مستبعد من الحسابات${
             l.excludedNote?` · ${esc(l.excludedNote)}`:""}</div>`:""}</td>
         <td class="num">${kwd(l.amount)}
@@ -3356,11 +3542,6 @@ function renderBooks(){
       }).join("")+`</tbody></table>`
     : `<div class="muted" style="font-size:13px;padding:10px">ما في مكافآت بهذا الشهر.</div>`;
 
-  const rsel=$("#bkMnRule");
-  if(rsel && rsel.dataset.keys!==(BK.rules||[]).map(r=>r.id).join("|")){
-    rsel.dataset.keys=(BK.rules||[]).map(r=>r.id).join("|");
-    rsel.innerHTML=(BK.rules||[]).map(r=>`<option value="${esc(r.id)}">${esc(r.label)}</option>`).join("");
-  }
 
   /* Every rule is editable here, because a percentage that needs a deploy to
      change is a percentage that will be wrong for a month. The split is only
@@ -3761,18 +3942,6 @@ $("#bkFcAdd") && $("#bkFcAdd").addEventListener("click", async ()=>{
   }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
 });
 
-$("#bkMnAdd") && $("#bkMnAdd").addEventListener("click", async ()=>{
-  const label=$("#bkMnLabel").value.trim();
-  const amount=Number($("#bkMnAmount").value), costs=Number($("#bkMnCosts").value)||0;
-  if(label.length<2) return pfMsg("اكتب وصف الدخل", false);
-  if(!(amount>0))    return pfMsg("اكتب مبلغ صحيح", false);
-  try{
-    await saveProfitItem({ what:"manual", row:{ label, amount, costs, month:BKMONTH,
-      ruleId:$("#bkMnRule").value, kind:"contract", when:Date.now() } });
-    $("#bkMnLabel").value=""; $("#bkMnAmount").value=""; $("#bkMnCosts").value="";
-    await loadBooks(BKMONTH); pfMsg("انضاف ✅", true);
-  }catch(e){ pfMsg((e&&e.message)||"تعذّر الحفظ", false); }
-});
 
 /* ---------- render ---------- */
 function renderPayoutNudge(){
@@ -5105,6 +5274,8 @@ const CL_TYPE = {
   report:    { label:"تقرير",    color:"#2F1748" },
   newsletter:{ label:"النشرة",   color:"#8E8899" },
   rating:    { label:"تقييم",    color:"#B35661" },
+  /* a contract or anything else entered by hand from before the system */
+  past:      { label:"عملية سابقة", color:"#3EADAD" },
 };
 let CLQ="", CLFILTER="all";
 
