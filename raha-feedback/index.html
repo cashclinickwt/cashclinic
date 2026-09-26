@@ -73,7 +73,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
   projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
-  messagingSenderId:"547780714224",appId:"1:547780714224:web:0d0c2f7b6d09a1b4b2d0f5"},functionsRegion:"us-central1"};
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
 const fns = getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion);
 const who    = httpsCallable(fns, "rahaFeedbackWho");
 const submit = httpsCallable(fns, "submitRahaFeedback");

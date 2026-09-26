@@ -547,6 +547,15 @@
      which. The row also says it in words — colour alone is not information
      to somebody who cannot tell these two tints apart. */
   .pfpend td{background:#F1ECF7}
+  /* a checkbox in front of each name. The multi-select it replaces needed Ctrl
+     or Cmd to pick more than one — invisible to most people, and impossible on
+     a phone. Ticked names take the light purple used across the panel. */
+  .whopick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;
+    border:1.5px solid var(--line);border-radius:12px;padding:8px;background:#fff;max-height:230px;overflow:auto}
+  .whopick label{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);border-radius:10px;
+    padding:8px 11px;margin:0;font-size:14px;font-weight:500;cursor:pointer;min-height:42px;line-height:1.4}
+  .whopick input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#614588;cursor:pointer}
+  .whopick label:has(input:checked){background:#F1ECF7;border-color:#614588}
   /* an excluded line stays on the page, greyed and struck through, so it can
      be put back — deleting it outright would leave nobody able to undo it */
   .pfout td{opacity:.55}
@@ -754,8 +763,8 @@
                  font:inherit;font-size:14px;line-height:1.9;resize:vertical;min-height:150px"></textarea>
         <div class="muted" style="font-size:12px;margin-top:4px" id="idCount">0 حرف</div></div>
       <div class="f" style="flex:1 1 220px"><label>تذكر أحد من الفريق؟</label>
-        <select id="idWho" multiple size="4" style="width:100%"></select>
-        <div class="muted" style="font-size:12px;margin-top:4px">اضغط Ctrl أو Cmd لاختيار أكثر من واحد · بيوصلهم إيميل</div></div>
+        <div class="whopick" id="idWho" role="group" aria-label="تذكر أحد من الفريق؟"></div>
+        <div class="muted" style="font-size:12px;margin-top:4px">تقدر تختار أكثر من واحد · بيوصلهم إيميل</div></div>
       <div class="f" style="flex:1 1 220px"><label>مرفقات (اختياري)</label>
         <input id="idFiles" type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,text/plain">
         <div class="muted" style="font-size:12px;margin-top:4px">حتى 4 ملفات · 100 ميجا للملف</div></div>
@@ -796,6 +805,7 @@
     <div class="flt" id="stTabs">
       <button class="on" data-st="leads">متابعة العملاء</button>
       <button data-st="vouchers">القسائم</button>
+      <button data-st="budget">رفع إلى الميزانية</button>
     </div>
     <div class="addmsg" id="stMsg"></div>
     <div id="stBody"></div>
@@ -840,7 +850,7 @@
     <h2><span></span> مراسلات الفريق</h2>
     <div class="pfbar">
       <div class="f" style="flex:1 1 200px"><label>الى من (تقدر تختار أكثر من واحد)</label>
-        <select id="tkWho" multiple size="4" style="min-height:96px"></select></div>
+        <div class="whopick" id="tkWho" role="group" aria-label="الى من"></div></div>
       <div class="f" style="flex:1 1 100%"><label>الرسالة</label>
         <textarea id="tkText" rows="5" placeholder="اكتب رسالتك هني .. تقدر تطوّل براحتك"
           style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;font-family:inherit;line-height:1.9;resize:vertical;min-height:130px;background:#fff"></textarea></div>
@@ -1441,6 +1451,9 @@ const getTaskFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTas
 const touchStaff=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"touchStaff");
 const setPriorities=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setPriorities");
 const getSalesTeam=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getSalesTeam");
+const addBudgetEntry=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addBudgetEntry");
+const listBudgetEntries=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listBudgetEntries");
+const removeBudgetEntry=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"removeBudgetEntry");
 const sendToSales=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendToSales");
 const updateSalesLead=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateSalesLead");
 const editVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editVoucher");
@@ -1544,7 +1557,7 @@ const setCourseAttendance=httpsCallable(getFunctions(app,CONFIG.functionsRegion)
 const setApplicationStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setApplicationStatus");
 
 const $=s=>document.querySelector(s);
-const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة",sales:"فريق المبيعات"};
+const ROLE_AR={all:"صلاحية كاملة",personal:"كاش ناس",riyada:"كاش ريادة",sales:"فريق المبيعات",service:"خدمة العملاء"};
 let DATA=null, SFILTER="all", QFILTER="all", BFILTER="all";
 
 const fmt=n=>Number(n||0).toLocaleString("en-US");
@@ -1631,7 +1644,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null; BS=null; RF=null;
+  ST=null; FU=null; BS=null; RF=null; BG=null;
 }
 
 async function refreshAll(opt){
@@ -2016,12 +2029,7 @@ function renderTasks(){
   if(t1) t1.textContent = (TK.viewing && TK.viewing!==TK.me)
     ? "الوارد لـ "+tkName(TK.viewing) : "اللي وصلني";
 
-  const sel=$("#tkWho");
-  const ppl=(TK.people||[]).filter(p=>p.email!==TK.me);
-  if(sel && sel.dataset.keys!==ppl.map(p=>p.email).join("|")){
-    sel.dataset.keys=ppl.map(p=>p.email).join("|");
-    sel.innerHTML=ppl.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
-  }
+  whoFill($("#tkWho"), (TK.people||[]).filter(p=>p.email!==TK.me));
   $("#tkMine").innerHTML=tkTable(TK.mine||[], true);
   $("#tkSent").innerHTML=tkTable(TK.sent||[], false);
 
@@ -2065,9 +2073,12 @@ $("#tkView") && $("#tkView").addEventListener("change", e=>{
 });
 
 $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
-  const toList=Array.from($("#tkWho").selectedOptions||[]).map(o=>o.value).filter(Boolean);
+  const toList=whoVals($("#tkWho"));
   const text=$("#tkText").value.trim();
   if(!toList.length) return tkMsg("اختر شخص أو أكثر من الفريق", false);
+  /* the server keeps the first 8 and drops the rest without a word — say it
+     here, before anybody believes a ninth person was told */
+  if(toList.length>8) return tkMsg("أقصى شي ٨ أشخاص بالرسالة الوحدة", false);
   if(text.length<2) return tkMsg("اكتب الرسالة", false);
   const picked=Array.from(($("#tkFiles")&&$("#tkFiles").files)||[]);
   if(picked.length>4) return tkMsg("أقصى شي ٤ مرفقات بالرسالة الوحدة", false);
@@ -2088,7 +2099,7 @@ $("#tkAdd") && $("#tkAdd").addEventListener("click", async ()=>{
     await addTask({ toList, text, due:$("#tkDue").value||"", files });
     $("#tkText").value=""; $("#tkDue").value="";
     if($("#tkFiles")) $("#tkFiles").value="";
-    Array.from($("#tkWho").options||[]).forEach(o=>{ o.selected=false; });
+    whoClear($("#tkWho"));
     await loadTasks(); tkMsg(`انرسلت لـ ${toList.map(tkName).join("، ")} ✅ ووصلهم إيميل`, true);
   }catch(e){ tkMsg((e&&e.message)||"تعذّر الإرسال", false); }
   finally{ b.disabled=false; b.textContent=t0; }
@@ -2282,8 +2293,63 @@ async function loadSalesTeam(){
 function stDate(ms){ if(!ms) return "—"; const d=new Date(ms); 
   return `${d.getUTCFullYear()}-${bkPad2(d.getUTCMonth()+1)}-${bkPad2(d.getUTCDate())}`; }
 
+/* ---- رفع إلى الميزانية: a favour غالية did, paid to the company whole ---- */
+let BG=null;
+async function loadBudget(){
+  try{ const r=await listBudgetEntries({}); BG=(r&&r.data)||{rows:[]}; if(STTAB==="budget") renderSalesTeam(); }
+  catch(err){ stMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+function renderBudget(box){
+  const rows=(BG&&BG.rows)||[];
+  box.innerHTML = `
+    <div class="addbox" style="margin-bottom:14px">
+      <h3>⬆️ رفع إلى الميزانية</h3>
+      <p class="hint">لما غالية تسوي لعميل شي خاص ويدفع — اكتب اسمه والمبلغ اللي دفعه. يروح لحسابات الشركة كامل، ١٠٠٪ للشركة، بهذا الشهر.</p>
+      <div class="addrow">
+        <div class="addf"><label>اسم العميل</label><input id="bgClient" type="text" maxlength="120" autocomplete="off"></div>
+        <div class="addf"><label>المبلغ اللي دفعه (د.ك)</label><input id="bgAmount" type="number" min="0" step="0.001" inputmode="decimal"></div>
+        <div class="addf" style="flex:1 1 220px"><label>ملاحظة (اختياري)</label><input id="bgNote" type="text" maxlength="300" autocomplete="off"></div>
+      </div>
+      <button class="addbtn" data-bg-add>ارفع للميزانية</button>
+    </div>
+    <div class="muted" style="font-size:13px;margin:0 0 8px">${BG?`اللي رفعته هالشهر (${esc(BG.month||"")})`:"لحظة…"}</div>
+    ${rows.length ? rows.map(x=>`
+      <div class="hmcard" style="margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div><b>${esc(x.client)}</b> · <span class="num">${fmt(x.amount)} د.ك</span>
+          <div class="muted" style="font-size:12.5px">${esc(stDate(x.when))}${x.note?` · ${esc(x.note)}`:""}${
+            DATA&&DATA.role==="all"&&x.byName?` · ${esc(x.byName)}`:""}</div></div>
+        <button class="pfbtn" data-bg-del="${esc(x.id)}" style="font-size:12px;padding:4px 11px">احذف</button>
+      </div>`).join("") : (BG?`<div class="hmempty">ما رفعت شي هالشهر.</div>`:"")}`;
+}
+$("#stBody") && $("#stBody").addEventListener("click", async e=>{
+  const add=e.target.closest("[data-bg-add]");
+  if(add){
+    const client=($("#bgClient").value||"").trim(), note=($("#bgNote").value||"").trim();
+    const amount=Number($("#bgAmount").value);
+    if(client.length<2) return stMsg("اكتب اسم العميل", false);
+    if(!(amount>0)) return stMsg("اكتب المبلغ اللي دفعه", false);
+    /* it lands in the company's books the moment it is sent, so say exactly
+       what is about to happen before it does */
+    if(!confirm(`بيرتفع ${fmt(amount)} د.ك من «${client}» لحسابات الشركة — كامل للشركة. أكمل؟`)) return;
+    add.disabled=true;
+    try{ await addBudgetEntry({ client, amount, note }); stMsg("انرفع للميزانية ✅", true);
+         ["#bgClient","#bgAmount","#bgNote"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
+         await loadBudget(); }
+    catch(err){ stMsg((err&&err.message)||"تعذّر الرفع", false); }
+    finally{ add.disabled=false; }
+    return;
+  }
+  const del=e.target.closest("[data-bg-del]");
+  if(del){
+    if(!confirm("تحذف هذا الرفع؟ بيطلع من حسابات الشركة.")) return;
+    try{ await removeBudgetEntry({ id:del.dataset.bgDel }); stMsg("انحذف", true); await loadBudget(); }
+    catch(err){ stMsg((err&&err.message)||"تعذّر الحذف", false); }
+  }
+});
+
 function renderSalesTeam(){
   const box=$("#stBody"); if(!box || !ST) return;
+  if(STTAB==="budget"){ renderBudget(box); if(!BG) loadBudget(); return; }
   if(STTAB==="leads"){
     const rows=(ST.leads||[]);
     box.innerHTML = rows.length ? rows.map(l=>`
@@ -2396,6 +2462,23 @@ function renderFollowUp(){
     </div>`).join("") || `<div class="pfrule">ما في بيانات.</div>`;
 }
 $("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp(); });
+
+/* ================= a checkbox in front of each name =================
+   Shared by المهام and الأفكار. Filling again with the same people keeps what
+   was ticked — the panels re-render on refresh, and a half-written message
+   must not lose its recipients because the list redrew underneath it. */
+function whoFill(el, people){
+  if(!el) return;
+  const keys=people.map(p=>p.email).join("|");
+  if(el.dataset.keys===keys && el.children.length) return;
+  const was=new Set(whoVals(el));
+  el.dataset.keys=keys;
+  el.innerHTML = people.length
+    ? people.map(p=>`<label><input type="checkbox" value="${esc(p.email)}"${was.has(p.email)?" checked":""}><span>${esc(p.name)}</span></label>`).join("")
+    : `<span class="muted" style="font-size:13px;padding:6px">ما في أحد بالفريق للحين</span>`;
+}
+function whoVals(el){ return el ? Array.from(el.querySelectorAll('input[type="checkbox"]:checked')).map(i=>i.value).filter(Boolean) : []; }
+function whoClear(el){ if(el) el.querySelectorAll('input[type="checkbox"]').forEach(i=>{ i.checked=false; }); }
 
 /* ================= رأي المشاركين — ورشة الراحة ================= */
 function rfMsg(t,ok){ const m=$("#rfMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
@@ -3346,7 +3429,7 @@ function renderBooks(){
   document.querySelectorAll("#bkRules .rulecard").forEach(ruleTotal);
 }
 
-const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد"};
+const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد",budget:"رفع للميزانية"};
 const DELIV_AR={done:"خلّص جلساته",voucher:"ألغى وأخذ رصيد",pending:"لم تنتهي حتى الآن"};
 
 $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
@@ -3797,7 +3880,7 @@ function myName(){
 /* a consultant sees her own diary; sales and full access see everyone's */
 function hmMyDiary(){
   const role=(DATA&&DATA.role)||"";
-  if(role==="all"||role==="sales") return null;
+  if(role==="all"||role==="sales"||role==="service") return null;
   return (DATA&&DATA.profitMember)||null;
 }
 /**
@@ -3919,11 +4002,7 @@ const ID_TONE={ "جديدة":"#614588", "قيد الدراسة":"#D3A146", "من
 function renderIdeas(){
   if(!ID || !$("#idList")) return;
   const list=ID.list||[], st=ID.statuses||[];
-  const who=$("#idWho");
-  if(who && !who.options.length){
-    who.innerHTML=(ID.people||[]).filter(p=>p.email!==ID.me)
-      .map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
-  }
+  whoFill($("#idWho"), (ID.people||[]).filter(p=>p.email!==ID.me));
   const by={}; list.forEach(x=>{ by[x.status]=(by[x.status]||0)+1; });
   $("#idFlt").innerHTML=`<button${IDFLT?"":' class="on"'} data-idf="">الكل · ${fmt(list.length)}</button>`+
     st.map(k=>`<button${IDFLT===k?' class="on"':""} data-idf="${esc(k)}">${esc(k)} · ${fmt(by[k]||0)}</button>`).join("");
@@ -3983,12 +4062,12 @@ $("#idAdd") && $("#idAdd").addEventListener("click", async ()=>{
       files.push(await ccUpload(f,(pct)=>{ b.textContent=`رفع ${i+1}/${picked.length} · ${pct}%`; }));
     }
     b.textContent="يحفظ…";
-    const mentions=Array.from(($("#idWho")||{}).selectedOptions||[]).map(o=>o.value).filter(Boolean);
+    const mentions=whoVals($("#idWho"));
     await addIdea({ title, area:($("#idArea").value||"").trim(),
       body:($("#idBody").value||"").trim(), mentions, files });
     ["idTitle","idArea","idBody"].forEach(k=>$("#"+k).value="");
     if($("#idFiles")) $("#idFiles").value="";
-    if($("#idWho")) Array.from($("#idWho").options).forEach(o=>o.selected=false);
+    whoClear($("#idWho"));
     if($("#idCount")) $("#idCount").textContent="0 حرف";
     m.textContent="انضافت فكرتك ✅ ووصلت للفريق 📩"; m.className="addmsg ok";
     ID=null; await loadIdeas();
@@ -4406,6 +4485,10 @@ const SALES_PANELS = ["home","clients","bookings","events","subscribers","course
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
 const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify"];
+/* أشواق — customer service: the diary like نورة, the client list, and the
+   team's shared board. No leads, no vouchers tab, no events, no targets — and
+   no money anywhere, which the server enforces by never sending it. */
+const SERVICE_PANELS = ["home","clients","bookings","tasks","meetings","ideas","notify"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
 const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
@@ -4460,6 +4543,7 @@ function panelAvailable(k){
   if(role==="sales" && SALES_PANELS.indexOf(k)===-1) return false;
   if(role==="consultant" && CONSULTANT_PANELS.indexOf(k)===-1) return false;
   if(role==="marketing" && MARKETING_PANELS.indexOf(k)===-1) return false;
+  if(role==="service" && SERVICE_PANELS.indexOf(k)===-1) return false;
   /* Left standing for a role nobody carries any more — إسماعيل is full access
      now. It costs nothing and it is the thing that would have to be rewritten
      from memory if anyone is ever put back on riyada_c. */
@@ -5055,7 +5139,7 @@ function renderClients(){
   /* The tab is hidden only from roles that are never given the client index
      at all. Marketing is given it, so an empty list must read as «no clients
      yet» rather than making the tab disappear on a quiet day. */
-  const MAY_SEE_CLIENTS = ["all","sales","marketing"];
+  const MAY_SEE_CLIENTS = ["all","sales","service","marketing"];
   if(!all.length && MAY_SEE_CLIENTS.indexOf(DATA.role)===-1){ sec.hidden=true; return; }
   sec.hidden=false;
 
