@@ -455,7 +455,7 @@
 })();
 </script>
 
-<!-- ===== NEW-PROGRAM AD POPUP (ورشة كيف تصنع راحتك المالية؟) — to remove: delete this whole block ===== -->
+<!-- ===== AD POPUP (currently: ديوانية كاش كلينك) — to stop it: empty the ADS list below ===== -->
 <style>
 .cc-ad-overlay{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(47,23,72,.6);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .25s;overflow:auto;-webkit-overflow-scrolling:touch}
 .cc-ad-overlay[hidden]{display:none}
@@ -496,7 +496,12 @@
        { until:"YYYY-MM-DDT00:00:00+03:00", href:"…", img:"…", w:1080, h:1350,
          alt:"…", cta:"… ←" }
      and it retires itself at `until`. */
-  var ADS=[];
+  var ADS=[
+    /* ديوانية كاش كلينك — stops at 6 PM on the day, when its sales close */
+    { until:"2026-10-24T18:00:00+03:00", href:"courses/diwaniya.html",
+      img:"courses/img/diwaniya-promo.jpg", w:1000, h:1250,
+      alt:"ديوانية كاش كلينك — السبت 24/10/2026، مجمع جوهرة الخليج", cta:"احجز مكانك في الديوانية ←" }
+  ];
   var now=Date.now(), ad=null;
   for(var i=0;i<ADS.length;i++){ if(now < Date.parse(ADS[i].until)){ ad=ADS[i]; break; } }
   if(!ad) return;                      /* everything promoted has passed */
