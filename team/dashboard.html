@@ -1177,7 +1177,12 @@
     <div class="kpis" id="eventKpis"></div>
     <div id="eventFix"></div>
 
-    <h2 style="font-size:17px;margin-top:24px"><span></span> تقييم اللقاء</h2>
+    <!-- folded by default — the register is what's used day to day; the
+         ratings open with + when wanted, and stay rendered while folded -->
+    <h2 style="font-size:17px;margin-top:24px;display:flex;align-items:center;gap:10px"><span></span> تقييم اللقاء
+      <button type="button" id="rtToggle" aria-expanded="false" aria-controls="rtBody" title="اعرض التقييم"
+        style="margin-inline-start:auto;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--cc-purple,#2F1749);background:#fff;color:var(--cc-purple,#2F1749);font-size:20px;line-height:1;cursor:pointer">+</button></h2>
+    <div id="rtBody" hidden>
     <div class="flt" id="rtEvPick"></div>
     <div class="kpis" id="rtKpis"></div>
     <div class="rtbars" id="rtBars"></div>
@@ -1189,6 +1194,7 @@
       <button data-rt="low">تقييم متوسط أو ضعيف</button>
     </div>
     <div id="rtList"></div>
+    </div>
 
     <h2 style="font-size:17px;margin-top:26px"><span></span> المسجّلين</h2>
     <div id="eventChart"></div>
@@ -1426,6 +1432,7 @@
       <button data-c="booking">حجزوا استشارة</button>
       <button data-c="quiz">سوّوا اختبار</button>
       <button data-c="course">دورات</button>
+      <button data-c="diwaniya">الديوانية</button>
       <button data-c="event">سجّلوا بلقاء</button>
       <button data-c="paid">دفعوا لنا</button>
       <button data-c="month">هالشهر</button>
@@ -5061,8 +5068,13 @@ function renderEvents(){
     : E.regs;
 
   const vip = regs.filter(r=>r.vip).length;
+  /* a paid لقاء: what it brought in. Amounts reach full access only — for
+     everyone else the server sends 0, so the box stays away */
+  const paidRegs = regs.filter(r=>r.paid);
+  const income = paidRegs.reduce((a,r)=>a+(Number(r.amount)||0),0);
   $("#eventKpis").innerHTML=
     `<div class="kpi"><div class="n">${fmt(regs.length)}</div><div class="l">المسجّلين</div></div>` +
+    (income>0?`<div class="kpi"><div class="n">${fmt(income)} د.ك</div><div class="l">الدخل · ${fmt(paidRegs.length)} مقعد مدفوع</div></div>`:"") +
     (vip?`<div class="kpi"><div class="n">${fmt(vip)}</div><div class="l">عملاء VIP · ساعة إضافية</div></div>`:"") +
     ((EVFILTER==="__all"||!EVFILTER)&&E.totals?`<div class="kpi"><div class="n">${fmt(E.totals.count||0)}</div><div class="l">إجمالي كل اللقاءات</div></div>`:"");
 
@@ -5384,6 +5396,12 @@ $("#nbCopy") && $("#nbCopy").addEventListener("click", ()=>{
 });
 
 /* ================= ALL CLIENTS ================= */
+document.addEventListener("click",(e)=>{
+  const b=e.target && e.target.closest && e.target.closest("#rtToggle"); if(!b) return;
+  const body=$("#rtBody"), open=body.hidden;
+  body.hidden=!open; b.textContent=open?"−":"+";
+  b.setAttribute("aria-expanded",String(open)); b.title=open?"صغّر التقييم":"اعرض التقييم";
+});
 const CL_TYPE = {
   quiz:      { label:"اختبار",   color:"#614588" },
   book:      { label:"كتاب",     color:"#505632" },
@@ -5392,6 +5410,8 @@ const CL_TYPE = {
   attempt:   { label:"حاول يحجز", color:"#8E8899" },
   event:     { label:"لقاء",     color:"#2F8789" },
   course:    { label:"دورة",     color:"#D3A146" },
+  /* the paid, in-person ديوانية — its own box, not «دورة» and not «لقاء» */
+  diwaniya:  { label:"الديوانية", color:"#7E8455" },
   question:  { label:"سؤال",     color:"#6B6577" },
   report:    { label:"تقرير",    color:"#2F1748" },
   newsletter:{ label:"النشرة",   color:"#8E8899" },
@@ -5543,7 +5563,7 @@ function openClient(c){
       <div class="clstats">
         ${seesMoney()&&c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
         ${stat("book","كتاب")}${stat("booking","استشارة")}${stat("quiz","اختبار")}
-        ${stat("course","دورة")}${stat("event","لقاء")}${stat("question","سؤال")}
+        ${stat("course","دورة")}${stat("diwaniya","الديوانية")}${stat("event","لقاء")}${stat("question","سؤال")}
         ${stat("rating","تقييم")}${stat("newsletter","نشرة")}${stat("report","تقرير")}
         <span class="clstat">أول تعامل <b>${dt(c.firstSeen)}</b></span>
         <span class="clstat">آخر نشاط <b>${dt(c.lastSeen)}</b></span>
