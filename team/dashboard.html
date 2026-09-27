@@ -931,6 +931,7 @@
       <div class="f"><label>&nbsp;</label><button class="pfbtn" id="bkFxSave">احفظ السعر</button></div>
     </div>
     <div class="kpis" id="bkKpisMoney"></div>
+    <div id="bkTapFees" style="margin-top:8px"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> المستحق لكل واحد</h2>
     <div class="addmsg" id="bkDueMsg"></div>
@@ -990,19 +991,35 @@
         <div class="f"><label>رقمه</label><input id="pxPhone" type="tel" inputmode="tel" maxlength="40" style="direction:ltr;text-align:right"></div>
         <div class="f"><label>أو إيميله</label><input id="pxEmail" type="email" maxlength="200" style="direction:ltr;text-align:right"></div>
       </div>
+      <div class="pfbar" id="pxPeriodF" hidden>
+        <div class="f"><label>الاشتراك من</label><input id="pxFrom" type="date"></div>
+        <div class="f"><label>إلى</label><input id="pxTo" type="date"></div>
+      </div>
       <div class="pfbar">
         <div class="f"><label>المبلغ اللي دفعه (د.ك)</label><input id="pxAmount" type="number" step="0.001" min="0" style="width:140px"></div>
-        <div class="f"><label>مصاريف (اختياري)</label><input id="pxCosts" type="number" step="0.001" min="0" style="width:120px"></div>
+        <div class="f"><label>طريقة الدفع</label><select id="pxChannel">
+          <option value="">— اختر —</option>
+          <option value="knet">كي نت</option>
+          <option value="card_kw">Apple Pay · Google Pay · فيزا · ماستر — محلية</option>
+          <option value="card_int">Apple Pay · Google Pay · فيزا · ماستر — خليجية أو عالمية</option>
+          <option value="deema">ديمة</option>
+          <option value="cash">كاش / تحويل</option></select></div>
+        <div class="f"><label>مصاريف ثانية (اختياري)</label><input id="pxCosts" type="number" step="0.001" min="0" style="width:120px"></div>
       </div>
+      <div class="muted" id="pxFeeNote" style="font-size:12.5px;margin:-4px 0 6px"></div>
       <div class="pxmode" role="radiogroup" aria-label="طريقة التقسيم">
         <label><input type="radio" name="pxMode" value="rule" checked> نسبة حسب القواعد</label>
         <label><input type="radio" name="pxMode" value="fixed"> مبالغ ثابتة</label>
       </div>
       <div id="pxFixed" hidden></div>
+      <div class="pfbar"><div class="f" style="flex:1 1 100%"><label>ملاحظة (اختياري)</label>
+        <input id="pxNote" type="text" maxlength="300" placeholder="تطلع على السطر بحسابات الشركة"></div></div>
       <label class="pxpaid"><input type="checkbox" id="pxPaid" checked> انصرفت الحصص — العملية قديمة وانحاسبنا عليها</label>
+      <div class="pxwarn" id="pxEditing" hidden style="background:#F1ECF7;border-color:#614588"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         <button class="pfbtn" id="pxPreview">شوف التقسيم</button>
         <button class="pfbtn go" id="pxSave" disabled>احفظ العملية</button>
+        <button class="pfbtn" id="pxCancel" hidden>إلغاء التعديل</button>
       </div>
       <div id="pxOut"></div>
     </div>
@@ -1506,6 +1523,8 @@ const getTeamFollowUp=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"ge
 const getCheckups=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCheckups");
 const getRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getRahaFeedback");
 const addPastTransaction=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastTransaction");
+const backfillTapChannels=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"backfillTapChannels");
+const getPastTransaction=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getPastTransaction");
 const sendRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendRahaFeedback");
 const setCheckupNextStep=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCheckupNextStep");
 const sendCheckupResult=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendCheckupResult");
@@ -2350,10 +2369,11 @@ function renderBudget(box){
   box.innerHTML = `
     <div class="addbox" style="margin-bottom:14px">
       <h3>⬆️ رفع إلى الميزانية</h3>
-      <p class="hint">لما غالية تسوي لعميل شي خاص ويدفع — اكتب اسمه والمبلغ اللي دفعه. يروح لحسابات الشركة كامل، ١٠٠٪ للشركة، بهذا الشهر.</p>
+      <p class="hint">لما غالية تسوي لعميل شي خاص ويدفع — اكتب اسمه والمبلغ اللي دفعه، ومصاريفها إذا فيه. المصاريف تنخصم من المبلغ، والباقي يروح لحسابات الشركة كامل، ١٠٠٪ للشركة، بهذا الشهر.</p>
       <div class="addrow">
         <div class="addf"><label>اسم العميل</label><input id="bgClient" type="text" maxlength="120" autocomplete="off"></div>
         <div class="addf"><label>المبلغ اللي دفعه (د.ك)</label><input id="bgAmount" type="number" min="0" step="0.001" inputmode="decimal"></div>
+        <div class="addf"><label>المصاريف (اختياري)</label><input id="bgExpense" type="number" min="0" step="0.001" inputmode="decimal"></div>
         <div class="addf" style="flex:1 1 220px"><label>ملاحظة (اختياري)</label><input id="bgNote" type="text" maxlength="300" autocomplete="off"></div>
       </div>
       <button class="addbtn" data-bg-add>ارفع للميزانية</button>
@@ -2361,7 +2381,8 @@ function renderBudget(box){
     <div class="muted" style="font-size:13px;margin:0 0 8px">${BG?`اللي رفعته هالشهر (${esc(BG.month||"")})`:"لحظة…"}</div>
     ${rows.length ? rows.map(x=>`
       <div class="hmcard" style="margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
-        <div><b>${esc(x.client)}</b> · <span class="num">${fmt(x.amount)} د.ك</span>
+        <div><b>${esc(x.client)}</b> · <span class="num">${fmt(x.amount)} د.ك</span>${
+          x.expense?` <span class="muted" style="font-size:12.5px">− ${fmt(x.expense)} مصاريف = ${fmt(x.amount-x.expense)} للشركة</span>`:""}
           <div class="muted" style="font-size:12.5px">${esc(stDate(x.when))}${x.note?` · ${esc(x.note)}`:""}${
             DATA&&DATA.role==="all"&&x.byName?` · ${esc(x.byName)}`:""}</div></div>
         <button class="pfbtn" data-bg-del="${esc(x.id)}" style="font-size:12px;padding:4px 11px">احذف</button>
@@ -2371,15 +2392,19 @@ $("#stBody") && $("#stBody").addEventListener("click", async e=>{
   const add=e.target.closest("[data-bg-add]");
   if(add){
     const client=($("#bgClient").value||"").trim(), note=($("#bgNote").value||"").trim();
-    const amount=Number($("#bgAmount").value);
+    const amount=Number($("#bgAmount").value), expense=Number($("#bgExpense").value)||0;
     if(client.length<2) return stMsg("اكتب اسم العميل", false);
     if(!(amount>0)) return stMsg("اكتب المبلغ اللي دفعه", false);
+    if(expense<0 || expense>=amount) return stMsg("المصاريف لازم تكون أقل من المبلغ", false);
     /* it lands in the company's books the moment it is sent, so say exactly
        what is about to happen before it does */
-    if(!confirm(`بيرتفع ${fmt(amount)} د.ك من «${client}» لحسابات الشركة — كامل للشركة. أكمل؟`)) return;
+    const rest=Math.round((amount-expense)*1000)/1000;
+    if(!confirm(expense
+        ? `من «${client}»: ${fmt(amount)} د.ك، تنخصم مصاريف ${fmt(expense)} د.ك، ويروح ${fmt(rest)} د.ك لحسابات الشركة. أكمل؟`
+        : `بيرتفع ${fmt(amount)} د.ك من «${client}» لحسابات الشركة — كامل للشركة. أكمل؟`)) return;
     add.disabled=true;
-    try{ await addBudgetEntry({ client, amount, note }); stMsg("انرفع للميزانية ✅", true);
-         ["#bgClient","#bgAmount","#bgNote"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
+    try{ await addBudgetEntry({ client, amount, expense, note }); stMsg("انرفع للميزانية ✅", true);
+         ["#bgClient","#bgAmount","#bgExpense","#bgNote"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
          await loadBudget(); }
     catch(err){ stMsg((err&&err.message)||"تعذّر الرفع", false); }
     finally{ add.disabled=false; }
@@ -2516,7 +2541,15 @@ $("#fuGo") && $("#fuGo").addEventListener("click", ()=>{ FU=null; loadFollowUp()
    nothing is saved on a split nobody looked at. */
 /* history only — mirrors HISTORY_MEMBERS on the server, a test holds them together */
 const PX_HISTORY=[{id:"hasan",name:"حسن أكبر"}];
-let PX_LAST="";
+/* Tap's and ديمة's fees — mirrors PAY_CHANNELS on the server, a test holds
+   them together. Only for the live figure while typing: the preview and the
+   books both use the server's. */
+const PX_CHANNELS={knet:[0.75,0.100],card_kw:[2.5,0.100],card_int:[3.0,0.100],deema:[6.5,0.125],cash:[0,0]};
+function pxFee(){
+  const c=PX_CHANNELS[$("#pxChannel").value], a=Number($("#pxAmount").value)||0;
+  return c&&a ? Math.round((a*c[0]/100+c[1])*1000)/1000 : 0;
+}
+let PX_LAST="", PX_EDIT="";
 function pxPeople(){
   return (BK&&BK.members||[]).filter(m=>m.id!=="company")
     .concat([{id:"external",name:"مستشار خارجي"}], PX_HISTORY)
@@ -2546,6 +2579,9 @@ function pxCastNow(){
 function pxRenderSessions(){
   const box=$("#pxSessions"), pkg=pxPkgs().find(x=>x.key===$("#pxPkg").value);
   if(!box) return;
+  /* a monthly package asks which months it covered */
+  const monthly = !!(pkg && pkg.monthly && $("#pxType").value==="package");
+  $("#pxPeriodF").hidden = !monthly;
   if(!pkg || $("#pxType").value!=="package"){ box.innerHTML=""; return; }
   const opts=(sel)=>pxPeople().map(m=>`<option value="${esc(m.id)}"${m.id===sel?" selected":""}>${esc(m.name)}</option>`).join("");
   box.innerHTML=`<div class="pxl">منو قدّم كل جلسة</div>`+(pkg.sessions||[]).map((x,i)=>
@@ -2566,6 +2602,8 @@ function pxRenderFixed(){
 }
 function pxRest(){
   const el=$("#pxRest"); if(!el) return;
+  const fee=pxFee();
+  const fn=$("#pxFeeNote"); if(fn) fn.textContent = $("#pxChannel").value && $("#pxChannel").value!=="cash" && fee ? `رسوم الدفع: ${fmt(fee)} د.ك — على الشركة، مو من التقسيم (مثل أي بيع أونلاين)` : "";
   const net=(Number($("#pxAmount").value)||0)-(Number($("#pxCosts").value)||0);
   let sum=0; document.querySelectorAll("#pxFixed input[data-fx]").forEach(i=>{ sum+=Number(i.value)||0; });
   const rest=Math.round((net-sum)*1000)/1000;
@@ -2583,6 +2621,8 @@ function pxPayload(){
     name:$("#pxName").value.trim(), phone:$("#pxPhone").value.trim(), email:$("#pxEmail").value.trim(),
     amount:Number($("#pxAmount").value)||0, costs:Number($("#pxCosts").value)||0,
     mode: fixed?"fixed":"rule", fixed: fixed?f:{}, paid:$("#pxPaid").checked,
+    note:$("#pxNote").value.trim(), id:PX_EDIT, channel:$("#pxChannel").value,
+    periodFrom:$("#pxFrom").value, periodTo:$("#pxTo").value,
   };
 }
 function pxShowType(){
@@ -2599,6 +2639,7 @@ $("#pxBox") && $("#pxBox").addEventListener("change", e=>{
   if(e.target.id==="pxType") pxShowType();
   else if(e.target.id==="pxPkg"){ $("#pxAmount").value=""; pxRenderSessions(); pxRenderFixed(); }
   else if(e.target.name==="pxMode" || e.target.closest("#pxSessions") || e.target.closest("#pxCast")) pxRenderFixed();
+  else if(e.target.id==="pxChannel") pxRest();
   pxDirty();
 });
 $("#pxBox") && $("#pxBox").addEventListener("input", e=>{
@@ -2611,10 +2652,17 @@ $("#pxPreview") && $("#pxPreview").addEventListener("click", async ()=>{
     const r=(await addPastTransaction({...body, dryRun:true})).data||{};
     const rows=(r.shares||[]).map(x=>`<tr><td>${esc(x.name)}</td><td class="num">${fmt(x.amount)} د.ك</td></tr>`).join("");
     out.innerHTML = `<div style="margin-top:12px;font-size:13.5px;line-height:1.9">
-      <b>شهر ${esc(r.month)}</b> · الصافي ${fmt(r.net)} د.ك ·
+      <b>شهر ${esc(r.month)}</b> · ${esc(r.channel||"")}${r.fee?` — رسوم ${fmt(r.fee)} على الشركة`:""}${r.extra?` · مصاريف ${fmt(r.extra)}`:""} · الصافي ${fmt(r.net)} د.ك ·
       ${body.mode==="rule" ? (r.rule?`القاعدة: <b>${esc(r.rule.label)}</b>`:`<b style="color:#962E37">ما انطبقت أي قاعدة — اختر «مبالغ ثابتة»</b>`) : "مبالغ ثابتة"}
       ${r.paid?" · الحصص مسجّلة كمنصرفة":" · الحصص بتطلع كمستحقة"}</div>`+
       (rows?`<table class="pftab" style="margin-top:6px"><tbody>${rows}</tbody></table>`:"")+
+      (r.compare?`<div class="pxl" style="margin-top:12px">لو كانت بالنسبة — «${esc(r.compare.label)}»</div>
+        <table class="pftab"><thead><tr><th></th><th>انصرف له</th><th>حسب القاعدة</th><th>الفرق</th></tr></thead><tbody>${
+        r.compare.rows.filter(x=>x.id!=="company").map(x=>`<tr><td>${esc(x.name)}</td>
+          <td class="num">${fmt(x.paidAs)}</td><td class="num">${fmt(x.byRule)}</td>
+          <td class="num" style="font-weight:700;color:${x.gap>0?"#962E37":x.gap<0?"#2F8789":"inherit"}">${
+            x.gap>0?`ناقصه ${fmt(x.gap)}`:x.gap<0?`زايد ${fmt(-x.gap)}`:"—"}</td></tr>`).join("")}</tbody></table>`
+      : (body.mode==="fixed"?`<div class="muted" style="font-size:12.5px;margin-top:8px">ما في قاعدة تنطبق عليها، فما في مقارنة.</div>`:""))+
       ((r.dupes||[]).length?`<div class="pxwarn">⚠️ نفس العميل ونفس المبلغ موجودين بهالشهر:<br>${
         r.dupes.map(x=>`${esc(stDate(x.when))} · ${esc(x.what||"")} · ${fmt(x.amount)} د.ك${x.past?" (مدخلة يدوياً)":""}`).join("<br>")
       }<br>تأكد إنها مو نفس العملية قبل ما تحفظ.</div>`:"");
@@ -2631,12 +2679,46 @@ $("#pxSave") && $("#pxSave").addEventListener("click", async ()=>{
   $("#pxSave").disabled=true;
   try{
     const r=(await addPastTransaction(body)).data||{};
-    ["#pxName","#pxPhone","#pxEmail","#pxAmount","#pxCosts","#pxLabel"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
-    whoClear($("#pxCast")); $("#pxOut").innerHTML=""; PX_LAST="";
+    pxReset();
     /* show it where it landed, which may not be the month on screen */
     await loadBooks(r.month||BKMONTH, true);
-    pfMsg(`انحفظت العملية بشهر ${r.month} ✅`, true);
+    pfMsg(r.edited ? `انعدّلت العملية — بشهر ${r.month} ✅` : `انحفظت العملية بشهر ${r.month} ✅`, true);
   }catch(err){ pfMsg((err&&err.message)||"تعذّر الحفظ", false); $("#pxSave").disabled=false; }
+});
+function pxReset(){
+  ["#pxName","#pxPhone","#pxEmail","#pxAmount","#pxCosts","#pxLabel","#pxNote","#pxChannel","#pxFrom","#pxTo"].forEach(k=>{ const el=$(k); if(el) el.value=""; });
+  const fn=$("#pxFeeNote"); if(fn) fn.textContent="";
+  whoClear($("#pxCast")); $("#pxOut").innerHTML=""; PX_LAST=""; PX_EDIT="";
+  $("#pxEditing").hidden=true; $("#pxCancel").hidden=true; $("#pxSave").textContent="احفظ العملية"; $("#pxSave").disabled=true;
+}
+$("#pxCancel") && $("#pxCancel").addEventListener("click", pxReset);
+/* «عدّل» puts the entry back in the form, exactly as it was saved */
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("[data-pxedit]"); if(!b) return;
+  try{
+    const x=((await getPastTransaction({ id:b.dataset.pxedit })).data||{}).entry; if(!x) return;
+    pxInit(); pxReset();
+    $("#pxDate").value=x.date; $("#pxType").value=x.type; pxShowType();
+    if(x.type==="package"){
+      $("#pxPkg").value=x.packageId; pxRenderSessions();
+      document.querySelectorAll("#pxSessions select").forEach((sel,i)=>{ const w=(x.sessionPicks||[])[i]; if(w&&w[0]) sel.value=w[0]; });
+    } else {
+      $("#pxCast").querySelectorAll('input[type="checkbox"]').forEach(i=>{ i.checked=(x.cast||[]).indexOf(i.value)!==-1; });
+      $("#pxLabel").value=x.label||""; if($("#pxOrg")) $("#pxOrg").value=x.organiser||"";
+    }
+    $("#pxName").value=x.name; $("#pxPhone").value=x.phone; $("#pxEmail").value=x.email;
+    $("#pxAmount").value=x.amount; $("#pxCosts").value=x.costs||""; $("#pxNote").value=x.note||"";
+    $("#pxChannel").value=x.channel||""; $("#pxFrom").value=x.periodFrom||""; $("#pxTo").value=x.periodTo||"";
+    $("#pxPaid").checked=!!x.paid;
+    document.querySelector(`input[name="pxMode"][value="${x.mode}"]`).checked=true;
+    pxRenderFixed();
+    document.querySelectorAll("#pxFixed input[data-fx]").forEach(i=>{ if(x.fixed[i.dataset.fx]!=null) i.value=x.fixed[i.dataset.fx]; });
+    pxRest();
+    PX_EDIT=x.id;
+    $("#pxEditing").hidden=false; $("#pxEditing").textContent=`تعدّل عملية «${x.name}» — ${x.date}. شوف التقسيم ثم احفظ التعديل.`;
+    $("#pxCancel").hidden=false; $("#pxSave").textContent="احفظ التعديل";
+    $("#pxBox").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(err){ pfMsg((err&&err.message)||"تعذّر فتح العملية", false); }
 });
 /* a hand-entered line can be taken out — kept for the trail, counted for nothing */
 document.addEventListener("click", async e=>{
@@ -3247,6 +3329,21 @@ $("#pfMonth") && $("#pfMonth").addEventListener("change", ()=>loadProfit($("#pfM
 
 /* ---------- company books ---------- */
 
+document.addEventListener("click", async (e)=>{
+  if(!e.target || e.target.id!=="bkTapLookup") return;
+  const b=e.target, msg=$("#bkTapMsg"); b.disabled=true;
+  let knet=0, card=0, none=0, left=1;
+  try{
+    while(left>0){
+      const r=(await backfillTapChannels({})).data||{};
+      knet+=r.knet||0; card+=r.card||0; none+=r.none||0; left=r.left||0;
+      if(msg) msg.textContent=` … كي نت ${knet} · بطاقة ${card}${none?` · ما لقينا ${none}`:""}${left?` · باقي ${left}`:""}`;
+      if(!r.done) break;
+    }
+    if(msg) msg.textContent=` ✓ كي نت ${knet} · بطاقة ${card}${none?` · ${none} ما عطانا Tap شي عنهم — تبقى بطاقة محلية`:""}`;
+    await loadBooks(BK && BK.month, true);
+  }catch(err){ if(msg) msg.textContent=" تعذّر: "+(err.message||err); b.disabled=false; }
+});
 async function loadBooks(month, keepScroll){
   const box=$("#bkLines"); if(!box) return;
   /* Re-rendering after every tick used to scroll the page back to the top,
@@ -3287,6 +3384,18 @@ function renderBooks(){
    "#bkFcCur","#bkFcBasis","#bkFcAdd","#bkRuleNew"].forEach(sel=>{ const el=$(sel); if(el) el.disabled=!canEdit; });
   const pxb=$("#pxBox"); if(pxb) pxb.hidden=!canEdit;
   if(canEdit) pxInit();
+  /* Tap orders whose payment method we do not know yet — counted as a Kuwaiti
+     card until looked up. The button asks Tap for each, a batch at a time. */
+  const tf=$("#bkTapFees");
+  if(tf){
+    const g=Number(BK.feeGuessed)||0;
+    tf.innerHTML = g
+      ? `<div class="muted" style="font-size:13px;background:#F1ECF7;border-radius:10px;padding:9px 12px">
+           ${g} طلب بهالشهر ما نعرف كيف انْدفع (قبل ما نسجّل طريقة الدفع) — محسوب رسومه كبطاقة محلية ٢٫٥٪ + ٠٫١٠٠.
+           ${canEdit?`<button class="pfbtn" id="bkTapLookup" style="margin-inline-start:8px">جيب طريقة الدفع من Tap</button>`:""}
+           <span id="bkTapMsg"></span></div>`
+      : "";
+  }
   const rulesH=$("#bkRules"); if(rulesH) rulesH.style.display=canEdit?"":"none";
   const rn=$("#bkRuleNew");  if(rn) rn.style.display=canEdit?"":"none";
   fillMonths($("#bkMonth"), BK.months, BK.month);
@@ -3307,20 +3416,26 @@ function renderBooks(){
   const cb=BK.costsBy||{};
   /* somebody whose costs outran their share still belongs on the list —
      dropping a negative row would hide exactly the case worth seeing */
-  const people=Object.keys(due).filter(k=>due[k]>0 || paid[k] || cb[k]>0);
+  /* past months paid on fixed amounts: what the rules would have added, held
+     for غالية to decide — shown, never counted into المستحق */
+  const rg=BK.ruleGap||{};
+  const people=[...new Set(Object.keys(due).filter(k=>due[k]>0 || paid[k] || cb[k]>0).concat(Object.keys(rg).filter(k=>rg[k])))];
   $("#bkDue").innerHTML = people.length
     ? `<table class="pftab"><thead><tr><th>الشخص</th><th>المستحق</th><th>الحالة</th><th></th></tr></thead><tbody>`+
       people.map(k=>{
-        const nm=((BK.members||[]).find(m=>m.id===k)||{}).name||k;
+        const nm=((BK.members||[]).concat(PX_HISTORY).find(m=>m.id===k)||{}).name||k;
         const p=paid[k]||{}; const done=!!p.paidAt;
+        /* here only for the rules gap — nothing to transfer, so no button saying there is */
+        const gapOnly = !(Number(due[k])>0) && !done;
         const pd=(BK.payDays||{})[k];
         const hl=(BK.held||{})[k]||0;
         return `<tr>
           <td><b>${esc(nm)}</b>${pd?`<div class="pfrule">راتبه يوم ${esc(String(pd))} من كل شهر</div>`:""}</td>
-          <td class="num">${kwd(due[k])}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}${
-            cb[k]>0?`<div class="pfrule" style="color:#962E37">بعد خصم ${esc(kwd(cb[k]))} تكاليف عليه</div>`:""}</td>
-          <td>${done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
-          <td>${canEdit?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`
+          <td class="num">${kwd(Number(due[k])||0)}${hl>0?`<div class="pfrule">منها ${esc(kwd(hl))} لعملاء ما أنهوا جلساتهم</div>`:""}${
+            cb[k]>0?`<div class="pfrule" style="color:#962E37">بعد خصم ${esc(kwd(cb[k]))} تكاليف عليه</div>`:""}${
+            rg[k]?`<div class="pfrule" style="color:#614588">محجوز — فرق القواعد: ${rg[k]>0?"ناقصه":"زايد"} ${esc(kwd(Math.abs(rg[k])))}</div>`:""}</td>
+          <td>${gapOnly?'<span class="muted">ما عليه تحويل</span>':done?'<span style="color:#128C4A;font-weight:700">✅ تحوّل</span>':'<span style="color:#962E37;font-weight:700">لم يتم التحويل حتى الآن</span>'}</td>
+          <td>${canEdit&&!gapOnly?`<button class="pfbtn ${done?"paid":"go"}" data-pay="${esc(k)}" data-amount="${due[k]}">${done?"رجّعه غير مدفوع":"سجّل إنه تحوّل"}</button>`
               +(!done&&(BK.owing||{})[k]>0?` <button class="pfbtn" data-payall="${esc(k)}">حدّد كل حصصه</button>`:"")
               :""}</td></tr>`;
       }).join("")+`</tbody></table>`
@@ -3440,6 +3555,10 @@ function renderBooks(){
             l.mode?` · ${modeAr(l.mode)}`:""}${
             l.pending?` · <b style="color:#614588">الجلسة ما صارت — الفلوس محجوزة</b>`:""}${
             l.past?` · <b style="color:#614588">عملية سابقة</b>`:""}${
+            l.period?` · الاشتراك من ${esc(l.period.from)} إلى ${esc(l.period.to)}`:""}${
+            l.channel?` · ${esc(l.channel)}`:""}${
+            l.note?` · ${esc(l.note)}`:""}${
+            l.past&&canEdit?` <button class="pfbtn" data-pxedit="${esc(String(l.orderId||"").replace(/^manual:/,""))}" style="font-size:11px;padding:2px 8px">عدّل</button>`:""}${
             l.manual&&canEdit?` <button class="pfbtn" data-mndel="${esc(String(l.orderId||"").replace(/^manual:/,""))}" style="font-size:11px;padding:2px 8px">احذف</button>`:""}</div>
           ${l.excluded?`<div class="pfrule" style="color:#962E37;font-weight:700">مستبعد من الحسابات${
             l.excludedNote?` · ${esc(l.excludedNote)}`:""}</div>`:""}</td>
@@ -4704,7 +4823,10 @@ let ST=null, FU=null, BS=null, RF=null;
 const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
-let ACTIVE_PANEL=null;
+/* a tapped notification opens the dashboard at …#salesteam, #tasks … — start
+   there. An unknown tab, or one this person may not open, falls back to the
+   first they can, a few lines further down. */
+let ACTIVE_PANEL=(location.hash||"").replace(/^#/,"")||null;
 function panelEl(k){ return document.querySelector('.sec[data-panel="'+k+'"]'); }
 function panelAvailable(k){
   const p=panelDef(k); if(!p || !panelEl(k)) return false;
@@ -4952,7 +5074,7 @@ function renderEvents(){
     regs.map(r=>`<tr>
       <td class="num">${dt(r.when)}</td>
       ${showEv?`<td>${esc(r.eventName)||"—"}</td>`:""}
-      <td>${esc(r.name)||"—"}${r.vip?' <span class="badge" style="background:#D3A146;color:#2F1749">VIP</span>':""}</td>
+      <td>${esc(r.name)||"—"}${r.vip?' <span class="badge" style="background:#D3A146;color:#2F1749">VIP</span>':""}${r.paid?' <span class="badge" style="background:#2F8789;color:#fff">مدفوع</span>':""}</td>
       <td>${esc(r.audience)||"—"}</td>
       <td style="white-space:normal;max-width:260px">${esc(r.goal)||"—"}</td>
       <td class="num">${esc(r.phone)||"—"}</td>

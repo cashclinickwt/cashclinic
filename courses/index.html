@@ -84,18 +84,47 @@
 
 <div class="cc-wrap">
   <div class="crs-tabs" id="crsTabs" role="tablist">
-    <button class="crs-tab on" type="button" data-grid="now" role="tab" aria-selected="true">الحالية<span class="n">0</span></button>
+    <button class="crs-tab on" type="button" data-grid="now" role="tab" aria-selected="true">الحالية<span class="n">2</span></button>
     <button class="crs-tab" type="button" data-grid="past" role="tab" aria-selected="false">السابقة<span class="n">4</span></button>
   </div>
 
   <div class="crs-grid" id="gridNow">
     <!-- shown only while nothing is current; delete it when the next card goes in -->
-    <div class="crs-empty" style="grid-column:1/-1;text-align:center;padding:44px 18px;
-         border:1.5px dashed var(--cc-grey-200,#ddd);border-radius:18px;line-height:2">
-      <b style="font-size:17px">ما في فعالية مفتوحة الحين</b><br>
-      <span style="color:var(--cc-grey-700,#555)">نخبرك بأول ما ننزل الجديد —
-        <a href="../index.html#newsletter">اشترك بالنشرة</a></span>
-    </div>
+    <a class="crs-card" href="ratibak.html">
+      <div class="crs-card-media">
+        <img src="img/ratibak-promo.jpg" alt="لقاء مجاني: راتبك زين بس وين المشكلة؟">
+        <span class="crs-brandchip"><img src="../brand/nas-logo.png" alt="">كاش ناس</span>
+      </div>
+      <div class="crs-card-body">
+        <div class="crs-eq">الراتب الزين ≠ فلوس تكفي</div>
+        <h2>راتبك زين .. بس وين المشكلة؟</h2>
+        <div class="crs-chips">
+          <span class="crs-chip">السبت 17/10/2026</span>
+          <span class="crs-chip">7 مساءً</span>
+          <span class="crs-chip">مجاني</span>
+          <span class="crs-chip">أونلاين</span>
+          <span class="crs-chip">ساعة VIP لحاملي أهدافي المالية</span>
+        </div>
+        <span class="crs-go">سجّل مجاناً ←</span>
+      </div>
+    </a>
+    <a class="crs-card" href="diwaniya.html">
+      <div class="crs-card-media">
+        <img src="img/diwaniya-promo.jpg" alt="ديوانية كاش كلينك">
+        <span class="crs-brandchip"><img src="../brand/nas-logo.png" alt="">كاش ناس</span>
+      </div>
+      <div class="crs-card-body">
+        <div class="crs-eq">لأن بعض سوالف الفلوس .. تحتاج ديوانية</div>
+        <h2>ديوانية كاش كلينك</h2>
+        <div class="crs-chips">
+          <span class="crs-chip">السبت 24/10/2026</span>
+          <span class="crs-chip">6 – 7 مساءً</span>
+          <span class="crs-chip">حضوري · جوهرة الخليج</span>
+          <span class="crs-chip">15 د.ك · 15 مقعد</span>
+        </div>
+        <span class="crs-go">احجز مكانك ←</span>
+      </div>
+    </a>
   </div>
 
   <!-- بعد ما ينتهي أي لقاء: انقل بطاقته من gridNow لهني، ضيف class="past"

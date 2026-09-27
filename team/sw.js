@@ -19,7 +19,7 @@
    message, so it can be read directly, and then there is nothing left to fail.
    --------------------------------------------------------------------------- */
 
-const SW_VERSION = "2026-09-15-c";
+const SW_VERSION = "2026-09-26-a";
 
 /* A new worker should take over immediately. Without these two the team would
    keep running the previous worker until every dashboard tab was closed —
@@ -64,7 +64,12 @@ self.addEventListener("push", (event) => {
    that is already open rather than opening a second copy of it. */
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || "/team/dashboard.html";
+  /* The server sends a tab as a bare "#sales". openWindow resolves a relative
+     link against THIS FILE, so "#sales" became /team/sw.js#sales and the phone
+     opened this worker's source code as a page — which is what نورة saw. Every
+     link is now resolved against the dashboard instead. */
+  const raw = (event.notification.data && event.notification.data.url) || "";
+  const url = new URL(raw || "dashboard.html", new URL("dashboard.html", self.registration.scope)).href;
   event.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const c of all) {
