@@ -672,7 +672,7 @@
 <!-- DASHBOARD -->
 <div id="dash"><div class="wrap">
   <div class="top">
-    <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span></div>
+    <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span><span id="loadTime" class="muted" style="font-size:11.5px;margin-inline-start:6px" hidden></span></div>
     <div class="gsearch" id="gSearch" hidden>
       <input type="search" id="gsInput" placeholder="ابحث باسم أو رقم أو إيميل عميل" autocomplete="off">
       <div class="gsdrop" id="gsDrop" hidden></div>
@@ -1724,15 +1724,27 @@ async function refreshAll(opt){
   REFRESHING = true;
   const b=$("#refreshBtn");
   if(b){ b.disabled=true; b.classList.add("spin"); }
+  const first = !!(opt&&opt.first);
+  if(b && first) b.textContent="↻ يكمّل التحميل…";
   try{
+    const _t=Date.now();
     const r=await getDashboard(); DATA=r.data;
+    /* how long it took — shown to full access, so "is it still slow?" has a
+       number: the whole round trip, and the server's own part of it */
+    const lt=$("#loadTime");
+    if(lt && DATA && DATA.timing){
+      const all=((Date.now()-_t)/1000).toFixed(1), srv=((DATA.timing.total||0)/1000).toFixed(1);
+      lt.textContent=`· تحميل ${all} ث (الخادم ${srv})`; lt.hidden=false;
+    }
     /* the build the server is on, against the build this page was served as:
        different means the file in front of you is older than the deploy */
     if(DATA && DATA.build){
       if(!PAGE_BUILD) PAGE_BUILD = DATA.build;
       const nb=$("#newBuild"); if(nb) nb.hidden = (DATA.build === PAGE_BUILD);
     }
-    clearPanelCaches();
+    /* the first fill after login keeps what the open tab already loaded —
+       it was fetched a second ago; a real refresh clears and reloads it */
+    if(!first) clearPanelCaches();
     render();
     foldInit();
     foldSections();
@@ -1740,11 +1752,13 @@ async function refreshAll(opt){
     /* whatever tab is open reloads its own data too, or the page would look
        refreshed while the panel in front of you stayed yesterday's */
     const def = panelDef(ACTIVE_PANEL);
-    if(def && def.load) def.load();
+    if(!first && def && def.load) def.load();
     LAST_REFRESH = Date.now();
     if(b && !(opt&&opt.quiet)){ b.textContent="↻ تم"; setTimeout(()=>{ b.textContent="↻ حدّث"; },1400); }
   }catch(e){
     if(b) b.textContent="↻ تعذّر";
+    /* the light first load is on screen; say plainly the rest did not come */
+    if(first){ const be=$("#bootErr"); if(be){ be.textContent="تعذّر تحميل باقي البيانات — اضغط ↻ حدّث"; be.hidden=false; } }
     setTimeout(()=>{ if(b) b.textContent="↻ حدّث"; },2000);
     console.error("refresh failed:",e);
   }finally{
@@ -1841,7 +1855,12 @@ onAuthStateChanged(auth, async (user)=>{
   $("#uName").textContent=user.email;
   const _be=$("#bootErr"); if(_be) _be.hidden=true;
   try{
-    const r=await getDashboard(); DATA=r.data;
+    /* B — open fast: the first call asks for bookings only (today's diary,
+       what most people open the app for), paints, and the rest follows in
+       the background through refreshAll({first}). Every section not asked
+       for comes back empty, in its normal shape, so the page renders fine
+       and simply fills in a moment later. */
+    const r=await getDashboard({ sections:["bookings"] }); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
     var _rl=DATA.role;
     /* كاش ريادة is paused, so its reports system stays hidden for everyone.
@@ -1876,6 +1895,8 @@ onAuthStateChanged(auth, async (user)=>{
     /* silent, asks for nothing, and repairs a token that rotated while the
        app was closed — which is the usual reason notifications go quiet */
     nfSyncToken();
+    /* the rest of the dashboard, behind what is already on screen */
+    refreshAll({ first:true, quiet:true });
   }catch(e){
     /* This used to write the error into #salesTbl — the sales table, on a
        tab the person may never open — so a failed load looked like an empty
@@ -4159,7 +4180,8 @@ async function refreshSections(list){
   const d=(r&&r.data)||{};
   if(!DATA){ DATA=d; return d; }
   list.forEach(sec=>(SECTION_KEYS[sec]||[]).forEach(k=>{ if(k in d) DATA[k]=d[k]; }));
-  if("payoutNudge" in d) DATA.payoutNudge=d.payoutNudge;
+  /* only a full load carries the payout reminder — never blank it here */
+  if(d.payoutNudge) DATA.payoutNudge=d.payoutNudge;
   return d;
 }
 
