@@ -7084,7 +7084,7 @@ function cOpen(){
   cmpLoadDrafts(); $("#cOvl").classList.add("on"); }
 function cClose(){ $("#cOvl").classList.remove("on"); }
 window.cClose=cClose;
-const _AUD_AR={quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",subscribers:"المشتركين بالنشرة",single:"إيميل عميل محدد"};
+const _AUD_AR={all:"كل العملاء",quiz:"كل من سوّى اختبار",book:"كل من اشترى كتاب",event:"المسجّلين في اللقاء",subscribers:"المشتركين بالنشرة",single:"إيميل عميل محدد"};
 $("#openComposer") && $("#openComposer").addEventListener("click", cOpen);
 $("#cmpAud") && $("#cmpAud").addEventListener("change", cmpSyncAud);
 let _cmpLastAud="";
@@ -7124,11 +7124,19 @@ function cmpRecipients(){
     const e=String(r.email||"").trim().toLowerCase();
     if(e && inR(Number(r[tsKey]||r.when||0))) emails.add(e);
   }));
-  if(aud==="quiz")            add((DATA.quiz||{}).leads,"when");
-  else if(aud==="event")      add((DATA.events||{}).regs,"when");
-  else if(aud==="subscribers")add((DATA.subscribers||{}).list,"when");
-  else if(aud==="book"){
-    const key=($("#cmpBookSel")&&$("#cmpBookSel").value)||"";
+  /* «كل العملاء» counts every list together — the same union the server
+     sends to — so the number shown is the number that will receive it */
+  const all=aud==="all";
+  if(all||aud==="quiz")        add((DATA.quiz||{}).leads,"when");
+  if(all||aud==="event")       add((DATA.events||{}).regs,"when");
+  if(all||aud==="subscribers") add((DATA.subscribers||{}).list,"when");
+  if(all){
+    /* paid consultations only, dated by payment — as the server takes them */
+    add(((DATA.bookings||{}).list||[]).filter(b=>b.status==="paid"),"paidAt");
+    add((DATA.courses||{}).regs,"when");
+  }
+  if(all||aud==="book"){
+    const key=all?"":(($("#cmpBookSel")&&$("#cmpBookSel").value)||"");
     ((DATA.sales||{}).orders||[]).forEach(o=>{
       if(o.kind==="course") return;
       if(key && (o.productKey||o.product)!==key) return;
@@ -7401,6 +7409,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
     <div class="cmp-body">
       <div class="cmp-fld"><label>المستلمون</label>
         <select id="cmpAud">
+          <option value="all">كل العملاء</option>
           <option value="quiz">كل من سوّى اختبار</option>
           <option value="book">كل من اشترى كتاب</option>
           <option value="event">المسجّلين في اللقاء</option>
