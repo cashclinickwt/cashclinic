@@ -1438,6 +1438,11 @@
       <button data-c="month">هالشهر</button>
     </div>
     <div id="clList"></div>
+    <!-- عيادتي: one-off, full access only — shown by the script below -->
+    <div id="clinicPrep" hidden style="margin-top:18px;font-size:13.5px" class="muted">
+      عيادتي تلقى سجلات العميل من إيميله. السجلات القديمة محفوظة بالإيميل مثل ما انكتب (أحرف كبيرة وصغيرة) —
+      <button class="pfbtn" id="clinicPrepBtn" type="button">جهّز السجلات القديمة لعيادتي</button> <span id="clinicPrepMsg"></span>
+    </div>
   </div>
 
   <div class="sec" id="careersSec" data-panel="careers">
@@ -1482,7 +1487,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getStorage, ref as sRef, uploadBytesResumable }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFunctions, httpsCallable }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
@@ -1531,6 +1536,16 @@ const getCheckups=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getChe
 const getRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getRahaFeedback");
 const addPastTransaction=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastTransaction");
 const backfillTapChannels=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"backfillTapChannels");
+const portalBackfillEmails=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"portalBackfillEmails");
+document.addEventListener("click", async (e)=>{
+  if(!e.target || e.target.id!=="clinicPrepBtn") return;
+  const b=e.target, m=$("#clinicPrepMsg"); b.disabled=true; if(m) m.textContent=" … شوي";
+  try{
+    const r=(await portalBackfillEmails({})).data||{};
+    const f=(k)=>(r[k]&&r[k].fixed)||0;
+    if(m) m.textContent=` ✓ تم — الطلبات ${f("orders")} · الاختبارات ${f("leads")} · اللقاءات ${f("events")}`;
+  }catch(err){ if(m) m.textContent=" تعذّر: "+(err.message||err); b.disabled=false; }
+});
 const getPastTransaction=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getPastTransaction");
 const sendRahaFeedback=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"sendRahaFeedback");
 const setCheckupNextStep=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"setCheckupNextStep");
@@ -1862,6 +1877,7 @@ onAuthStateChanged(auth, async (user)=>{
        and simply fills in a moment later. */
     const r=await getDashboard({ sections:["bookings"] }); DATA=r.data;
     $("#uRole").textContent=ROLE_AR[DATA.role]||"";
+    { const cp=$("#clinicPrep"); if(cp) cp.hidden = DATA.role!=="all"; }
     var _rl=DATA.role;
     /* كاش ريادة is paused, so its reports system stays hidden for everyone.
        The line that used to reveal it is kept rather than deleted — bringing
@@ -1908,6 +1924,18 @@ onAuthStateChanged(auth, async (user)=>{
       be.innerHTML=`تعذّر تحميل البيانات: ${esc(msg)} <button type="button" id="bootRetry" style="margin-inline-start:10px;padding:4px 12px;border-radius:8px;border:1px solid #7A1F2B;background:#fff;color:#7A1F2B;font:inherit;cursor:pointer">أعد المحاولة</button>`;
       be.hidden=false;
       const rb=$("#bootRetry"); if(rb) rb.addEventListener("click", ()=>location.reload());
+    }
+    /* a staff account added after 30 Sept 2026 must confirm its email once —
+       offer the link here instead of signing them straight out */
+    if(/أكّد إيميلك/.test(msg) && be && auth.currentUser){
+      be.innerHTML=`${esc(msg)} <button type="button" id="bootVerify" style="margin-inline-start:10px;padding:4px 12px;border-radius:8px;border:1px solid #7A1F2B;background:#fff;color:#7A1F2B;font:inherit;cursor:pointer">أرسل رابط التأكيد</button>`;
+      const vb=$("#bootVerify");
+      if(vb) vb.addEventListener("click", async ()=>{
+        vb.disabled=true;
+        try{ auth.languageCode="ar"; await sendEmailVerification(auth.currentUser); vb.textContent="✓ وصلك الرابط — أكّد وارجع ادخل"; }
+        catch(err){ vb.textContent="تعذّر الإرسال — حاول بعد شوي"; vb.disabled=false; }
+      });
+      return;
     }
     if((e&&e.code)==="functions/permission-denied"){ setTimeout(()=>signOut(auth),2500); }
   }

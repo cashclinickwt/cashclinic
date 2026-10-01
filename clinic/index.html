@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>عيادتي | كاش كلينك</title>
+<meta name="description" content="عيادتي — كل اللي أخذته من كاش كلينك في مكان واحد: كتبك، نتائج اختباراتك، لقاءاتك واستشاراتك.">
+<!-- not public yet: the team tries it before a header link goes in -->
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/ds/tokens/colors.css">
+<link rel="stylesheet" href="../assets/ds/tokens/typography.css">
+<link rel="stylesheet" href="../assets/ds/tokens/spacing.css">
+<link rel="stylesheet" href="../assets/ds/tokens/effects.css">
+<link rel="stylesheet" href="../assets/ds/tokens/base.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+<style>
+  body{background:var(--cc-grey-050,#F7F6FA)}
+  .ck-wrap{max-width:760px;margin:0 auto;padding:34px 18px 60px}
+  .ck-card{background:#fff;border:1px solid var(--cc-grey-200,#E3E1EA);border-radius:22px;padding:26px 22px;box-shadow:0 10px 30px rgba(47,23,72,.05)}
+  .ck-title{font-size:clamp(24px,4vw,32px);font-weight:700;color:var(--cc-ink,#2F1749);margin:0 0 6px;text-align:center}
+  .ck-sub{text-align:center;color:var(--cc-grey-700,#555);margin:0 0 22px;line-height:1.9}
+  .ck-tabs{display:flex;gap:6px;background:var(--cc-grey-050,#F3F0F8);padding:5px;border-radius:14px;margin-bottom:18px}
+  .ck-tabs button{flex:1;border:0;background:transparent;padding:11px;border-radius:10px;font:inherit;font-weight:700;color:var(--cc-grey-700,#555);cursor:pointer}
+  .ck-tabs button.on{background:#fff;color:var(--cc-purple,#2F1749);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .ck-fld{margin-bottom:14px}
+  .ck-fld label{display:block;font-weight:700;font-size:14px;margin-bottom:6px;color:var(--cc-ink,#2F1749)}
+  .ck-fld input{width:100%;box-sizing:border-box;border:2px solid var(--cc-grey-200,#E3E1EA);border-radius:12px;padding:13px 14px;font:inherit;font-size:16px}
+  .ck-fld input:focus{outline:0;border-color:var(--cc-purple,#2F1749)}
+  .ck-btn{width:100%;border:0;border-radius:999px;padding:15px;background:var(--cc-purple,#2F1749);color:var(--cc-cream,#FFE6BB);font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+  .ck-btn:disabled{opacity:.6;cursor:default}
+  .ck-btn.g{background:transparent;color:var(--cc-purple,#2F1749);border:1.5px solid var(--cc-purple,#2F1749);margin-top:10px}
+  .ck-link{background:none;border:0;color:var(--cc-purple,#2F1749);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+  .ck-err{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;background:#FDE5E9;color:#7A1F2B;font-size:14px;line-height:1.8}
+  .ck-ok{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;background:#E6F3EE;color:#1F5B45;font-size:14px;line-height:1.8}
+  .ck-agree{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.8;color:var(--cc-grey-700,#555);margin:4px 0 14px}
+  .ck-agree input{margin-top:5px;width:17px;height:17px;flex:0 0 auto}
+  .ck-hello{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .ck-hello h1{font-size:clamp(22px,4vw,28px);margin:0;color:var(--cc-ink,#2F1749)}
+  .ck-hello .e{color:var(--cc-grey-600,#777);font-size:13.5px;direction:ltr;text-align:right}
+  .ck-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:18px}
+  .ck-stat{background:#fff;border:1px solid var(--cc-grey-200,#E3E1EA);border-radius:16px;padding:12px;text-align:center}
+  .ck-stat b{display:block;font-size:24px;color:var(--cc-purple,#2F1749)}
+  .ck-stat span{font-size:13px;color:var(--cc-grey-700,#555)}
+  .ck-sec{margin-top:16px}
+  .ck-sec h2{font-size:18px;margin:0 0 10px;color:var(--cc-ink,#2F1749)}
+  .ck-item{background:#fff;border:1px solid var(--cc-grey-200,#E3E1EA);border-radius:16px;padding:14px 16px;margin-bottom:9px}
+  .ck-item .t{font-weight:700;color:var(--cc-ink,#2F1749)}
+  .ck-item .m{font-size:13.5px;color:var(--cc-grey-700,#555);margin-top:4px;line-height:1.8}
+  .ck-tag{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;margin-inline-start:6px;vertical-align:middle}
+  .ck-tag.up{background:#E6F3EE;color:#1F5B45} .ck-tag.vip{background:#D3A146;color:#2F1749}
+  .ck-tag.paid{background:#2F8789;color:#fff} .ck-tag.done{background:#F3F0F8;color:#614588}
+  .ck-empty{color:var(--cc-grey-600,#777);font-size:14px;padding:6px 2px}
+  .ck-item a{color:var(--cc-burgundy,#962E37);font-weight:700}
+  .ck-diag{margin-top:8px;font-size:14px;line-height:1.95;color:var(--cc-grey-700,#555);white-space:pre-line}
+  .ck-lock{position:relative;overflow:hidden;background:linear-gradient(150deg,#2F1749,#614588);color:#fff;border:0}
+  .ck-lock .t{color:var(--cc-cream,#FFE6BB);font-size:17px}
+  .ck-lock .m{color:#E9E3F2}
+  .ck-soon{display:inline-block;background:var(--cc-cream,#FFE6BB);color:#2F1749;font-weight:700;font-size:12px;border-radius:999px;padding:3px 10px;margin-inline-start:8px}
+  .ck-miss textarea{width:100%;box-sizing:border-box;min-height:84px;border:2px solid var(--cc-grey-200,#E3E1EA);border-radius:12px;padding:11px 13px;font:inherit;font-size:15px}
+</style>
+</head>
+<body>
+<header class="cc-header">
+  <div class="cc-header-in">
+    <a class="cc-logo" href="../index.html"><img src="../brand/logo/logo-primary.png" alt="Cash Clinic" style="height:38px;width:auto;display:block;"></a>
+    <nav class="cc-nav-links">
+      <a class="cc-navlink" href="../index.html">الرئيسية</a>
+      <a class="cc-navlink" href="../index.html#clinics">عياداتنا</a>
+      <a class="cc-navlink" href="../index.html#consultants">استشاريونا</a>
+      <a class="cc-navlink" href="../quiz/index.html">الاختبارات</a>
+      <a class="cc-navlink" href="index.html" style="color:var(--cc-olive);font-weight:700;">دورات</a>
+      <a class="cc-navlink" href="../books/index.html">الكتب</a>
+      <a class="cc-navlink" href="../newsletters/index.html">نشراتنا</a>
+    </nav>
+    <div class="cc-header-cta">
+      <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%AF%D9%8A%D9%88%D8%A7%D9%86%D9%8A%D8%A9%20%D9%83%D8%A7%D8%B4%20%D9%83%D9%84%D9%8A%D9%86%D9%83" style="font-size:15px;padding:11px 20px;">
+        <svg class="cc-wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.02 1.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Zm5.05-6.89c-.28-.14-1.64-.81-1.89-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.17-.43-2.22-1.37-.82-.73-1.38-1.63-1.54-1.91-.16-.28-.02-.43.12-.57.13-.13.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.61-1.48-.84-2.02-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.47.07-.72.35-.25.28-.95.93-.95 2.27 0 1.34.97 2.63 1.11 2.81.14.18 1.9 2.9 4.6 4.06.64.28 1.14.44 1.53.57.64.2 1.23.17 1.69.1.52-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33Z"/></svg>
+        <span>استفسار</span>
+      </a><span class="cc-social-row"><a class="cc-social" href="https://www.instagram.com/cash.clinic" target="_blank" rel="noopener" aria-label="إنستغرام كاش كلينك"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07Zm0 1.62c-3.15 0-3.52.01-4.76.07-1.15.05-1.77.24-2.19.41-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.17.42-.36 1.04-.41 2.19-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.05 1.15.24 1.77.41 2.19.21.55.47.94.88 1.35.41.41.8.67 1.35.88.42.17 1.04.36 2.19.41 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c1.15-.05 1.77-.24 2.19-.41.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.17-.42.36-1.04.41-2.19.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.05-1.15-.24-1.77-.41-2.19a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.42-.17-1.04-.36-2.19-.41-1.24-.06-1.61-.07-4.76-.07Zm0 2.76a5.46 5.46 0 1 1 0 10.92 5.46 5.46 0 0 1 0-10.92Zm0 1.62a3.84 3.84 0 1 0 0 7.68 3.84 3.84 0 0 0 0-7.68Zm5.65-2.9a1.28 1.28 0 1 1 0 2.56 1.28 1.28 0 0 1 0-2.56Z"/></svg></a><a class="cc-social" href="https://www.tiktok.com/@ghalia.alnuwaief" target="_blank" rel="noopener" aria-label="تيك توك كاش كلينك"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82a4.28 4.28 0 0 1-1.05-2.82h-3.11v12.4a2.53 2.53 0 0 1-2.53 2.45 2.53 2.53 0 0 1-2.53-2.53 2.53 2.53 0 0 1 3.13-2.46V9.7a5.64 5.64 0 0 0-6.24 5.62A5.64 5.64 0 0 0 9.92 21a5.64 5.64 0 0 0 5.63-5.64V9.01a7.36 7.36 0 0 0 4.32 1.38V7.28a4.28 4.28 0 0 1-3.27-1.46Z"/></svg></a></span>
+    </div>
+  </div>
+</header>
+
+<main class="ck-wrap">
+
+  <!-- 1 · signed out -->
+  <section id="vAuth" class="ck-card" hidden>
+    <h1 class="ck-title">عيادتي</h1>
+    <p class="ck-sub">كل اللي أخذته من كاش كلينك في مكان واحد — كتبك، نتائج اختباراتك، لقاءاتك واستشاراتك.</p>
+    <div class="ck-tabs" role="tablist">
+      <button type="button" data-tab="in" class="on" role="tab">دخول</button>
+      <button type="button" data-tab="up" role="tab">حساب جديد</button>
+    </div>
+    <div class="ck-fld" id="fName" hidden><label for="aName">الاسم</label><input id="aName" autocomplete="name" placeholder="اسمك الكامل"></div>
+    <div class="ck-fld"><label for="aEmail">الإيميل</label>
+      <input id="aEmail" type="email" autocomplete="email" placeholder="example@email.com" style="direction:ltr;text-align:right"></div>
+    <div class="ck-fld"><label for="aPass">كلمة السر</label>
+      <input id="aPass" type="password" autocomplete="current-password" placeholder="٨ أحرف أو أكثر" style="direction:ltr;text-align:right"></div>
+    <div class="ck-agree" id="fAgree" hidden><input type="checkbox" id="aAgree">
+      <label for="aAgree">أوافق على <a href="../policy.html" target="_blank" rel="noopener">الشروط والسياسات</a> الخاصة بكاش كلينك.</label></div>
+    <p class="ck-sub" id="fHint" hidden style="margin:0 0 14px;font-size:13.5px">سجّل بنفس الإيميل اللي استخدمته وقت الشراء أو التسجيل، عشان يطلع لك كل شي.</p>
+    <button class="ck-btn" id="aGo" type="button">دخول</button>
+    <div style="text-align:center;margin-top:14px" id="fForgot"><button class="ck-link" id="aForgot" type="button">نسيت كلمة السر؟</button></div>
+    <div class="ck-err" id="aErr"></div>
+    <div class="ck-ok" id="aOk"></div>
+  </section>
+
+  <!-- 2 · signed in, email not confirmed yet -->
+  <section id="vVerify" class="ck-card" hidden>
+    <h1 class="ck-title">أكّد إيميلك</h1>
+    <p class="ck-sub">أرسلنا رابط تأكيد إلى <b id="vEmail" style="direction:ltr;display:inline-block"></b>.<br>
+      افتح الرابط، وارجع هني واضغط «أكّدت». ما نعرض أي شي قبل التأكيد — عشان محد يقدر يشوف معلوماتك غيرك.</p>
+    <button class="ck-btn" id="vDone" type="button">أكّدت ✓</button>
+    <button class="ck-btn g" id="vAgain" type="button">أرسل الرابط مرة ثانية</button>
+    <div style="text-align:center;margin-top:14px"><button class="ck-link" id="vOut" type="button">غيّر الحساب</button></div>
+    <p class="ck-sub" style="margin:14px 0 0;font-size:13px">ما وصلك؟ شيّك مجلد الرسائل غير المرغوب فيها (Spam).</p>
+    <div class="ck-err" id="vErr"></div><div class="ck-ok" id="vOk"></div>
+  </section>
+
+  <!-- 3 · عيادتي -->
+  <section id="vClinic" hidden>
+    <div class="ck-hello">
+      <div><h1 id="cHello">هلا 👋</h1><div class="e" id="cEmail"></div></div>
+      <button class="ck-link" id="cOut" type="button">تسجيل خروج</button>
+    </div>
+    <div class="ck-stats" id="cStats"></div>
+    <div id="cBody"></div>
+
+    <div class="ck-sec">
+      <div class="ck-item ck-lock">
+        <div class="t">🔒 متابعة كاش <span class="ck-soon">قريباً</span></div>
+        <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. بيكون ضمن باقات عيادتي.</div>
+      </div>
+    </div>
+
+    <div class="ck-sec ck-miss">
+      <h2>شي ناقص؟</h2>
+      <div class="ck-item">
+        <div class="m" style="margin:0 0 10px">اشتريت أو سجّلت بإيميل ثاني؟ اكتب لنا شنو الناقص (والإيميل أو الرقم اللي استخدمته) ونضيفه لك.</div>
+        <textarea id="mNote" placeholder="مثال: اشتريت كتيّب أهدافي المالية بإيميل ثاني: …"></textarea>
+        <button class="ck-btn" id="mGo" type="button" style="margin-top:10px">أرسل</button>
+        <div class="ck-err" id="mErr"></div><div class="ck-ok" id="mOk"></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="vLoad" class="ck-sub" style="padding:40px 0">جاري التحميل…</div>
+</main>
+
+<footer style="background:var(--cc-ink);color:var(--cc-purple-100);">
+  <div class="cc-wrap" style="padding-top:56px;padding-bottom:30px;">
+    <div class="cc-footer-grid">
+      <div>
+        <img src="../brand/logo/logo-cream.png" alt="Cash Clinic" style="height:34px;width:auto;display:block;">
+        <p style="font-size:15px;line-height:1.7;color:var(--cc-purple-300);margin:18px 0 0;max-width:34ch;">نشخص، نعالج، ونطور حياتك المالية. عيادة الصحة المالية الأولى في الكويت.</p>
+      </div>
+      <div>
+        <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--cc-cream);margin:0 0 16px;">روابط</h4>
+        <div style="display:flex;flex-direction:column;gap:11px;">
+          <a href="../index.html" style="font-size:15px;color:var(--cc-purple-200);">الرئيسية</a>
+          <a href="index.html" style="font-size:15px;color:var(--cc-purple-200);">الدورات</a>
+          <a href="../quiz/index.html" style="font-size:15px;color:var(--cc-purple-200);">الاختبارات</a>
+          <a href="../careers.html" style="font-size:15px;color:var(--cc-purple-200);" data-ar="التوظيف" data-en="Careers">التوظيف</a>
+          <a href="../index.html#newsletter" style="font-size:15px;color:var(--cc-purple-200);" data-ar="النشرة البريدية" data-en="Newsletter">النشرة البريدية</a>
+          <a href="../newsletters/index.html" style="font-size:15px;color:var(--cc-purple-200);" data-ar="نشراتنا" data-en="Newsletters">نشراتنا</a>
+        <a href="../policy.html" style="font-size:15px;color:var(--cc-purple-200);">السياسة</a>
+        <a href="../team/dashboard.html" style="font-size:15px;color:var(--cc-purple-300);opacity:.75;" data-ar="دخول الفريق" data-en="Team login">دخول الفريق</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--cc-cream);margin:0 0 16px;">تواصل</h4>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:15px;">
+          <a href="tel:+96569954849" style="color:var(--cc-purple-200);" dir="ltr">+965 69954849</a>
+          <a href="mailto:contact@cashclinic.net" style="color:var(--cc-purple-200);">contact@cashclinic.net</a>
+          <a href="https://cashclinic.net" target="_blank" rel="noopener" style="color:var(--cc-purple-200);">cashclinic.net</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,231,188,.16);margin-top:40px;padding-top:22px;font-size:13.5px;color:var(--cc-purple-300);">
+      <span style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between;"><span>© 2026 كاش كلينك. جميع الحقوق محفوظة.</span><span class="cc-social-row"><a class="cc-social-f" href="https://whatsapp.com/channel/0029VbD0DfVGk1G0UgQ6Qm2S" target="_blank" rel="noopener" aria-label="قناة واتساب كاش كلينك"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.9 4 4.92 8.98 4.92 15.12c0 2.02.53 3.98 1.55 5.72L4 28l7.34-1.92a11.1 11.1 0 0 0 4.7 1.05h.01c6.14 0 11.12-4.98 11.12-11.12C27.17 8.98 22.18 4 16.04 4Zm0 20.3h-.01a9.2 9.2 0 0 1-4.69-1.28l-.34-.2-3.9 1.021.04-3.8-.22-.35a9.17 9.17 0 0 1-1.4-4.9c0-5.08 4.13-9.2 9.22-9.2 2.46 0 4.77.96 6.51 2.7a9.14 9.14 0 0 1 2.7 6.51c0 5.08-4.13 9.2-9.22 9.2Z"/></svg></a><a class="cc-social-f" href="https://www.instagram.com/cash.clinic" target="_blank" rel="noopener" aria-label="إنستغرام كاش كلينك"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07Zm0 1.62c-3.15 0-3.52.01-4.76.07-1.15.05-1.77.24-2.19.41-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.17.42-.36 1.04-.41 2.19-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.05 1.15.24 1.77.41 2.19.21.55.47.94.88 1.35.41.41.8.67 1.35.88.42.17 1.04.36 2.19.41 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c1.15-.05 1.77-.24 2.19-.41.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.17-.42.36-1.04.41-2.19.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.05-1.15-.24-1.77-.41-2.19a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.42-.17-1.04-.36-2.19-.41-1.24-.06-1.61-.07-4.76-.07Zm0 2.76a5.46 5.46 0 1 1 0 10.92 5.46 5.46 0 0 1 0-10.92Zm0 1.62a3.84 3.84 0 1 0 0 7.68 3.84 3.84 0 0 0 0-7.68Zm5.65-2.9a1.28 1.28 0 1 1 0 2.56 1.28 1.28 0 0 1 0-2.56Z"/></svg></a><a class="cc-social-f" href="https://www.tiktok.com/@ghalia.alnuwaief" target="_blank" rel="noopener" aria-label="تيك توك كاش كلينك"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82a4.28 4.28 0 0 1-1.05-2.82h-3.11v12.4a2.53 2.53 0 0 1-2.53 2.45 2.53 2.53 0 0 1-2.53-2.53 2.53 2.53 0 0 1 3.13-2.46V9.7a5.64 5.64 0 0 0-6.24 5.62A5.64 5.64 0 0 0 9.92 21a5.64 5.64 0 0 0 5.63-5.64V9.01a7.36 7.36 0 0 0 4.32 1.38V7.28a4.28 4.28 0 0 1-3.27-1.46Z"/></svg></a></span></span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/nav.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+         sendEmailVerification, sendPasswordResetEmail, updateProfile, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+const app=initializeApp(CONFIG.firebase);
+const auth=getAuth(app); auth.languageCode="ar";      // the confirmation and reset emails in Arabic
+const fns=getFunctions(app,CONFIG.functionsRegion);
+const getMyClinic=httpsCallable(fns,"getMyClinic"), portalMissing=httpsCallable(fns,"portalMissing");
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const RETURN={url:"https://cashclinic.net/clinic/"};
+function show(v){ ["vAuth","vVerify","vClinic","vLoad"].forEach(id=>{ $("#"+id).hidden = id!==v; }); }
+function say(box,msg){ const e=$(box); e.textContent=msg||""; e.style.display=msg?"block":"none"; }
+
+/* Firebase's errors, in words a client understands. Sign-in says the same
+   thing for a wrong email or a wrong password — on purpose. */
+function authMsg(e){
+  const c=(e&&e.code)||"";
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return "الإيميل أو كلمة السر غلط";
+  if(/email-already-in-use/.test(c)) return "هذا الإيميل عنده حساب — ادخل من «دخول»، ولو نسيت كلمة السر اضغط «نسيت كلمة السر؟»";
+  if(/weak-password/.test(c)) return "كلمة السر ضعيفة — خلها ٨ أحرف أو أكثر";
+  if(/invalid-email/.test(c)) return "الإيميل مو صحيح";
+  if(/too-many-requests/.test(c)) return "محاولات كثيرة — انتظر شوي وحاول مرة ثانية";
+  if(/network/.test(c)) return "مشكلة بالاتصال — تأكد من الإنترنت";
+  return (e&&e.message)||"صار خطأ، حاول مرة ثانية";
+}
+async function sendVerify(user){
+  try{ await sendEmailVerification(user, RETURN); }
+  catch(e){ if(/unauthorized-continue-uri|invalid-continue-uri/.test((e&&e.code)||"")) await sendEmailVerification(user); else throw e; }
+}
+
+/* ---------- sign in / up ---------- */
+let MODE="in";
+document.querySelectorAll(".ck-tabs button").forEach(b=>b.addEventListener("click",()=>{
+  MODE=b.dataset.tab;
+  document.querySelectorAll(".ck-tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  const up=MODE==="up";
+  $("#fName").hidden=!up; $("#fAgree").hidden=!up; $("#fHint").hidden=!up; $("#fForgot").hidden=up;
+  $("#aGo").textContent=up?"أنشئ حسابي":"دخول";
+  $("#aPass").autocomplete=up?"new-password":"current-password";
+  say("#aErr",""); say("#aOk","");
+}));
+$("#aGo").addEventListener("click", async ()=>{
+  say("#aErr",""); say("#aOk","");
+  const email=$("#aEmail").value.trim(), pass=$("#aPass").value;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say("#aErr","اكتب إيميل صحيح");
+  if(pass.length<8) return say("#aErr","كلمة السر لازم تكون ٨ أحرف أو أكثر");
+  const b=$("#aGo"); b.disabled=true;
+  try{
+    if(MODE==="up"){
+      const name=$("#aName").value.trim();
+      if(name.length<2){ b.disabled=false; return say("#aErr","اكتب اسمك"); }
+      if(!$("#aAgree").checked){ b.disabled=false; return say("#aErr","لازم توافق على الشروط والسياسات"); }
+      const cred=await createUserWithEmailAndPassword(auth,email,pass);
+      await updateProfile(cred.user,{ displayName:name }).catch(()=>{});
+      await sendVerify(cred.user);
+    } else {
+      await signInWithEmailAndPassword(auth,email,pass);
+    }
+  }catch(e){ say("#aErr",authMsg(e)); }
+  b.disabled=false;
+});
+$("#aForgot").addEventListener("click", async ()=>{
+  say("#aErr",""); say("#aOk","");
+  const email=$("#aEmail").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say("#aErr","اكتب إيميلك فوق، بعدين اضغط «نسيت كلمة السر؟»");
+  try{ await sendPasswordResetEmail(auth,email,RETURN); }
+  catch(e){ if(!/user-not-found/.test((e&&e.code)||"")){ try{ await sendPasswordResetEmail(auth,email); }catch(_){ } } }
+  /* the same answer whether the email has an account or not */
+  say("#aOk","لو عندك حساب بهذا الإيميل، بيوصلك رابط تغيير كلمة السر خلال دقايق.");
+});
+
+/* ---------- confirm email ---------- */
+let lastSend=0;
+$("#vAgain").addEventListener("click", async ()=>{
+  say("#vErr",""); say("#vOk","");
+  if(Date.now()-lastSend<60000) return say("#vErr","انتظر دقيقة قبل ما نرسله مرة ثانية");
+  try{ await sendVerify(auth.currentUser); lastSend=Date.now(); say("#vOk","أرسلناه مرة ثانية ✓"); }
+  catch(e){ say("#vErr",authMsg(e)); }
+});
+$("#vDone").addEventListener("click", async ()=>{
+  say("#vErr","");
+  await auth.currentUser.reload();
+  if(!auth.currentUser.emailVerified) return say("#vErr","لسه ما تأكد — افتح الرابط اللي بالإيميل أول");
+  await auth.currentUser.getIdToken(true);     // the server reads the confirmation from a fresh token
+  load();
+});
+$("#vOut").addEventListener("click",()=>signOut(auth));
+$("#cOut").addEventListener("click",()=>signOut(auth));
+
+/* ---------- عيادتي ---------- */
+const d8=ms=>ms?new Date(ms).toLocaleDateString("en-GB"):"";
+function sec(title, items, row, empty){
+  return `<div class="ck-sec"><h2>${title}</h2>${
+    items.length ? items.map(row).join("") : `<div class="ck-empty">${empty}</div>`}</div>`;
+}
+function render(D){
+  $("#cHello").textContent="هلا "+(D.name||auth.currentUser.displayName||"")+" 👋";
+  $("#cEmail").textContent=D.email;
+  const n=(l)=>(l||[]).length;
+  $("#cStats").innerHTML=[["استشارات",n(D.consults)],["كتب",n(D.books)],["اختبارات",n(D.quizzes)],["لقاءات",n(D.events)],["دورات",n(D.courses)]]
+    .map(([l,v])=>`<div class="ck-stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  let h="";
+  h+=sec("استشاراتي", D.consults, c=>`<div class="ck-item"><div class="t">${esc(c.what)}${c.upcoming?'<span class="ck-tag up">جاية</span>':'<span class="ck-tag done">خلصت</span>'}</div>
+      <div class="m">${esc(c.clinic)} · ${esc(c.mode)}</div>
+      ${c.sessions.map(s=>`<div class="m">• ${esc(s.label)} — مع ${esc(s.with)}${s.date?` · ${esc(s.date)} ${esc(s.time)}`:""}${s.done?" ✓":""}</div>`).join("")}</div>`,
+    'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
+  if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
+  h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
+    'ما اشتريت كتب للحين. <a href="../books/index.html">شوف الكتب ←</a>');
+  h+=sec("اختباراتي", D.quizzes, q=>`<div class="ck-item"><div class="t">${esc(q.what)}${q.band?` — <span style="color:var(--cc-burgundy,#962E37)">${esc(q.band)}</span>`:""}</div>
+      <div class="m">${esc(d8(q.when))}</div>${q.diagnosis?`<details><summary class="m" style="cursor:pointer">اعرض نتيجتك</summary><div class="ck-diag">${esc(q.diagnosis)}</div></details>`:""}</div>`,
+    'ما سويت اختبار للحين. <a href="../index.html#quiz">سوّ الاختبار ←</a>');
+  h+=sec("لقاءاتي", D.events, e=>`<div class="ck-item"><div class="t">${esc(e.what)}${e.upcoming?'<span class="ck-tag up">جاي</span>':""}${e.vip?'<span class="ck-tag vip">VIP</span>':""}${e.paid?'<span class="ck-tag paid">مدفوع</span>':""}${e.attended?'<span class="ck-tag done">حضرت ✓</span>':""}</div>
+      <div class="m">${esc(e.date)}${e.time?` · ${esc(e.time)}`:""}${e.place?` · ${esc(e.place)}`:""}</div>
+      ${e.join?`<div class="m"><a href="${esc(e.join)}">ادخل اللقاء ←</a></div>`:""}</div>`,
+    'ما سجّلت بلقاء للحين. <a href="../courses/index.html">شوف اللقاءات ←</a>');
+  h+=sec("دوراتي", D.courses, c=>`<div class="ck-item"><div class="t">${esc(c.what)}</div>
+      <div class="m">${esc(c.mode)}${(c.dates||[]).length?` · ${esc(c.dates.join("، "))}`:""}</div>
+      ${c.replay?`<div class="m"><a href="${esc(c.replay)}">شاهد التسجيلات ←</a></div>`:""}</div>`,
+    'ما عندك دورات للحين. <a href="../courses/index.html">شوف الدورات ←</a>');
+  $("#cBody").innerHTML=h;
+  show("vClinic");
+}
+async function load(){
+  show("vLoad");
+  try{
+    const D=(await getMyClinic({})).data||{};
+    if(!D.verified){ $("#vEmail").textContent=D.email||auth.currentUser.email; show("vVerify"); return; }
+    render(D);
+  }catch(e){
+    show("vLoad"); $("#vLoad").textContent="تعذّر تحميل عيادتك — حدّث الصفحة بعد شوي.";
+  }
+}
+$("#mGo").addEventListener("click", async ()=>{
+  say("#mErr",""); say("#mOk","");
+  const note=$("#mNote").value.trim();
+  if(note.length<4) return say("#mErr","اكتب لنا شنو الناقص");
+  const b=$("#mGo"); b.disabled=true;
+  try{ const r=(await portalMissing({ note })).data||{};
+        say("#mOk", r.already?"طلبك السابق عندنا وبنرد عليك قريب ✓":"وصلنا ✓ بنراجعه ونضيفه لك."); $("#mNote").value=""; }
+  catch(e){ say("#mErr",(e&&e.message)||"تعذّر الإرسال"); }
+  b.disabled=false;
+});
+
+onAuthStateChanged(auth, async (u)=>{
+  if(!u){ show("vAuth"); return; }
+  if(!u.emailVerified){ $("#vEmail").textContent=u.email; show("vVerify"); return; }
+  load();
+});
+</script>
+</body>
+</html>
