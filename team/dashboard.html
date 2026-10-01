@@ -1285,11 +1285,7 @@
         <div class="addf"><label>الباقة</label><select id="nbPkg"></select></div>
         <div class="addf"><label>الجلسة</label><select id="nbSession"></select></div>
         <div class="addf"><label>الاستشاري</label>
-          <select id="nbConsultant">
-            <option value="ghalia">غالية النويف</option>
-            <option value="sara">سارة الهندي</option>
-            <option value="hasan">حسن أكبر</option>
-          </select></div>
+          <select id="nbConsultant" class="consultsel"></select></div>
         <div class="addf"><label>التاريخ</label><input id="nbDate" type="date"></div>
         <div class="addf"><label>الوقت</label><select id="nbTime" class="timesel" data-step="15"></select></div>
         <div class="addf"><label>الطريقة</label><select id="nbMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
@@ -1401,6 +1397,7 @@
       <button data-bk="upcoming" class="on">القادمة</button>
       <button data-bk="past">السابقة</button>
       <button data-bk="cancelled">الملغية</button>
+      <button data-bk="vouchers">القسائم</button>
       <button data-bk="unpaid">بانتظار الدفع</button>
       <button data-bk="all">الكل</button>
     </div>
@@ -1629,6 +1626,7 @@ const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repair
 const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
 const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
 const updateStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateStaffBooking");
+const redeemVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"redeemVoucher");
 const listNewsletters=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listNewsletters");
 const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastNewsletter");
 const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
@@ -4168,6 +4166,8 @@ function safe(panel, fn){
   }
 }
 function render(){
+  /* the new-booking picker, from the server's active consultants */
+  { const nbc=$("#nbConsultant"); if(nbc) consultFill(nbc, nbc.value||""); }
   safe("quiz",        buildFilters);
   safe("sales",       renderSales);
   safe("quiz",        renderQuiz);
@@ -6209,6 +6209,7 @@ function renderBkList(){
   /* An unpaid checkout is a person who tried to book and did not finish, so it
      belongs on its own list rather than mixed into the diary — otherwise the
      day looks fuller than it is. */
+  if(BKFILTER==="vouchers"){ renderBkVouchers(all); return; }
   const rows = BKFILTER==="all"    ? all
     : BKFILTER==="unpaid"   ? all.filter(x=>x.status==="pending")
     : BKFILTER==="upcoming" ? all.filter(x=>x.status!=="cancelled"&&x.status!=="pending"&&x.startMs>=now)
@@ -6231,6 +6232,7 @@ function renderBkList(){
         ${b.paymentMethod==="cash"?'<span class="bkpill" style="background:#505632">مدفوع مسبقاً</span>':""}
         ${b.paymentMethod==="online"&&b.status==="paid"?'<span class="bkpill" style="background:#2F8789">مدفوع أونلاين</span>':""}
         ${b.voucher?`<span class="bkpill" style="background:#614588">قسيمة ${esc(b.voucher.code)}</span>`:""}
+        ${b.fromVoucher?`<span class="bkpill" style="background:#614588">بقسيمة ${esc(b.fromVoucher.code)}</span>`:""}
         ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
         ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
         ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
@@ -6254,6 +6256,37 @@ function renderBkList(){
         ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:""}
+    </div>`;
+  }).join("");
+}
+
+/* القسائم: every voucher, the ones still to use on top. A used one says
+   which appointment it became, so nobody redeems the same voucher twice. */
+function renderBkVouchers(all){
+  const box=$("#bkList"); const now=Date.now();
+  const list=all.filter(b=>b.voucher).sort((a,b)=>
+    (a.voucher.redeemedMs?1:0)-(b.voucher.redeemedMs?1:0) || (a.voucher.until||0)-(b.voucher.until||0));
+  if(!list.length){ box.innerHTML='<div class="empty">ما في قسائم. تتحوّل أي استشارة مدفوعة لقسيمة من زر «حوّل لقسيمة» على الموعد.</div>'; return; }
+  box.innerHTML=list.map(b=>{
+    const v=b.voucher, used=!!v.redeemedMs, expired=!used && v.until && v.until<now;
+    const to=used ? (DATA.bookings.list||[]).find(x=>x.id===v.redeemedOrderId) : null;
+    const state = used ? `<span class="bkpill" style="background:#505632">استُخدمت</span>`
+                : expired ? `<span class="bkpill" style="background:#962E37">منتهية</span>`
+                : `<span class="bkpill" style="background:#2F8789">صالحة</span>`;
+    return `<div class="bkcard ${used?"gone":"soon"}">
+      <div class="bkh"><b>${esc(b.name)||"—"}</b>
+        <span class="bkpill" style="background:#614588">قسيمة ${esc(v.code)}</span>${state}
+        <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
+        ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
+        <span class="num">${esc(b.email)}</span></div>
+      <div class="bknote">${used
+        ? `استُخدمت ${esc(stDate(v.redeemedMs))}${to?` ← موعد ${esc(bkWhen(to.startIso))} مع ${esc(to.consultantName||"")}`:""}`
+        : `${esc(vchUntil(v.until))} · كانت موعد ${esc(bkWhen(b.startIso))}`}</div>
+      ${used?"":`<div class="bkacts">
+        ${expired?"":`<button data-vuse="${esc(b.id)}">استخدم القسيمة</button>`}
+        <button data-vext="${esc(b.id)}">مدّد القسيمة</button>
+        ${String(b.phone||"").replace(/\D/g,"")?`<a class="wa" href="https://wa.me/${esc(String(b.phone).replace(/\D/g,""))}" target="_blank" rel="noopener">واتساب</a>`:""}
+      </div>`}
     </div>`;
   }).join("");
 }
@@ -6297,12 +6330,24 @@ function bkAddSecond(b){
 }
 
 /* ---- editing an existing booking ---- */
+/* who can take an appointment: the server's active consultants. The list
+   used to be typed in — حسن was still on it and إسماعيل was not. A booking
+   held by someone no longer listed keeps its name, so editing it does not
+   silently move it to whoever happens to be first. */
+function consultFill(sel, keep, keepName){
+  const act=((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).filter(c=>c.active!==false);
+  const opts=act.map(c=>[c.id,c.name]);
+  if(keep && !opts.some(o=>o[0]===keep)) opts.push([keep,(keepName||keep)+" (غير متاح)"]);
+  sel.innerHTML=opts.map(([id,n])=>`<option value="${esc(id)}">${esc(n)}</option>`).join("");
+  if(keep) sel.value=keep;
+}
+
 let BEID="";
 function bkEditOpen(b){
   BEID=b.id;
   $("#bkEditTitle").textContent="تعديل الحجز";
   $("#bkEditSub").textContent=`${b.packageName||""}${b.sessionLabel?" · "+b.sessionLabel:""}`;
-  $("#beConsultant").value=b.consultantId||"ghalia";
+  consultFill($("#beConsultant"), b.consultantId||"", b.consultantName||"");
   $("#beMode").value=b.mode||"online";
   /* the stored time is UTC; the pickers work in Kuwait time */
   if(b.startIso){
@@ -6322,6 +6367,34 @@ function bkEditOpen(b){
   document.getElementById("bkEditOvl").classList.add("on");
 }
 function bkEditClose(){ document.getElementById("bkEditOvl").classList.remove("on"); }
+
+let VUID="";
+function vuOpen(b){
+  VUID=b.id;
+  $("#vuSub").textContent=`${b.name||""} · ${b.packageName||""}${b.sessionLabel?" · "+b.sessionLabel:""} · قسيمة ${(b.voucher&&b.voucher.code)||""}`;
+  consultFill($("#vuConsultant"), b.consultantId||"", b.consultantName||"");
+  $("#vuMode").value=b.mode||"online";
+  $("#vuDate").value=""; if($("#vuTime").options.length) $("#vuTime").selectedIndex=0;
+  $("#vuNotes").value=""; $("#vuNotify").checked=true;
+  $("#vuMsg").className="addmsg"; $("#vuMsg").textContent="";
+  document.getElementById("vuOvl").classList.add("on");
+}
+function vuClose(){ document.getElementById("vuOvl").classList.remove("on"); }
+window.vuClose=vuClose;
+$("#vuSave") && $("#vuSave").addEventListener("click", async ()=>{
+  const dt=$("#vuDate").value, tm=$("#vuTime").value;
+  if(!dt||!tm){ $("#vuMsg").textContent="اختر التاريخ والوقت"; $("#vuMsg").className="addmsg err"; return; }
+  const btn=$("#vuSave"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الحجز…";
+  try{
+    const r=(await redeemVoucher({ orderId:VUID, consultantId:$("#vuConsultant").value, mode:$("#vuMode").value,
+      startIso:nbIso(dt,tm), notes:$("#vuNotes").value.trim(), notify:$("#vuNotify").checked })).data||{};
+    $("#vuMsg").className="addmsg ok";
+    $("#vuMsg").textContent=`✓ انحجز الموعد مع ${r.consultantName||""}${r.confirmed?" ووصل العميل التأكيد":""}${r.mailError?" — بس الإيميل ما انرسل: "+r.mailError:""}`;
+    setTimeout(()=>{ vuClose(); refreshAll(); }, 1400);
+  }catch(e){
+    $("#vuMsg").textContent=(e&&e.message)||"تعذّر الحجز"; $("#vuMsg").className="addmsg err";
+  }finally{ btn.disabled=false; btn.textContent=t; }
+});
 window.bkEditClose=bkEditClose;
 
 $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
@@ -6394,6 +6467,8 @@ async function bkRowAction(e){
     return;
   }
 
+  const vu=e.target.closest("button[data-vuse]");
+  if(vu){ const row=(DATA.bookings.list||[]).find(x=>x.id===vu.dataset.vuse); if(row) vuOpen(row); return; }
   const ed=e.target.closest("button[data-edit]");
   if(ed){ const row=(DATA.bookings.list||[]).find(x=>x.id===ed.dataset.edit); if(row) bkEditOpen(row); return; }
   const sc=e.target.closest("button[data-second]");
@@ -6622,13 +6697,20 @@ function renderBkCalDay(){
         <span class="bkpill" style="background:${b.mode==="present"?"#614588":b.mode==="call"?"#D3A146":"#2F8789"}">${modeAr(b.mode)}</span>
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
+        ${b.fromVoucher?`<span class="bkpill" style="background:#614588">بقسيمة ${esc(b.fromVoucher.code)}</span>`:""}
         ${(b.withNames&&b.withNames.length)?`<span class="bkpill" style="background:#962E37">مع ${esc(b.withNames.join(" + "))}</span>`:""}
         <span class="num">${esc(b.email)}</span>
         ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}
       </div>
       ${b.notes?`<div class="bknote">${esc(b.notes)}</div>`:""}
-      ${!gone?`<div class="bkacts">
+      ${/* every live card gets every action — a session that has started or
+           passed still needs correcting, noting, or turning into a voucher.
+           Hiding them once the start time passed is what locked نورة and
+           أشواق out of past and current appointments. */
+        b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
+        <button data-note="${esc(b.id)}">أضف ملاحظة</button>
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
         ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
@@ -7379,6 +7461,27 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
 </script>
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
 
+<div class="ovl" id="vuOvl" onclick="if(event.target===this)vuClose()">
+  <div class="modal m-pad" style="max-width:520px;position:relative">
+    <button class="m-x" onclick="vuClose()">×</button>
+    <h3 style="margin:0 0 4px;font-size:19px">استخدم القسيمة</h3>
+    <p class="muted" style="font-size:13px;margin:0 0 16px" id="vuSub"></p>
+    <div class="addgrid">
+      <div class="addf"><label>الاستشاري</label><select id="vuConsultant" class="consultsel"></select></div>
+      <div class="addf"><label>الطريقة</label>
+        <select id="vuMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
+      <div class="addf"><label>التاريخ</label><input id="vuDate" type="date"></div>
+      <div class="addf"><label>الوقت</label><select id="vuTime" class="timesel" data-step="15"></select></div>
+    </div>
+    <div class="addf" style="margin-top:12px"><label>ملاحظات</label><input id="vuNotes" type="text"></div>
+    <div class="addrow">
+      <label><input type="checkbox" id="vuNotify" checked> أرسل تأكيد الموعد للعميل</label>
+      <button class="addbtn" id="vuSave">احجز الموعد بالقسيمة</button>
+    </div>
+    <div class="addmsg" id="vuMsg"></div>
+  </div>
+</div>
+
 <div class="ovl" id="bkEditOvl" onclick="if(event.target===this)bkEditClose()">
   <div class="modal m-pad" style="max-width:560px;position:relative">
     <button class="m-x" onclick="bkEditClose()">×</button>
@@ -7386,11 +7489,7 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
     <p class="muted" style="font-size:13px;margin:0 0 16px" id="bkEditSub"></p>
     <div class="addgrid">
       <div class="addf"><label>الاستشاري</label>
-        <select id="beConsultant">
-          <option value="ghalia">غالية النويف</option>
-          <option value="sara">سارة الهندي</option>
-          <option value="hasan">حسن أكبر</option>
-        </select></div>
+        <select id="beConsultant" class="consultsel"></select></div>
       <div class="addf"><label>الطريقة</label>
         <select id="beMode"><option value="online">أونلاين</option><option value="present">حضوري</option><option value="call">مكالمة</option></select></div>
       <div class="addf"><label>التاريخ</label><input id="beDate" type="date"></div>
