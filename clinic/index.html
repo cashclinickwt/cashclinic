@@ -199,6 +199,7 @@ const app=initializeApp(CONFIG.firebase);
 const auth=getAuth(app); auth.languageCode="ar";      // the confirmation and reset emails in Arabic
 const fns=getFunctions(app,CONFIG.functionsRegion);
 const getMyClinic=httpsCallable(fns,"getMyClinic"), portalMissing=httpsCallable(fns,"portalMissing");
+const clinicSendVerify=httpsCallable(fns,"clinicSendVerify"), clinicSendReset=httpsCallable(fns,"clinicSendReset");
 const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const RETURN={url:"https://cashclinic.net/clinic/"};
@@ -217,7 +218,15 @@ function authMsg(e){
   if(/network/.test(c)) return "مشكلة بالاتصال — تأكد من الإنترنت";
   return (e&&e.message)||"صار خطأ، حاول مرة ثانية";
 }
+/* our own mail first — Firebase's sender is often filtered — and Firebase's
+   only if ours cannot be reached. A refusal from ours (too soon, daily cap)
+   is said as it is, not papered over with a second email. */
 async function sendVerify(user){
+  try{ await clinicSendVerify({}); return; }
+  catch(e){
+    if(/resource-exhausted/.test((e&&e.code)||"")) throw e;
+    console.error("own verify mail failed, using Firebase's:", e);
+  }
   try{ await sendEmailVerification(user, RETURN); }
   catch(e){ if(/unauthorized-continue-uri|invalid-continue-uri/.test((e&&e.code)||"")) await sendEmailVerification(user); else throw e; }
 }
@@ -246,7 +255,13 @@ $("#aGo").addEventListener("click", async ()=>{
       if(!$("#aAgree").checked){ b.disabled=false; return say("#aErr","لازم توافق على الشروط والسياسات"); }
       const cred=await createUserWithEmailAndPassword(auth,email,pass);
       await updateProfile(cred.user,{ displayName:name }).catch(()=>{});
-      await sendVerify(cred.user);
+      /* the account exists now, so the page has already moved to «أكّد
+         إيميلك» — whatever happens with the email is said there, where the
+         client is looking, not on the sign-up card that just disappeared */
+      say("#vOk","جاري إرسال رابط التأكيد…");
+      try{ await sendVerify(cred.user); lastSend=Date.now();
+           say("#vOk","أرسلنا الرابط ✓ — إذا ما وصلك خلال دقايق، شيّك مجلد Spam."); }
+      catch(e){ say("#vOk",""); say("#vErr","ما قدرنا نرسل رابط التأكيد: "+authMsg(e)+" — اضغط «أرسل الرابط مرة ثانية»."); }
     } else {
       await signInWithEmailAndPassword(auth,email,pass);
     }
@@ -257,8 +272,11 @@ $("#aForgot").addEventListener("click", async ()=>{
   say("#aErr",""); say("#aOk","");
   const email=$("#aEmail").value.trim();
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say("#aErr","اكتب إيميلك فوق، بعدين اضغط «نسيت كلمة السر؟»");
-  try{ await sendPasswordResetEmail(auth,email,RETURN); }
-  catch(e){ if(!/user-not-found/.test((e&&e.code)||"")){ try{ await sendPasswordResetEmail(auth,email); }catch(_){ } } }
+  try{ await clinicSendReset({ email }); }
+  catch(e){
+    if(/resource-exhausted|invalid-argument/.test((e&&e.code)||"")) return say("#aErr",(e&&e.message)||"حاول بعد شوي");
+    try{ await sendPasswordResetEmail(auth,email,RETURN); }catch(_){ try{ await sendPasswordResetEmail(auth,email); }catch(__){ } }
+  }
   /* the same answer whether the email has an account or not */
   say("#aOk","لو عندك حساب بهذا الإيميل، بيوصلك رابط تغيير كلمة السر خلال دقايق.");
 });

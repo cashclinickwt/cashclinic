@@ -272,6 +272,7 @@
   .clh b{font-size:15.5px;color:var(--ink)}
   .clh .num{font-size:12.5px}
   .clspent{margin-inline-start:auto;font-size:14px;font-weight:700;color:var(--auber);white-space:nowrap}
+  .clpkg{margin-top:8px;font-size:13px;color:#614588;font-weight:600}
   .clchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
   .clchip{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
   .clempty{text-align:center;color:var(--muted);font-size:14px;padding:28px 10px}
@@ -5490,6 +5491,8 @@ function clMatches(c){
   const q=CLQ.toLowerCase();
   const digits=q.replace(/\D/g,"");
   if((c.name||"").toLowerCase().indexOf(q)!==-1) return true;
+  /* sales search by package too: «الوفرة» finds everyone who took it */
+  if((c.packages||[]).some(p=>String(p).toLowerCase().indexOf(q)!==-1)) return true;
   if((c.emails||[]).some(e=>e.toLowerCase().indexOf(q)!==-1)) return true;
   /* match a number however it was typed, with or without country code */
   if(digits && (c.phones||[]).some(p=>p.replace(/\D/g,"").indexOf(digits)!==-1)) return true;
@@ -5564,6 +5567,7 @@ function renderClients(){
         ${seesMoney()&&c.spent>0?`<span class="clspent">${money(c.spent)}</span>`:""}
       </div>
       <div class="clchips">${chips}<span class="clchip" style="background:#EDEAF2;color:var(--muted)">آخر نشاط ${dt(c.lastSeen)}</span></div>
+      ${(c.packages||[]).length?`<div class="clpkg">📦 ${c.packages.map(esc).join(" · ")}</div>`:""}
       <div style="margin-top:9px"><button class="pfbtn" data-tosales="${esc((c.emails||[])[0]||"")}"
         data-name="${esc(c.name||"")}" data-phone="${esc((c.phones||[])[0]||"")}"
         style="padding:4px 11px;font-size:12px">أرسله لفريق المبيعات</button></div>
@@ -5610,6 +5614,7 @@ function openClient(c){
         ${(c.emails||[]).map(x=>esc(x)).join("<br>")}
         ${(c.phones||[]).length?"<br>"+(c.phones||[]).map(x=>esc(x)).join(" · "):""}
       </div>
+      ${(c.packages||[]).length?`<div class="clpkg" style="font-size:14px;margin:4px 0 12px">📦 <b>الباقات:</b> ${c.packages.map(esc).join(" · ")}</div>`:""}
       <div class="clstats">
         ${seesMoney()&&c.spent>0?`<span class="clstat"><b>${money(c.spent)}</b> إجمالي</span>`:""}
         ${stat("book","كتاب")}${stat("booking","استشارة")}${stat("quiz","اختبار")}
@@ -6247,6 +6252,13 @@ function renderBkList(){
       ${bkSubLine(b)}
       ${bkNotesBlock(b)}
       ${b.voucher?`<div class="bkacts"><button data-vext="${esc(b.id)}">مدّد القسيمة</button></div>`:""}
+      ${/* a cancelled meeting can be put back on a new time, or turned into
+           a voucher if it had been paid — a voucher is used from القسائم */
+        b.status==="cancelled"&&!b.voucher&&mayEdit()?`<div class="bkacts">
+        ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
+        <button data-edit="${esc(b.id)}">أرجع الموعد</button>
+        ${b.wasPaid?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
+      </div>`:""}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
@@ -6342,10 +6354,11 @@ function consultFill(sel, keep, keepName){
   if(keep) sel.value=keep;
 }
 
-let BEID="";
+let BEID="", BE_REVIVE=false;
 function bkEditOpen(b){
   BEID=b.id;
-  $("#bkEditTitle").textContent="تعديل الحجز";
+  const reviving=b.status==="cancelled";
+  $("#bkEditTitle").textContent=reviving?"أرجع الموعد الملغي":"تعديل الحجز";
   $("#bkEditSub").textContent=`${b.packageName||""}${b.sessionLabel?" · "+b.sessionLabel:""}`;
   consultFill($("#beConsultant"), b.consultantId||"", b.consultantName||"");
   $("#beMode").value=b.mode||"online";
@@ -6360,10 +6373,12 @@ function bkEditOpen(b){
   $("#bePhone").value=b.phone||"";
   $("#beAmount").value=b.amount||0;
   if($("#bePay"))  $("#bePay").value  = b.paymentMethod || "online";
-  if($("#bePaid")) $("#bePaid").checked = b.status==="paid";
+  /* a cancelled booking comes back as it was: paid if it had been */
+  if($("#bePaid")) $("#bePaid").checked = reviving ? !!b.wasPaid : b.status==="paid";
   $("#beNotes").value=b.notes||"";
   if($("#beNotify")) $("#beNotify").checked=true;
-  $("#beMsg").className="addmsg"; $("#beMsg").textContent="";
+  $("#beMsg").className="addmsg"; $("#beMsg").textContent=reviving?"اختر الموعد الجديد واحفظ — يرجع الحجز للمواعيد":"";
+  BE_REVIVE=reviving;
   document.getElementById("bkEditOvl").classList.add("on");
 }
 function bkEditClose(){ document.getElementById("bkEditOvl").classList.remove("on"); }
@@ -6403,6 +6418,7 @@ $("#beSave") && $("#beSave").addEventListener("click", async ()=>{
   if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
     $("#beMsg").textContent="الإيميل غير صحيح"; $("#beMsg").className="addmsg err"; return; }
   const dt=$("#beDate").value, tm=$("#beTime").value;
+  if(BE_REVIVE && !(dt&&tm)){ $("#beMsg").textContent="اختر التاريخ والوقت الجديد"; $("#beMsg").className="addmsg err"; return; }
   const btn=$("#beSave"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الحفظ…";
   try{
     const r=await updateStaffBooking({
