@@ -5739,7 +5739,9 @@ function renderSalesFix(){
           ? `<button class="go" data-verify="${esc(r.id)}">تحقق من الدفع وأرسل</button>`
           : `<button class="go" data-fix="${esc(r.id)}">صحّح وأعد الإرسال</button>`}
         <button class="alt" data-resend="${esc(r.id)}">أعد الإرسال بدون تغيير</button>
+        ${r.kind==="undelivered"?`<button class="alt" data-confirm="${esc(r.id)}" style="border-color:#2F8789;color:#2F8789">شفته مدفوع في Tap — أرسل</button>`:""}
       </div>
+      ${r.chargeId?`<div class="muted" style="font-size:12px;margin-top:6px">رقم العملية في Tap: <span class="num" dir="ltr" style="user-select:all">${esc(r.chargeId)}</span></div>`:""}
     </div>`;
   }).join("");
 }
@@ -5760,9 +5762,11 @@ $("#fixList") && $("#fixList").addEventListener("click", async e=>{
     return;
   }
 
-  const btn = e.target.closest("button[data-fix],button[data-verify],button[data-resend]"); if(!btn) return;
-  const id = btn.dataset.fix || btn.dataset.verify || btn.dataset.resend;
-  const action = btn.dataset.fix ? "fix" : (btn.dataset.verify ? "verify" : "resend");
+  const btn = e.target.closest("button[data-fix],button[data-verify],button[data-resend],button[data-confirm]"); if(!btn) return;
+  const id = btn.dataset.fix || btn.dataset.verify || btn.dataset.resend || btn.dataset.confirm;
+  const action = btn.dataset.fix ? "fix" : (btn.dataset.verify ? "verify" : (btn.dataset.confirm ? "confirmPaid" : "resend"));
+  /* only after looking at Tap's own dashboard — this sends the book with no lookup */
+  if(action==="confirmPaid" && !confirm("متأكد إنك شفت هالعملية «CAPTURED / مدفوعة» في لوحة Tap؟\nبينرسل الكتاب ويتسجّل الطلب مدفوع باسمك.")) return;
   const input = $(`input[data-fix-email="${id}"]`);
   const email = input ? input.value.trim() : "";
 
