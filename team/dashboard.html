@@ -693,6 +693,7 @@
   <!-- if the data never arrives, say so where it can be seen, with a way back -->
   <div id="bootErr" class="secfail" hidden></div>
   <!-- the payout reminder rides on top of whatever tab she lands on -->
+  <div id="tapAlert"></div>
   <div id="topNudge"></div>
 
   <button class="navburger" id="navBurger" type="button">☰ <span id="navHere">الأقسام</span></button>
@@ -4118,6 +4119,20 @@ $("#bkFcAdd") && $("#bkFcAdd").addEventListener("click", async ()=>{
 
 
 /* ---------- render ---------- */
+/* Checkouts Tap refused lately. A customer who sees «صفحة الدفع ما فتحت»
+   simply leaves — this is how the office finds out the same day. */
+function renderTapAlert(){
+  const box=$("#tapAlert"); if(!box) return;
+  const t=DATA&&DATA.tapHealth;
+  if(!t || !t.day){ box.innerHTML=""; return; }
+  const where={book:"كتاب",booking:"استشارة",offer:"عرض حجز"}[t.last.where] || (String(t.last.where).indexOf("course:")===0?"دورة/لقاء ("+t.last.where.slice(7)+")":t.last.where);
+  box.innerHTML=`<div class="pfnudge" style="background:#FDE5E9;border-color:#962E37">
+    <h3 style="color:#962E37">⚠️ الدفع ما اشتغل لـ ${fmt(t.day)} ${t.day===1?"عميل":"عملاء"} آخر ٢٤ ساعة</h3>
+    <p style="margin:0 0 6px">آخر مرة: <b>${esc(dt(t.last.at))}</b> · ${esc(where)}${t.last.amount?` · ${fmt(t.last.amount)} د.ك`:""}</p>
+    <p style="margin:0">السبب من Tap: <b dir="auto">${esc(t.last.why)}</b></p>
+    <p class="muted" style="margin:8px 0 0;font-size:12.5px">هذولا حاولوا يدفعون وصفحة الدفع ما فتحت لهم. شيّك لوحة Tap أو كلّم دعم Tap بهالسبب، وتواصل مع العملاء.</p>
+  </div>`;
+}
 function renderPayoutNudge(){
   const n=DATA&&DATA.payoutNudge, box=$("#bkNudge"), top=$("#topNudge");
   if(!n || n.done || !(n.owed||[]).length){
@@ -4211,6 +4226,7 @@ async function refreshSections(list){
   list.forEach(sec=>(SECTION_KEYS[sec]||[]).forEach(k=>{ if(k in d) DATA[k]=d[k]; }));
   /* only a full load carries the payout reminder — never blank it here */
   if(d.payoutNudge) DATA.payoutNudge=d.payoutNudge;
+  if("tapHealth" in d) DATA.tapHealth=d.tapHealth;
   return d;
 }
 
@@ -4924,6 +4940,7 @@ function showPanel(k){
   if(def.load) def.load();
   if(k==="home"){ renderHome(); if(DATA&&DATA.profitMember) loadPies(); }
   renderPayoutNudge();
+  renderTapAlert();
 }
 
 /* the pills at the top of a merged family: اللقاءات (events · live) and
