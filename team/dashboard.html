@@ -272,6 +272,12 @@
   .clh b{font-size:15.5px;color:var(--ink)}
   .clh .num{font-size:12.5px}
   .clspent{margin-inline-start:auto;font-size:14px;font-weight:700;color:var(--auber);white-space:nowrap}
+  .rpbox{margin-top:10px;padding:10px 12px;border:1px dashed #D2D3E1;border-radius:12px;background:#FAF9FB}
+  .rpchip{display:inline-block;color:#fff;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:999px}
+  .rpmeta{font-size:12px;color:var(--muted);margin-top:5px}
+  .rpwhy{font-size:13px;color:#962E37;margin-top:6px}
+  .rpup{border:1.5px solid #2F1749;background:#fff;color:#2F1749;font-weight:700;border-radius:999px;padding:6px 14px;cursor:pointer;font-family:inherit}
+  .rpq{padding:7px 0;border-top:1px solid #F1E2B8;font-size:13.5px}
   .clpkg{margin-top:8px;font-size:13px;color:#614588;font-weight:600}
   .clchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
   .clchip{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
@@ -1092,16 +1098,18 @@
       <h3>➕ أضف عملية بيع</h3>
       <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر. تنضاف للمبيعات مثل أي عملية ثانية، وتقدر ترسل الكتاب للعميل على طول.</p>
       <div class="addgrid">
-        <div class="addf"><label>الكتاب</label><select id="asProduct"></select></div>
+        <div class="addf"><label id="asProdLbl">الكتاب أو الخدمة</label><select id="asProduct"></select></div>
         <div class="addf"><label>اسم العميل</label><input id="asName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل <span>(للإرسال)</span></label><input id="asEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
         <div class="addf"><label>الجوال <span>(اختياري)</span></label><input id="asPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
         <div class="addf"><label>المبلغ المدفوع</label><input id="asAmount" type="number" min="0" step="0.5"></div>
-        <div class="addf"><label>تاريخ البيع <span>(اختياري)</span></label><input id="asDate" type="date"></div>
+        <div class="addf" id="asDateF"><label>تاريخ البيع <span>(اختياري)</span></label><input id="asDate" type="date"></div>
+        <div class="addf" id="asExpF" hidden><label>مصاريف <span>(اختياري — تنخصم قبل الشركة)</span></label><input id="asExpense" type="number" min="0" step="0.5"></div>
       </div>
+      <p class="muted" id="asBudgetHint" hidden style="font-size:12.5px;margin:8px 0 0">رفع الميزانية يروح كامل للشركة ويتسجّل بهذا الشهر، ويطلع بملف العميل في «كل العملاء» — لازم رقمه أو إيميله.</p>
       <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="asNote" type="text" placeholder="مثال: بيع عبر واتساب"></div>
       <div class="addrow">
-        <label><input type="checkbox" id="asDeliver" checked> أرسل الكتاب على إيميله</label>
+        <label id="asDeliverL"><input type="checkbox" id="asDeliver" checked> أرسل الكتاب على إيميله</label>
         <button class="addbtn" id="asAdd">أضف العملية</button>
       </div>
       <div class="addmsg" id="asMsg"></div>
@@ -1274,6 +1282,8 @@
   <div class="sec" id="bookingsSec" data-panel="bookings">
     <h2><span></span> المواعيد</h2>
     <div class="bkmsg" id="bkMsg"></div>
+    <div id="rpQueue"></div>
+    <input type="file" id="rpFile" accept="application/pdf,.pdf" hidden>
     <div class="bklaunch" id="bkLaunch" hidden></div>
     <div class="kpis" id="bkKpis"></div>
 
@@ -1629,6 +1639,10 @@ const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addM
 const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
 const updateStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateStaffBooking");
 const redeemVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"redeemVoucher");
+/* session reports */
+const _rf=getFunctions(app,CONFIG.functionsRegion);
+const attachReport=httpsCallable(_rf,"attachReport"), removeReport=httpsCallable(_rf,"removeReport"),
+      openReport=httpsCallable(_rf,"openReport"), reviewReport=httpsCallable(_rf,"reviewReport");
 const listNewsletters=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listNewsletters");
 const addPastNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addPastNewsletter");
 const updateNewsletter=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateNewsletter");
@@ -5486,6 +5500,8 @@ const CL_TYPE = {
   rating:    { label:"تقييم",    color:"#B35661" },
   /* a contract or anything else entered by hand from before the system */
   past:      { label:"عملية سابقة", color:"#3EADAD" },
+  /* رفع الميزانية sold through «أضف عملية بيع» — a service, 100% company */
+  budget:    { label:"رفع الميزانية", color:"#A87A2A" },
 };
 let CLQ="", CLFILTER="all";
 
@@ -5676,8 +5692,13 @@ function renderAddSale(){
   if(!cat.length){ box.hidden=true; return; }
   box.hidden=false;
   const sel=$("#asProduct");
-  if(sel && sel.options.length!==cat.length){
-    sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("");
+  /* رفع الميزانية sits with the books for those who may record it — the
+     price is typed each time, so it has none to prefill */
+  const budget = DATA.role==="all" || DATA.role==="sales";
+  const want = cat.length + (budget?1:0);
+  if(sel && sel.options.length!==want){
+    sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("")
+      + (budget?`<option value="budget" data-price="">رفع الميزانية · خدمة (اكتب المبلغ)</option>`:"");
     syncPrice();
   }
 }
@@ -5686,6 +5707,11 @@ function syncPrice(){
   const o=sel.options[sel.selectedIndex];
   /* prefill the list price, but leave it editable for a WhatsApp discount */
   if(o) amt.value=o.dataset.price;
+  /* the service has no book to send and is always this month */
+  const isB = sel.value==="budget";
+  ["#asDateF","#asDeliverL"].forEach(id=>{ const e=$(id); if(e) e.hidden=isB; });
+  ["#asExpF","#asBudgetHint"].forEach(id=>{ const e=$(id); if(e) e.hidden=!isB; });
+  if(isB){ amt.placeholder="المبلغ اللي دفعه"; amt.focus(); } else amt.placeholder="";
 }
 $("#asProduct") && $("#asProduct").addEventListener("change", syncPrice);
 
@@ -5698,6 +5724,21 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return asMsg("الإيميل غير صحيح","err");
     const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
     if(fix) return asMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
+  }
+  if(productKey==="budget"){
+    const amount=Number($("#asAmount").value);
+    if(!(amount>0)) return asMsg("اكتب المبلغ اللي دفعه","err");
+    if(!email && !$("#asPhone").value.trim()) return asMsg("اكتب رقم العميل أو إيميله — عشان تطلع الخدمة بملفه","err");
+    const btn=$("#asAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
+    try{
+      await addManualSale({ productKey, name, email, phone:$("#asPhone").value.trim(), note:$("#asNote").value.trim(),
+                            amount:$("#asAmount").value, expense:$("#asExpense").value||0 });
+      asMsg(`انضاف «رفع الميزانية» ${fmt(amount)} د.ك لحسابات الشركة ✅ وطلع بملف العميل`,"ok");
+      ["#asName","#asEmail","#asPhone","#asNote","#asAmount","#asExpense"].forEach(id=>{ $(id).value=""; });
+      await refreshSections(["sales","clients"]); render();
+    }catch(e){ asMsg((e&&e.message)||"تعذّر الإضافة","err"); }
+    finally{ btn.disabled=false; btn.textContent=t; }
+    return;
   }
   const deliver=$("#asDeliver").checked;
   if(!email && deliver && !confirm("ما كتبت إيميل، فما راح ينرسل الكتاب.\n\nتبي تضيف العملية بدون إرسال؟")) return;
@@ -5973,8 +6014,86 @@ function bkPaintKpis(cons){
     `<div class="kpi"><div class="n">${fmt(cancelled.length)}</div><div class="l">ملغي هالشهر</div></div>`;
 }
 
+/* ================= SESSION REPORTS =================
+   After a session its consultant (or full access) uploads a PDF. It waits
+   for غالية; approved, the client gets an email and finds it in عيادتي.
+   Rejected, it comes back with her reason. Replace or delete any time — a
+   replacement waits for approval again. */
+const RP_STATE={ pending:["بانتظار موافقة غالية","#A87A2A"], approved:["معتمد ✓ وصل للعميل","#2F8789"], rejected:["مرفوض","#962E37"] };
+function bkEnded(b){ return ((Date.parse(b.startIso||"")||0) + (Number(b.minutes)||60)*60000) < Date.now(); }
+function reportBlock(b){
+  if(b.status==="cancelled" || !b.canReport || !bkEnded(b)) return "";
+  const r=b.report, id=esc(b.id);
+  if(!r) return `<div class="rpbox"><button class="rpup" data-rup="${id}">⬆️ ارفع تقرير الجلسة (PDF)</button></div>`;
+  const st=RP_STATE[r.status]||RP_STATE.pending;
+  return `<div class="rpbox">
+    <span class="rpchip" style="background:${st[1]}">📄 التقرير: ${st[0]}</span>
+    ${r.status==="rejected"&&r.reason?`<div class="rpwhy">سبب الرفض: ${esc(r.reason)}</div>`:""}
+    <div class="rpmeta">${esc(r.name)} · رفعه ${esc(r.byName)} · ${esc(dt(r.ms))}</div>
+    <div class="bkacts" style="margin-top:6px">
+      <button data-ropen="${id}">افتح</button>
+      ${b.canApprove&&r.status!=="approved"?`<button data-rok="${id}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل للعميل</button>`:""}
+      ${b.canApprove&&r.status==="pending"?`<button data-rno="${id}">ارفض</button>`:""}
+      <button data-rup="${id}">بدّل الملف</button>
+      <button class="no" data-rdel="${id}">احذف</button>
+    </div></div>`;
+}
+/* غالية's queue: every report waiting for her, at the top of المواعيد */
+function renderReportQueue(){
+  const box=$("#rpQueue"); if(!box) return;
+  const list=(DATA.bookings && DATA.bookings.list)||[];
+  /* غالية's own queue — the server marks the rows she may approve */
+  const wait=list.filter(b=>b.canApprove&&b.report&&b.report.status==="pending");
+  if(!wait.length){ box.innerHTML=""; return; }
+  box.innerHTML=`<div class="pfnudge" style="background:#FFF6E3;border-color:#D3A146">
+    <h3>📄 ${fmt(wait.length)} ${wait.length===1?"تقرير ينتظر":"تقارير تنتظر"} موافقتك</h3>
+    ${wait.map(b=>`<div class="rpq">
+      <b>${esc(b.name)}</b> · ${esc(b.packageName||"استشارة")} · ${esc(b.consultantName||"")} · رفعه ${esc(b.report.byName)}
+      <span class="bkacts" style="display:inline-flex;margin-inline-start:8px">
+        <button data-ropen="${esc(b.id)}">افتح</button>
+        <button data-rok="${esc(b.id)}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل</button>
+        <button data-rno="${esc(b.id)}">ارفض</button>
+      </span></div>`).join("")}
+  </div>`;
+}
+let RP_ID="";
+document.addEventListener("click", async (e)=>{
+  const b=e.target.closest("button[data-rup],button[data-ropen],button[data-rdel],button[data-rok],button[data-rno]"); if(!b) return;
+  if(b.dataset.rup){ RP_ID=b.dataset.rup; const f=$("#rpFile"); f.value=""; f.click(); return; }
+  if(b.dataset.ropen) return ccOpenFile(openReport, { orderId:b.dataset.ropen }, b);
+  const id=b.dataset.rdel||b.dataset.rok||b.dataset.rno, was=b.textContent;
+  try{
+    if(b.dataset.rdel){
+      if(!confirm("تحذف التقرير؟ إذا كان معتمد، بيختفي من عيادتي العميل.")) return;
+      b.disabled=true; b.textContent="…"; await removeReport({ orderId:id }); bkMsg("انحذف التقرير",true);
+    } else if(b.dataset.rok){
+      b.disabled=true; b.textContent="…";
+      const d=(await reviewReport({ orderId:id, approve:true })).data||{};
+      bkMsg(d.mailed?"اعتُمد التقرير ✅ وانرسل للعميل إيميل إنه جاهز في عيادتي":"اعتُمد التقرير ✅ — بس الإيميل ما انرسل (ما في إيميل أو صار خطأ)", !!d.mailed);
+    } else {
+      const why=prompt("سبب الرفض — يوصل للمستشار:"); if(!why||why.trim().length<3) return;
+      b.disabled=true; b.textContent="…"; await reviewReport({ orderId:id, approve:false, reason:why.trim() }); bkMsg("انرفض التقرير ورجع للمستشار",true);
+    }
+    await refreshSections(["bookings"]); render();
+  }catch(err){ bkMsg((err&&err.message)||"صار خطأ",false); }
+  finally{ b.disabled=false; b.textContent=was; }
+});
+$("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
+  const file=e.target.files&&e.target.files[0]; if(!file||!RP_ID) return;
+  if(!/\.pdf$/i.test(file.name) || (file.type&&file.type!=="application/pdf")) return bkMsg("التقرير لازم يكون PDF",false);
+  if(file.size>20*1024*1024) return bkMsg("حجم التقرير أكبر من ٢٠ ميجا",false);
+  try{
+    bkMsg("جاري رفع التقرير… 0%",true);
+    const up=await ccUpload(file, pct=>bkMsg(`جاري رفع التقرير… ${pct}%`,true));
+    await attachReport({ orderId:RP_ID, file:up });
+    bkMsg("انرفع التقرير ✅ — ينتظر موافقة غالية قبل ما يشوفه العميل",true);
+    await refreshSections(["bookings"]); render();
+  }catch(err){ bkMsg((err&&err.message)||"تعذّر رفع التقرير",false); }
+  finally{ RP_ID=""; }
+});
 function renderBookings(){
   const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;
+  renderReportQueue();
   /* Inactive consultants are kept in THIS picker on purpose. bookings.list is
      scoped to the consultants in this list, so dropping somebody here does not
      tidy them away — it hides every client still booked with them, including
@@ -6280,6 +6399,7 @@ function renderBkList(){
         <button data-edit="${esc(b.id)}">أرجع الموعد</button>
         ${b.wasPaid?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
       </div>`:""}
+      ${reportBlock(b)}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
@@ -6744,14 +6864,14 @@ function renderBkCalDay(){
            passed still needs correcting, noting, or turning into a voucher.
            Hiding them once the start time passed is what locked نورة and
            أشواق out of past and current appointments. */
-        b.status!=="cancelled"?`<div class="bkacts">
+        reportBlock(b) + (b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
         <button data-note="${esc(b.id)}">أضف ملاحظة</button>
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
         ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
-      </div>`:""}
+      </div>`:"")}
     </div>`;
   }).join("") : "";
 

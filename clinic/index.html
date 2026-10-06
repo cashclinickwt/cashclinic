@@ -59,6 +59,9 @@
   .ck-lock .m{color:#E9E3F2}
   .ck-soon{display:inline-block;background:var(--cc-cream,#FFE6BB);color:#2F1749;font-weight:700;font-size:12px;border-radius:999px;padding:3px 10px;margin-inline-start:8px}
   .ck-miss textarea{width:100%;box-sizing:border-box;min-height:84px;border:2px solid var(--cc-grey-200,#E3E1EA);border-radius:12px;padding:11px 13px;font:inherit;font-size:15px}
+  .ck-report{margin-top:9px;border:1.5px solid #2F1749;background:#fff;color:#2F1749;font:inherit;font-weight:700;
+    font-size:14px;border-radius:999px;padding:7px 16px;cursor:pointer}
+  .ck-report:hover{background:#2F1749;color:#FFE6BB}
 </style>
 </head>
 <body>
@@ -200,6 +203,7 @@ const auth=getAuth(app); auth.languageCode="ar";      // the confirmation and re
 const fns=getFunctions(app,CONFIG.functionsRegion);
 const getMyClinic=httpsCallable(fns,"getMyClinic"), portalMissing=httpsCallable(fns,"portalMissing");
 const clinicSendVerify=httpsCallable(fns,"clinicSendVerify"), clinicSendReset=httpsCallable(fns,"clinicSendReset");
+const getMyReport=httpsCallable(fns,"getMyReport");
 const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const RETURN={url:"https://cashclinic.net/clinic/"};
@@ -314,7 +318,8 @@ function render(D){
   let h="";
   h+=sec("استشاراتي", D.consults, c=>`<div class="ck-item"><div class="t">${esc(c.what)}${c.upcoming?'<span class="ck-tag up">جاية</span>':'<span class="ck-tag done">خلصت</span>'}</div>
       <div class="m">${esc(c.clinic)} · ${esc(c.mode)}</div>
-      ${c.sessions.map(s=>`<div class="m">• ${esc(s.label)} — مع ${esc(s.with)}${s.date?` · ${esc(s.date)} ${esc(s.time)}`:""}${s.done?" ✓":""}</div>`).join("")}</div>`,
+      ${c.sessions.map(s=>`<div class="m">• ${esc(s.label)} — مع ${esc(s.with)}${s.date?` · ${esc(s.date)} ${esc(s.time)}`:""}${s.done?" ✓":""}</div>`).join("")}
+      ${c.report?`<button class="ck-report" data-report="${esc(c.id)}">📄 افتح تقرير جلستك</button>`:""}</div>`,
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
   h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
@@ -352,6 +357,18 @@ $("#mGo").addEventListener("click", async ()=>{
         say("#mOk", r.already?"طلبك السابق عندنا وبنرد عليك قريب ✓":"وصلنا ✓ بنراجعه ونضيفه لك."); $("#mNote").value=""; }
   catch(e){ say("#mErr",(e&&e.message)||"تعذّر الإرسال"); }
   b.disabled=false;
+});
+
+/* the session report — a link issued only for this signed-in, confirmed client */
+document.addEventListener("click", async (e)=>{
+  const b=e.target.closest("button[data-report]"); if(!b) return;
+  const was=b.textContent; b.disabled=true; b.textContent="جاري الفتح…";
+  try{
+    const d=(await getMyReport({ orderId:b.dataset.report })).data||{};
+    if(!d.url) throw new Error("ما قدرنا نفتح التقرير");
+    window.open(d.url, "_blank", "noopener");
+  }catch(err){ alert((err&&err.message)||"ما قدرنا نفتح التقرير — كلّمنا واتساب"); }
+  finally{ b.disabled=false; b.textContent=was; }
 });
 
 onAuthStateChanged(auth, async (u)=>{
