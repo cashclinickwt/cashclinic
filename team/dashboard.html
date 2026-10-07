@@ -272,6 +272,10 @@
   .clh b{font-size:15.5px;color:var(--ink)}
   .clh .num{font-size:12.5px}
   .clspent{margin-inline-start:auto;font-size:14px;font-weight:700;color:var(--auber);white-space:nowrap}
+  .tkrbox{margin-top:9px;padding:9px;border:1px solid var(--line);border-radius:12px;background:#FAF9FB}
+  .tkrbox textarea,.tkrbox .tkrtext{width:100%;box-sizing:border-box;font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-bottom:7px}
+  .tkrrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tkrnames{font-size:12px;flex:1}
   .rpbox{margin-top:10px;padding:10px 12px;border:1px dashed #D2D3E1;border-radius:12px;background:#FAF9FB}
   .rpchip{display:inline-block;color:#fff;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:999px}
   .rpmeta{font-size:12px;color:var(--muted);margin-top:5px}
@@ -2128,8 +2132,19 @@ function tkTable(rows, mineSide){
             t.files.map((f,i)=>`<button class="pfbtn" data-tkfile="${esc(t.id)}" data-i="${i}"
               style="font-size:12px;padding:4px 9px">📎 ${esc(f.name)}</button>`).join("")+`</div>`:""}
           <div class="pfrule">${esc(dt(t.when))}</div>
-          ${(t.replies||[]).map(rp=>`<div class="pfrule" style="border-inline-start:3px solid var(--line);
-             padding-inline-start:8px;margin-top:5px;line-height:1.7"><b>${esc(rp.byName)}</b>: ${esc(rp.text)}</div>`).join("")}</td>
+          ${(t.replies||[]).map((rp,ri)=>`<div class="pfrule" style="border-inline-start:3px solid var(--line);
+             padding-inline-start:8px;margin-top:5px;line-height:1.7"><b>${esc(rp.byName)}</b>${rp.text?": "+esc(rp.text):""}
+             ${(rp.files||[]).length?`<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px">`+
+               rp.files.map((f,i)=>`<button class="pfbtn" data-tkfile="${esc(t.id)}" data-r="${ri}" data-i="${i}"
+                 style="font-size:12px;padding:3px 9px">📎 ${esc(f.name)}</button>`).join("")+`</div>`:""}</div>`).join("")}
+          ${!t.done?`<div class="tkrbox" id="tkr-${esc(t.id)}" hidden>
+             <textarea placeholder="ردك…" rows="2"></textarea>
+             ${mineSide?`<input class="tkrtext" type="text" value="${esc(t.text)}" title="نص المهمة — عدّله إذا فهمته غير">`:""}
+             <div class="tkrrow">
+               <label class="pfbtn" style="cursor:pointer">📎 أرفق ملف<input type="file" multiple hidden data-tkrfiles></label>
+               <span class="tkrnames muted"></span>
+               <button class="pfbtn go" data-tksend="${esc(t.id)}" data-mine="${mineSide?1:0}" data-text="${esc(t.text)}">أرسل</button>
+             </div></div>`:""}</td>
       <td>${esc(mineSide ? tkName(t.from)
             : ((t.toList&&t.toList.length?t.toList:[t.to]).map(tkName).join("، ")))}</td>
       <td class="num">${t.due?esc(t.due):"—"}</td>
@@ -2245,7 +2260,8 @@ document.addEventListener("click", async (e)=>{
   const fl=e.target.closest("[data-tkfile]"); if(!fl) return;
   const was=fl.textContent; fl.disabled=true; fl.textContent="…";
   try{
-    await ccOpenFile(getTaskFile,{id:fl.dataset.tkfile,index:Number(fl.dataset.i)||0},fl);
+    await ccOpenFile(getTaskFile,Object.assign({id:fl.dataset.tkfile,index:Number(fl.dataset.i)||0},
+      fl.dataset.r!==undefined?{reply:Number(fl.dataset.r)}:{}),fl);
   }catch(err){ alert((err&&err.message)||"تعذّر فتح المرفق"); }
   finally{ fl.disabled=false; fl.textContent=was; }
 });
@@ -2256,18 +2272,29 @@ document.addEventListener("click", async e=>{
      whoever set it before anyone ticks it closed. */
   const rp=e.target.closest("button[data-tkreply]");
   if(rp){
-    const reply=prompt("ردك على المهمة:","");
-    if(reply===null || !reply.trim()) return;
+    /* a box, not a prompt — a prompt cannot carry a file */
+    const bx=document.getElementById("tkr-"+rp.dataset.tkreply); if(!bx) return;
+    bx.hidden=!bx.hidden; if(!bx.hidden){ const ta=bx.querySelector("textarea"); ta&&ta.focus(); }
+    return;
+  }
+  const sd=e.target.closest("button[data-tksend]");
+  if(sd){
+    const bx=sd.closest(".tkrbox"), reply=(bx.querySelector("textarea").value||"").trim();
+    const fin=bx.querySelector("input[data-tkrfiles]"), picked=[...(fin&&fin.files||[])];
     let text;
-    if(rp.dataset.mine==="1"){
-      const nt=prompt("تعدّل نص المهمة؟ (اتركه مثل ما هو إذا مو محتاج)", rp.dataset.text||"");
-      if(nt!==null && nt.trim() && nt.trim()!==rp.dataset.text) text=nt.trim();
-    }
-    rp.disabled=true;
+    const te=bx.querySelector(".tkrtext");
+    if(te && te.value.trim() && te.value.trim()!==sd.dataset.text) text=te.value.trim();
+    if(!reply && !picked.length && !text) return tkMsg("اكتب ردك أو أرفق ملف", false);
+    if(picked.length>4) return tkMsg("أقصى شي ٤ مرفقات بالرد", false);
+    if(picked.some(f=>f.size>100*1024*1024)) return tkMsg("حجم المرفق أكبر من ١٠٠ ميجا", false);
+    sd.disabled=true; const was=sd.textContent;
     try{
-      await replyTask({ id:rp.dataset.tkreply, reply:reply.trim(), text });
+      const files=[];
+      for(const f of picked) files.push(await ccUpload(f, pct=>{ sd.textContent=`${pct}%`; }));
+      sd.textContent="…";
+      await replyTask({ id:sd.dataset.tksend, reply, text, files });
       await loadTasks(); tkMsg("انرسل ردك ✅ ووصل إشعار للطرف الثاني 📩", true);
-    }catch(err){ tkMsg((err&&err.message)||"تعذّر الإرسال", false); rp.disabled=false; }
+    }catch(err){ tkMsg((err&&err.message)||"تعذّر الإرسال", false); sd.disabled=false; sd.textContent=was; }
     return;
   }
   const d=e.target.closest("button[data-tk]");
@@ -6014,6 +6041,11 @@ function bkPaintKpis(cons){
     `<div class="kpi"><div class="n">${fmt(cancelled.length)}</div><div class="l">ملغي هالشهر</div></div>`;
 }
 
+document.addEventListener("change", e=>{
+  const fin=e.target.closest("input[data-tkrfiles]"); if(!fin) return;
+  const out=fin.closest(".tkrbox").querySelector(".tkrnames");
+  if(out) out.textContent=[...fin.files].map(f=>f.name).join("، ");
+});
 /* ================= SESSION REPORTS =================
    After a session its consultant (or full access) uploads a PDF. It waits
    for غالية; approved, the client gets an email and finds it in عيادتي.
@@ -6025,7 +6057,8 @@ function reportBlock(b){
   if(b.status==="cancelled" || !b.canReport || !bkEnded(b)) return "";
   const r=b.report, id=esc(b.id);
   if(!r) return `<div class="rpbox"><button class="rpup" data-rup="${id}">⬆️ ارفع تقرير الجلسة (PDF)</button></div>`;
-  const st=RP_STATE[r.status]||RP_STATE.pending;
+  const st=(RP_STATE[r.status]||RP_STATE.pending).slice();
+  if(r.status==="pending") st[0]="بانتظار موافقة "+(r.approverName||"غالية");
   return `<div class="rpbox">
     <span class="rpchip" style="background:${st[1]}">📄 التقرير: ${st[0]}</span>
     ${r.status==="rejected"&&r.reason?`<div class="rpwhy">سبب الرفض: ${esc(r.reason)}</div>`:""}
@@ -6038,7 +6071,7 @@ function reportBlock(b){
       <button class="no" data-rdel="${id}">احذف</button>
     </div></div>`;
 }
-/* غالية's queue: every report waiting for her, at the top of المواعيد */
+/* the approver's queue — غالية's, or سارة's for عبدالعزيز's reports */
 function renderReportQueue(){
   const box=$("#rpQueue"); if(!box) return;
   const list=(DATA.bookings && DATA.bookings.list)||[];
@@ -6085,8 +6118,10 @@ $("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
   try{
     bkMsg("جاري رفع التقرير… 0%",true);
     const up=await ccUpload(file, pct=>bkMsg(`جاري رفع التقرير… ${pct}%`,true));
-    await attachReport({ orderId:RP_ID, file:up });
-    bkMsg("انرفع التقرير ✅ — ينتظر موافقة غالية قبل ما يشوفه العميل",true);
+    const d=(await attachReport({ orderId:RP_ID, file:up })).data||{};
+    bkMsg(d.status==="approved"
+      ? (d.mailed?"انرفع التقرير ✅ ووصل للعميل إيميل إنه جاهز في عيادتي":"انرفع التقرير ✅ وصار بعيادتي العميل — بس الإيميل ما انرسل")
+      : `انرفع التقرير ✅ — ينتظر موافقة ${d.approverName||"غالية"} قبل ما يشوفه العميل`, true);
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"تعذّر رفع التقرير",false); }
   finally{ RP_ID=""; }
