@@ -575,11 +575,12 @@ function analysisBlock(){
     <div class="rcard anbox anwork"><div class="head"><span class="ic">!</span>النقاط اللي تحتاج تشتغل عليها</div><ul>${li(work)}</ul></div>`;
 }
 const WA_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 2.1.55 4.15 1.6 5.96L2 22l4.25-1.11a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 1.8c2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.37 5.72c0 4.46-3.63 8.09-8.09 8.09-1.48 0-2.93-.4-4.19-1.15l-.3-.18-2.52.66.67-2.46-.2-.31a8.02 8.02 0 0 1-1.23-4.29c0-4.46 3.63-8.09 8.09-8.09zm4.44 10.16c-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.39-.41-.54-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.15.2-.57.2-1.06.14-1.15-.06-.1-.22-.16-.46-.28z"/></svg>';
-function waLink(sc){
+function waLink(sc, pkgName){
   const L=window.__LEAD||{};
   const lines=["السلام عليكم 👋", WA_MSG_INTRO, "",
     "📊 النتيجة الكلية: "+toAr(sc.overall)+"% ("+band(sc.overall)+")"];
   ORDER.forEach(k=>lines.push("• "+DIMS[k].title+": "+toAr(sc[k])+"%"));
+  if(pkgName) lines.push("", "الباقة المقترحة لي: "+pkgName);
   lines.push(""); lines.push(WA_MSG_OUTRO);
   if(L.name) lines.push("", "الاسم: "+L.name);
     var _sz=Q.find(function(q){return q.id==="size";}), _rv=Q.find(function(q){return q.id==="revenue";});
@@ -638,9 +639,10 @@ function rqNext(sc){
       <span class="rib">الأنسب لمشروعك</span>
       <h4>${e(rec.name)}</h4>
       <p>${e(rec.why)}</p>
-      <div class="meta"><span>${rec.amount} د.ك</span><span>مع حسن أكبر</span><span>تختار موعدك بنفسك</span></div>
-      <a class="go" href="${rqLink(rec.id)}">احجز موعدك الأول</a>
-      <p class="pay">بالصفحة الجاية تختار التاريخ وطريقة الدفع — كامل بالبطاقة، أو تقسيط مع ديمة عبر الواتساب.</p>
+      <div class="meta"><span>${rec.amount} د.ك</span><span>نحجز لك موعدك</span></div>
+      <!-- booking from the quiz goes through the team on WhatsApp (12 Oct 2026) -->
+      <a class="go" href="${waLink(sc, rec.name)}" target="_blank" rel="noopener">احجز عن طريق الواتساب</a>
+      <p class="pay">يوصل فريقنا نتيجتك كاملة، ويتواصلون معك يحجزون موعدك ويرتبون طريقة الدفع — كامل أو تقسيط مع ديمة.</p>
     </div>
 
     <div class="rqcall">
@@ -648,7 +650,7 @@ function rqNext(sc){
         <b>محتار وتبي جواب سريع؟</b>
         <span>الاستشارة السريعة · ٧٠ د.ك</span>
       </div>
-      <a href="${rqLink("sarie")}">احجز استشارة سريعة</a>
+      <a href="${waLink(sc, "الاستشارة السريعة")}" target="_blank" rel="noopener">احجزها واتساب</a>
     </div>
 
     <a class="wa" href="${waLink(sc)}" target="_blank" rel="noopener">${WA_ICON}<span>${WA_TEXT}</span></a>
