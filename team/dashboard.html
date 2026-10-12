@@ -833,7 +833,6 @@
     <div class="flt" id="stTabs">
       <button class="on" data-st="leads">متابعة العملاء</button>
       <button data-st="vouchers">القسائم</button>
-      <button data-st="budget">رفع إلى الميزانية</button>
     </div>
     <div class="addmsg" id="stMsg"></div>
     <div id="stBody"></div>
@@ -5415,7 +5414,13 @@ function nbSyncSession(){
      server correctly bills at 100, and the two disagree */
   const mode = ($("#nbMode")||{}).value;
   const listed = (mode==="online" && Number(p.amountOnline) > 0) ? Number(p.amountOnline) : Number(p.amount);
-  $("#nbAmount").value = later ? 0 : listed;
+  /* رفع الميزانية: no list price — whoever books types the agreed figure,
+     sales included, so the box shows for everyone and starts empty */
+  const aw=$("#nbAmountWrap");
+  if(aw) aw.hidden = !(seesMoney() || p.priceTyped);
+  const lab=aw&&aw.querySelector("label"); if(lab) lab.textContent = p.priceTyped ? "السعر المتفق عليه (د.ك)" : "المبلغ";
+  $("#nbAmount").placeholder = p.priceTyped ? "اكتب السعر" : "";
+  $("#nbAmount").value = later ? 0 : (p.priceTyped ? "" : listed);
   if(later){ const r=document.querySelector('input[name="nbPay"][value="cash"]'); if(r) r.checked=true; }
   nbHint();
 }
@@ -5463,10 +5468,12 @@ $("#nbCreate") && $("#nbCreate").addEventListener("click", async ()=>{
   if(!pay){ $("#nbPayWrap").style.outline="2px solid #962E37"; $("#nbPayWrap").style.borderRadius="10px";
             return nbMsg("اختر طريقة الدفع","err"); }
   $("#nbPayWrap").style.outline="";
+  if(p.priceTyped && Number($("#nbSession").value||0)===0 && !(Number($("#nbAmount").value)>0))
+    return nbMsg("اكتب السعر اللي اتفقتوا عليه مع العميل","err");
   const method = pay;
   const paid = method !== "link";
   const how = method==="deema" ? "بـ ديمة" : "مسبقاً";
-  if(paid && seesMoney() && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
+  if(paid && (seesMoney() || p.priceTyped) && !confirm(`تأكيد: العميل دفع ${$("#nbAmount").value} د.ك ${how}؟\n\nبيتأكد الحجز على طول وبيوصله إيميل التأكيد.`)) return;
 
   const btn=$("#nbCreate"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ التجهيز…";
   try{
@@ -5723,7 +5730,8 @@ function renderAddSale(){
   const sel=$("#asProduct");
   /* رفع الميزانية sits with the books for those who may record it — the
      price is typed each time, so it has none to prefill */
-  const budget = DATA.role==="all" || DATA.role==="sales";
+  /* رفع الميزانية moved to المواعيد as a package (12 Oct 2026) */
+  const budget = false;
   const want = cat.length + (budget?1:0);
   if(sel && sel.options.length!==want){
     sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("")
