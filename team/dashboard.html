@@ -2565,7 +2565,7 @@ function renderSalesTeam(){
           <span class="pill" style="background:${v.redeemedMs?"var(--olive)":(lapsed?"#962E37":"var(--teal)")}">
             ${v.redeemedMs?"استُخدمت":(lapsed?"منتهية":"سارية")}</span></div>
         <div class="muted" style="font-size:12.5px;line-height:1.9">
-          ${esc(v.email)}${v.phone?" · "+esc(v.phone):""} · ${kwd(v.amount)}<br>
+          ${esc(v.email)}${v.phone?" · "+esc(v.phone):""}${seesMoney()?" · "+kwd(v.amount):""}<br>
           أصدرها ${esc(v.issuedByName||v.issuedBy||"—")}
         </div>
         <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -3295,9 +3295,9 @@ function tgSlug(label){
 
 function renderTarget(){
   const box=$("#tgList"); if(!box||!TG) return;
-  /* only full access writes a goal: نورة is measured against it, so she does
-     not get to move it */
-  const mayEdit = !!(DATA && DATA.role==="all");
+  /* full access and نورة add and edit goals (13 Oct 2026); closing one
+     stays with full access */
+  const mayEdit = !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
   const form=$("#tgForm"); if(form) form.hidden=!mayEdit;
   const osel=$("#tgOwner");
   if(mayEdit && osel && !osel.options.length){
@@ -3329,9 +3329,9 @@ function renderTarget(){
                     <span>باقي: <b>${kwd(Math.max(0,(t.target||0)-(t.achieved||0)))}</b></span>`:""}
       </div>
       ${t.hit?`<div class="tghit">🎉 وصلنا الهدف! ${TG.money?esc(kwd(t.achieved))+" من "+esc(kwd(t.target)):fmt(t.pct)+"%"}</div>`:""}
-      ${(DATA&&DATA.role==="all")?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      ${mayEdit?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="pfbtn" data-tgedit="${esc(t.id)}">عدّل</button>
-        <button class="pfbtn" data-tgoff="${esc(t.id)}">سكّره</button></div>`:""}
+        ${DATA.role==="all"?`<button class="pfbtn" data-tgoff="${esc(t.id)}">سكّره</button>`:""}</div>`:""}
       ${TG.money&&(t.byProduct||[]).length?`<table class="pftab" style="margin-top:16px">
         <thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>`+
         t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")+
@@ -4901,14 +4901,14 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","sales","addsale","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
+const SALES_PANELS = ["home","sales","addsale","salesteam","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
 const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify"];
 /* أشواق — customer service: the diary like نورة, the client list, and the
    team's shared board. No leads, no vouchers tab, no events, no targets — and
    no money anywhere, which the server enforces by never sending it. */
-const SERVICE_PANELS = ["home","sales","addsale","clients","bookings","tasks","meetings","ideas","notify"];
+const SERVICE_PANELS = ["home","sales","addsale","salesteam","clients","bookings","tasks","meetings","ideas","notify"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
 const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
@@ -4938,7 +4938,7 @@ const PANELS = [
     count:()=>mtNext(2).length },
   { id:"ideas",       group:"team",   icon:"💡", allowed:()=>true, load:()=>{ if(!ID) loadIdeas(); } },
   /* worked by sales and by full access — the two roles that touch it */
-  { id:"salesteam",   group:"sales",  icon:"🤝", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")),
+  { id:"salesteam",   group:"sales",  icon:"🤝", allowed:()=>!!(DATA&&["all","sales","service"].indexOf(DATA.role)!==-1),
     load:()=>{ if(!ST) loadSalesTeam(); },
     count:()=>((ST&&ST.leads)||[]).filter(l=>l.state==="جديد").length },
   /* نورة runs the pilot, so sales sees it alongside full access */
@@ -5767,7 +5767,9 @@ function syncPrice(){
   if(o) amt.value=o.dataset.price;
   /* the service has no book to send and is always this month */
   const isB = sel.value==="budget";
-  ["#asDateF","#asDeliverL"].forEach(id=>{ const e=$(id); if(e) e.hidden=isB; });
+  /* the date stays for رفع الميزانية too — older ones go in their own month */
+  ["#asDeliverL"].forEach(id=>{ const e=$(id); if(e) e.hidden=isB; });
+  const dl=$("#asDateF label"); if(dl) dl.innerHTML = isB ? 'التاريخ <span>(اختياري — للقديمة)</span>' : 'تاريخ البيع <span>(اختياري)</span>';
   ["#asExpF","#asBudgetHint"].forEach(id=>{ const e=$(id); if(e) e.hidden=!isB; });
   if(isB){ amt.placeholder="المبلغ اللي دفعه"; amt.focus(); } else amt.placeholder="";
 }
@@ -5789,10 +5791,12 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
     if(!email && !$("#asPhone").value.trim()) return asMsg("اكتب رقم العميل أو إيميله — عشان تطلع الخدمة بملفه","err");
     const btn=$("#asAdd"); btn.disabled=true; const t=btn.textContent; btn.textContent="جارٍ الإضافة…";
     try{
+      const soldOn=$("#asDate").value||"";
+      if(soldOn && soldOn > new Date(Date.now()+3*3600e3).toISOString().slice(0,10)) return asMsg("التاريخ ما يصير يكون بالمستقبل","err");
       await addManualSale({ productKey, name, email, phone:$("#asPhone").value.trim(), note:$("#asNote").value.trim(),
-                            amount:$("#asAmount").value, expense:$("#asExpense").value||0 });
-      asMsg(`انضاف «رفع الميزانية» ${fmt(amount)} د.ك لحسابات الشركة ✅ وطلع بملف العميل`,"ok");
-      ["#asName","#asEmail","#asPhone","#asNote","#asAmount","#asExpense"].forEach(id=>{ $(id).value=""; });
+                            amount:$("#asAmount").value, expense:$("#asExpense").value||0, soldOn });
+      asMsg(`انضاف «رفع الميزانية» ${fmt(amount)} د.ك لحسابات الشركة${soldOn?" بشهر "+soldOn.slice(0,7):""} ✅ وطلع بملف العميل`,"ok");
+      ["#asName","#asEmail","#asPhone","#asNote","#asAmount","#asExpense","#asDate"].forEach(id=>{ $(id).value=""; });
       await refreshSections(["sales","clients"]); render();
     }catch(e){ asMsg((e&&e.message)||"تعذّر الإضافة","err"); }
     finally{ btn.disabled=false; btn.textContent=t; }
