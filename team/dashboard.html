@@ -272,6 +272,14 @@
   .clh b{font-size:15.5px;color:var(--ink)}
   .clh .num{font-size:12.5px}
   .clspent{margin-inline-start:auto;font-size:14px;font-weight:700;color:var(--auber);white-space:nowrap}
+  .bkhint{font-size:12px;color:var(--muted);margin:8px 0 6px}
+  .bkhours{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .bkhrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .bkhrow b{min-width:62px}
+  .bkhrow select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:8px}
+  .bkhrow.own{border-color:#D3A146;background:#FFF8EA}
+  .bkhrow.own b::after{content:" · وقت خاص";font-weight:400;color:#A87A2A;font-size:11.5px}
+  .bkhreset{border:0;background:none;cursor:pointer;font-size:15px;color:#A87A2A}
   .tkrbox{margin-top:9px;padding:9px;border:1px solid var(--line);border-radius:12px;background:#FAF9FB}
   .tkrbox textarea,.tkrbox .tkrtext{width:100%;box-sizing:border-box;font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-bottom:7px}
   .tkrrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -715,6 +723,7 @@
     <button data-tab="home" class="on">الرئيسية</button>
     <div class="navgrp" data-grp="sales">المبيعات</div>
     <button data-tab="sales">المبيعات</button>
+    <button data-tab="addsale">إضافة عمليات البيع</button>
     <button data-tab="clients">كل العملاء</button>
     <button data-tab="salesteam">فريق المبيعات</button>
     <div class="navgrp" data-grp="clients">العملاء</div>
@@ -1097,9 +1106,23 @@
     <div class="flt" id="bookFlt" style="display:none"></div>
     <div class="kpis" id="salesKpis"></div>
 
+    <div id="fixWrap" hidden>
+      <h2 style="font-size:17px;margin-top:22px"><span></span> مشترين يحتاجون متابعة</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 12px">
+        هذولا دفعوا بس يحتمل ما وصلتهم نسختهم .. إما الإيميل فيه غلط إملائي، أو الإرسال فشل وقتها.
+      </p>
+      <div class="fixmsg" id="fixMsg"></div>
+      <div id="fixList"></div>
+    </div>
+    <div class="tbl" id="salesTbl"></div>
+  </div>
+
+  <!-- إضافة عمليات البيع — its own section (13 Oct 2026), out of المبيعات -->
+  <div class="sec" id="addSaleSec" data-panel="addsale">
+    <h2><span></span> إضافة عمليات البيع</h2>
     <div class="addbox" id="addBox" hidden>
       <h3>➕ أضف عملية بيع</h3>
-      <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر. تنضاف للمبيعات مثل أي عملية ثانية، وتقدر ترسل الكتاب للعميل على طول.</p>
+      <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر: الكتب، و«رفع الميزانية». تنضاف للمبيعات مثل أي عملية ثانية، وتطلع بملف العميل في «كل العملاء»، وتقدر ترسل الكتاب للعميل على طول.</p>
       <div class="addgrid">
         <div class="addf"><label id="asProdLbl">الكتاب أو الخدمة</label><select id="asProduct"></select></div>
         <div class="addf"><label>اسم العميل</label><input id="asName" type="text" placeholder="الاسم الكامل"></div>
@@ -1118,15 +1141,6 @@
       <div class="addmsg" id="asMsg"></div>
     </div>
 
-    <div id="fixWrap" hidden>
-      <h2 style="font-size:17px;margin-top:22px"><span></span> مشترين يحتاجون متابعة</h2>
-      <p class="muted" style="font-size:13px;margin:0 0 12px">
-        هذولا دفعوا بس يحتمل ما وصلتهم نسختهم .. إما الإيميل فيه غلط إملائي، أو الإرسال فشل وقتها.
-      </p>
-      <div class="fixmsg" id="fixMsg"></div>
-      <div id="fixList"></div>
-    </div>
-    <div class="tbl" id="salesTbl"></div>
   </div>
 
   <div class="sec" id="quizSec" data-panel="quiz">
@@ -1340,6 +1354,8 @@
           <div class="bkf"><label>من</label><select id="onStart" class="timesel" data-step="30"></select></div>
           <div class="bkf"><label>إلى</label><select id="onEnd" class="timesel" data-step="30"></select></div>
         </div>
+        <div class="bkhint">الوقت فوق للأيام كلها. يوم وقته غير؟ غيّره من تحت.</div>
+        <div class="bkhours" id="onHours"></div>
         <div class="bkf"><label>رابط Google Meet</label><input id="onMeet" type="text" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="direction:ltr;text-align:left"></div>
       </div>
       <div class="bkbox" data-fold="bk-present">
@@ -1349,6 +1365,8 @@
           <div class="bkf"><label>من</label><select id="prStart" class="timesel" data-step="30"></select></div>
           <div class="bkf"><label>إلى</label><select id="prEnd" class="timesel" data-step="30"></select></div>
         </div>
+        <div class="bkhint">الوقت فوق للأيام كلها. يوم وقته غير؟ غيّره من تحت.</div>
+        <div class="bkhours" id="prHours"></div>
         <div class="bkf"><label>العنوان</label><input id="prLoc" type="text" placeholder="برج التجارية، الدور ..، مكتب .."></div>
       </div>
       <div class="bkbox" data-fold="bk-blocked">
@@ -2447,7 +2465,7 @@ let STTAB="leads";
 function stMsg(t,ok){ const m=$("#stMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
 
 async function loadSalesTeam(){
-  try{ const r=await getSalesTeam({}); ST=(r&&r.data)||{leads:[],vouchers:[]}; renderSalesTeam(); paintNav(); }
+  try{ const r=await getSalesTeam({}); ST=(r&&r.data)||{leads:[],vouchers:[]}; renderSalesTeam(); syncTabs(); }
   catch(err){ stMsg((err&&err.message)||"تعذّر التحميل", false); }
 }
 
@@ -4236,7 +4254,7 @@ function render(){
   safe("bookings",    renderBookings);
   safe("careers",     renderCareers);
   safe("sales",       renderSalesFix);
-  safe("sales",       renderAddSale);
+  safe("addsale",     renderAddSale);
   safe("clients",     renderClients);
   safe("bookings",    renderNasBooking);
   safe("composer",    renderNewsletters);
@@ -4883,20 +4901,22 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","sales","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
+const SALES_PANELS = ["home","sales","addsale","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
 const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify"];
 /* أشواق — customer service: the diary like نورة, the client list, and the
    team's shared board. No leads, no vouchers tab, no events, no targets — and
    no money anywhere, which the server enforces by never sending it. */
-const SERVICE_PANELS = ["home","sales","clients","bookings","tasks","meetings","ideas","notify"];
+const SERVICE_PANELS = ["home","sales","addsale","clients","bookings","tasks","meetings","ideas","notify"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
 const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
   { id:"sales",       group:"sales",  icon:"💳", allowed:()=>true },
+  /* recording a sale by hand — the desk and full access */
+  { id:"addsale",     group:"sales",  icon:"➕", allowed:()=>!!(DATA&&["all","sales","service"].indexOf(DATA.role)!==-1) },
   { id:"clients",     group:"sales",  icon:"👥", allowed:()=>gated("clients") },
   { id:"bookings",    group:"clients",icon:"📅", allowed:()=>true,
     count:()=>{ const B=(DATA&&DATA.bookings)||{}; return hmTodayRows(B.list||[]).length; } },
@@ -5730,8 +5750,9 @@ function renderAddSale(){
   const sel=$("#asProduct");
   /* رفع الميزانية sits with the books for those who may record it — the
      price is typed each time, so it has none to prefill */
-  /* رفع الميزانية moved to المواعيد as a package (12 Oct 2026) */
-  const budget = false;
+  /* رفع الميزانية: a service sold like a book (13 Oct 2026) — sales and
+     full access, as the old form was */
+  const budget = DATA.role==="all" || DATA.role==="sales";
   const want = cat.length + (budget?1:0);
   if(sel && sel.options.length!==want){
     sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("")
@@ -6192,6 +6213,8 @@ function renderBookings(){
 
 function paintLaunch(B){
   const box=$("#bkLaunch"); if(!box) return;
+  /* online booking is closed for good (13 Oct 2026) — the switch is gone */
+  box.hidden=true; box.innerHTML=""; return;
   /* only the admin role gets the switch; a consultant just sees the state */
   const canLaunch = !!B.previewKey;
   /* Three states, because "open to everyone" and "closed to everyone" were
@@ -6264,6 +6287,9 @@ function paintSchedule(){
   $("#onStart").value=sc.online.start;  $("#onEnd").value=sc.online.end;
   $("#prStart").value=sc.present.start; $("#prEnd").value=sc.present.end;
   $("#onMeet").value=sc.meetUrl||"";    $("#prLoc").value=sc.location||"";
+  BK_HRS.online = Object.assign({}, sc.online.hours||{});
+  BK_HRS.present = Object.assign({}, sc.present.hours||{});
+  paintAllHours();
   /* a two-week holiday is fourteen dates in the data but should read as one
      chip, so consecutive days are collapsed into a range */
   const runs=blkRuns(sc.blocked||[]);
@@ -6286,6 +6312,67 @@ function paintSchedule(){
 }
 
 function pickedDays(host){ return Array.from(document.querySelectorAll(host+" .bkday.on")).map(b=>Number(b.dataset.d)); }
+
+/* ---- a different time on some days (13 Oct 2026) ----
+   Each worked day gets a row under its mode, prefilled with the usual time.
+   Only rows that differ from the usual time are saved as that day's own
+   hours, so changing the usual time still moves every ordinary day. */
+const BK_HRS={ online:{}, present:{} };
+const BK_HRS_IDS={ online:["#onDays","#onStart","#onEnd","#onHours"], present:["#prDays","#prStart","#prEnd","#prHours"] };
+function bkTimeOpts(v){
+  let h='';
+  for(let m=0;m<24*60;m+=30){ const t=bkHHMM(m); h+=`<option value="${t}"${t===v?" selected":""}>${t}</option>`; }
+  if(v && h.indexOf(`value="${v}"`)===-1) h=`<option value="${v}" selected>${v}</option>`+h;
+  return h;
+}
+function paintHours(mode){
+  const [daysSel,stSel,enSel,host]=BK_HRS_IDS[mode];
+  const box=$(host); if(!box) return;
+  const days=pickedDays(daysSel).sort((a,b)=>a-b);
+  const defS=$(stSel).value, defE=$(enSel).value;
+  if(!days.length){ box.innerHTML=""; return; }
+  box.innerHTML=days.map(d=>{
+    const h=BK_HRS[mode][d]||{start:defS,end:defE};
+    const own=!!BK_HRS[mode][d];
+    return `<div class="bkhrow${own?" own":""}" data-m="${mode}" data-d="${d}">
+      <b>${BK_DAYS[d]}</b>
+      <select data-h="start">${bkTimeOpts(h.start)}</select>
+      <span>إلى</span>
+      <select data-h="end">${bkTimeOpts(h.end)}</select>
+      ${own?`<button type="button" class="bkhreset" title="رجّعه للوقت المعتاد">↺</button>`:""}
+    </div>`;
+  }).join("");
+}
+function paintAllHours(){ paintHours("online"); paintHours("present"); }
+["online","present"].forEach(mode=>{
+  const [daysSel,stSel,enSel,host]=BK_HRS_IDS[mode];
+  $(host) && $(host).addEventListener("change",e=>{
+    const row=e.target.closest(".bkhrow"); if(!row) return;
+    const d=Number(row.dataset.d);
+    const st=row.querySelector('[data-h="start"]').value, en=row.querySelector('[data-h="end"]').value;
+    if(st===$(stSel).value && en===$(enSel).value) delete BK_HRS[mode][d];
+    else BK_HRS[mode][d]={start:st,end:en};
+    paintHours(mode);
+  });
+  $(host) && $(host).addEventListener("click",e=>{
+    const r=e.target.closest(".bkhreset"); if(!r) return;
+    delete BK_HRS[mode][Number(r.closest(".bkhrow").dataset.d)]; paintHours(mode);
+  });
+  /* the day buttons toggle on their own listener; repaint just after */
+  $(daysSel) && $(daysSel).addEventListener("click",()=>setTimeout(()=>paintHours(mode),0));
+  [stSel,enSel].forEach(x=>$(x) && $(x).addEventListener("change",()=>paintHours(mode)));
+});
+/** this mode's hours, ready to save: only the worked days that differ */
+function hoursToSave(mode){
+  const [daysSel,stSel,enSel]=BK_HRS_IDS[mode], days=pickedDays(daysSel), out={};
+  Object.keys(BK_HRS[mode]).forEach(k=>{
+    const d=Number(k), h=BK_HRS[mode][k];
+    if(days.indexOf(d)===-1) return;
+    if(h.start===$(stSel).value && h.end===$(enSel).value) return;
+    out[d]=h;
+  });
+  return out;
+}
 
 $("#bkWho") && $("#bkWho").addEventListener("click",e=>{ const b=e.target.closest("button[data-who]"); if(!b)return;
   BKWHO=b.dataset.who; renderBookings(); renderNasBooking(); });
@@ -6381,8 +6468,8 @@ $("#bkSave") && $("#bkSave").addEventListener("click",async()=>{
   try{
     const r=await setConsultantSchedule({
       consultantId:BKWHO,
-      online:{enabled:$("#onEn").checked,days:pickedDays("#onDays"),start:$("#onStart").value,end:$("#onEnd").value},
-      present:{enabled:$("#prEn").checked,days:pickedDays("#prDays"),start:$("#prStart").value,end:$("#prEnd").value},
+      online:{enabled:$("#onEn").checked,days:pickedDays("#onDays"),start:$("#onStart").value,end:$("#onEnd").value,hours:hoursToSave("online")},
+      present:{enabled:$("#prEn").checked,days:pickedDays("#prDays"),start:$("#prStart").value,end:$("#prEnd").value,hours:hoursToSave("present")},
       meetUrl:$("#onMeet").value.trim(), location:$("#prLoc").value.trim(),
       blocked:(BKSCHED&&BKSCHED.blocked)||[], extra:(BKSCHED&&BKSCHED.extra)||[],
       breaks:(BKSCHED&&BKSCHED.breaks)||[],
@@ -6789,7 +6876,8 @@ function bkCalFree(key){
   ["online","present"].forEach(mode=>{
     const r=BKSCHED[mode];
     if(!r || r.enabled===false || (r.days||[]).indexOf(w)===-1) return;
-    const a=bkMinOf(r.start), b=bkMinOf(r.end);
+    const hh=(r.hours&&r.hours[w])||r;
+    const a=bkMinOf(hh.start), b=bkMinOf(hh.end);
     for(let m=a; m+step<=b; m+=step){
       /* overlap, same as the server: a 90-minute session starting 13:30
          runs into a 14:00 break and is not free */

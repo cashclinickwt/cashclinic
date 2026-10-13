@@ -228,12 +228,12 @@
 
   <div class="bk-card hide" id="bkSoon" style="text-align:center">
     <div style="font-size:46px;margin-bottom:12px">🗓️</div>
-    <h2 style="justify-content:center">الحجز يفتح قريباً</h2>
+    <h2 style="justify-content:center">احجز استشارتك عن طريق الواتساب</h2>
     <p class="hint" style="margin:0 auto 20px;max-width:44ch">
-      نجهّز مواعيد الاستشارات الحين. خلّك متابعنا وبنعلن عن فتح الحجز أول ما يجهز.
+      راسلنا واتساب، وفريقنا يساعدك تختار الباقة اللي تناسب وضعك ويحجز لك موعدك ويرتب معك طريقة الدفع.
     </p>
-    <a class="pay" href="index.html#newsletter" style="display:inline-block;width:auto;padding:15px 32px;text-decoration:none">اشترك بالنشرة ونخبرك أول ما نفتح</a>
-    <p class="muted">أو راسلنا واتساب ونرتب لك موعد بشكل خاص.</p>
+    <a class="pay" href="https://wa.me/96522260820?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%AD%D8%AC%D8%B2%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9" target="_blank" rel="noopener" style="display:inline-block;width:auto;padding:15px 32px;text-decoration:none">احجز عن طريق الواتساب</a>
+    <p class="muted" dir="ltr">+965 2226 0820</p>
   </div>
 
   <!-- 1 · package -->
@@ -411,15 +411,18 @@ let OPTS = null, CLINIC = "", CONSULTANTS = [];
   try{
     /* the package travels with the request: in quiz mode the server only
        answers for somebody who arrived with one we chose */
-    const r = await getBookingOptions({ preview: PREVIEW, pkg: WANT_PKG });
+    /* a reschedule link carries its own id and token, so the server lets
+       that client through even with new bookings closed */
+    const r = await getBookingOptions(Object.assign({ preview: PREVIEW, pkg: WANT_PKG },
+      (RESCHED.id && RESCHED.token) ? { r: RESCHED.id, t: RESCHED.token } : {}));
     const data = r.data || {};
     if(data.preview) show("#bkPreview",true);
     /* not launched yet: show the holding page and stop */
     if(data.live === false && !data.preview){
       show("#bkLoading",false); show("#bkSoon",true);
-      $("#bkBadge").textContent = "قريباً";
+      $("#bkBadge").textContent = "واتساب";
       $("#bkTitle").textContent = "حجز الاستشارات";
-      $("#bkSub").textContent   = "نجهّز المواعيد الحين.";
+      $("#bkSub").textContent   = "الحجز يتم عن طريق فريقنا على الواتساب.";
       return;
     }
     OPTS = data;
