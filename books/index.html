@@ -32,6 +32,9 @@
   .bk-cover::after{content:"";position:absolute;inset:0;
     background:radial-gradient(120% 90% at 15% 0%,rgba(255,255,255,.16),transparent 60%);pointer-events:none}
   .bk-cover .mark{position:absolute;inset-inline-end:-24px;bottom:-28px;width:150px;opacity:.14}
+  /* the book's line, faded behind the cover (15 Oct 2026) — the tangle that
+     settles into a straight stem, as on the cover of أهدافي المالية */
+  .bk-cover .lines{position:absolute;left:-26px;top:-12%;height:128%;width:auto;opacity:.16;pointer-events:none;z-index:0}
   .bk-chip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
     background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);border-radius:999px;
     padding:5px 13px;font-size:12.5px;color:#fff;margin-bottom:16px}
@@ -82,6 +85,7 @@
       <a class="cc-navlink" href="../courses/index.html">دورات</a>
       <a class="cc-navlink" href="index.html" style="color:var(--cc-gold);font-weight:700;">الكتب</a>
       <a class="cc-navlink" href="../newsletters/index.html">نشراتنا</a>
+      <a class="cc-navlink cc-navclinic" href="../clinic/index.html" data-ar="عيادتي" data-en="My Clinic">عيادتي</a>
     </nav>
     <div class="cc-header-cta">
       <a class="cc-btn cc-btn-wa" href="https://wa.me/96522260820?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D8%AF%D9%88%D8%B1%D8%A7%D8%AA%20%D9%83%D8%A7%D8%B4%20%D9%83%D9%84%D9%8A%D9%86%D9%83" style="font-size:15px;padding:11px 20px;">
@@ -113,6 +117,7 @@
         <p class="sub">كتيّب تفاعلي · 45 صفحة · 16 محور</p>
         <div class="by">أ/ غالية مبارك النويف &nbsp;·&nbsp; م. سارة الهندي</div>
         <img class="mark" src="../brand/mark/mark-cream.png" alt="">
+        <img class="lines" src="../brand/elements/tangle-line-cream.png" alt="" aria-hidden="true">
       </div>
       <div class="bk-body">
         <p>مو كتيّب تقراه وتخلّصه. كل محور فيه صفحة شرح وبعدها تمرين تعبّيه بيدك — تبدأ من قصتك مع المال، وتطلع بخطة مالية مكتوبة بالأرقام والمواعيد ومصادر التمويل.</p>
@@ -138,6 +143,7 @@
         <p class="sub">من الصدمة المالية إلى بناء الثروة الحقيقية</p>
         <div class="by">أ/ غالية مبارك النويف &nbsp;·&nbsp; م. سارة الهندي</div>
         <img class="mark" src="../brand/mark/mark-cream.png" alt="">
+        <img class="lines" src="../brand/elements/tangle-line-cream.png" alt="" aria-hidden="true">
       </div>
       <div class="bk-body">
         <p>دليل عملي بالأرقام يجمع بين علم السلوكيات المالية وأدوات المحاسبة الشخصية. يعالج جذور علاقتك بالفلوس أول، وبعدها يبني معك الخطة — بنماذج مصمّمة للأسرة الخليجية.</p>
@@ -205,5 +211,6 @@
 </footer>
 
 <script src="../assets/js/nav.js"></script>
+<script src="../assets/js/hit.js" defer></script>
 </body>
 </html>

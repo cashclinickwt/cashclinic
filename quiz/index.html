@@ -114,6 +114,28 @@ img{max-width:100%;display:block}
   border-radius:999px;padding:19px 18px;background:#2F1749;color:#FFE7BC;margin-bottom:38px}
 .nxbuy:hover{filter:brightness(1.14)}
 
+/* ---- 15 Oct 2026: the result reads like the cover of أهدافي المالية ----
+   plum panel, the tangled line on the left settling into a straight stem,
+   and the same line faded behind the whole page */
+.rcard.rtop{position:relative;overflow:hidden;background:#2F1749;border:0;
+  padding-left:min(36%,270px)}
+.rtop>*:not(.rtop-art){position:relative;z-index:1}
+.rtop-art{position:absolute;inset-inline-end:auto;left:-18px;top:-6%;height:118%;width:auto;
+  opacity:.95;pointer-events:none;z-index:0}
+@media(max-width:640px){
+  .rcard.rtop{padding-left:26px}
+  .rtop-art{left:50%;transform:translateX(-50%);opacity:.16}
+}
+#result{position:relative}
+#result::before{content:"";position:fixed;top:0;bottom:0;left:-60px;width:min(46vw,420px);
+  background:url("../brand/elements/tangle-line.png") no-repeat left top/contain;
+  opacity:.07;pointer-events:none;z-index:-1}
+a.nxbook{text-decoration:none;cursor:pointer;overflow:hidden;display:flex;flex-direction:column}
+.nxbooks{grid-template-columns:1fr !important}
+.nxbook .nxlines{position:absolute;left:-30px;top:-20px;height:150%;width:auto;opacity:.10;pointer-events:none;
+  filter:brightness(.35) sepia(1) hue-rotate(-30deg)}
+.nxbook>*:not(.nxlines){position:relative}
+a.nxbuy{text-align:center;text-decoration:none;box-sizing:border-box}
 .nxpkg{background:#fff;border:2px solid #E0D3B4;border-radius:20px;padding:22px 20px}
 .nxpkg .rib{display:inline-block;background:#D3A146;color:#2F1749;font-size:12px;font-weight:700;
   border-radius:999px;padding:5px 13px;margin-bottom:12px}
@@ -510,6 +532,7 @@ function renderResult(sc, leadId){
   const diagTxt = DIAG[ sc.overall>=B2?'high':sc.overall>=B1?'mid':'low' ];
   R.innerHTML=`
     <div class="rcard rtop">
+      <img class="rtop-art" src="../brand/elements/tangle-line.png" alt="" aria-hidden="true">
       <div class="dialbox">${dial}<div class="label" style="color:${bandC(sc.overall)}">${band(sc.overall)}</div></div>
       <h2>${RESULT_TITLE}</h2>
       <p class="summary">${diagTxt}</p>
@@ -535,11 +558,19 @@ function renderResult(sc, leadId){
    ============================================ */
 
 const NX_BOOKS = [
-  { key:"dalil",  name:"دليل الوفرة المالية", accent:"#505632", rib:"الأكثر مبيعاً", was:30, now:20,
+  { key:"dalil",  name:"دليل الوفرة المالية", accent:"#505632", rib:"الكتيّب المناسب لنتيجتك", was:30, now:20, page:"book.html",
     desc:"الأساس: خطوات عملية تنقلك من التخبط للوضوح، وتبني بها وفرتك خطوة بخطوة." },
-  { key:"ahdafi", name:"كتيّب أهدافي المالية", accent:"#962E37", rib:"للتخطيط", was:35, now:25,
+  { key:"ahdafi", name:"كتيّب أهدافي المالية", accent:"#962E37", rib:"الكتيّب المناسب لنتيجتك", was:35, now:25, page:"ahdafi.html",
     desc:"تحوّل أهدافك من أمنيات لأرقام ومواعيد، وتعرف بالضبط شنو الخطوة الجاية." },
 ];
+/* the book that goes with the package the result points at (15 Oct 2026):
+   أساس الحرية → دليل الوفرة, الوفرة → أهدافي المالية */
+const NX_BOOK_FOR = { asas:"dalil", wafra:"ahdafi" };
+/** the book's own landing page, carrying what the gate already collected */
+function nxBookPage(b){
+  const L = window.__LEAD || {};
+  return b.page + "?" + new URLSearchParams({ name:L.name||"", email:L.email||"", phone:L.phone||"" }).toString();
+}
 
 /** which package this result points at */
 const NX_CUT = 60;
@@ -569,34 +600,30 @@ function nxLink(pkg, extra){
 function nextSteps(sc){
   const rec = nxRecommend(sc);
 
-  /* The books lead, because reading is the step most people will actually
-     take today. The package follows for whoever is ready for it. */
-  const books = NX_BOOKS.map((b,i)=>`
-    <label class="nxbook${i===0?" on":""}" style="--bk-a:${b.accent}">
-      <input type="radio" name="nxbook" value="${b.key}"${i===0?" checked":""}>
+  /* One book — the one that goes with their package — and it opens the
+     book's own page, so they read about it before they buy. */
+  const b = NX_BOOKS.find(x=>x.key===(NX_BOOK_FOR[rec.id]||"dalil")) || NX_BOOKS[0];
+  const books = `
+    <a class="nxbook on" href="${nxBookPage(b)}" style="--bk-a:${b.accent}">
+      <img class="nxlines" src="../brand/elements/tangle-line-cream.png" alt="" aria-hidden="true">
       <span class="rib">${esc0(b.rib)}</span>
       <h4>${esc0(b.name)}</h4>
       <p>${esc0(b.desc)}</p>
       <span class="price"><span class="now">${b.now} د.ك</span><span class="was">${b.was} د.ك</span></span>
-    </label>`).join("");
+    </a>`;
 
   return `
   <section class="nx">
     <h3>شنو خطوتك الجاية؟</h3>
-    <p class="sub">اختر اللي يناسبك الحين. تقدر تبدأ بكتيّب، أو تكلّم فريقنا واتساب ونحجز لك الباقة اللي تناسب نتيجتك.</p>
+    <p class="sub">ابدأ بالكتيّب اللي يناسب نتيجتك، أو كلّم فريقنا واتساب ونحجز لك الباقة اللي تناسبك.</p>
 
     <div class="nxbooks">${books}</div>
-    <button type="button" class="nxbuy" id="nxBookGo">اشتر الكتيّب المختار</button>
+    <a class="nxbuy" href="${nxBookPage(b)}">تعرّف على الكتيّب ←</a>
 
     <div class="nxpkg">
       <span class="rib">الأنسب لنتيجتك</span>
       <h4>${esc0(rec.name)}</h4>
       <p>${esc0(rec.why)}</p>
-      <div class="meta">
-        <span>${rec.amount} د.ك</span>
-        <span>${esc0(rec.sessions)}</span>
-        <span>نحجز لك موعدك</span>
-      </div>
       <!-- booking from the quiz goes through the team on WhatsApp (12 Oct 2026) -->
       <a class="go" href="${waLink(sc, rec.name)}" target="_blank" rel="noopener">احجز عن طريق الواتساب</a>
       <p class="nxpay">يوصل فريقنا نتيجتك كاملة، ويتواصلون معك يحجزون موعدك ويرتبون طريقة الدفع — كامل أو تقسيط مع ديمة.</p>
