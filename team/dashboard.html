@@ -74,6 +74,26 @@
   .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
   .kpi .n{font-size:28px;font-weight:800;direction:ltr;text-align:right}
   .kpi .l{font-size:13px;color:var(--muted);margin-top:2px}
+  .kpi.kpx{cursor:pointer;transition:box-shadow .15s,border-color .15s}
+  .kpi.kpx:hover{border-color:#614588;box-shadow:0 4px 14px rgba(47,23,73,.10)}
+  .kpi.kpx.on{border-color:#2F1749;box-shadow:0 0 0 2px #2F1749 inset}
+  .kpi .h{font-size:11px;color:#614588;margin-top:6px}
+  .kpxbox:empty{display:none}
+  .kpxbox{background:#F7F3FB;border:1.5px solid #614588;border-radius:14px;padding:14px 16px;margin:6px 0 14px}
+  .kpxbox h3{margin:0 0 4px;font-size:15px;color:#2F1749;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .kpxbox .kpxnote{font-size:12.5px;color:var(--muted);line-height:1.8;margin:0 0 8px}
+  .kpxbox table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:10px;overflow:hidden}
+  .kpxbox td,.kpxbox th{padding:7px 10px;border-bottom:1px solid #ECEAF1;text-align:right}
+  .kpxbox th{background:#EFE8F6;font-weight:700}
+  .kpxbox tr.sum td{font-weight:800;background:#F1ECF7;border-bottom:0}
+  .kpxbox tr.sub td{color:var(--muted);font-size:12px}
+  .kpxbox .kpxeq{font-size:14px;font-weight:700;background:#fff;border-radius:10px;padding:10px 12px;line-height:2}
+  .kpxbox .kpxwarn{color:#962E37;font-size:12.5px;margin-top:6px}
+  .kpxbox tr.grp{cursor:pointer}.kpxbox tr.grp:hover td{background:#FBF8FD}
+  .kpxbox tr.grp.open .kxarr{display:inline-block;transform:rotate(-90deg)}
+  .kpxbox{scroll-margin-top:90px}
+  .kpxflash{animation:kpxflash 1.4s ease-out}
+  @keyframes kpxflash{0%{box-shadow:0 0 0 4px rgba(97,69,136,.45)}100%{box-shadow:0 0 0 0 rgba(97,69,136,0)}}
   .tbl{background:#fff;border:1px solid var(--line);border-radius:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .tbl table{min-width:600px}
   .tbl td.num{white-space:nowrap}
@@ -85,7 +105,7 @@
   .badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#fff}
   .empty{padding:26px;text-align:center;color:var(--muted);font-size:14px}
   .muted{color:var(--muted);font-size:13px}
-  .flt{display:inline-flex;gap:6px;margin-bottom:12px}
+  .flt{display:inline-flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;max-width:100%}
   .flt button{padding:7px 16px;border:1.5px solid var(--line);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
   .flt button.on{background:var(--auber);color:#fff;border-color:var(--auber)}
   .view-btn{padding:6px 14px;border:1.5px solid var(--auber);background:#fff;border-radius:999px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--auber);white-space:nowrap}
@@ -288,6 +308,7 @@
   .rpchip{display:inline-block;color:#fff;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:999px}
   .rpmeta{font-size:12px;color:var(--muted);margin-top:5px}
   .rpwhy{font-size:13px;color:#962E37;margin-top:6px}
+  .rpone{padding:8px 0;border-top:1px solid #ECEAF1}.rpone:first-of-type{border-top:0;padding-top:0}
   .rpup{border:1.5px solid #2F1749;background:#fff;color:#2F1749;font-weight:700;border-radius:999px;padding:6px 14px;cursor:pointer;font-family:inherit}
   .rpq{padding:7px 0;border-top:1px solid #F1E2B8;font-size:13.5px}
   .clpkg{margin-top:8px;font-size:13px;color:#614588;font-weight:600}
@@ -954,12 +975,14 @@
     <div id="bkTapFees" style="margin-top:8px"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> المستحق لكل واحد</h2>
+    <div class="kpxbox" id="bkxDue"></div>
     <div class="addmsg" id="bkDueMsg"></div>
     <div id="bkDue"></div>
 
     <div id="bkUnmatched"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> حركة الشهر</h2>
+    <div class="kpxbox" id="bkxLines"></div>
     <div class="flt" id="bkTab">
       <button data-mv="open" class="on">تحت التحويل</button>
       <button data-mv="done">تم التحويل</button>
@@ -976,6 +999,7 @@
     <div id="bkLines"></div>
 
     <h2 style="font-size:17px;margin-top:22px"><span></span> التكاليف</h2>
+    <div class="kpxbox" id="bkxCosts"></div>
     <div id="bkCosts"></div>
     <div class="pfbar" style="margin-top:12px">
       <div class="f"><label>تكلفة متغيّرة — الوصف</label><input id="bkVcLabel" type="text" placeholder="مثال: قاعة كاش كلَب"></div>
@@ -3485,6 +3509,160 @@ function pfMsg(m,ok,where){
   if(!ok) el.scrollIntoView({behavior:"smooth",block:"center"});
 }
 
+/* ===== «كيف انحسب؟» — what is behind each tile in حسابات الشركة =====
+   Everything here is added up on the page from the same rows the server
+   sent (BK.lines, BK.costs, BK.earned), so the sum shown is the sum of what
+   is listed — and if it ever disagrees with the tile, it says so in red
+   instead of quietly matching. */
+let BKX="";
+const r3=(n)=>Math.round((Number(n)||0)*1000)/1000;
+const KX_TARGET={ gross:"#bkxLines", fees:"#bkxLines", company:"#bkxLines", shares:"#bkxDue", costs:"#bkxCosts", net:"#bkxCosts" };
+const KX_KINDS=[["book","الكتيّبات"],["consult","الاستشارات"],["call","الاتصال السريع"],["course","الورش والدورات"],
+                ["contract","العقود"],["budget","رفع للميزانية"]];
+function kxKindName(k){ const f=KX_KINDS.find(x=>x[0]===k); return f?f[1]:(PF_KIND[k]||k||"أخرى"); }
+function kxNameOf(id){
+  if(id==="company") return "الشركة";
+  if(id==="external") return "مستشار خارجي";
+  return (((BK.members||[]).concat(PX_HISTORY)).find(m=>m.id===id)||{}).name||id;
+}
+/* group the month's lines by kind, summing one number from each */
+function kxByKind(pick, keep){
+  const g={};
+  (BK.lines||[]).forEach(l=>{
+    if(keep && !keep(l)) return;
+    const v=Number(pick(l))||0;
+    const k=l.kind||"other";
+    g[k]=g[k]||{ n:0, sum:0 }; g[k].n++; g[k].sum+=v;
+  });
+  const order=KX_KINDS.map(x=>x[0]);
+  return Object.keys(g).sort((a,b)=>(order.indexOf(a)+99*(order.indexOf(a)<0))-(order.indexOf(b)+99*(order.indexOf(b)<0)))
+    .map(k=>({ k, name:kxKindName(k), n:g[k].n, sum:r3(g[k].sum) }));
+}
+function kxTable(head, rows, total, totalLabel){
+  return `<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}
+    <tr class="sum"><td>${totalLabel||"المجموع"}</td>${head.length>2?`<td></td>`.repeat(head.length-2):""}<td class="num">${kwd(total)}</td></tr>
+  </tbody></table>`;
+}
+function kxCheck(sum, tile){
+  return Math.abs(r3(sum)-r3(tile))>0.001
+    ? `<div class="kpxwarn">⚠️ مجموع البنود ${esc(kwd(sum))} والمربع ${esc(kwd(tile))} — الفرق ${esc(kwd(r3(tile)-r3(sum)))}. قول لنا نشيك عليه.</div>` : "";
+}
+function kxHead(title){ return `<h3><span>${title}</span><button class="pfbtn" data-kxclose="1" style="padding:3px 10px;font-size:12px">سكّر ✕</button></h3>`; }
+function bkExplainHtml(k){
+  const t=BK.totals||{}, lines=BK.lines||[];
+  if(k==="gross"){
+    const rows=kxByKind(l=>l.amount);
+    const sum=rows.reduce((a,r)=>a+r.sum,0);
+    const nOut=lines.filter(l=>l.excluded).length;
+    const unm=r3((BK.unmatched||[]).reduce((a,l)=>a+(Number(l.net!=null?l.net:l.amount)||0),0));
+    const off=r3(lines.reduce((a,l)=>a+(l.manual?(Number(l.costOff)||0):0),0));
+    return kxHead("📥 إجمالي الدخل — كل اللي انباع هالشهر")+
+      `<p class="kpxnote">مجموع مبالغ كل عمليات البيع بهالشهر قبل أي خصم. الجلسة الثانية من الباقة والحجز بقسيمة ما ينحسبون مرة ثانية (انحسبوا لما انباعوا)، والعملية المستبعدة تنحسب صفر.</p>`+
+      kxTable(["النوع","عدد العمليات","المبلغ"], rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.n)}</td><td class="num">${kwd(r.sum)}</td></tr>`), sum, "إجمالي الدخل")+
+      (nOut?`<div class="kpxnote" style="margin-top:6px">منها ${fmt(nOut)} عملية مستبعدة — محسوبة صفر.</div>`:"")+
+      `<div class="kpxeq" style="margin-top:8px">وين راح الدخل؟<br>
+        حصص الفريق ${esc(kwd(t.shares))} + حصة كاش كلينيك ${esc(kwd(t.company))}${unm?` + ما انقسم (بدون قاعدة) ${esc(kwd(unm))}`:""}${off?` + مصاريف العقود قبل القسمة ${esc(kwd(off))}`:""}
+        = <b>${esc(kwd(r3(Number(t.shares)+Number(t.company)+unm+off)))}</b></div>`+
+      kxCheck(sum, t.gross);
+  }
+  if(k==="fees"){
+    const fee=l=>l.payFee!=null?l.payFee:(l.manual?0:l.fee);
+    const rows=kxByKind(fee, l=>Number(fee(l))>0);
+    const sum=rows.reduce((a,r)=>a+r.sum,0);
+    return kxHead("💳 رسوم الدفع — اللي ياخذه Tap / ديمة")+
+      `<p class="kpxnote">رسوم بوابة الدفع على كل عملية انْدفعت أونلاين (البطاقة المحلية ٢٫٥٪ + ٠٫١٠٠). هالمبلغ داخل ضمن «التكاليف» على الشركة — مو مخصوم من حصص الفريق.</p>`+
+      kxTable(["النوع","عمليات عليها رسوم","الرسوم"], rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.n)}</td><td class="num">${kwd(r.sum)}</td></tr>`), sum, "رسوم الدفع")+
+      ((Number(BK.feeGuessed)||0)?`<div class="kpxnote" style="margin-top:6px">${fmt(BK.feeGuessed)} طلب ما نعرف طريقة دفعه — محسوب كبطاقة محلية.</div>`:"")+
+      kxCheck(sum, t.fees);
+  }
+  if(k==="company"){
+    const rows=kxByKind(l=>(l.shares||{}).company, l=>Number((l.shares||{}).company)>0);
+    const sum=rows.reduce((a,r)=>a+r.sum,0);
+    return kxHead("🏢 حصة كاش كلينيك — نصيب الشركة من البيع")+
+      `<p class="kpxnote">نسبة الشركة من كل عملية حسب قاعدة القسمة اللي عليها. هذي قبل التكاليف — الصافي = هذي − تكاليف الشركة.</p>`+
+      kxTable(["النوع","عدد العمليات","حصة الشركة"], rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.n)}</td><td class="num">${kwd(r.sum)}</td></tr>`), sum, "حصة كاش كلينيك")+
+      ((BK.unmatched||[]).length?`<div class="kpxwarn">${fmt(BK.unmatched.length)} عملية بدون قاعدة — ما انقسمت، فما دخلت هني ولا بحصص الفريق.</div>`:"")+
+      kxCheck(sum, t.company);
+  }
+  if(k==="shares"){
+    const e=BK.earned||{};
+    const n={}; lines.forEach(l=>Object.keys(l.shares||{}).forEach(w=>{ n[w]=(n[w]||0)+1; }));
+    const ids=Object.keys(e).filter(w=>w!=="company" && Math.abs(Number(e[w])||0)>0.0005)
+      .sort((a,b)=>(Number(e[b])||0)-(Number(e[a])||0));
+    const sum=ids.reduce((a,w)=>a+(Number(e[w])||0),0);
+    return kxHead("👥 حصص الفريق — نصيب كل واحد من البيع")+
+      `<p class="kpxnote">مجموع حصة كل شخص من عمليات هالشهر حسب القواعد. الراتب والمكافأة مو هني — هذيلا داخلين بالتكاليف. «المستحق» تحت يختلف: هو اللي باقي ما تحوّل، مع الراتب، وناقص أي تكلفة عليه.</p>`+
+      kxTable(["الشخص","عدد العمليات","حصته"], ids.map(w=>`<tr><td><b>${esc(kxNameOf(w))}</b></td><td class="num">${fmt(n[w]||0)}</td><td class="num">${kwd(e[w])}</td></tr>`), sum, "حصص الفريق")+
+      kxCheck(sum, t.shares);
+  }
+  if(k==="costs"){
+    const BAS=[["monthly","ثابتة شهرية"],["yearly","ثابتة سنوية (١/١٢ كل شهر)"],["variable","متغيّرة هالشهر"],["salary","الرواتب"],
+               ["fees","رسوم الدفع"],["line","مصاريف على حجوزات"],["bonus","المكافآت"]];
+    const cs=BK.costs||[];
+    const groups=BAS.map(([b,label])=>({ label, items:cs.filter(c=>c.basis===b) }))
+      .concat([{ label:"أخرى", items:cs.filter(c=>!BAS.some(x=>x[0]===c.basis)) }])
+      .filter(g=>g.items.length);
+    const sum=cs.reduce((a,c)=>a+(Number(c.kwd)||0),0);
+    const by=BK.costsBy||{};
+    const ppl=Object.keys(by).filter(w=>Number(by[w])>0);
+    return kxHead("🧾 التكاليف — كل اللي طلع هالشهر")+
+      `<p class="kpxnote">كل بند بالجدول تحت محسوب بالدينار لهالشهر. اضغط على أي مجموعة تشوف بنودها.</p>`+
+      `<table><thead><tr><th>المجموعة</th><th>عدد البنود</th><th>المبلغ</th></tr></thead><tbody>`+
+      groups.map((g,i)=>{
+        const gs=r3(g.items.reduce((a,c)=>a+(Number(c.kwd)||0),0));
+        return `<tr class="grp" data-kxg="${i}"><td><span class="kxarr">◂</span> ${esc(g.label)}</td><td class="num">${fmt(g.items.length)}</td><td class="num"><b>${kwd(gs)}</b></td></tr>`+
+          g.items.map(c=>`<tr class="sub" data-kxof="${i}" hidden><td style="padding-inline-start:28px">${esc(c.label)}${c.from&&c.from!=="company"?` <span class="pfrule">· على ${esc(kxNameOf(c.from))}</span>`:""}</td><td></td><td class="num">${kwd(c.kwd)}</td></tr>`).join("");
+      }).join("")+
+      `<tr class="sum"><td>التكاليف</td><td></td><td class="num">${kwd(sum)}</td></tr></tbody></table>`+
+      (ppl.length?`<div class="kpxeq" style="margin-top:8px">منها على الشركة <b>${esc(kwd(t.costsCompany))}</b>، وعلى أشخاص (تنخصم من مستحقهم):
+        ${ppl.map(w=>`${esc(kxNameOf(w))} ${esc(kwd(by[w]))}`).join("، ")}</div>`:"")+
+      kxCheck(sum, t.costs);
+  }
+  if(k==="net"){
+    const cc=t.costsCompany!=null?t.costsCompany:t.costs;
+    const calc=r3(Number(t.company)-Number(cc));
+    return kxHead("🧮 الصافي بعد كل شي")+
+      `<p class="kpxnote">اللي يبقى للشركة: حصتها من البيع ناقص تكاليفها. حصص الفريق مو داخلة لأنها مو فلوس الشركة أصلاً، والتكاليف اللي على أشخاص تنخصم منهم مو من الشركة.</p>`+
+      `<div class="kpxeq">حصة كاش كلينيك ${esc(kwd(t.company))}<br>
+        − تكاليف الشركة ${esc(kwd(cc))}${Number(t.costsPeople)>0?` <span class="muted" style="font-weight:400">(التكاليف ${esc(kwd(t.costs))} ناقص ${esc(kwd(t.costsPeople))} على أشخاص)</span>`:""}<br>
+        = <b style="color:${calc<0?"#962E37":"#128C4A"}">${esc(kwd(calc))}</b></div>`+
+      (calc<0?`<div class="kpxwarn">بالسالب: تكاليف الشركة هالشهر أكثر من حصتها من البيع.</div>`:"")+
+      kxCheck(calc, t.net);
+  }
+  return "";
+}
+function bkExplainPaint(scroll){
+  ["#bkxDue","#bkxLines","#bkxCosts"].forEach(sel=>{ const el=$(sel); if(el) el.innerHTML=""; });
+  if(!BKX || !BK) return;
+  const box=$(KX_TARGET[BKX]); if(!box) return;
+  box.innerHTML=bkExplainHtml(BKX);
+  if(scroll){
+    box.scrollIntoView({ behavior:"smooth", block:"start" });
+    box.classList.remove("kpxflash"); void box.offsetWidth; box.classList.add("kpxflash");
+  }
+}
+function bkExplainOpen(k){
+  BKX = BKX===k ? "" : k;
+  /* repaint only the tiles (to flip their ▼/▲) and the box — the rest of the page is untouched */
+  $("#bkKpisMoney").querySelectorAll(".kpx").forEach(el=>{
+    const on=el.dataset.kx===BKX; el.classList.toggle("on",on);
+    const h=el.querySelector(".h"); if(h) h.textContent=on?"▲ سكّر التفاصيل":"▼ كيف انحسب؟";
+  });
+  bkExplainPaint(!!BKX);
+  if(!BKX) $("#bkKpisMoney").scrollIntoView({ behavior:"smooth", block:"center" });
+}
+document.addEventListener("click", e=>{
+  const t=e.target.closest("#bkKpisMoney .kpx"); if(t) return bkExplainOpen(t.dataset.kx);
+  if(e.target.closest(".kpxbox [data-kxclose]")) return bkExplainOpen(BKX);
+  const g=e.target.closest(".kpxbox tr.grp");
+  if(g){ const open=!g.classList.contains("open"); g.classList.toggle("open",open);
+    g.closest("table").querySelectorAll(`tr[data-kxof="${g.dataset.kxg}"]`).forEach(r=>r.hidden=!open); }
+});
+document.addEventListener("keydown", e=>{
+  const t=e.target.closest && e.target.closest("#bkKpisMoney .kpx");
+  if(t && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); bkExplainOpen(t.dataset.kx); }
+});
+
 function renderBooks(){
   if(!BK || !$("#bkKpisMoney")) return;
   /* which build of the backend answered — so a partial deploy is visible */
@@ -3516,13 +3694,18 @@ function renderBooks(){
   if(document.activeElement!==$("#bkFx")) $("#bkFx").value=BK.usdRate||"";
   const t=BK.totals||{};
 
+  /* every tile opens how it was worked out, inside the section it comes from */
+  const kpx=(k,n,label,style)=>`<div class="kpi kpx${BKX===k?" on":""}" data-kx="${k}" role="button" tabindex="0"
+      title="اضغط تشوف كيف انحسب"${style?` style="${style}"`:""}><div class="n">${kwd(n)}</div><div class="l">${label}</div>
+      <div class="h">${BKX===k?"▲ سكّر التفاصيل":"▼ كيف انحسب؟"}</div></div>`;
   $("#bkKpisMoney").innerHTML=
-    `<div class="kpi"><div class="n">${kwd(t.gross)}</div><div class="l">إجمالي الدخل</div></div>`+
-    `<div class="kpi"><div class="n">${kwd(t.fees)}</div><div class="l">رسوم الدفع</div></div>`+
-    `<div class="kpi"><div class="n">${kwd(t.shares)}</div><div class="l">حصص الفريق</div></div>`+
-    `<div class="kpi"><div class="n">${kwd(t.company)}</div><div class="l">حصة كاش كلينيك</div></div>`+
-    `<div class="kpi"><div class="n">${kwd(t.costs)}</div><div class="l">التكاليف</div></div>`+
-    `<div class="kpi" style="${(t.net||0)<0?"outline:2px solid #962E37":""}"><div class="n">${kwd(t.net)}</div><div class="l">الصافي بعد كل شي</div></div>`;
+    kpx("gross",t.gross,"إجمالي الدخل")+
+    kpx("fees",t.fees,"رسوم الدفع")+
+    kpx("shares",t.shares,"حصص الفريق")+
+    kpx("company",t.company,"حصة كاش كلينيك")+
+    kpx("costs",t.costs,"التكاليف")+
+    kpx("net",t.net,"الصافي بعد كل شي",(t.net||0)<0?"outline:2px solid #962E37":"");
+  bkExplainPaint();
 
   /* who is owed what, and whether it has gone out */
   const paid=(BK.payout&&BK.payout.people)||{};
@@ -6082,65 +6265,80 @@ document.addEventListener("change", e=>{
   if(out) out.textContent=[...fin.files].map(f=>f.name).join("، ");
 });
 /* ================= SESSION REPORTS =================
-   After a session its consultant (or full access) uploads a PDF. It waits
-   for غالية; approved, the client gets an email and finds it in عيادتي.
-   Rejected, it comes back with her reason. Replace or delete any time — a
-   replacement waits for approval again. */
+   After a session each consultant on it (or full access) can upload their own
+   PDF — غالية and سارة may each write one on the same client, up to 4.
+   Each report waits for its own approval; approved, the client gets an email
+   and finds it in عيادتي. Rejected, it comes back with the reason. Only the
+   uploader (or full access) replaces or deletes a report — a replacement
+   waits for approval again. */
 const RP_STATE={ pending:["بانتظار موافقة غالية","#A87A2A"], approved:["معتمد ✓ وصل للعميل","#2F8789"], rejected:["مرفوض","#962E37"] };
+const RP_MAX=4;
 function bkEnded(b){ return ((Date.parse(b.startIso||"")||0) + (Number(b.minutes)||60)*60000) < Date.now(); }
+function bkReports(b){ return Array.isArray(b.reports) ? b.reports : (b.report ? [Object.assign({ id:"" }, b.report, { canApprove:!!b.canApprove, canChange:true })] : []); }
 function reportBlock(b){
   if(b.status==="cancelled" || !b.canReport || !bkEnded(b)) return "";
-  const r=b.report, id=esc(b.id);
-  if(!r) return `<div class="rpbox"><button class="rpup" data-rup="${id}">⬆️ ارفع تقرير الجلسة (PDF)</button></div>`;
-  const st=(RP_STATE[r.status]||RP_STATE.pending).slice();
-  if(r.status==="pending") st[0]="بانتظار موافقة "+(r.approverName||"غالية");
+  const list=bkReports(b), id=esc(b.id);
+  const add=list.length<RP_MAX
+    ? `<button class="rpup" data-rup="${id}">⬆️ ${list.length?"أضف تقرير ثاني (PDF)":"ارفع تقرير الجلسة (PDF)"}</button>` : "";
+  if(!list.length) return `<div class="rpbox">${add}</div>`;
   return `<div class="rpbox">
-    <span class="rpchip" style="background:${st[1]}">📄 التقرير: ${st[0]}</span>
-    ${r.status==="rejected"&&r.reason?`<div class="rpwhy">سبب الرفض: ${esc(r.reason)}</div>`:""}
-    <div class="rpmeta">${esc(r.name)} · رفعه ${esc(r.byName)} · ${esc(dt(r.ms))}</div>
-    <div class="bkacts" style="margin-top:6px">
-      <button data-ropen="${id}">افتح</button>
-      ${b.canApprove&&r.status!=="approved"?`<button data-rok="${id}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل للعميل</button>`:""}
-      ${b.canApprove&&r.status==="pending"?`<button data-rno="${id}">ارفض</button>`:""}
-      <button data-rup="${id}">بدّل الملف</button>
-      <button class="no" data-rdel="${id}">احذف</button>
-    </div></div>`;
+    <div class="rpmeta" style="margin-bottom:6px"><b>📄 تقارير الجلسة (${fmt(list.length)})</b></div>
+    ${list.map(r=>{
+      const st=(RP_STATE[r.status]||RP_STATE.pending).slice();
+      if(r.status==="pending") st[0]="بانتظار موافقة "+(r.approverName||"غالية");
+      const rid=esc(r.id||"");
+      return `<div class="rpone">
+        <span class="rpchip" style="background:${st[1]}">${esc(r.byName||"")} · ${st[0]}</span>
+        ${r.status==="rejected"&&r.reason?`<div class="rpwhy">سبب الرفض: ${esc(r.reason)}</div>`:""}
+        <div class="rpmeta">${esc(r.name)} · ${esc(dt(r.ms))}</div>
+        <div class="bkacts" style="margin-top:6px">
+          <button data-ropen="${id}" data-rid="${rid}">افتح</button>
+          ${r.canApprove&&r.status==="pending"?`<button data-rok="${id}" data-rid="${rid}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل للعميل</button>
+          <button data-rno="${id}" data-rid="${rid}">ارفض</button>`:""}
+          ${r.canChange?`<button data-rup="${id}" data-rid="${rid}">بدّل الملف</button>
+          <button class="no" data-rdel="${id}" data-rid="${rid}">احذف</button>`:""}
+        </div></div>`;
+    }).join("")}
+    ${add?`<div style="margin-top:8px">${add}</div>`:""}
+  </div>`;
 }
-/* the approver's queue — غالية's, or سارة's for عبدالعزيز's reports */
+/* the approver's queue — غالية's, or سارة's for عبدالعزيز's reports.
+   One line per waiting REPORT, so two reports on one client are two lines. */
 function renderReportQueue(){
   const box=$("#rpQueue"); if(!box) return;
   const list=(DATA.bookings && DATA.bookings.list)||[];
-  /* غالية's own queue — the server marks the rows she may approve */
-  const wait=list.filter(b=>b.canApprove&&b.report&&b.report.status==="pending");
+  const wait=[];
+  list.forEach(b=>bkReports(b).forEach(r=>{ if(r.canApprove&&r.status==="pending") wait.push({ b, r }); }));
   if(!wait.length){ box.innerHTML=""; return; }
   box.innerHTML=`<div class="pfnudge" style="background:#FFF6E3;border-color:#D3A146">
     <h3>📄 ${fmt(wait.length)} ${wait.length===1?"تقرير ينتظر":"تقارير تنتظر"} موافقتك</h3>
-    ${wait.map(b=>`<div class="rpq">
-      <b>${esc(b.name)}</b> · ${esc(b.packageName||"استشارة")} · ${esc(b.consultantName||"")} · رفعه ${esc(b.report.byName)}
+    ${wait.map(({b,r})=>`<div class="rpq">
+      <b>${esc(b.name)}</b> · ${esc(b.packageName||"استشارة")} · ${esc(b.consultantName||"")} · رفعه ${esc(r.byName)}
       <span class="bkacts" style="display:inline-flex;margin-inline-start:8px">
-        <button data-ropen="${esc(b.id)}">افتح</button>
-        <button data-rok="${esc(b.id)}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل</button>
-        <button data-rno="${esc(b.id)}">ارفض</button>
+        <button data-ropen="${esc(b.id)}" data-rid="${esc(r.id||"")}">افتح</button>
+        <button data-rok="${esc(b.id)}" data-rid="${esc(r.id||"")}" style="border-color:#2F8789;color:#2F8789">اعتمد وأرسل</button>
+        <button data-rno="${esc(b.id)}" data-rid="${esc(r.id||"")}">ارفض</button>
       </span></div>`).join("")}
   </div>`;
 }
-let RP_ID="";
+let RP_ID="", RP_RID="";
 document.addEventListener("click", async (e)=>{
   const b=e.target.closest("button[data-rup],button[data-ropen],button[data-rdel],button[data-rok],button[data-rno]"); if(!b) return;
-  if(b.dataset.rup){ RP_ID=b.dataset.rup; const f=$("#rpFile"); f.value=""; f.click(); return; }
-  if(b.dataset.ropen) return ccOpenFile(openReport, { orderId:b.dataset.ropen }, b);
+  const rid=b.dataset.rid||"";
+  if(b.dataset.rup){ RP_ID=b.dataset.rup; RP_RID=rid; const f=$("#rpFile"); f.value=""; f.click(); return; }
+  if(b.dataset.ropen) return ccOpenFile(openReport, { orderId:b.dataset.ropen, reportId:rid }, b);
   const id=b.dataset.rdel||b.dataset.rok||b.dataset.rno, was=b.textContent;
   try{
     if(b.dataset.rdel){
-      if(!confirm("تحذف التقرير؟ إذا كان معتمد، بيختفي من عيادتي العميل.")) return;
-      b.disabled=true; b.textContent="…"; await removeReport({ orderId:id }); bkMsg("انحذف التقرير",true);
+      if(!confirm("تحذف هذا التقرير؟ إذا كان معتمد، بيختفي من عيادتي العميل.")) return;
+      b.disabled=true; b.textContent="…"; await removeReport({ orderId:id, reportId:rid }); bkMsg("انحذف التقرير",true);
     } else if(b.dataset.rok){
       b.disabled=true; b.textContent="…";
-      const d=(await reviewReport({ orderId:id, approve:true })).data||{};
+      const d=(await reviewReport({ orderId:id, reportId:rid, approve:true })).data||{};
       bkMsg(d.mailed?"اعتُمد التقرير ✅ وانرسل للعميل إيميل إنه جاهز في عيادتي":"اعتُمد التقرير ✅ — بس الإيميل ما انرسل (ما في إيميل أو صار خطأ)", !!d.mailed);
     } else {
       const why=prompt("سبب الرفض — يوصل للمستشار:"); if(!why||why.trim().length<3) return;
-      b.disabled=true; b.textContent="…"; await reviewReport({ orderId:id, approve:false, reason:why.trim() }); bkMsg("انرفض التقرير ورجع للمستشار",true);
+      b.disabled=true; b.textContent="…"; await reviewReport({ orderId:id, reportId:rid, approve:false, reason:why.trim() }); bkMsg("انرفض التقرير ورجع للمستشار",true);
     }
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"صار خطأ",false); }
@@ -6153,13 +6351,13 @@ $("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
   try{
     bkMsg("جاري رفع التقرير… 0%",true);
     const up=await ccUpload(file, pct=>bkMsg(`جاري رفع التقرير… ${pct}%`,true));
-    const d=(await attachReport({ orderId:RP_ID, file:up })).data||{};
+    const d=(await attachReport(Object.assign({ orderId:RP_ID, file:up }, RP_RID?{ replaceId:RP_RID }:{}))).data||{};
     bkMsg(d.status==="approved"
       ? (d.mailed?"انرفع التقرير ✅ ووصل للعميل إيميل إنه جاهز في عيادتي":"انرفع التقرير ✅ وصار بعيادتي العميل — بس الإيميل ما انرسل")
       : `انرفع التقرير ✅ — ينتظر موافقة ${d.approverName||"غالية"} قبل ما يشوفه العميل`, true);
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"تعذّر رفع التقرير",false); }
-  finally{ RP_ID=""; }
+  finally{ RP_ID=""; RP_RID=""; }
 });
 function renderBookings(){
   const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;

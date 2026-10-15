@@ -319,7 +319,8 @@ function render(D){
   h+=sec("استشاراتي", D.consults, c=>`<div class="ck-item"><div class="t">${esc(c.what)}${c.upcoming?'<span class="ck-tag up">جاية</span>':'<span class="ck-tag done">خلصت</span>'}</div>
       <div class="m">${esc(c.clinic)} · ${esc(c.mode)}</div>
       ${c.sessions.map(s=>`<div class="m">• ${esc(s.label)} — مع ${esc(s.with)}${s.date?` · ${esc(s.date)} ${esc(s.time)}`:""}${s.done?" ✓":""}</div>`).join("")}
-      ${c.report?`<button class="ck-report" data-report="${esc(c.id)}">📄 افتح تقرير جلستك</button>`:""}</div>`,
+      ${(Array.isArray(c.reports)?c.reports:(c.report?[Object.assign({id:""},c.report)]:[])).map((r,i,all)=>
+        `<button class="ck-report" data-report="${esc(c.id)}" data-rid="${esc(r.id||"")}">📄 ${all.length>1?`تقرير ${esc(r.byName||String(i+1))}`:"افتح تقرير جلستك"}</button>`).join(" ")}</div>`,
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
   h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
@@ -364,7 +365,7 @@ document.addEventListener("click", async (e)=>{
   const b=e.target.closest("button[data-report]"); if(!b) return;
   const was=b.textContent; b.disabled=true; b.textContent="جاري الفتح…";
   try{
-    const d=(await getMyReport({ orderId:b.dataset.report })).data||{};
+    const d=(await getMyReport({ orderId:b.dataset.report, reportId:b.dataset.rid||"" })).data||{};
     if(!d.url) throw new Error("ما قدرنا نفتح التقرير");
     window.open(d.url, "_blank", "noopener");
   }catch(err){ alert((err&&err.message)||"ما قدرنا نفتح التقرير — كلّمنا واتساب"); }
