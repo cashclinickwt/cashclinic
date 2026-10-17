@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>متابعة كاش · عيادتي</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-sans:"IBM Plex Sans Arabic",system-ui,"Segoe UI",sans-serif;
+  --fw-thin:100;--fw-extralight:200;--fw-light:300;--fw-regular:400;--fw-medium:500;--fw-semibold:600;--fw-bold:700;
+  --text-2xs:.6875rem;--text-xs:.75rem;--text-sm:.875rem;--text-md:1rem;
+  --text-lg:1.125rem;--text-xl:1.375rem;--text-2xl:1.75rem;--text-3xl:2.25rem;--text-4xl:3rem;
+  --tracking-tight:-.02em;--tracking-caps:.14em;
+  --indigo-50:#f3eff8;--indigo-100:#e6ddef;--indigo-200:#c9b8d8;--indigo-300:#a68fbd;
+  --indigo-400:#7d5f9c;--indigo-500:#543279;--indigo-600:#3f2261;--indigo-700:#2f1749;
+  --indigo-800:#231137;--indigo-900:#1a0c29;
+  --teal-50:#eef8f8;--teal-100:#d3ecec;--teal-200:#a8dada;--teal-300:#7bc8c8;
+  --teal-400:#55b8b8;--teal-500:#3eadad;--teal-600:#2f8f8f;--teal-700:#256f6f;
+  --wine-50:#f8ebec;--wine-100:#f0d5d8;--wine-200:#dda3a9;--wine-300:#c8757d;
+  --wine-400:#af4a54;--wine-500:#962e37;--wine-600:#7c262e;
+  --amber-50:#fdf4e3;--amber-400:#d69223;--amber-600:#a56b12;
+  --ice-50:#f4fafc;--ice-100:#e0eff4;--ice-200:#c6e2ec;--ice-300:#a5d1e0;
+  --n-0:#fff;--n-50:#f6f8fa;--n-100:#eef2f5;--n-200:#dde4ea;--n-300:#c3ced7;
+  --n-400:#9aa7b4;--n-500:#6b7884;--n-600:#4c5661;--n-700:#333b44;--n-800:#1f252c;--n-900:#12161b;
+  --gradient-brand:linear-gradient(135deg,#962e37 0%,#2f1749 52%,#3eadad 100%);
+  --brand:var(--indigo-700);--accent:var(--teal-500);
+  --text-strong:var(--indigo-700);--text-body:var(--n-700);--text-muted:var(--n-500);
+  --border:var(--n-200);--border-strong:var(--n-300);
+  --r-xs:6px;--r-sm:10px;--r-md:14px;--r-lg:20px;--r-xl:28px;--r-pill:999px;
+  --sh-xs:0 1px 2px rgba(47,23,73,.06);
+  --sh-sm:0 2px 8px rgba(47,23,73,.07);
+  --sh-md:0 8px 24px rgba(47,23,73,.10);
+  --sh-brand:0 16px 40px rgba(47,23,73,.28);
+}
+:root{padding-bottom:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;font-family:var(--font-sans);color:var(--text-body);
+  background:var(--ice-50);
+  background-image:radial-gradient(1200px 520px at 88% -8%,rgba(62,173,173,.13),transparent 62%),radial-gradient(900px 460px at 4% 4%,rgba(150,46,55,.07),transparent 60%);
+  background-attachment:fixed;
+  font-size:var(--text-sm);line-height:1.9;direction:rtl;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;color:var(--text-strong);font-weight:var(--fw-semibold);line-height:1.4;}
+p{margin:0 0 .6em;}
+a{color:var(--teal-600);}
+button{font-family:inherit;}
+.en{direction:ltr;text-align:left;}
+.shell{display:flex;min-height:100vh;}
+.rail{
+  width:236px;flex:none;background:var(--indigo-900);color:#fff;
+  padding:calc(26px + env(safe-area-inset-top,0px)) 0 20px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.rail-brand{padding:0 24px 22px;border-bottom:1px solid rgba(255,255,255,.10);}
+.rail-mark{width:34px;height:34px;border-radius:9px;background:var(--gradient-brand);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.rail-mark svg{width:19px;height:19px;}
+.rail-brand h1{color:#fff;font-size:var(--text-lg);font-weight:var(--fw-medium);letter-spacing:var(--tracking-tight);}
+.rail-brand span{display:block;font-size:var(--text-2xs);color:rgba(255,255,255,.52);letter-spacing:.02em;margin-top:2px;}
+.nav{list-style:none;margin:16px 0 0;padding:0 12px;flex:1;}
+.nav li{margin-bottom:2px;}
+.nav li.nav-group{font-size:var(--text-2xs);color:rgba(255,255,255,.4);padding:14px 12px 6px;letter-spacing:.03em;}
+.nav li.nav-group:first-child{padding-top:0;}
+.nav button{
+  width:100%;display:flex;align-items:center;gap:11px;background:none;border:0;
+  color:rgba(255,255,255,.66);padding:9px 12px;border-radius:var(--r-sm);
+  font-size:var(--text-sm);cursor:pointer;text-align:right;transition:.16s;
+}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav button.on{background:rgba(62,173,173,.16);color:#fff;}
+.nav button.on .nav-num{color:var(--teal-300);}
+.nav-num{font-size:var(--text-md);font-weight:var(--fw-extralight);color:rgba(255,255,255,.34);min-width:22px;letter-spacing:-.02em;direction:ltr;unicode-bidi:isolate;text-align:center;}
+.rail-foot{padding:14px 24px 0;border-top:1px solid rgba(255,255,255,.10);font-size:var(--text-2xs);color:rgba(255,255,255,.4);line-height:1.8;}
+.main{flex:1;min-width:0;padding:30px 40px 80px;max-width:1180px;}
+.sec-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:6px;}
+.sec-num{font-weight:var(--fw-extralight);font-size:52px;line-height:.8;color:var(--indigo-300);letter-spacing:-.03em;flex:none;direction:ltr;unicode-bidi:isolate;}
+.sec-head h2{font-size:var(--text-2xl);font-weight:var(--fw-extralight);letter-spacing:var(--tracking-tight);}
+.eyebrow{font-size:var(--text-2xs);font-weight:var(--fw-semibold);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--teal-600);display:block;margin-bottom:3px;}
+.lead{color:var(--text-muted);max-width:76ch;margin:2px 0 26px 0;padding-right:70px;}
+.panel{display:none;}
+.panel.on{display:block;animation:fade .28s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--ice-100);border:0;border-radius:var(--r-lg);padding:18px 22px;}
+.card.pale{background:var(--ice-50);}
+.sheet{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-sm);padding:22px 24px;margin-bottom:20px;}
+.sheet > h3{font-size:var(--text-lg);font-weight:var(--fw-medium);margin-bottom:4px;}
+.sheet > .hint{color:var(--text-muted);font-size:var(--text-xs);margin-bottom:16px;}
+.hint{color:var(--text-muted);font-size:var(--text-xs);}
+.grid{display:grid;gap:18px;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+.hero{position:relative;overflow:hidden;background:var(--gradient-brand);color:#fff;border-radius:var(--r-xl);box-shadow:var(--sh-brand);padding:26px 30px;margin-bottom:24px;}
+.hero h3,.hero p,.hero strong{color:#fff;}
+.hero p{color:rgba(255,255,255,.9);margin:0;}
+.hero .wm{position:absolute;left:-30px;bottom:-60px;width:190px;opacity:.10;}
+table{border-collapse:collapse;width:100%;background:transparent;font-size:var(--text-sm);}
+th{color:var(--brand);text-align:right;border-bottom:1.5px solid var(--brand);font-weight:var(--fw-semibold);padding:8px 10px;font-size:var(--text-xs);white-space:nowrap;}
+td{border-bottom:1px solid var(--border);padding:7px 10px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:0;}
+td:first-child{color:var(--brand);font-weight:var(--fw-medium);}
+.tw{overflow-x:auto;}
+tfoot td{border-top:1.5px solid var(--brand);border-bottom:0;font-weight:var(--fw-semibold);color:var(--brand);padding-top:9px;}
+input,select,textarea{font-family:inherit;font-size:var(--text-sm);color:var(--text-body);background:#fff;border:1px solid var(--border-strong);border-radius:var(--r-xs);padding:6px 9px;width:100%;transition:.15s;}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal-300);outline-offset:1px;border-color:var(--teal-400);}
+input[type=number]{text-align:left;direction:ltr;}
+label{display:block;font-size:var(--text-xs);color:var(--text-muted);margin-bottom:3px;}
+.field{margin-bottom:12px;}
+.row-in input,.row-in select{border:0;border-bottom:1px solid transparent;border-radius:0;padding:4px 2px;background:transparent;}
+.row-in input:hover,.row-in select:hover{border-bottom-color:var(--border-strong);}
+.row-in input:focus,.row-in select:focus{border-bottom-color:var(--teal-500);outline:none;background:var(--ice-50);}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--brand);color:#fff;border:0;border-radius:var(--r-pill);padding:8px 18px;font-size:var(--text-xs);font-weight:var(--fw-medium);cursor:pointer;transition:.16s;}
+.btn:hover{background:var(--indigo-600);transform:translateY(-1px);}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--border-strong);}
+.btn.ghost:hover{background:var(--ice-50);border-color:var(--teal-400);}
+.btn.teal{background:var(--teal-600);}
+.btn.teal:hover{background:var(--teal-700);}
+.btn.wine{background:var(--wine-500);}
+.btn.wine:hover{background:var(--wine-600);}
+.btn.sm{padding:4px 11px;font-size:var(--text-2xs);}
+.btn:focus-visible{outline:2px solid var(--teal-400);outline-offset:2px;}
+.bar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+.x{background:none;border:0;color:var(--n-400);cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;border-radius:4px;}
+.x:hover{color:var(--wine-500);background:var(--wine-50);}
+.stat{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-xs);padding:16px 18px;}
+.stat .lbl{font-size:var(--text-2xs);color:var(--text-muted);letter-spacing:.03em;}
+.stat .val{font-size:var(--text-2xl);font-weight:var(--fw-extralight);color:var(--brand);letter-spacing:var(--tracking-tight);line-height:1.25;}
+.stat .val.teal{color:var(--teal-600);}
+.stat .val.wine{color:var(--wine-500);}
+.stat .val.amber{color:var(--amber-600);}
+.stat .sub{font-size:var(--text-2xs);color:var(--text-muted);}
+.tag{display:inline-block;border-radius:var(--r-pill);padding:2px 11px;font-size:var(--text-2xs);font-weight:var(--fw-medium);white-space:nowrap;}
+.tag.teal{background:var(--teal-100);color:var(--teal-700);}
+.tag.wine{background:var(--wine-100);color:var(--wine-600);}
+.tag.amber{background:var(--amber-50);color:var(--amber-600);}
+.tag.ice{background:var(--ice-200);color:var(--indigo-600);}
+.tag.gray{background:var(--n-100);color:var(--n-600);}
+.meter{height:6px;border-radius:var(--r-pill);background:var(--n-100);overflow:hidden;margin-top:8px;}
+.meter i{display:block;height:100%;border-radius:var(--r-pill);background:var(--gradient-brand);transition:width .5s;}
+.meter.teal i{background:var(--teal-500);}
+.meter.wine i{background:var(--wine-400);}
+.meter.amber i{background:var(--amber-400);}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--n-200);}
+.dots span.on{background:var(--teal-500);}
+.dots.risk span.on{background:var(--wine-400);}
+.thread{position:relative;padding:32px 0 8px;margin-top:6px;}
+.thread::before{content:"";position:absolute;top:20px;right:14px;left:14px;height:2px;background:linear-gradient(270deg,var(--teal-500),var(--indigo-700),var(--wine-500));opacity:.4;}
+.thread-row{display:flex;justify-content:space-between;gap:8px;position:relative;}
+.node{flex:1;text-align:center;position:relative;padding-top:22px;min-width:0;}
+.node::before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--indigo-400);}
+.node.done::before{background:var(--teal-500);border-color:#fff;box-shadow:0 0 0 3px var(--teal-100);}
+.node.risk::before{background:var(--wine-500);border-color:#fff;box-shadow:0 0 0 3px var(--wine-100);}
+.node .nt{font-size:var(--text-xs);color:var(--brand);font-weight:var(--fw-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.node .nd{font-size:var(--text-2xs);color:var(--text-muted);}
+.chart{width:100%;height:auto;display:block;}
+.chart .gl{stroke:var(--n-200);stroke-width:1;}
+.chart .ax{fill:var(--n-400);font-size:9px;}
+.note{border-radius:var(--r-md);padding:12px 16px;font-size:var(--text-xs);line-height:1.85;margin:12px 0;}
+.note.ice{background:var(--ice-100);color:var(--indigo-700);}
+.note.wine{background:var(--wine-50);color:var(--wine-600);}
+.note.amber{background:var(--amber-50);color:var(--amber-600);}
+.note.teal{background:var(--teal-50);color:var(--teal-700);}
+.note b{font-weight:var(--fw-semibold);}
+.k{color:var(--teal-600);font-weight:var(--fw-semibold);}
+.mono{direction:ltr;display:inline-block;font-variant-numeric:tabular-nums;}
+.qz{margin-bottom:16px;}
+.qz p{color:var(--brand);font-weight:var(--fw-medium);margin-bottom:7px;font-size:var(--text-sm);}
+.opts{display:flex;flex-wrap:wrap;gap:7px;}
+.opt{border:1px solid var(--border-strong);background:#fff;border-radius:var(--r-pill);padding:5px 14px;font-size:var(--text-xs);cursor:pointer;color:var(--text-body);transition:.14s;}
+.opt:hover{border-color:var(--teal-400);background:var(--ice-50);}
+.opt.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+.asset{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-xs);padding:16px 18px;transition:.18s;}
+.asset:hover{box-shadow:var(--sh-md);}
+.asset.top{box-shadow:0 0 0 1.5px var(--teal-400),var(--sh-md);}
+.asset h4{font-size:var(--text-md);font-weight:var(--fw-medium);}
+.asset ul{margin:5px 0 0;padding-right:16px;font-size:var(--text-2xs);line-height:1.8;color:var(--text-muted);}
+.asset .fam{font-size:var(--text-2xs);color:var(--teal-600);letter-spacing:.05em;}
+.kv{display:flex;justify-content:space-between;font-size:var(--text-2xs);padding:3px 0;border-bottom:1px solid var(--n-100);}
+.kv:last-of-type{border-bottom:0;}
+.kv span:first-child{color:var(--text-muted);}
+.kv span:last-child{color:var(--brand);font-weight:var(--fw-medium);}
+.sos{background:linear-gradient(135deg,var(--wine-600),var(--wine-400));color:#fff;border-radius:var(--r-xl);padding:22px 26px;box-shadow:0 14px 34px rgba(150,46,55,.26);}
+.sos h3,.sos p{color:#fff;}
+.sos p{color:rgba(255,255,255,.9);}
+.foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-size:var(--text-2xs);color:var(--n-400);line-height:1.9;}
+@media (max-width:1080px){ .g4{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:900px){
+  .shell{flex-direction:column;}
+  .rail{width:100%;height:auto;position:relative;padding-bottom:10px;}
+  .nav{display:flex;overflow-x:auto;padding:10px;gap:4px;}
+  .nav li{margin:0;}
+  .nav li.nav-group{display:none;}
+  .nav button{white-space:nowrap;}
+  .rail-foot{display:none;}
+  .main{padding:22px 18px 60px;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .lead{padding-right:0;}
+  .sec-num{font-size:38px;}
+}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important;} html{scroll-behavior:auto;} }
+@media print{
+  .rail,.bar,.no-print{display:none!important;}
+  .main{padding:0;max-width:none;}
+  .panel{display:block!important;page-break-after:always;}
+  body{background:#fff;}
+  .sheet{box-shadow:none;border:1px solid var(--border);}
+}
+.main{position:relative;}
+.main::before{content:"";position:fixed;top:0;right:236px;left:0;height:4px;background:var(--gradient-brand);z-index:5;}
+.sheet{border:1px solid rgba(47,23,73,.055);}
+.stat{border:1px solid rgba(47,23,73,.055);position:relative;overflow:hidden;}
+.stat::after{content:"";position:absolute;top:0;right:0;width:100%;height:3px;background:linear-gradient(270deg,var(--teal-400),var(--indigo-300));opacity:.85;}
+.stat .val.wine ~ .sub{color:var(--wine-500);}
+.sec-head{padding-bottom:2px;}
+th{background:linear-gradient(180deg,rgba(224,239,244,.55),transparent);}
+.asset.top::after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:var(--gradient-brand);}
+.asset{position:relative;overflow:hidden;}
+.rail{background:linear-gradient(180deg,#1a0c29 0%,#231137 62%,#2f1749 100%);}
+@media (max-width:900px){ .main::before{right:0;} }
+@media print{ .main::before{display:none;} }
+td .mono,td.mono{white-space:nowrap;}
+th,td{white-space:nowrap;}
+td:first-child,th:first-child{white-space:normal;}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tw table{min-width:100%;}
+td.mono,th.mono{display:table-cell;}
+
+/* ============ مدير الحياة ============ */
+input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--teal-600);}
+input[type=range]:focus{outline:none;}
+.wheel-box{display:flex;flex-direction:column;align-items:center;}
+.wheel-box svg{width:100%;max-width:440px;height:auto;}
+.lv-score{display:grid;grid-template-columns:118px 1fr 44px;align-items:center;gap:10px;margin-bottom:8px;}
+.lv-score .nm{font-size:var(--text-sm);color:var(--brand);font-weight:var(--fw-medium);display:flex;align-items:center;gap:7px;margin:0;}
+.lv-score .nm i{width:10px;height:10px;border-radius:3px;flex:none;display:inline-block;}
+.lv-score output{font-size:var(--text-lg);font-weight:var(--fw-extralight);color:var(--brand);text-align:center;}
+.lv-fin{border-radius:var(--r-md);background:var(--ice-50);padding:10px 12px;margin-bottom:10px;}
+.lv-fin .two{display:flex;gap:18px;flex-wrap:wrap;font-size:var(--text-xs);}
+.lv-fin .two b{font-size:var(--text-lg);font-weight:var(--fw-extralight);color:var(--brand);}
+.fin-row{margin-bottom:12px;}
+.fin-row .top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.fin-row .top label{margin:0;color:var(--brand);font-size:var(--text-sm);font-weight:var(--fw-medium);}
+.recs{list-style:none;margin:0;padding:0;}
+.recs li{border-right:3px solid var(--teal-500);background:var(--ice-50);border-radius:var(--r-sm);padding:9px 13px;margin-bottom:8px;font-size:var(--text-xs);line-height:1.85;}
+.recs li.wine{border-right-color:var(--wine-400);}
+.recs li b{display:block;color:var(--brand);font-size:var(--text-sm);font-weight:var(--fw-medium);}
+.snap{display:inline-flex;gap:8px;align-items:center;background:var(--ice-100);border-radius:var(--r-pill);padding:3px 12px;font-size:var(--text-2xs);margin:0 0 6px 6px;}
+.hab-cell{width:32px;height:26px;border-radius:7px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:12px;padding:0;color:var(--n-400);}
+.hab-cell.s1{background:var(--teal-100);color:var(--teal-700);border-color:transparent;}
+.hab-cell.s2{background:var(--amber-50);color:var(--amber-600);border-color:transparent;}
+.hab-cell.s3{background:var(--wine-100);color:var(--wine-600);border-color:transparent;}
+.hab-tbl th.w,.hab-tbl td.w{padding:4px 2px;text-align:center;}
+.hab-tbl .sticky{position:sticky;right:0;background:#fff;z-index:1;min-width:200px;box-shadow:-1px 0 0 var(--border);}
+.bline{display:grid;grid-template-columns:1fr 110px 28px;gap:6px;margin-bottom:6px;}
+.grat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.grat-grid textarea{min-height:130px;line-height:1.9;resize:vertical;}
+.vision{font-size:var(--text-md);min-height:70px;resize:vertical;border-color:var(--indigo-300);}
+.pbar{height:6px;border-radius:999px;background:var(--n-100);overflow:hidden;min-width:60px;}
+.pbar span{display:block;height:100%;border-radius:999px;}
+.modal{position:fixed;inset:0;background:rgba(26,12,41,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:80;}
+.modal.on{display:flex;}
+.modal .box{background:#fff;border-radius:var(--r-lg);padding:20px 22px;max-width:560px;width:100%;max-height:90%;overflow:auto;}
+.modal textarea{min-height:170px;font-size:11px;direction:ltr;text-align:left;}
+
+/* ============ عيادتي · متابعة كاش ============ */
+.ccgate{position:fixed;inset:0;z-index:200;background:var(--ice-50);display:flex;align-items:center;justify-content:center;padding:20px;}
+.ccgate[hidden]{display:none!important;}
+.ccgate .box{background:#fff;border-radius:var(--r-xl);box-shadow:var(--sh-md);max-width:520px;width:100%;padding:30px 28px;text-align:center;}
+.ccgate h2{font-size:var(--text-xl);font-weight:var(--fw-medium);margin-bottom:8px;}
+.ccgate p{color:var(--text-muted);font-size:var(--text-sm);line-height:1.9;}
+.ccgate .btn{margin:6px 4px 0;text-decoration:none;}
+.ccgate .lock{width:54px;height:54px;border-radius:16px;background:var(--gradient-brand);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:26px;margin-bottom:12px;}
+.ccback{display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:rgba(255,255,255,.75);font-size:var(--text-2xs);text-decoration:none;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:3px 12px;}
+.ccback:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+.ccasbar{position:sticky;top:0;z-index:60;background:#FFF6E3;color:#7A5410;border-bottom:1.5px solid #D3A146;padding:8px 16px;font-size:var(--text-xs);display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.ccasbar[hidden]{display:none!important;}
+.ccpill{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:90;background:#fff;color:var(--brand);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:var(--text-2xs);box-shadow:var(--sh-sm);}
+.ccpill.err{background:var(--wine-50);color:var(--wine-600);border-color:var(--wine-200);}
+.ccpill:empty{display:none;}
+.rail-logo{display:block;width:150px;height:auto;margin-bottom:10px;}
+@media (max-width:900px){ .rail-logo{width:120px;} }
+.ccoff{display:none!important;}
+body.ccro .main input,body.ccro .main select,body.ccro .main textarea{pointer-events:none;background:var(--n-50);}
+body.ccro .main button:not(#print){pointer-events:none;opacity:.45;}
+body.ccro .main .x{display:none;}
+@media print{ .ccasbar,.ccpill,.ccgate,.ccoff{display:none!important;} }
+</style>
+</head>
+<body>
+<div class="ccgate" id="ccGate"><div class="box"><div class="lock" id="ccGateIcon">⏳</div><h2 id="ccGateTitle">جاري فتح متابعة كاش…</h2><p id="ccGateText"></p><div id="ccGateBtns"></div></div></div>
+<div class="ccasbar" id="ccAsBar" hidden></div>
+<div class="ccpill" id="ccPill" role="status" aria-live="polite"></div>
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-brand">
+      <img class="rail-logo" src="../brand/logo/logo-cream.png" alt="Cash Clinic · كاش كلينك" width="150" height="62">
+      <span>متابعة كاش · <b id="ccPkgName" style="font-weight:500"></b></span>
+      <a class="ccback" href="./">→ رجوع لعيادتي</a>
+    </div>
+    <ul class="nav" id="nav">
+      <li class="nav-group">البداية · العلاقة بالمال</li>
+      <li><button data-p="behavior" class="on"><span class="nav-num">01</span> السلوك المالي</button></li>
+      <li><button data-p="letter"><span class="nav-num">02</span> رسالة إلى المال</button></li>
+      <li><button data-p="type"><span class="nav-num">03</span> نمطك مع المال</button></li>
+      <li><button data-p="wheel"><span class="nav-num">04</span> عجلة الحياة</button></li>
+      <li class="nav-group">الأرقام والجانب المحاسبي</li>
+      <li><button data-p="budget"><span class="nav-num">05</span> الميزانية الصفرية</button></li>
+      <li><button data-p="goals"><span class="nav-num">06</span> الأهداف وخطتها</button></li>
+      <li><button data-p="debt"><span class="nav-num">07</span> إدارة الديون</button></li>
+      <li><button data-p="invest"><span class="nav-num">08</span> الاستثمار</button></li>
+      <li><button data-p="index"><span class="nav-num">09</span> المؤشرات</button></li>
+      <li><button data-p="track"><span class="nav-num">10</span> المتابعة الشهرية</button></li>
+      <li class="nav-group">المتابعة · مدير الحياة</li>
+      <li><button data-p="vision"><span class="nav-num">11</span> الرؤية والأهداف السنوية</button></li>
+      <li><button data-p="whabits"><span class="nav-num">12</span> العادات الأسبوعية</button></li>
+      <li><button data-p="mbudget"><span class="nav-num">13</span> ميزانية الشهر</button></li>
+      <li><button data-p="savings"><span class="nav-num">14</span> المدخرات والاستثمار</button></li>
+      <li><button data-p="balance"><span class="nav-num">15</span> الرصيد الأسبوعي</button></li>
+      <li><button data-p="grat"><span class="nav-num">16</span> الامتنان</button></li>
+      <li class="nav-group">الملف</li>
+      <li><button data-p="file"><span class="nav-num">17</span> الملف والطوارئ</button></li>
+    </ul>
+    <div class="rail-foot"><div id="railName">ملف بلا اسم</div><div id="railSave">لم يُحفظ بعد</div></div>
+  </aside>
+
+  <main class="main">
+
+    <section class="panel on" id="p-behavior">
+      <div class="sec-head"><div class="sec-num">01</div><div><span class="eyebrow">Financial behavior</span><h2>السلوك المالي</h2></div></div>
+      <p class="lead">قبل أي رقم، نبدأ بالسلوك. الميزانية تنكتب بيوم، بس السلوك هو اللي يقرر إذا راح تنفذ ولا لا. علّم العادات اللي صارت منتظمة عندك، والعلامات اللي تشوفها بنفسك اليوم، بصراحة وبدون أحكام.</p>
+      <div class="grid g2">
+        <div class="sheet"><h3>العادات السبع</h3><p class="hint">علّمي العادة اللي صارت منتظمة عند العميل</p><div id="habitsBox"></div></div>
+        <div class="sheet"><h3>علامات الخطر السلوكي السبع</h3><p class="hint">علّمي العلامة الموجودة اليوم</p><div id="flagsBox"></div></div>
+      </div>
+      <div class="note ice">هذي الإجابات تدخل بحساب مؤشر التعافي المالي بنسبة 40% · وتطلع نتيجتها بصفحة المؤشرات بعد ما تعبي الأرقام.</div>
+    </section>
+
+    <section class="panel" id="p-letter">
+      <div class="sec-head"><div class="sec-num">02</div><div><span class="eyebrow">A letter to money</span><h2>رسالة إلى المال</h2></div></div>
+      <p class="lead">اكتب للمال كأنه شخص تعرفه من زمان. لا تفكر بالصياغة ولا بالأرقام، اكتب اللي تحسه. الرسالة تكشف علاقتك بالمال أوضح من أي جدول.</p>
+      <div class="grid g2">
+        <div class="sheet" style="margin:0">
+          <h3>أسئلة تساعدك تبدأ</h3>
+          <ul class="recs" id="letterPrompts"></ul>
+        </div>
+        <div class="sheet" style="margin:0">
+          <h3>رسالتك</h3>
+          <p class="hint">تنحفظ وأنت تكتب</p>
+          <textarea data-lv="letterDraft" rows="12" style="line-height:2;resize:vertical"></textarea>
+          <div class="bar"><button class="btn teal sm" id="letterSave">احفظ الرسالة بتاريخ اليوم</button><span class="hint">نرجع نكتبها بعد 90 يوم ونقارن بين الرسالتين</span></div>
+        </div>
+      </div>
+      <div class="sheet" style="margin-top:20px"><h3>رسائلك المحفوظة</h3><div id="letterArchive"></div></div>
+    </section>
+
+    <section class="panel" id="p-type">
+      <div class="sec-head"><div class="sec-num">03</div><div><span class="eyebrow">Money beliefs</span><h2>نمطك مع المال</h2></div></div>
+      <p class="lead">اثنعشر عبارة. اختار لكل وحدة قد شنو تنطبق عليك. ما فيه جواب صح وجواب غلط، فيه جواب صادق وجواب يضيّع عليك النتيجة.</p>
+      <div class="sheet"><div id="typeQuiz"></div></div>
+      <div id="typeResult"></div>
+      <p class="hint">مبني على الأنماط الأربعة للمعتقدات المالية اللي حددتها دراسة Klontz وزملاؤه (2011) بمجلة العلاج المالي · العبارات مكتوبة من كاش كلينك · وهي أداة استكشاف تساعد بالجلسة، مو تشخيص نفسي.</p>
+    </section>
+
+    <section class="panel" id="p-wheel">
+      <div class="sec-head"><div class="sec-num">04</div><div><span class="eyebrow">Wheel of life</span><h2>عجلة الحياة</h2></div></div>
+      <p class="lead">ثمانية جوانب من حياتك من 1 إلى 10. محور المالية له رقمين: رقم أرقامك الحقيقية من الميزانية والديون والمؤشرات، ورقم تقييمك لنفسك. والفرق بينهم يقول لنا كثير.</p>
+      <div class="grid g2">
+        <div class="sheet wheel-box"><svg id="wheelSvg" viewBox="0 0 420 420" role="img" aria-label="رسم عجلة الحياة"></svg><p class="hint" id="wheelLegend" style="text-align:center"></p></div>
+        <div class="sheet"><h3>تقييم المحاور</h3><p class="hint">حرّكي المؤشر لكل محور</p><div id="lvScores"></div></div>
+      </div>
+      <div class="grid g4" id="lvStats"></div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="sheet"><h3>تقييم العميل لوضعه المالي</h3><p class="hint">ثمانية مؤشرات يقيّمها العميل بنفسه · متوسطها هو «تقييمك» بمحور المالية</p><div id="lvFin"></div></div>
+        <div class="sheet">
+          <h3>التوصيات</h3>
+          <ul class="recs" id="lvRecs"></ul>
+          <h3 style="font-size:var(--text-md);font-weight:500;margin:16px 0 6px">توصية المستشار</h3>
+          <textarea data-lv="recommendation" rows="4" placeholder="تكتبها المستشارة بعد الجلسة"></textarea>
+        </div>
+      </div>
+      <div class="sheet">
+        <h3>القياسات الشهرية</h3>
+        <p class="hint">احفظي قياس كل شهر للمقارنة · آخر قياس يطلع بخط منقط على العجلة</p>
+        <div id="lvSnaps"></div>
+        <div class="bar"><button class="btn teal sm" id="lvSnapBtn">احفظ قياس اليوم</button></div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-budget">
+      <div class="sec-head"><div class="sec-num">05</div><div><span class="eyebrow">Zero-based budget</span><h2>الميزانية الصفرية</h2></div></div>
+      <p class="lead">المدخول ناقص الالتزامات الثابتة ناقص المصروفات المتغيرة ناقص الأهداف يساوي صفر. كل دينار له وظيفة، واللي ما له وظيفة يروح بلا أثر.</p>
+      <div class="hero" id="eq"></div>
+      <div class="grid g4" id="budgetStats"></div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="sheet">
+          <h3>المدخول</h3>
+          <p class="hint">كل ما يدخل الحساب شهرياً · الراتب والدخل الإضافي والنفقة والإعانات</p>
+          <div class="tw"><table><thead><tr><th>البند</th><th style="width:120px">المبلغ · د.ك</th><th style="width:34px"></th></tr></thead><tbody id="tIncome"></tbody>
+            <tfoot><tr><td>إجمالي المدخول</td><td id="fIncome">0</td><td></td></tr></tfoot></table></div>
+          <div class="bar"><button class="btn ghost sm" data-add="income">إضافة بند</button></div>
+        </div>
+        <div class="sheet">
+          <h3>الالتزامات الثابتة</h3>
+          <p class="hint">اللي ينخصم بنفس المبلغ كل شهر · الأقساط والإيجار والفواتير والعمالة</p>
+          <div class="tw"><table><thead><tr><th>البند</th><th style="width:120px">المبلغ · د.ك</th><th style="width:34px"></th></tr></thead><tbody id="tFixed"></tbody>
+            <tfoot><tr><td>إجمالي الثابتة</td><td id="fFixed">0</td><td></td></tr></tfoot></table></div>
+          <div class="bar"><button class="btn ghost sm" data-add="fixed">إضافة بند</button></div>
+        </div>
+      </div>
+      <div class="sheet">
+        <h3>المصروفات المتغيرة</h3>
+        <p class="hint">اللي يتغير من شهر لشهر · الأكل والبنزين والمناسبات. المهم هنا مو الرقم الفعلي بس، المهم <span class="k">الحد المريح</span> اللي يقول العميل بنفسه إنه ما يقدر يعيش بأقل منه.</p>
+        <div class="grid g2">
+          <div>
+            <div class="tw"><table><thead><tr><th>البند</th><th style="width:120px">المبلغ · د.ك</th><th style="width:34px"></th></tr></thead><tbody id="tVar"></tbody>
+              <tfoot><tr><td>المتغيرة الفعلية</td><td id="fVar">0</td><td></td></tr></tfoot></table></div>
+            <div class="bar"><button class="btn ghost sm" data-add="variable">إضافة بند</button></div>
+          </div>
+          <div>
+            <div class="field">
+              <label>الحد المريح للمعيشة · د.ك شهرياً</label>
+              <input type="number" id="comfort" min="0" step="5">
+              <p class="hint" style="margin-top:5px">اسألي العميل: كم أقل مبلغ تعيش عليه الشهر كامل وأنت مرتاح؟ هذا الرقم يقوله هو لا نحن.</p>
+            </div>
+            <div class="note ice" id="comfortNote"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet"><h3>قراءة الميزانية</h3><div id="budgetRead"></div></div>
+    </section>
+
+    <section class="panel" id="p-goals">
+      <div class="sec-head"><div class="sec-num">06</div><div><span class="eyebrow">Goals · funding · timeline</span><h2>الأهداف وخطتها الزمنية</h2></div></div>
+      <p class="lead">الهدف اللي ما له مبلغ وتاريخ ومصدر تمويل مو هدف، أمنية. نرتب الأهداف بالأولوية، وننفذها واحد بعد واحد، ونجاوب على سؤال واحد لكل هدف: من وين نموّله؟</p>
+      <div class="sheet">
+        <h3>جدول الأهداف</h3>
+        <p class="hint">التاريخ اختياري، وإذا تركتيه نحسب أقرب تاريخ ممكن من الراتب</p>
+        <div class="tw"><table><thead><tr>
+          <th style="width:52px">الأولوية</th><th>الهدف</th><th style="width:110px">المبلغ · د.ك</th><th style="width:135px">التاريخ المطلوب</th>
+          <th style="width:150px">مصدر التمويل</th><th style="width:110px">المدى</th><th style="width:34px"></th>
+        </tr></thead><tbody id="tGoals"></tbody>
+        <tfoot><tr><td colspan="2">إجمالي الأهداف</td><td id="fGoals">0</td><td colspan="4"></td></tr></tfoot></table></div>
+        <div class="bar"><button class="btn ghost sm" data-add="goals">إضافة هدف</button><button class="btn teal sm" id="runGoals">احسب الخطة الزمنية</button></div>
+      </div>
+      <div id="goalsPlan"></div>
+    </section>
+
+    <section class="panel" id="p-debt">
+      <div class="sec-head"><div class="sec-num">07</div><div><span class="eyebrow">Debt management</span><h2>إدارة الديون الشخصية</h2></div></div>
+      <p class="lead">المشكلة مو بالدين نفسه. المشكلة بالشخص اللي ما يعرف يدير دينه وأقساطه. هنا نحوّل الأقساط المتفرقة إلى مسار واحد يخلي الأقساط تأكل بعضها بعضاً.</p>
+      <div class="sheet">
+        <h3>كشف الالتزامات</h3>
+        <p class="hint">كلفة التمويل السنوية اختيارية · تحتاجينها فقط لمقارنة استراتيجية الأعلى كلفة</p>
+        <div class="tw"><table><thead><tr>
+          <th>الجهة</th><th style="width:130px">الرصيد · د.ك</th><th style="width:130px">القسط · د.ك</th>
+          <th style="width:120px">كلفة التمويل %</th><th style="width:110px">نسبة القسط للرصيد</th><th style="width:120px">الانتهاء بلا خطة</th><th style="width:34px"></th>
+        </tr></thead><tbody id="tDebts"></tbody>
+        <tfoot><tr><td>الإجمالي</td><td id="fDebtBal">0</td><td id="fDebtPay">0</td><td colspan="4"></td></tr></tfoot></table></div>
+        <div class="bar"><button class="btn ghost sm" data-add="debts">إضافة التزام</button></div>
+      </div>
+      <div class="grid g4" id="debtStats"></div>
+      <div class="sheet" style="margin-top:20px">
+        <h3>محاكاة السداد</h3>
+        <p class="hint">المبلغ الموجه هو الفائض اللي يُدفع <b>فوق</b> الأقساط الأساسية · اتركيه صفر ليأخذ الفائض المتاح من الميزانية تلقائياً</p>
+        <div class="grid g3">
+          <div class="field"><label>المبلغ الموجه شهرياً فوق الأقساط · د.ك</label><input type="number" id="extra" min="0" step="5" value="0"></div>
+          <div class="field"><label>الاستراتيجية</label><select id="strategy"></select></div>
+          <div class="field"><label>&nbsp;</label><button class="btn teal" id="runDebt" style="width:100%;justify-content:center">شغّل المحاكاة</button></div>
+        </div>
+        <div id="debtOut"></div>
+      </div>
+      <div class="sheet"><h3>الاستراتيجيات الثلاث · متى نستخدم كل وحدة</h3><div id="stratCards" class="grid g3"></div></div>
+    </section>
+
+    <section class="panel" id="p-invest">
+      <div class="sec-head"><div class="sec-num">08</div><div><span class="eyebrow">Investment calculator</span><h2>الاستثمار وحاسبة العائد</h2></div></div>
+      <p class="lead">قبل أي أصل، سؤالين: كم المبلغ اللي يجوز يخرج من ميزانيتك بلا ما يكسرها؟ وشنو هويتك المالية؟ الحاسبة تشتغل بعد جواب السؤالين، لا قبلهم.</p>
+      <div class="note wine"><b>تنبيه لازم يُقرأ للعميل:</b> كل عائد بهالصفحة <b>متوقع لا مضمون</b>، ومبني على معدلات تاريخية تقديرية. الغيب بيد الله سبحانه، والأداء الماضي ما يضمن المستقبل. هذي أداة تشخيص وترتيب أولويات، وليست توصية بشراء أصل معيّن.</div>
+      <div class="sheet">
+        <h3>مؤشر معدل المخاطرة · كم يجوز يستثمر</h3>
+        <p class="hint">الفائض الكبير ما يعني إن كله يروح للاستثمار. نبدأ بربع الفائض ونتدرّج، والقاعدة: يُبنى الأساس قبل الانتقال للمرحلة اللي بعدها.</p>
+        <div class="grid g3">
+          <div class="field"><label>ثبات الدخل</label><select id="incomeStab">
+            <option value="1">ثابت ومعه مصدر ثاني</option><option value="0.9" selected>ثابت من مصدر واحد</option>
+            <option value="0.75">متغير بس له حد أدنى</option><option value="0.55">متغير وما يمكن توقعه</option></select></div>
+          <div class="field"><label>التزامات رعاية أو علاج متكررة بالأسرة</label><select id="careLoad">
+            <option value="1" selected>ما فيه</option><option value="0.75">بند شهري متوسط</option><option value="0.5">بند شهري كبير ومتكرر</option></select></div>
+          <div class="field"><label>الرصيد النقدي المتوفر اليوم · د.ك</label><input type="number" id="cashNow" min="0" step="50" value="0"></div>
+        </div>
+        <div id="riskOut"></div>
+      </div>
+      <div class="sheet">
+        <h3>الهوية المالية</h3>
+        <p class="hint">جاوبي الكويز مع العميل · أو اختاري الهوية مباشرة إذا ما يبي يسوي الاختبار</p>
+        <div class="bar" style="margin:0 0 14px"><button class="btn ghost sm" id="tabQuiz">الكويز</button><button class="btn ghost sm" id="tabPick">اختيار مباشر مع الشرح</button></div>
+        <div id="quizBox"></div><div id="pickBox" style="display:none"></div><div id="identityOut"></div>
+      </div>
+      <div class="sheet">
+        <h3>حاسبة الاستثمار</h3>
+        <div class="grid g4">
+          <div class="field"><label>المبلغ الشهري · د.ك</label><input type="number" id="invMonthly" min="0" step="10" value="0"></div>
+          <div class="field"><label>مبلغ البداية · د.ك</label><input type="number" id="invStart" min="0" step="100" value="0"></div>
+          <div class="field"><label>المدة · سنوات</label><input type="number" id="invYears" min="1" max="40" step="1" value="7"></div>
+          <div class="field"><label>مصدر معدلات العائد</label><select id="rateSet"></select></div>
+        </div>
+        <div class="bar" style="margin-top:0"><button class="btn teal sm" id="runInv">احسب العائد المتوقع</button><button class="btn ghost sm" id="editRates">تعديل المعدلات يدوياً</button><span class="hint" id="rateLabel"></span></div>
+        <div id="ratesEditor" style="display:none;margin-top:14px"></div>
+        <div id="invOut"></div>
+      </div>
+      <div class="sheet"><h3>مقارنة الأصول</h3><p class="hint">مرتبة حسب العائد المتوقع بالسيناريو المتوسط · والترتيب وحده ما يكفي، اقرئي معه السيولة والمخاطرة والملاءمة</p><div id="assetGrid" class="grid g3"></div></div>
+      <div class="sheet"><h3>ربط الاستثمار بالهدف المحاسبي</h3><p class="hint">مثال: تبي أرباح تنزل بشهر 5 كل سنة عشان تشتري تذاكر سفر بشهر 8 · بلا ما تمس الراتب ولا المصروفات المتغيرة</p><div id="passiveOut"></div></div>
+    </section>
+
+    <section class="panel" id="p-index">
+      <div class="sec-head"><div class="sec-num">09</div><div><span class="eyebrow">Indicators</span><h2>المؤشرات المالية والسلوكية</h2></div></div>
+      <p class="lead">المؤشر المحاسبي يقيس القدرة، والمؤشر السلوكي يقيس الالتزام. الحالة ما تُقرأ بواحد منهم لحاله.</p>
+      <div class="grid g3" id="indexStats"></div>
+      <div class="note ice" style="margin-top:20px">العادات السبع وعلامات الخطر تتعبى بصفحة <b>السلوك المالي</b> · وهني يطلع أثرها على المؤشرات.</div>
+      <div class="sheet"><h3>المرحلة المالية</h3><p class="hint">خمس مراحل · ما ننتقل للي بعدها قبل ما يكتمل شرطها</p><div id="phaseBox"></div></div>
+      <div class="sheet"><h3>قراءة النتيجة</h3><div id="readingBox"></div></div>
+    </section>
+
+    <section class="panel" id="p-track">
+      <div class="sec-head"><div class="sec-num">10</div><div><span class="eyebrow">Monthly tracking</span><h2>المتابعة الشهرية</h2></div></div>
+      <p class="lead">التتبع هو اللي يفرّق بين خطة مكتوبة وخطة تشتغل. سجّلي كل شهر رقمين: كم دخل فعلاً، وكم صرف فعلاً. المنحنى هو أول من يقول إن في شي بدأ ينحرف.</p>
+      <div class="sheet">
+        <h3>سجل الأشهر</h3>
+        <div class="tw"><table><thead><tr>
+          <th style="width:130px">الشهر</th><th style="width:120px">الدخل الفعلي</th><th style="width:120px">المصروف الفعلي</th><th style="width:130px">الموجه للأهداف والديون</th>
+          <th style="width:100px">الفائض</th><th>ملاحظة</th><th style="width:34px"></th>
+        </tr></thead><tbody id="tTrack"></tbody></table></div>
+        <div class="bar"><button class="btn ghost sm" data-add="track">تسجيل شهر</button></div>
+      </div>
+      <div class="sheet"><h3>منحنى الالتزام</h3><div id="trackChart"></div><div id="trackRead"></div></div>
+      <div class="sheet">
+        <h3>الإيقاف المؤقت</h3>
+        <p class="hint">لو صار ظرف طارئ، الإيقاف المؤقت أفضل من الانقطاع الصامت · يُسجل بتاريخه ويُراجع بالجلسة</p>
+        <div class="grid g2">
+          <div>
+            <label><input type="checkbox" id="pauseGoals" style="width:auto"> إيقاف مؤقت للأهداف</label>
+            <label style="margin-top:8px"><input type="checkbox" id="pauseInvest" style="width:auto"> إيقاف مؤقت للاستثمار</label>
+          </div>
+          <div class="field"><label>سبب الإيقاف وتاريخه</label><input type="text" id="pauseNote" placeholder="مثال: ظرف صحي · يوليو 2026"></div>
+        </div>
+        <div id="pauseOut"></div>
+      </div>
+    </section>
+
+    <!-- ═══════ مدير الحياة ═══════ -->
+
+    <section class="panel" id="p-vision">
+      <div class="sec-head"><div class="sec-num">11</div><div><span class="eyebrow">Vision · yearly goals</span><h2>الرؤية والأهداف السنوية</h2></div></div>
+      <p class="lead">ابدأ برؤيتك لثلاث سنوات، بعدها نزّلها لأهداف هالسنة بكل جوانب حياتك. الأهداف المالية بمبالغها وتمويلها مكانها صفحة الأهداف وخطتها.</p>
+      <div class="sheet">
+        <label>رؤيتي للسنوات الثلاث القادمة</label>
+        <textarea class="vision" data-lv="vision" placeholder="بعد ثلاث سنوات، أبي أكون…"></textarea>
+      </div>
+      <div class="sheet">
+        <h3>أهداف السنة</h3>
+        <div class="tw"><table><thead><tr><th style="width:40px">#</th><th style="width:120px">المحور</th><th>الهدف · شنو</th><th>الخطوة · كيف</th><th style="width:110px">المستهدف</th><th style="width:135px">تاريخ البداية</th><th style="width:110px">الحالة</th><th style="width:150px">الإنجاز</th><th style="width:34px"></th></tr></thead><tbody id="lvGoals"></tbody></table></div>
+        <div class="bar"><button class="btn ghost sm" id="lvAddGoal">إضافة هدف</button></div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-whabits">
+      <div class="sec-head"><div class="sec-num">12</div><div><span class="eyebrow">Weekly habits</span><h2>العادات الأسبوعية</h2></div></div>
+      <p class="lead">اضغطي مربع الأسبوع عشان تقيّمين العادة: رائع ثم جيد ثم غير جيد، والضغطة الرابعة تمسح. العادات السبع بصفحة السلوك المالي تقيس الانتظام العام، وهني نتابع أسبوع بأسبوع.</p>
+      <div class="bar" style="margin:0 0 12px"><span class="tag teal">✓ رائع</span><span class="tag amber">~ جيد</span><span class="tag wine">✗ غير جيد</span></div>
+      <div class="sheet"><div class="tw"><table class="hab-tbl" id="lvHabTable"></table></div><div class="bar"><button class="btn ghost sm" id="lvAddHabit">إضافة عادة</button></div></div>
+    </section>
+
+    <section class="panel" id="p-mbudget">
+      <div class="sec-head"><div class="sec-num">13</div><div><span class="eyebrow">Monthly budget</span><h2>ميزانية الشهر</h2></div></div>
+      <p class="lead">ميزانية العميل الشهرية اللي يعبّيها بنفسه كل شهر. الميزانية الصفرية التفصيلية بالصفحة الأولى هي اللي تعتمدها المستشارة بالجلسة.</p>
+      <div class="sheet"><label style="max-width:220px">الشهر<input type="month" data-lv="budget.month"></label></div>
+      <div class="grid g2" id="lvBudgetGrid"></div>
+      <div class="sheet" id="lvEq"></div>
+    </section>
+
+    <section class="panel" id="p-savings">
+      <div class="sec-head"><div class="sec-num">14</div><div><span class="eyebrow">Savings · investment</span><h2>المدخرات والاستثمار الشهري</h2></div></div>
+      <p class="lead">سجّل كل شهر راتبك وكم ادخرت وكم استثمرت. الأرصدة وصافي الثروة ونسبة الادخار تنحسب لحالها.</p>
+      <div class="sheet"><div class="grid g3">
+        <div class="field"><label>السنة</label><input type="number" data-lv="savings.year"></div>
+        <div class="field"><label>رصيد المدخرات بداية السنة · د.ك</label><input type="number" data-lv="savings.startSaved"></div>
+        <div class="field"><label>رصيد الاستثمار بداية السنة · د.ك</label><input type="number" data-lv="savings.startInvested"></div>
+      </div></div>
+      <div class="sheet"><div class="tw"><table><thead><tr><th>الشهر</th><th>الراتب</th><th>المدخرات</th><th>الاستثمار</th><th>رصيد المدخرات</th><th>رصيد الاستثمار</th><th>صافي الثروة</th><th>نسبة الادخار</th></tr></thead><tbody id="lvSavBody"></tbody><tfoot><tr id="lvSavFoot"></tr></tfoot></table></div>
+      <p class="hint" style="margin-top:8px">نسبة الادخار = المدخرات والاستثمار ÷ الراتب · فيروزي من 20%، عنبري من 10%، عنابي أقل</p></div>
+    </section>
+
+    <section class="panel" id="p-balance">
+      <div class="sec-head"><div class="sec-num">15</div><div><span class="eyebrow">Weekly balance</span><h2>الرصيد الأسبوعي</h2></div></div>
+      <p class="lead">كل حساباتك بجدول واحد. اكتب رصيد كل حساب كل أسبوع، والمصاريف الكبيرة بالسالب. المتبقي يقول لك كم بعيد عن هدف الادخار.</p>
+      <div class="sheet"><div class="field" style="max-width:260px"><label>هدف الادخار · د.ك</label><input type="number" data-lv="balance.goal"></div></div>
+      <div class="sheet"><div class="tw"><table id="lvBalTable"></table></div><div class="bar"><button class="btn ghost sm" id="lvAddAcc">إضافة حساب أو بند</button><button class="btn ghost sm" id="lvAddWeek">إضافة أسبوع</button></div></div>
+    </section>
+
+    <section class="panel" id="p-grat">
+      <div class="sec-head"><div class="sec-num">16</div><div><span class="eyebrow">Gratitude</span><h2>قائمة الامتنان</h2></div></div>
+      <p class="lead">اكتب كل أسبوع الأشياء اللي تحس بالامتنان لها، بالقدر اللي تبيه. كل سطر شي.</p>
+      <div class="grat-grid" id="lvGrat"></div>
+      <div class="bar"><button class="btn ghost sm" id="lvAddGrat">إضافة أسبوع</button></div>
+    </section>
+
+    <section class="panel" id="p-file">
+      <div class="sec-head"><div class="sec-num">17</div><div><span class="eyebrow">Client file</span><h2>الملف والطوارئ</h2></div></div>
+      <p class="lead">ملف واحد يجمع التخطيط المالي ومدير الحياة. صدّريه وأرسليه للعميل أو للعيادة، ويفتحه الطرف الثاني بنفس الأرقام بلا إعادة تعبئة.</p>
+      <div class="sheet">
+        <h3>بيانات الملف</h3>
+        <div class="grid g3">
+          <div class="field"><label>الاسم</label><input type="text" id="cName" placeholder="الاسم الأول فقط"></div>
+          <div class="field"><label>رمز الحالة</label><input type="text" id="cCode" placeholder="مثال: 767"></div>
+          <div class="field"><label>الباقة</label><select id="cPkg"><option>المعتفسين</option><option>المرتاحين الأساسية</option><option>الخطة الاستثمارية</option><option>المرتاحين برو</option><option>متابعة شهرية</option></select></div>
+        </div>
+        <div class="bar">
+          <button class="btn" id="save">حفظ الملف</button>
+          <button class="btn ghost" id="export">تصدير ملف</button>
+          <button class="btn ghost" id="importBtn">استيراد ملف</button>
+          <button class="btn ghost" id="print">طباعة الخطة</button>
+          <button class="btn ghost" id="reset">تفريغ الملف</button>
+          <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+        </div>
+        <p class="hint" style="margin-top:10px">الاستيراد يقبل ملف النظام الموحد، وملفات نظام التخطيط القديم، وملفات مدير الحياة القديمة.</p>
+      </div>
+      <div class="sos">
+        <h3 style="font-size:var(--text-xl);font-weight:var(--fw-medium)">زر الطوارئ المالي</h3>
+        <p style="margin:6px 0 14px">صار ظرف طارئ قلب ميزانيتك؟ لا تعدّل الخطة بروحك ولا توقفها بصمت. اضغطي الزر، وينفتح ملفك عند المستشارة بأرقامك الحالية، وتنعاد جدولة الميزانية على وضعك الجديد.</p>
+        <div id="sosSummary"></div>
+        <div class="bar" style="margin-top:14px"><button class="btn" id="sos" style="background:#fff;color:var(--wine-600)">فتح طلب جلسة طارئة</button></div>
+      </div>
+      <div class="sheet" style="margin-top:20px"><h3>ملخص الملف للمستشارة</h3><div id="summaryOut"></div></div>
+      <div class="foot">الخطة تُبنى على الأرقام اللي أدخلها العميل، وتُراجع بالجلسة قبل الاعتماد. مسؤولية التنفيذ على العميل، ودور كاش كلينك التشخيص والتوجيه وتصميم الخطة.<br>كاش كلينك · عيادة الصحة المالية الأولى في دولة الكويت ودول الخليج · واتساب 22260820</div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="dataModal" role="dialog" aria-modal="true" aria-labelledby="dmTitle">
+  <div class="box">
+    <h3 id="dmTitle" style="font-size:var(--text-lg);font-weight:500">بيانات الملف</h3>
+    <p class="hint" id="dmText"></p>
+    <textarea id="dmArea"></textarea>
+    <div class="bar"><button class="btn" id="dmOk">نسخ</button><button class="btn ghost" id="dmClose">إغلاق</button></div>
+  </div>
+</div>
+<script>
+/* ============ المرجع الثابت · التخطيط المالي ============ */
+const FUNDING_SOURCES = [
+  { id: 'salary',  code: 'ر',   name: 'الراتب',            desc: 'الفائض بعد الالتزامات الثابتة والحد المريح للمعيشة' },
+  { id: 'income',  code: 'ز',   name: 'زيادة مصادر الدخل',  desc: 'بونص · مشروع · أعمال ممتازة · ترقية · ورث · منحة · هدية · لجنة · مكافأة' },
+  { id: 'debt',    code: 'ق',   name: 'تمويل',             desc: 'قرض · جمعية · قطية · شراء بالتقسيط' },
+  { id: 'passive', code: 'د.س', name: 'عائد استثماري',      desc: 'دخل سلبي من أصل مملوك .. يُدرس بصفحة الاستثمار' }
+];
+const PHASES = [
+  { id: 1, name: 'تأسيس',  test: 'ميزانية مكتوبة · صفر دين جديد · صندوق طوارئ يبدأ',            note: 'لا استثمار قبل اكتمال هذي المرحلة' },
+  { id: 2, name: 'بناء',   test: 'صندوق طوارئ 3 أشهر · نسبة الأقساط أقل من 40% · أهداف مكتوبة', note: 'يُسمح بربع الفائض للاستثمار' },
+  { id: 3, name: 'نمو',    test: 'صفر ديون أشخاص · فائض ثابت · مصدر دخل ثاني قيد البناء',       note: 'يُرفع المخصص الاستثماري تدريجياً' },
+  { id: 4, name: 'استقرار',test: 'صفر دين بنكي · صندوق 6 أشهر · أصل مدرّ للدخل',                note: 'التركيز ينتقل للتنويع' },
+  { id: 5, name: 'حرية',   test: 'الدخل السلبي يغطي الالتزامات الثابتة',                        note: 'الراتب صار خياراً لا شرطاً' }
+];
+const HABITS = ['التخطيط قبل الصرف','مراجعة كشف الحساب','ميزانية مكتوبة','تجنب الدين الجديد','ادخار جزء من الدخل','التفريق بين الحاجة والرغبة','متابعة الأهداف شهرياً'];
+const RISK_FLAGS = ['صرف عاطفي','تأجيل القرار المالي','صرف للمقارنة والمناسبات','ما يتابع كشف حسابه','تقسيط لغير أساسي','أهداف غير مكتوبة بمبلغ وتاريخ','ضيق آخر الشهر بلا تفسير'];
+const READING_SCALE = [
+  { min: 0,  max: 54,  label: 'اعتمادية عالية',  tone: 'wine',   action: 'تشخيص محاسبي كامل قبل أي هدف' },
+  { min: 55, max: 69,  label: 'استقلال جزئي',    tone: 'amber',  action: 'خطة مكتوبة والتزام 90 يوم' },
+  { min: 70, max: 100, label: 'استقلال مالي',    tone: 'teal',   action: 'مرحلة بناء أصول' }
+];
+const RECOVERY_SCALE = [
+  { min: 0,  max: 54,  label: 'متعثر', tone: 'wine',  action: 'الأولوية ترتيب الالتزامات وإيقاف أي دين جديد' },
+  { min: 55, max: 69,  label: 'متحسن', tone: 'amber', action: 'المسار صحيح · يحتاج ثبات تسعين يوماً على الجدول' },
+  { min: 70, max: 100, label: 'مستقر', tone: 'teal',  action: 'الأساس قائم · يُفتح ملف بناء الأصول' }
+];
+const RULES = { maxInstallmentRatio: 0.40, safeInstallmentRatio: 0.25, emergencyMonthsTarget: 3, firstInvestSlice: 0.25 };
+const IDENTITIES = [
+  { id: 'defensive', name: 'دفاعي', short: 'حفظ رأس المال أهم من العائد', band: [0, 24],
+    desc: 'ما تتحمل نزول قيمة رأس مالك حتى لو مؤقت. أولويتك الأمان والسيولة، وعندك التزامات ما تحتمل التأجيل.',
+    horizon: 'أقل من 3 سنوات', mix: { 'صكوك وودائع': 60, 'ذهب': 15, 'أسهم توزيعات': 15, 'صناديق مؤشرات': 10 },
+    stockStyle: 'أسهم توزيعات دفاعية · قطاعات مستقرة (اتصالات · بنوك · خدمات أساسية)', warn: 'الاستثمار العقاري المباشر ما يناسبك الحين .. سيولته صعبة' },
+  { id: 'conservative', name: 'متحفظ متوازن', short: 'عائد هادئ بتذبذب محدود', band: [25, 44],
+    desc: 'تقبل تذبذب بسيط مقابل عائد أعلى من الوديعة، بس أي خسارة كبيرة تربكك وتخليك تبيع بالوقت الغلط.',
+    horizon: '3 إلى 5 سنوات', mix: { 'صكوك وودائع': 40, 'أسهم توزيعات': 25, 'صناديق مؤشرات': 20, 'ذهب': 15 },
+    stockStyle: 'خليط توزيعات وصناديق مؤشرات عالمية', warn: 'لا تدخل مشروع خاص برأس مال تحتاجه خلال سنتين' },
+  { id: 'balanced', name: 'متوازن', short: 'نصف أمان ونصف نمو', band: [45, 62],
+    desc: 'تفهم إن التذبذب جزء من اللعبة وتقدر تصبر على سنة سيئة، بشرط يكون عندك صندوق طوارئ ما تلمسه.',
+    horizon: '5 إلى 7 سنوات', mix: { 'صناديق مؤشرات': 35, 'عقار': 25, 'صكوك وودائع': 20, 'أسهم توزيعات': 12, 'ذهب': 8 },
+    stockStyle: 'صناديق مؤشرات عالمية أساس · وأسهم محلية مختارة', warn: 'التوازن يضيع إذا زدت بند واحد على حساب الباقي بدون إعادة موازنة سنوية' },
+  { id: 'growth', name: 'نامي', short: 'النمو أولاً · مع أرضية أمان', band: [63, 80],
+    desc: 'دخلك ثابت والتزاماتك خفيفة، وتقدر تترك المبلغ سنوات بدون ما تحتاجه. تتحمل نزول 20% بدون ما تبيع.',
+    horizon: '7 إلى 10 سنوات', mix: { 'صناديق مؤشرات': 45, 'عقار': 25, 'أسهم نمو': 15, 'ذهب': 8, 'صكوك وودائع': 7 },
+    stockStyle: 'صناديق مؤشرات أمريكية وعالمية · وأسهم نمو بنسبة محدودة', warn: 'النمو ما يعوض غياب صندوق الطوارئ .. الأرضية أول' },
+  { id: 'aggressive', name: 'هجومي', short: 'أعلى عائد ممكن · وأعلى تذبذب', band: [81, 100],
+    desc: 'عندك فائض كبير وأفق طويل ودخل بديل، وتتعامل مع الخسارة المؤقتة كتكلفة لا كأزمة.',
+    horizon: 'أكثر من 10 سنوات', mix: { 'أسهم نمو': 40, 'صناديق مؤشرات': 30, 'مشروع خاص': 15, 'عقار': 10, 'ذهب': 5 },
+    stockStyle: 'أسهم نمو · قطاعات تقنية · أسواق ناشئة بنسبة محدودة', warn: 'هذي هوية لا تُمنح لعميل عليه أقساط تتجاوز 40% من دخله مهما كان فائضه' }
+];
+const QUIZ = [
+  { q: 'لو نزلت قيمة استثمارك 20% خلال شهر، شتسوي؟', a: [['أبيع كل شي فوراً', 0], ['أبيع جزء وأخفف', 6], ['أنتظر وأتابع', 12], ['أشتري زيادة بالسعر النازل', 18]] },
+  { q: 'متى راح تحتاج هذا المبلغ؟', a: [['خلال سنة', 0], ['2 إلى 4 سنوات', 6], ['5 إلى 9 سنوات', 12], ['10 سنوات فأكثر', 18]] },
+  { q: 'كم شهر تعيشه من مدخراتك لو انقطع دخلك اليوم؟', a: [['ولا شهر', 0], ['شهر إلى شهرين', 5], ['3 إلى 5 أشهر', 10], ['6 أشهر فأكثر', 15]] },
+  { q: 'أقساطك الشهرية كم من دخلك؟', a: [['أكثر من 40%', 0], ['بين 25% و40%', 5], ['أقل من 25%', 11], ['ما عليّ أقساط', 15]] },
+  { q: 'دخلك ثابت ولا متغير؟', a: [['متغير وما أقدر أتوقعه', 0], ['متغير بس له حد أدنى', 5], ['ثابت من مصدر واحد', 9], ['ثابت ومعه مصدر ثاني', 14]] },
+  { q: 'خبرتك بالاستثمار؟', a: [['أول مرة', 0], ['قريت وسمعت بس ما جربت', 4], ['جربت وعندي محفظة', 8], ['أتابع وأوازن بانتظام', 12]] },
+  { q: 'شنو اللي يزعجك أكثر؟', a: [['إني أخسر جزء من رأس مالي', 0], ['إن فلوسي تاكلها التضخم وهي واقفة', 8]] }
+];
+const QUIZ_MAX = 100;
+const RATE_SETS = {
+  global: { label: 'معدلات تاريخية عالمية · تقديرية', rates: {
+    sukuk: [2.0, 3.5, 5.0], gold: [2.0, 5.0, 8.0], resi: [4.0, 6.0, 8.0], comm: [5.0, 7.5, 10.0],
+    kwstocks: [4.0, 6.5, 9.0], etf: [5.0, 7.0, 10.0], biz: [-10.0, 12.0, 25.0] } },
+  kuwait: { label: 'أرقام كاش كلينك للسوق المحلي · تُعبأ منك', rates: {
+    sukuk: [2.5, 4.0, 5.5], gold: [2.0, 5.0, 8.0], resi: [3.5, 5.5, 7.5], comm: [5.0, 7.0, 9.5],
+    kwstocks: [3.5, 6.0, 8.5], etf: [5.0, 7.0, 10.0], biz: [-10.0, 12.0, 25.0] } },
+  manual: { label: 'إدخال يدوي · تعبّيه بالجلسة', rates: {
+    sukuk: [0, 0, 0], gold: [0, 0, 0], resi: [0, 0, 0], comm: [0, 0, 0], kwstocks: [0, 0, 0], etf: [0, 0, 0], biz: [0, 0, 0] } }
+};
+const ASSETS = [
+  { id: 'sukuk', name: 'صكوك وودائع', family: 'دخل ثابت', minEntry: 100, liquidity: 4, risk: 1, horizon: 'سنة إلى 3 سنوات', payout: 'دورية · ربع سنوية أو سنوية',
+    pros: ['رأس المال محفوظ نسبياً', 'العائد معروف مقدماً', 'مناسب لهدف قريب بتاريخ محدد'], cons: ['العائد قد لا يغطي التضخم', 'السحب المبكر يكسر العائد', 'ما فيه نمو لرأس المال'],
+    fit: 'الأهداف اللي تاريخها أقل من 3 سنوات · وصندوق الطوارئ الموسّع' },
+  { id: 'gold', name: 'ذهب', family: 'أصل حقيقي', minEntry: 50, liquidity: 4, risk: 3, horizon: '3 سنوات فأكثر', payout: 'لا يوجد · العائد من فرق السعر فقط',
+    pros: ['سيولة عالية والبيع سريع', 'يحمي من تراجع العملة', 'مبلغ الدخول صغير ويناسب البداية'], cons: ['ما يدرّ دخل شهري', 'فرق البيع والشراء يأكل جزء من العائد', 'التخزين والتأمين تكلفة إضافية'],
+    fit: 'التحوّط وتوزيع المخاطر · ولا يُعتمد كمصدر دخل' },
+  { id: 'resi', name: 'عقار سكني', family: 'عقار', minEntry: 25000, liquidity: 1, risk: 3, horizon: '7 سنوات فأكثر', payout: 'إيجار شهري',
+    pros: ['دخل شهري ملموس', 'أصل مرئي يطمئن العميل', 'يمكن تمويله وشراؤه بالتقسيط'], cons: ['سيولته صعبة والبيع يأخذ شهور', 'مصاريف صيانة وشغور', 'رأس مال دخول كبير'],
+    fit: 'هدف الدخل السلبي طويل المدى · وتشغيل أصل معطّل' },
+  { id: 'comm', name: 'عقار تجاري أو استثماري', family: 'عقار', minEntry: 60000, liquidity: 1, risk: 4, horizon: '7 سنوات فأكثر', payout: 'إيجار شهري أعلى من السكني',
+    pros: ['عائد إيجاري أعلى', 'عقود إيجار أطول', 'قابل للترقية والتطوير'], cons: ['حساس جداً للدورة الاقتصادية', 'الشغور يكلف أكثر', 'يحتاج إدارة أو شركة'],
+    fit: 'مرحلة الاستقرار أو الحرية · لا يناسب المبتدئ' },
+  { id: 'kwstocks', name: 'أسهم كويتية وخليجية', family: 'أسهم', minEntry: 500, liquidity: 4, risk: 4, horizon: '5 سنوات فأكثر', payout: 'توزيعات سنوية · غالباً الربع الثاني',
+    pros: ['سيولة عالية', 'توزيعات نقدية تناسب هدف موسمي', 'سوق قريب ومفهوم'], cons: ['تركّز قطاعي عالي', 'تذبذب موسمي', 'يحتاج متابعة'],
+    fit: 'العميل اللي يبي أرباح تنزل بشهر معيّن لهدف محدد' },
+  { id: 'etf', name: 'صناديق مؤشرات عالمية', family: 'أسهم', minEntry: 300, liquidity: 4, risk: 4, horizon: '7 سنوات فأكثر', payout: 'توزيعات أو نمو تراكمي',
+    pros: ['تنويع واسع بمبلغ صغير', 'رسوم منخفضة', 'ما يحتاج خبرة اختيار أسهم'], cons: ['تذبذب سوق كامل', 'مخاطر سعر صرف', 'يحتاج حساب وسيط دولي'],
+    fit: 'الأهداف طويلة المدى · التقاعد وتعليم الأبناء' },
+  { id: 'biz', name: 'مشروع خاص', family: 'أعمال', minEntry: 3000, liquidity: 1, risk: 5, horizon: '3 سنوات فأكثر', payout: 'غير منتظم · حسب التشغيل',
+    pros: ['أعلى سقف عائد', 'يبني مصدر دخل ثاني مستقل', 'يستفيد من مهارة العميل نفسها'], cons: ['احتمال خسارة رأس المال كامل', 'يحتاج وقت وإدارة لا فلوس فقط', 'الدخل غير منتظم بالسنة الأولى'],
+    fit: 'مسار زيادة الدخل لا مسار الاستثمار · ويُدرس بخطة عمل منفصلة' }
+];
+const DEBT_STRATEGIES = [
+  { id: 'snowball', name: 'المتدرجة · أصغر رصيد أولاً', rule: 'الفائض كله فوق الدين صاحب أصغر رصيد · وعند إقفاله ينضم قسطه المحرر للي بعده',
+    best: 'العميل اللي يحتاج انتصار سريع يثبّت التزامه · وحالات فيها ديون أشخاص صغيرة بلا جدول', watch: 'قد تكلف فوائد أعلى إذا كان أكبر دين هو الأغلى' },
+  { id: 'ratio', name: 'المتتالية · نسبة القسط إلى الرصيد', rule: 'نرتب بأعلى نسبة قسط إلى رصيد · أي الدين اللي يقفل أسرع بمجهود أقل ويحرر أكبر قسط',
+    best: 'المحافظ اللي فيها قرض قسطه كبير ورصيده صغير · وهي الأكفأ محاسبياً بأغلب الحالات', watch: 'تحتاج كشف حساب دقيق لكل قرض لا تقديرات' },
+  { id: 'avalanche', name: 'الأعلى كلفة أولاً', rule: 'الفائض كله فوق الدين صاحب أعلى كلفة تمويل · وعند إقفاله ينتقل للي بعده',
+    best: 'محافظ فيها بطاقات ائتمانية أو تمويل مرتفع الكلفة', watch: 'أبطأ في الإحساس بالإنجاز · وقد يخسر العميل حماسه' }
+];
+const GOAL_TERMS = [ { id: 'short', name: 'قصير المدى', months: 12 }, { id: 'mid', name: 'متوسط المدى', months: 36 }, { id: 'long', name: 'طويل المدى', months: 999 } ];
+const SEED = {
+  income: [ { name: 'الراتب الأساسي', amount: 1200, fixed: true }, { name: 'دخل إضافي', amount: 0, fixed: false } ],
+  fixed: [ { name: 'قسط بنكي', amount: 250 }, { name: 'إيجار أو سكن', amount: 0 }, { name: 'فواتير وخدمات', amount: 45 }, { name: 'عمالة منزلية', amount: 130 }, { name: 'اشتراكات ثابتة', amount: 15 } ],
+  variable: [ { name: 'أكل ومقاضي', amount: 200 }, { name: 'بنزين ومواصلات', amount: 60 }, { name: 'مصروف الأبناء', amount: 80 }, { name: 'مناسبات وضيافة', amount: 50 } ],
+  goals: [ { name: 'صندوق طوارئ 3 أشهر', amount: 1320, date: '', source: 'salary', term: 'short' }, { name: 'سفرة العائلة', amount: 900, date: '', source: 'passive', term: 'mid' } ],
+  debts: [ { name: 'قرض بنكي', balance: 8400, payment: 250, cost: 3.5 }, { name: 'دين شخصي', balance: 1500, payment: 100, cost: 0 } ]
+};
+
+/* ============ المرجع الثابت · مدير الحياة ============ */
+const LV_AXES = [
+  { id: 'finance', n: 'المالية',   c: '#2f1749' },
+  { id: 'health',  n: 'الصحة',     c: '#3eadad' },
+  { id: 'family',  n: 'الأسرة',    c: '#962e37' },
+  { id: 'social',  n: 'العلاقات',  c: '#d69223' },
+  { id: 'career',  n: 'المهنة',    c: '#543279' },
+  { id: 'growth',  n: 'التطوير',   c: '#55b8b8' },
+  { id: 'spirit',  n: 'الروحانية', c: '#c8757d' },
+  { id: 'fun',     n: 'الترفيه',   c: '#a68fbd' }
+];
+const LV_FIN = [
+  { id: 'income', n: 'استقرار الدخل',        h: '10 = دخل ثابت ومعروف يغطي احتياجاتك' },
+  { id: 'spend',  n: 'التحكم بالمصاريف',      h: '10 = تعرف وين يروح كل دينار' },
+  { id: 'save',   n: 'الادخار',              h: '10 = تدخر بانتظام كل شهر' },
+  { id: 'debt',   n: 'الديون',               h: '10 = بدون ديون أو ديون تحت السيطرة' },
+  { id: 'emerg',  n: 'صندوق الطوارئ',        h: '10 = يغطي مصاريف 6 شهور' },
+  { id: 'invest', n: 'الاستثمار',            h: '10 = استثمار منتظم بعد ما ثبّت الأساس' },
+  { id: 'fgoals', n: 'وضوح الأهداف المالية', h: '10 = أهداف بمبلغ وتاريخ واضح' },
+  { id: 'behav',  n: 'السلوك المالي',         h: '10 = قراراتك المالية واعية ومو عاطفية' }
+];
+const LV_LIFE_TIPS = {
+  health: 'خطوة صغيرة وثابتة أحسن من خطة كبيرة. مثلاً مشي 20 دقيقة 3 مرات بالأسبوع، وتابعها بالعادات الأسبوعية.',
+  family: 'وقت ثابت بالأسبوع للأسرة بدون جوال، ويتحط بالجدول مثل أي موعد.',
+  social: 'تواصل مع شخص واحد تفتقده هالأسبوع. العلاقات تتغذى بالاستمرار.',
+  career: 'مهارة وحدة ترفع قيمتك المهنية، وتنحط هدف بصفحة الرؤية والأهداف السنوية.',
+  growth: '15 دقيقة قراءة أو تعلّم يومياً، وتتابعها كعادة أسبوعية.',
+  spirit: 'ورد بسيط يومي يرجّع لك السكينة، وتتابعه بالعادات.',
+  fun: 'الترفيه جزء من الخطة مو مكافأة. له بند بالميزانية عشان تستمتع بدون ذنب.'
+};
+const LV_FIN_TIPS = {
+  income: 'رتّب مصادر دخلك: الثابت والمتغير. الميزانية تنبني على الدخل الثابت بس، والمتغير يروح للأهداف.',
+  spend: 'سجّل مصاريفك المتغيرة أسبوعين قبل لا تحط أي سقف. ما تقدر تعالج شي ما تشوفه.',
+  save: 'ابدأ بنسبة بسيطة تقدر تثبت عليها. الاستمرار أهم من الرقم.',
+  debt: 'كل ديونك بمبالغها وأقساطها بصفحة إدارة الديون، والمستشارة تختار معك استراتيجية السداد.',
+  emerg: 'صندوق الطوارئ قبل الاستثمار. هدفك الأول مصاريف شهر كامل، بعدين وسّعه.',
+  invest: 'الاستثمار مو أول خطوة. ثبّت الأساس من طوارئ وديون، وبعدها ابدأ بربع الفائض وكبّره بالتدريج.',
+  fgoals: 'اكتب 3 أهداف مالية بمبلغ وتاريخ بصفحة الأهداف وخطتها، ورتّبها بالأولوية.',
+  behav: 'لاحظ متى تصرف بدون تخطيط: تعب؟ ضغط؟ مناسبة؟ سجّلها عشان تشوف النمط.'
+};
+const LV_STATUS = ['لم يبدأ', 'جاري', 'مكتمل'];
+const LV_HAB = ['', 'رائع', 'جيد', 'غير جيد'];
+</script>
+<script>
+/* ============ الحالة ============ */
+const KEY = 'cashclinic.system.v1';
+const OLD_KEY = 'cashclinic.plan.v1';
+const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+function lifeBlank() {
+  const scores = {}; LV_AXES.forEach(a => { if (a.id !== 'finance') scores[a.id] = 5; });
+  const fin = {}; LV_FIN.forEach(f => fin[f.id] = 5);
+  return {
+    scores, fin, snapshots: [], recommendation: '', vision: '',
+    letterDraft: 'عزيزي المال،\n', letters: [], typeAnswers: {},
+    goals: [{ area: 'health', what: '', how: '', target: '', start: '', status: 0, progress: 0 }],
+    habits: [{ name: '', weeks: Array(52).fill(0) }],
+    budget: { month: '', income: [{ n: 'الراتب', a: '' }], fixed: [{ n: '', a: '' }], variable: [{ n: '', a: '' }], saving: [{ n: 'صندوق الطوارئ', a: '' }] },
+    savings: { year: new Date().getFullYear(), startSaved: '', startInvested: '', rows: MONTHS.map(() => ({ sal: '', sav: '', inv: '' })) },
+    balance: { goal: '', weeks: [''], accounts: [{ n: '', v: [''] }] },
+    gratitude: [{ w: '', t: '' }]
+  };
+}
+function fixLife(L) {
+  const b = lifeBlank();
+  if (!L || typeof L !== 'object') return b;
+  for (const k in b) if (L[k] === undefined) L[k] = b[k];
+  LV_AXES.forEach(a => { if (a.id !== 'finance' && L.scores[a.id] === undefined) L.scores[a.id] = 5; });
+  LV_FIN.forEach(f => { if (L.fin[f.id] === undefined) L.fin[f.id] = 5; });
+  return L;
+}
+
+const blank = () => ({
+  app: 'cc-system', v: 1,
+  meta: { name: '', code: '', pkg: 'المرتاحين الأساسية', saved: null },
+  income: [], fixed: [], variable: [], goals: [], debts: [], track: [],
+  comfort: 0, cashNow: 0, incomeStab: 0.9, careLoad: 1,
+  habits: [], flags: [],
+  identity: null, quizAnswers: {},
+  rateSet: 'global', customRates: null,
+  extra: 0, strategy: 'ratio',
+  pause: { goals: false, invest: false, note: '' },
+  inv: { monthly: 0, start: 0, years: 7 },
+  life: lifeBlank()
+});
+
+let S = load();
+
+/* عيادتي: the file is the client's own and is kept on the server, so it
+   opens the same on any device. A new file starts empty — one blank row in
+   each table — rather than with the sample numbers the planning tool shows
+   at a session, which a client would read as their own. */
+function load() {
+  const s = blank();
+  s.income = [{ name: 'الراتب', amount: 0 }];
+  s.fixed = [{ name: '', amount: 0 }];
+  s.variable = [{ name: '', amount: 0 }];
+  return s;
+}
+
+function save(quiet) {
+  if (window.ccReadOnly) return;
+  S.meta.saved = new Date().toISOString();
+  if (window.ccSync) window.ccSync(JSON.stringify(S), quiet);
+  paintFoot();
+}
+
+/* ============ أدوات ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const AR = '0123456789';
+const ar = n => String(n).replace(/\d/g, d => AR[+d]);
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const sum = (a, k) => a.reduce((t, x) => t + num(x[k]), 0);
+const kd = n => (Math.round(n * 1000) / 1000).toLocaleString('en-US', { maximumFractionDigits: 3 });
+const pct = n => (Math.round(n * 10) / 10) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function monthLabel(offset) {
+  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset);
+  return MONTHS[d.getMonth()] + ' ' + ar(d.getFullYear());
+}
+function monthsUntil(dateStr) {
+  if (!dateStr) return null;
+  const t = new Date(dateStr), n = new Date();
+  if (isNaN(t)) return null;
+  return (t.getFullYear() - n.getFullYear()) * 12 + (t.getMonth() - n.getMonth());
+}
+function toast(msg) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.cssText = 'position:fixed;bottom:calc(26px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:#2f1749;color:#fff;padding:10px 22px;border-radius:999px;font-size:13px;z-index:99;box-shadow:0 10px 30px rgba(47,23,73,.3)';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+/* ============ المحرك المحاسبي ============ */
+function calc() {
+  const income = sum(S.income, 'amount');
+  const fixed = sum(S.fixed, 'amount');
+  const varActual = sum(S.variable, 'amount');
+  const comfort = num(S.comfort) || varActual;
+  const afterFixed = income - fixed;
+  const available = afterFixed - comfort;
+  const goalsTotal = sum(S.goals, 'amount');
+  const debtPay = sum(S.debts, 'payment');
+  const debtBal = sum(S.debts, 'balance');
+  const instRatio = income ? (debtPay / income) * 100 : 0;
+  const fixedRatio = income ? (fixed / income) * 100 : 0;
+  const resilience = fixed + comfort > 0 ? num(S.cashNow) / (fixed + comfort) : 0;
+  const incomeSources = S.income.filter(x => num(x.amount) > 0).length;
+  return { income, fixed, varActual, comfort, afterFixed, available, goalsTotal, debtPay, debtBal, instRatio, fixedRatio, resilience, incomeSources };
+}
+
+function indicators() {
+  const c = calc();
+  const h = S.habits.length, f = S.flags.length;
+  let acc = 0;
+  acc += c.instRatio <= 25 ? 25 : c.instRatio <= 40 ? 15 : 5;
+  const surplusRatio = c.income ? (c.available / c.income) * 100 : 0;
+  acc += surplusRatio >= 20 ? 20 : surplusRatio >= 10 ? 12 : surplusRatio > 0 ? 6 : 0;
+  acc += c.resilience >= 3 ? 15 : c.resilience >= 1 ? 8 : 2;
+  const beh = ((7 - f) / 7) * 20 + (h / 7) * 20;
+  const recovery = Math.round(acc + beh);
+  let ind = 0;
+  const cover = c.income ? ((c.fixed + c.comfort) <= c.income ? 30 : 30 * (c.income / (c.fixed + c.comfort))) : 0;
+  ind += cover;
+  ind += c.resilience >= 6 ? 25 : c.resilience >= 3 ? 18 : c.resilience >= 1 ? 9 : 2;
+  ind += c.instRatio <= 25 ? 20 : c.instRatio <= 40 ? 12 : 3;
+  ind += c.incomeSources >= 3 ? 15 : c.incomeSources === 2 ? 9 : 3;
+  ind += (h / 7) * 10;
+  const independence = Math.round(Math.min(100, ind));
+  let phase = 1;
+  if (c.resilience >= 3 && c.instRatio < 40 && S.goals.length > 0) phase = 2;
+  if (phase === 2 && c.resilience >= 3 && c.instRatio < 40 && c.incomeSources >= 2) phase = 3;
+  if (c.debtBal === 0 && c.resilience >= 6) phase = 4;
+  if (c.debtBal === 0 && c.resilience >= 6 && c.incomeSources >= 2 && c.available > c.fixed) phase = 5;
+  return { recovery, independence, phase, ...c, habitsN: h, flagsN: f };
+}
+function reading(v) { return READING_SCALE.find(r => v >= r.min && v <= r.max) || READING_SCALE[0]; }
+function readRec(v) { return RECOVERY_SCALE.find(r => v >= r.min && v <= r.max) || RECOVERY_SCALE[0]; }
+
+function riskAllowance() {
+  const I = indicators();
+  let base;
+  if (I.resilience < 1) base = 0.25; else if (I.resilience < 3) base = 0.35; else if (I.resilience < 6) base = 0.50; else base = 0.70;
+  const debtF = I.instRatio > 40 ? 0.5 : I.instRatio > 25 ? 0.8 : 1;
+  let ratio = base * debtF * num(S.incomeStab) * num(S.careLoad);
+  const blockers = [];
+  if (I.phase === 1) blockers.push('المرحلة الحالية تأسيس · الأساس ما اكتمل بعد، فالاستثمار يُؤجل لين يقفل صندوق الطوارئ');
+  if (I.resilience < 1) blockers.push('صندوق الطوارئ أقل من شهر · أي طارئ يجبر العميل يسحب من الاستثمار بالوقت الغلط');
+  if (I.instRatio > 40) blockers.push('الأقساط تتجاوز 40% من الدخل · إقفال الدين عائده مضمون وأعلى من أي استثمار متوقع');
+  if (I.available <= 0) blockers.push('ما فيه فائض بعد الحد المريح · لا يوجد مبلغ قابل للاستثمار أصلاً');
+  if (blockers.length) ratio = 0;
+  const amount = Math.max(0, Math.floor(I.available * ratio));
+  const firstStep = Math.floor(I.available * RULES.firstInvestSlice);
+  return { ratio, amount, firstStep, blockers, I };
+}
+
+/* ============ الجداول ============ */
+const ROWS = { income: { tbody: 'tIncome' }, fixed: { tbody: 'tFixed' }, variable: { tbody: 'tVar' } };
+function rowInput(list, i, key, type, ph) {
+  const v = S[list][i][key] ?? '';
+  return `<input class="row-in-i" type="${type}" data-l="${list}" data-i="${i}" data-k="${key}" value="${String(v).replace(/"/g,'&quot;')}" ${ph ? 'placeholder="' + ph + '"' : ''} ${type === 'number' ? 'step="1" min="0"' : ''}>`;
+}
+function delBtn(list, i) { return `<button class="x" data-del="${list}" data-i="${i}" title="حذف" aria-label="حذف">×</button>`; }
+function paintSimple(list) {
+  $('#' + ROWS[list].tbody).innerHTML = S[list].map((r, i) =>
+    `<tr class="row-in"><td>${rowInput(list, i, 'name', 'text', 'اسم البند')}</td><td>${rowInput(list, i, 'amount', 'number')}</td><td>${delBtn(list, i)}</td></tr>`).join('')
+    || `<tr><td colspan="3" class="hint">ما فيه بنود · اضغطي إضافة بند</td></tr>`;
+}
+function paintGoals() {
+  $('#tGoals').innerHTML = S.goals.map((g, i) => `
+    <tr class="row-in"><td style="text-align:center">${ar(i + 1)}</td>
+      <td>${rowInput('goals', i, 'name', 'text', 'اسم الهدف')}</td><td>${rowInput('goals', i, 'amount', 'number')}</td><td>${rowInput('goals', i, 'date', 'date')}</td>
+      <td><select class="row-in-i" data-l="goals" data-i="${i}" data-k="source">${FUNDING_SOURCES.map(f => `<option value="${f.id}" ${g.source === f.id ? 'selected' : ''}>${f.name}</option>`).join('')}</select></td>
+      <td><select class="row-in-i" data-l="goals" data-i="${i}" data-k="term">${GOAL_TERMS.map(t => `<option value="${t.id}" ${g.term === t.id ? 'selected' : ''}>${t.name}</option>`).join('')}</select></td>
+      <td>${delBtn('goals', i)}</td></tr>`).join('') || `<tr><td colspan="7" class="hint">ما فيه أهداف · اضغطي إضافة هدف</td></tr>`;
+  $('#fGoals').textContent = kd(sum(S.goals, 'amount'));
+}
+function paintDebts() {
+  $('#tDebts').innerHTML = S.debts.map((d, i) => {
+    const bal = num(d.balance), pay = num(d.payment);
+    const ratio = bal ? (pay / bal) * 100 : 0;
+    const m = selfMonths(bal, pay, num(d.cost));
+    return `<tr class="row-in"><td>${rowInput('debts', i, 'name', 'text', 'الجهة')}</td><td>${rowInput('debts', i, 'balance', 'number')}</td>
+      <td>${rowInput('debts', i, 'payment', 'number')}</td><td>${rowInput('debts', i, 'cost', 'number')}</td><td><span class="mono">${ratio.toFixed(2)}%</span></td>
+      <td>${m === null ? '<span class="tag wine">ما يقفل</span>' : m > 480 ? '<span class="tag wine">أكثر من 40 سنة</span>' : monthLabel(m)}</td><td>${delBtn('debts', i)}</td></tr>`;
+  }).join('') || `<tr><td colspan="7" class="hint">ما فيه التزامات · وهذي بحد ذاتها نتيجة ممتازة</td></tr>`;
+  $('#fDebtBal').textContent = kd(sum(S.debts, 'balance'));
+  $('#fDebtPay').textContent = kd(sum(S.debts, 'payment'));
+}
+function paintTrack() {
+  $('#tTrack').innerHTML = S.track.map((t, i) => {
+    const s = num(t.income) - num(t.spend) - num(t.directed);
+    return `<tr class="row-in"><td>${rowInput('track', i, 'month', 'month')}</td><td>${rowInput('track', i, 'income', 'number')}</td><td>${rowInput('track', i, 'spend', 'number')}</td>
+      <td>${rowInput('track', i, 'directed', 'number')}</td><td class="mono" style="color:${s < 0 ? 'var(--wine-500)' : 'var(--teal-600)'}">${kd(s)}</td>
+      <td>${rowInput('track', i, 'note', 'text', 'شنو صار هالشهر')}</td><td>${delBtn('track', i)}</td></tr>`;
+  }).join('') || `<tr><td colspan="7" class="hint">ما فيه أشهر مسجلة · اضغطي تسجيل شهر</td></tr>`;
+}
+
+/* ============ 01 الميزانية ============ */
+const WM = `<img class="wm" src="../brand/mark/mark-cream.png" alt="" aria-hidden="true">`;
+function paintBudget() {
+  paintSimple('income'); paintSimple('fixed'); paintSimple('variable');
+  const c = calc();
+  $('#fIncome').textContent = kd(c.income); $('#fFixed').textContent = kd(c.fixed); $('#fVar').textContent = kd(c.varActual);
+  $('#comfort').value = S.comfort || '';
+  const goalsMonthly = plannedMonthlyGoals();
+  const balance = c.income - c.fixed - c.comfort - goalsMonthly;
+  const ok = Math.abs(balance) < 1;
+  $('#eq').innerHTML = `${WM}<div style="position:relative;z-index:1">
+      <div style="font-size:var(--text-2xs);letter-spacing:.14em;text-transform:uppercase;opacity:.7">Zero balance</div>
+      <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;margin-top:8px">
+        ${eqPart('المدخول', c.income)} <span style="opacity:.5;font-size:22px">−</span>
+        ${eqPart('الثابتة', c.fixed)} <span style="opacity:.5;font-size:22px">−</span>
+        ${eqPart('المتغيرة', c.comfort)} <span style="opacity:.5;font-size:22px">−</span>
+        ${eqPart('الأهداف', goalsMonthly)} <span style="opacity:.5;font-size:22px">=</span>
+        ${eqPart(ok ? 'صفر · متوازنة' : (balance > 0 ? 'فائض بلا وظيفة' : 'عجز'), balance, true)}
+      </div>
+      <p style="margin-top:12px;font-size:var(--text-xs)">${ok ? 'الميزانية متوازنة · كل دينار له وظيفة محددة.'
+        : balance > 0 ? `في <b>${kd(balance)} د.ك</b> شهرياً بلا وظيفة مكتوبة. الفائض بلا وجهة يُصرف على بنود غير مجدولة .. وزّعيه على هدف أو على جدول الديون.`
+        : `الميزانية ناقصة <b>${kd(Math.abs(balance))} د.ك</b> شهرياً. إما نقلل بند، أو نمدد تاريخ هدف، أو ندخل على مسار زيادة الدخل.`}</p></div>`;
+  $('#budgetStats').innerHTML =
+    stat('المتبقي بعد الالتزامات', kd(c.afterFixed) + ' د.ك', c.afterFixed > 0 ? 'teal' : 'wine', 'الدخل ناقص الثابتة') +
+    stat('الحد المريح للمعيشة', kd(c.comfort) + ' د.ك', '', 'يقوله العميل بنفسه') +
+    stat('الفائض المتاح للأهداف', kd(c.available) + ' د.ك', c.available > 0 ? 'teal' : 'wine', c.available > 0 ? 'هذا محرك الخطة كلها' : 'لا يوجد محرك سداد من الراتب') +
+    stat('نسبة الالتزامات من الدخل', pct(c.fixedRatio), c.fixedRatio > 40 ? 'wine' : c.fixedRatio > 25 ? 'amber' : 'teal', 'الصحي أقل من 40%');
+  $('#comfortNote').innerHTML = c.available >= 0
+    ? `المتبقي بعد الالتزامات <b>${kd(c.afterFixed)}</b> د.ك، والحد المريح <b>${kd(c.comfort)}</b> د.ك، فالفائض <b class="k">${kd(c.available)}</b> د.ك. هذا هو المبلغ اللي نشتغل عليه بالأهداف والديون.`
+    : `المتبقي بعد الالتزامات <b>${kd(c.afterFixed)}</b> د.ك، والعميل يقول ما يقدر يعيش بأقل من <b>${kd(c.comfort)}</b> د.ك. الفجوة <b style="color:var(--wine-500)">${kd(Math.abs(c.available))}</b> د.ك شهرياً .. فمسار الراتب مقفول، ونروح لزيادة الدخل.`;
+  $('#budgetRead').innerHTML = budgetRead(c);
+  paintFoot();
+}
+function eqPart(label, val, big) {
+  return `<div><div style="font-size:var(--text-2xs);opacity:.72">${label}</div><div style="font-size:${big ? '30px' : '24px'};font-weight:200;letter-spacing:-.02em" class="mono">${kd(Math.abs(val))}</div></div>`;
+}
+function stat(lbl, val, tone, sub) {
+  return `<div class="stat"><div class="lbl">${lbl}</div><div class="val ${tone || ''}">${val}</div><div class="sub">${sub || ''}</div></div>`;
+}
+function plannedMonthlyGoals() { return goalPlan().rows.filter(r => r.active && r.source === 'salary').reduce((t, r) => t + r.monthly, 0); }
+function budgetRead(c) {
+  const out = [];
+  if (c.income === 0) return `<p class="hint">عبّي المدخول أول عشان تظهر القراءة.</p>`;
+  if (c.fixedRatio > 40) out.push(['wine', `الالتزامات الثابتة تأكل <b>${pct(c.fixedRatio)}</b> من الدخل، والصحي أقل من 40%. أي هدف جديد راح يزاحم بند أساسي .. نبدأ بتخفيف الثابتة قبل الأهداف.`]);
+  else if (c.fixedRatio > 25) out.push(['amber', `الالتزامات الثابتة <b>${pct(c.fixedRatio)}</b> من الدخل · ضمن الحد بس قريبة منه. أي التزام جديد يقفل باب المرونة.`]);
+  else out.push(['teal', `الالتزامات الثابتة <b>${pct(c.fixedRatio)}</b> من الدخل · وهذي نسبة صحية تعطي مساحة للأهداف.`]);
+  if (c.available <= 0) out.push(['wine', 'ما فيه فائض من الراتب بعد الحد المريح. هذي الحالة ما تنحل بجدول أهداف .. تنحل بمسار زيادة دخل أو بمراجعة بند من الثابتة.']);
+  else out.push(['ice', `الفائض <b>${kd(c.available)}</b> د.ك شهرياً · أي <b>${kd(c.available * 12)}</b> د.ك بالسنة. هذا سقف ما تقدر الأهداف تتجاوزه بلا زيادة دخل.`]);
+  if (c.varActual > c.comfort && c.comfort > 0)
+    out.push(['amber', `المصروف المتغير الفعلي <b>${kd(c.varActual)}</b> د.ك أعلى من الحد المريح المعلن <b>${kd(c.comfort)}</b> د.ك بفارق <b>${kd(c.varActual - c.comfort)}</b> د.ك. إما الحد غير واقعي، أو في بند يتسرب خارج الخطة.`]);
+  return out.map(([t, m]) => `<div class="note ${t}">${m}</div>`).join('');
+}
+
+/* ============ 02 الأهداف ============ */
+function goalPlan() {
+  const c = calc();
+  let available = Math.max(0, c.available);
+  let cursor = 0;
+  const rows = [];
+  S.goals.forEach((g, i) => {
+    const amount = num(g.amount);
+    const want = monthsUntil(g.date);
+    const src = g.source || 'salary';
+    const r = { i, name: g.name || 'هدف بلا اسم', amount, source: src, want, term: g.term, active: false, monthly: 0, months: null, start: cursor, end: null, verdict: '', tone: 'gray', advice: '' };
+    if (amount <= 0) { r.verdict = 'بلا مبلغ'; r.advice = 'الهدف بلا مبلغ ما يُخطط له · اكتبي المبلغ المطلوب.'; rows.push(r); return; }
+    if (src === 'salary') {
+      if (available <= 0) { r.verdict = 'غير ممكن من الراتب'; r.tone = 'wine'; r.advice = 'ما فيه فائض بعد الحد المريح · ينتقل الهدف لمسار زيادة الدخل.'; }
+      else {
+        const months = Math.ceil(amount / available);
+        r.active = true; r.monthly = available; r.months = months; r.start = cursor; r.end = cursor + months;
+        if (want === null) { r.verdict = 'من الراتب'; r.tone = 'teal'; r.advice = `يقفل خلال <b>${ar(months)}</b> شهراً · ${monthLabel(r.end)} · بتوجيه <b>${kd(available)}</b> د.ك شهرياً.`; }
+        else if (r.end <= want) { r.verdict = 'من الراتب · بالموعد'; r.tone = 'teal'; r.advice = `يقفل ${monthLabel(r.end)} قبل التاريخ المطلوب بـ <b>${ar(want - r.end)}</b> شهراً.`; }
+        else {
+          const need = want > 0 ? amount / want : amount; const gap = need - available;
+          r.verdict = 'الراتب ما يكفي للموعد'; r.tone = 'amber';
+          r.advice = `التاريخ المطلوب يحتاج <b>${kd(need)}</b> د.ك شهرياً، والمتاح <b>${kd(available)}</b> د.ك. الفجوة <b>${kd(gap)}</b> د.ك شهرياً .. إما نمدد الموعد إلى ${monthLabel(r.end)}، أو نجيب الفجوة من زيادة الدخل.`;
+        }
+        cursor = r.end;
+      }
+    } else if (src === 'income') {
+      const m = want && want > 0 ? want : 12;
+      r.monthly = amount / m; r.months = m; r.end = m; r.verdict = 'زيادة الدخل'; r.tone = 'ice';
+      r.advice = `يحتاج <b>${kd(r.monthly)}</b> د.ك شهرياً من مصدر دخل إضافي على مدى <b>${ar(m)}</b> شهراً. اكتبي المصدر بالاسم: بونص · مشروع · ترقية · مكافأة .. الهدف بلا مصدر محدد ما ينفذ.`;
+    } else if (src === 'debt') {
+      const m = want && want > 0 ? want : 24;
+      const inst = amount / m;
+      const newRatio = c.income ? ((c.debtPay + inst) / c.income) * 100 : 0;
+      r.monthly = inst; r.months = m; r.end = m;
+      if (newRatio > RULES.maxInstallmentRatio * 100) { r.verdict = 'تمويل يكسر القاعدة'; r.tone = 'wine'; r.advice = `القسط المقدّر <b>${kd(inst)}</b> د.ك يرفع نسبة الأقساط إلى <b>${pct(newRatio)}</b> · فوق حد الـ40%. هذا التمويل يحوّل الهدف إلى مشكلة جديدة.`; }
+      else { r.verdict = 'تمويل ضمن الحد'; r.tone = 'amber'; r.advice = `القسط المقدّر <b>${kd(inst)}</b> د.ك على <b>${ar(m)}</b> شهراً · نسبة الأقساط تصير <b>${pct(newRatio)}</b> وهي ضمن الحد. لكن القاعدة تبقى: التمويل آخر خيار لا أوله.`; }
+    } else if (src === 'passive') { r.verdict = 'عائد استثماري'; r.tone = 'ice'; r.advice = 'هذا الهدف يُموّل من دخل سلبي · ينتقل لصفحة الاستثمار لتحديد الأصل والمبلغ والمدة.'; }
+    rows.push(r);
+  });
+  return { rows, available, horizon: cursor };
+}
+function paintGoalsPlan() {
+  const P = goalPlan(); const c = calc();
+  if (!S.goals.length) { $('#goalsPlan').innerHTML = ''; return; }
+  const sal = P.rows.filter(r => r.source === 'salary' && r.active);
+  const thread = sal.length ? `<div class="sheet"><h3>الخط الزمني · هدف بعد هدف</h3>
+      <p class="hint">كل الفائض يروح للهدف الأول لين يقفل، وبعدها ينتقل للي بعده كامل · لا توزيع بالتساوي</p>
+      <div class="thread"><div class="thread-row"><div class="node done"><div class="nt">اليوم</div><div class="nd">${monthLabel(0)}</div></div>
+        ${sal.map(r => `<div class="node ${r.tone === 'teal' ? 'done' : 'risk'}"><div class="nt" title="${esc(r.name)}">${esc(r.name)}</div><div class="nd">${monthLabel(r.end)}</div></div>`).join('')}
+      </div></div></div>` : '';
+  const cards = P.rows.map((r, n) => `<div class="sheet" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
+        <div style="display:flex;gap:14px;align-items:flex-start"><div class="sec-num" style="font-size:32px">${ar(n + 1)}</div>
+          <div><h3 style="margin:0">${esc(r.name)}</h3><div class="hint">${kd(r.amount)} د.ك · ${(GOAL_TERMS.find(t => t.id === r.term) || {}).name || ''} · ${(FUNDING_SOURCES.find(f => f.id === r.source) || {}).name}</div></div></div>
+        <span class="tag ${r.tone}">${r.verdict}</span></div>
+      <div class="note ${r.tone === 'gray' ? 'ice' : r.tone}" style="margin-bottom:0">${r.advice}</div>
+      ${r.active ? `<div class="grid g4" style="margin-top:12px">${stat('الموجه شهرياً', kd(r.monthly) + ' د.ك', 'teal', '')}${stat('المدة', ar(r.months) + ' شهراً', '', '')}${stat('يبدأ', monthLabel(r.start), '', '')}${stat('يقفل', monthLabel(r.end), 'teal', '')}</div>` : ''}
+    </div>`).join('');
+  const routes = `<div class="sheet"><h3>مسارات التمويل الثلاثة · بهذا الترتيب</h3><p class="hint">ما ننتقل للمسار اللي بعده إلا بعد ما نثبت إن اللي قبله ما يكفي</p>
+      <div class="grid g3">${FUNDING_SOURCES.slice(0, 3).map((f, i) => `<div class="card">
+            <div class="eyebrow">${['المسار الأول','المسار الثاني','المسار الثالث'][i]}</div>
+            <h4 style="font-size:var(--text-md);font-weight:500;margin-bottom:4px">${f.name}</h4>
+            <p style="font-size:var(--text-2xs);color:var(--text-muted);margin:0">${f.desc}</p>
+            ${i === 0 ? `<div class="kv" style="margin-top:9px"><span>المتاح اليوم</span><span>${kd(c.available)} د.ك</span></div>` : ''}
+            ${i === 1 ? `<div class="kv" style="margin-top:9px"><span>المطلوب من زيادة الدخل</span><span>${kd(neededFromIncome(P, c))} د.ك</span></div>` : ''}
+            ${i === 2 ? `<div class="kv" style="margin-top:9px"><span>مساحة القسط المتبقية</span><span>${kd(Math.max(0, c.income * RULES.maxInstallmentRatio - c.debtPay))} د.ك</span></div>` : ''}
+          </div>`).join('')}</div></div>`;
+  $('#goalsPlan').innerHTML = thread + routes + cards;
+}
+function neededFromIncome(P, c) {
+  let need = 0;
+  if (c.available < 0) need += Math.abs(c.available);
+  P.rows.forEach(r => {
+    if (r.source === 'income') need += r.monthly;
+    if (r.source === 'salary' && r.tone === 'amber' && r.want > 0) need += Math.max(0, r.amount / r.want - r.monthly);
+    if (r.source === 'salary' && !r.active) need += r.want > 0 ? r.amount / r.want : r.amount / 12;
+  });
+  return need;
+}
+
+/* ============ 03 الديون ============ */
+function selfMonths(balance, payment, costPct) {
+  if (balance <= 0) return 0;
+  if (payment <= 0) return null;
+  const i = (num(costPct) / 100) / 12;
+  if (i <= 0) return Math.ceil(balance / payment);
+  if (payment <= balance * i) return null;
+  return Math.ceil(-Math.log(1 - (balance * i) / payment) / Math.log(1 + i));
+}
+function orderDebts(list, strategy) {
+  const a = list.map((d, i) => ({ ...d, i, balance: num(d.balance), payment: num(d.payment), cost: num(d.cost) }));
+  if (strategy === 'snowball') a.sort((x, y) => x.balance - y.balance);
+  else if (strategy === 'avalanche') a.sort((x, y) => y.cost - x.cost || x.balance - y.balance);
+  else a.sort((x, y) => (y.payment / (y.balance || 1)) - (x.payment / (x.balance || 1)));
+  return a;
+}
+function simulateDebt(strategy, extra) {
+  const list = orderDebts(S.debts, strategy).filter(d => d.balance > 0);
+  if (!list.length) return null;
+  const bal = list.map(d => d.balance), base = list.map(d => d.payment), closed = list.map(() => null);
+  let freed = 0, month = 0, totalPaid = 0; const curve = [];
+  while (bal.some(b => b > 0.5) && month < 720) {
+    month++;
+    let pool = extra + freed;
+    for (let k = 0; k < list.length; k++) { if (bal[k] <= 0) continue; const i = (list[k].cost / 100) / 12; bal[k] += bal[k] * i; }
+    for (let k = 0; k < list.length; k++) {
+      if (bal[k] <= 0) continue;
+      const p = Math.min(base[k], bal[k]); bal[k] -= p; totalPaid += p;
+      if (bal[k] <= 0.5 && closed[k] === null) { bal[k] = 0; closed[k] = month; freed += base[k]; }
+    }
+    for (let k = 0; k < list.length && pool > 0; k++) {
+      if (bal[k] <= 0) continue;
+      const p = Math.min(pool, bal[k]); bal[k] -= p; pool -= p; totalPaid += p;
+      if (bal[k] <= 0.5 && closed[k] === null) { bal[k] = 0; closed[k] = month; freed += base[k]; }
+      break;
+    }
+    curve.push(bal.reduce((t, b) => t + b, 0));
+  }
+  const baseline = Math.max(...S.debts.map(d => selfMonths(num(d.balance), num(d.payment), num(d.cost)) ?? 720));
+  return { list, closed, months: month, totalPaid, curve, baseline, strategy, extra };
+}
+function paintDebt() {
+  paintDebts();
+  const c = calc();
+  $('#debtStats').innerHTML =
+    stat('إجمالي المديونية', kd(c.debtBal) + ' د.ك', c.debtBal > 0 ? 'wine' : 'teal', '') +
+    stat('الأقساط الشهرية', kd(c.debtPay) + ' د.ك', '', '') +
+    stat('نسبة الأقساط من الدخل', pct(c.instRatio), c.instRatio > 40 ? 'wine' : c.instRatio > 25 ? 'amber' : 'teal', 'الحد 40%') +
+    stat('مساحة القسط المتبقية', kd(Math.max(0, c.income * 0.4 - c.debtPay)) + ' د.ك', '', 'قبل كسر القاعدة');
+  $('#stratCards').innerHTML = DEBT_STRATEGIES.map(s => `<div class="card">
+      <h4 style="font-size:var(--text-md);font-weight:500;margin-bottom:6px">${s.name}</h4>
+      <div class="kv"><span>القاعدة</span><span></span></div><p style="font-size:var(--text-2xs);color:var(--text-body);margin:4px 0 10px">${s.rule}</p>
+      <div class="kv"><span>الأنسب لـ</span><span></span></div><p style="font-size:var(--text-2xs);color:var(--text-body);margin:4px 0 10px">${s.best}</p>
+      <div class="kv"><span>انتبهي</span><span></span></div><p style="font-size:var(--text-2xs);color:var(--wine-500);margin:4px 0 0">${s.watch}</p></div>`).join('');
+}
+function runDebtSim() {
+  const c = calc();
+  const extra = num($('#extra').value) || Math.max(0, c.available);
+  S.extra = num($('#extra').value); S.strategy = $('#strategy').value; save(true);
+  const results = DEBT_STRATEGIES.map(s => ({ s, r: simulateDebt(s.id, extra) })).filter(x => x.r);
+  if (!results.length) { $('#debtOut').innerHTML = `<div class="note teal">ما فيه ديون بأرصدة · ما نحتاج محاكاة.</div>`; return; }
+  const chosen = results.find(x => x.s.id === S.strategy) || results[0];
+  const R = chosen.r;
+  const best = results.reduce((a, b) => (b.r.months < a.r.months ? b : a));
+  $('#debtOut').innerHTML = `<div class="grid g4" style="margin:16px 0">
+      ${stat('المبلغ الموجه شهرياً', kd(extra) + ' د.ك', 'teal', 'فوق الأقساط الأساسية')}
+      ${stat('صفر دين', monthLabel(R.months), 'teal', ar(R.months) + ' شهراً')}
+      ${stat('بلا خطة', monthLabel(R.baseline), 'wine', ar(R.baseline) + ' شهراً')}
+      ${stat('التقليص', ar(Math.max(0, R.baseline - R.months)) + ' شهراً', '', R.baseline ? pct(((R.baseline - R.months) / R.baseline) * 100) + ' من عمر الدين' : '')}
+    </div>
+    ${lineChart(R.curve, 'الرصيد المتبقي · د.ك')}
+    <div class="tw" style="margin-top:16px"><table><thead><tr><th style="width:52px">الترتيب</th><th>الجهة</th><th>الرصيد عند البدء</th><th>القسط</th><th>يقفل</th><th>بلا خطة</th></tr></thead><tbody>
+      ${R.list.map((d, k) => `<tr><td style="text-align:center">${ar(k + 1)}</td><td>${esc(d.name || 'التزام')}</td><td class="mono">${kd(d.balance)}</td><td class="mono">${kd(d.payment)}</td>
+        <td><span class="tag teal">${R.closed[k] ? monthLabel(R.closed[k]) : 'ما يقفل'}</span></td>
+        <td class="hint">${(() => { const m = selfMonths(d.balance, d.payment, d.cost); return m === null ? 'ما يقفل' : monthLabel(m); })()}</td></tr>`).join('')}</tbody></table></div>
+    <div class="sheet" style="background:var(--ice-50);box-shadow:none;margin-top:18px">
+      <h3 style="font-size:var(--text-md)">مقارنة الاستراتيجيات الثلاث على نفس الأرقام</h3>
+      <div class="tw"><table><thead><tr><th>الاستراتيجية</th><th>صفر دين</th><th>عدد الأشهر</th><th>إجمالي المدفوع</th></tr></thead><tbody>
+        ${results.map(x => `<tr${x.s.id === best.s.id ? ' style="background:var(--teal-50)"' : ''}><td>${x.s.name}${x.s.id === best.s.id ? ' <span class="tag teal">الأسرع</span>' : ''}</td>
+          <td>${monthLabel(x.r.months)}</td><td class="mono">${ar(x.r.months)}</td><td class="mono">${kd(x.r.totalPaid)} د.ك</td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="note ice" style="margin-bottom:0">الفرق بين الاستراتيجيات هنا <b>${ar(Math.max(...results.map(x => x.r.months)) - Math.min(...results.map(x => x.r.months)))}</b> شهراً. لو الفرق صغير، اختاري اللي يثبّت التزام العميل لا اللي توفّر أشهر قليلة .. الخطة اللي ما تُنفذ ما لها قيمة.</div>
+    </div>`;
+}
+function lineChart(series, label, color) {
+  if (!series || series.length < 2) return '';
+  const W = 720, H = 206, PL = 68, PR = 16, PT = 24, PB = 28;
+  const max = Math.max(...series), min = 0, n = series.length;
+  const x = i => PL + (i / (n - 1)) * (W - PL - PR);
+  const y = v => PT + (1 - (v - min) / ((max - min) || 1)) * (H - PT - PB);
+  const d = series.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = d + ` L${x(n - 1).toFixed(1)},${y(0)} L${x(0).toFixed(1)},${y(0)} Z`;
+  const ticks = [0, .25, .5, .75, 1].map(t => max * t);
+  const gid = 'lg' + Math.random().toString(36).slice(2, 7);
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">
+    <defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${color || '#3eadad'}" stop-opacity=".22"/><stop offset="100%" stop-color="${color || '#3eadad'}" stop-opacity="0"/></linearGradient></defs>
+    ${ticks.map(t => `<line class="gl" x1="${PL}" x2="${W - PR}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${PL - 6}" y="${y(t) + 3}" text-anchor="end">${kd(t)}</text>`).join('')}
+    <path d="${area}" fill="url(#${gid})"/><path d="${d}" fill="none" stroke="${color || '#2f1749'}" stroke-width="2" stroke-linejoin="round"/>
+    <text class="ax" x="${W - PR}" y="${H - 8}" text-anchor="end">${monthLabel(0)}</text><text class="ax" x="${PL}" y="${H - 8}">${monthLabel(n)}</text>
+  </svg><p class="hint" style="text-align:center;margin-top:4px">${label}</p>`;
+}
+
+/* ============ 04 الاستثمار ============ */
+function currentRates() {
+  if (S.rateSet === 'manual' && S.customRates) return S.customRates;
+  if (S.customRates && S.rateSet === 'custom') return S.customRates;
+  return RATE_SETS[S.rateSet] ? RATE_SETS[S.rateSet].rates : RATE_SETS.global.rates;
+}
+function fv(start, monthly, years, annualPct) {
+  const i = (annualPct / 100) / 12, m = years * 12;
+  if (Math.abs(i) < 1e-9) return start + monthly * m;
+  return start * Math.pow(1 + i, m) + monthly * ((Math.pow(1 + i, m) - 1) / i);
+}
+function paintRisk() {
+  const R = riskAllowance(), I = R.I;
+  $('#cashNow').value = S.cashNow || 0; $('#incomeStab').value = S.incomeStab; $('#careLoad').value = S.careLoad;
+  $('#riskOut').innerHTML = `<div class="grid g4" style="margin:14px 0">
+      ${stat('الفائض الشهري', kd(I.available) + ' د.ك', 'teal', 'قبل أي اقتطاع')}
+      ${stat('أشهر الصمود', I.resilience.toFixed(1), I.resilience >= 3 ? 'teal' : 'wine', 'الهدف 3 أشهر')}
+      ${stat('النسبة الآمنة للاستثمار', R.blockers.length ? 'صفر' : pct(R.ratio * 100), R.blockers.length ? 'wine' : 'teal', 'من الفائض')}
+      ${stat('المبلغ المسموح شهرياً', kd(R.amount) + ' د.ك', R.amount ? 'teal' : 'wine', R.amount ? 'وابدئي بأقل منه' : 'الأساس ما اكتمل')}
+    </div>
+    ${R.blockers.length ? `<div class="note wine"><b>الاستثمار موقوف الحين للأسباب التالية:</b><ul style="margin:6px 0 0;padding-right:18px">${R.blockers.map(b => `<li>${b}</li>`).join('')}</ul></div>`
+      : `<div class="note ice">الفائض <b>${kd(I.available)}</b> د.ك، والمسموح استثماره <b class="k">${kd(R.amount)}</b> د.ك شهرياً. وحتى هذا المبلغ ما يُدخل دفعة واحدة .. ابدئي بـ <b>${kd(R.firstStep)}</b> د.ك أي ربع الفائض، وثبّتيه ثلاثة أشهر، وبعدها ارفعي.<br>القاعدة: الفائض الكبير ما يعني إن كله قابل للمخاطرة. نبني الأساس أول، وبعدها ننتقل للمرحلة اللي بعدها.</div>`}
+    <div class="note amber">مؤشر معدل المخاطرة يتغير بتغير ظروف الأسرة. أي التزام رعاية أو علاج متكرر يقلل المبلغ المسموح تلقائياً، لأن هذا البند يسحب من السيولة بلا موعد.</div>`;
+}
+function paintQuiz() {
+  $('#quizBox').innerHTML = QUIZ.map((q, qi) => `<div class="qz"><p>${ar(qi + 1)} · ${q.q}</p><div class="opts">
+      ${q.a.map((o, oi) => `<button class="opt ${S.quizAnswers[qi] === oi ? 'on' : ''}" data-q="${qi}" data-o="${oi}">${o[0]}</button>`).join('')}</div></div>`).join('') +
+    `<div class="bar"><button class="btn teal sm" id="quizDone">اعتماد النتيجة</button><span class="hint">أجبتِ على ${ar(Object.keys(S.quizAnswers).length)} من ${ar(QUIZ.length)}</span></div>`;
+  $('#pickBox').innerHTML = `<div class="grid g2">${IDENTITIES.map(id => `<div class="card" style="cursor:pointer" data-pick="${id.id}">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h4 style="font-size:var(--text-md);font-weight:500">${id.name}</h4>${S.identity === id.id ? '<span class="tag teal">المعتمدة</span>' : ''}</div>
+      <p style="font-size:var(--text-2xs);color:var(--teal-600);margin:2px 0 6px">${id.short}</p><p style="font-size:var(--text-2xs);color:var(--text-body);margin:0">${id.desc}</p>
+      <div class="kv" style="margin-top:8px"><span>الأفق الزمني</span><span>${id.horizon}</span></div></div>`).join('')}</div>`;
+  paintIdentity();
+}
+function paintIdentity() {
+  const id = IDENTITIES.find(x => x.id === S.identity);
+  if (!id) { $('#identityOut').innerHTML = `<div class="note ice">ما تحددت الهوية بعد · الحاسبة تشتغل بدونها، بس التوزيع المقترح ما يظهر.</div>`; return; }
+  $('#identityOut').innerHTML = `<div class="hero" style="margin-top:16px">${WM}<div style="position:relative;z-index:1">
+        <div class="eyebrow" style="color:rgba(255,255,255,.7)">Financial identity</div>
+        <h3 style="font-size:var(--text-2xl);font-weight:200;letter-spacing:-.02em">${id.name}</h3><p style="margin-top:6px">${id.desc}</p>
+        <p style="margin-top:10px;font-size:var(--text-xs)"><b>نمط الأسهم المناسب:</b> ${id.stockStyle}</p></div></div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="sheet" style="box-shadow:none;background:var(--ice-50);margin:0"><h3 style="font-size:var(--text-md)">التوزيع المقترح</h3>
+        ${Object.entries(id.mix).map(([k, v]) => `<div style="margin-bottom:9px"><div class="kv" style="border:0"><span>${k}</span><span>${ar(v)}%</span></div><div class="meter teal"><i style="width:${v}%"></i></div></div>`).join('')}</div>
+      <div class="sheet" style="box-shadow:none;background:var(--ice-50);margin:0"><h3 style="font-size:var(--text-md)">شروط الهوية</h3>
+        <div class="kv"><span>الأفق الزمني المناسب</span><span>${id.horizon}</span></div><div class="kv"><span>خلاصة الهوية</span><span>${id.short}</span></div>
+        <div class="note wine" style="margin-bottom:0">${id.warn}</div></div></div>`;
+}
+function paintRatesUI() {
+  $('#rateSet').innerHTML = Object.entries(RATE_SETS).map(([k, v]) => `<option value="${k}" ${S.rateSet === k ? 'selected' : ''}>${v.label}</option>`).join('');
+  $('#rateLabel').textContent = (RATE_SETS[S.rateSet] || RATE_SETS.global).label + ' · كلها معدلات سنوية تقديرية وقابلة للتعديل';
+  const r = currentRates();
+  $('#ratesEditor').innerHTML = `<div class="tw"><table><thead><tr><th>الأصل</th><th style="width:110px">متحفظ %</th><th style="width:110px">متوسط %</th><th style="width:110px">متفائل %</th></tr></thead><tbody>
+      ${ASSETS.map(a => `<tr class="row-in"><td>${a.name}</td>${[0, 1, 2].map(k => `<td><input type="number" step="0.1" class="rate-i" data-a="${a.id}" data-k="${k}" value="${r[a.id] ? r[a.id][k] : 0}"></td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="note amber" style="margin-bottom:0">أي تعديل هنا يُحفظ بملف العميل ويصير مصدر الحساب. اكتبي مصدر الرقم بملاحظة الجلسة عشان يكون موثقاً.</div>`;
+}
+function paintInvest() {
+  paintRisk(); paintRatesUI(); paintQuiz();
+  $('#invMonthly').value = S.inv.monthly || 0; $('#invStart').value = S.inv.start || 0; $('#invYears').value = S.inv.years || 7;
+  paintAssets(); paintPassive();
+}
+function runInvest() {
+  S.inv = { monthly: num($('#invMonthly').value), start: num($('#invStart').value), years: Math.max(1, num($('#invYears').value)) };
+  save(true);
+  const R = riskAllowance(), rates = currentRates();
+  const rows = ASSETS.map(a => { const r = rates[a.id] || [0, 0, 0];
+    return { a, low: fv(S.inv.start, S.inv.monthly, S.inv.years, r[0]), mid: fv(S.inv.start, S.inv.monthly, S.inv.years, r[1]), high: fv(S.inv.start, S.inv.monthly, S.inv.years, r[2]), r };
+  }).sort((x, y) => y.mid - x.mid);
+  const contributed = S.inv.start + S.inv.monthly * 12 * S.inv.years;
+  const top = rows[0];
+  const overLimit = S.inv.monthly > R.amount && R.amount >= 0;
+  $('#invOut').innerHTML = `${overLimit ? `<div class="note wine" style="margin-top:14px"><b>المبلغ الشهري أعلى من المسموح.</b> أدخلتي <b>${kd(S.inv.monthly)}</b> د.ك، والمسموح حسب مؤشر المخاطرة <b>${kd(R.amount)}</b> د.ك. الحساب أدناه صحيح رياضياً، لكنه غير مناسب لوضع العميل اليوم.</div>` : ''}
+    <div class="grid g3" style="margin:16px 0">
+      ${stat('المبلغ المدفوع فعلياً', kd(contributed) + ' د.ك', '', 'بداية + شهري × المدة')}
+      ${stat('أعلى قيمة متوقعة', kd(top.high) + ' د.ك', 'teal', top.a.name + ' · سيناريو متفائل')}
+      ${stat('أقل قيمة متوقعة', kd(Math.min.apply(null, rows.map(r => r.low))) + ' د.ك', 'wine', 'السيناريو المتحفظ')}
+    </div>
+    <div class="tw"><table style="table-layout:fixed"><colgroup><col style="width:22%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:15%"><col style="width:12%"><col style="width:12%"></colgroup>
+      <thead><tr><th>الأصل</th><th>متحفظ</th><th>متوسط</th><th>متفائل</th><th>الربح المتوقع</th><th>السيولة</th><th>المخاطرة</th></tr></thead><tbody>
+      ${rows.map((x, k) => `<tr${k === 0 ? ' style="background:var(--teal-50)"' : ''}><td>${x.a.name}${k === 0 ? ' <span class="tag teal">الأعلى متوقعاً</span>' : ''}</td>
+        <td class="mono">${kd(x.low)}</td><td class="mono">${kd(x.mid)}</td><td class="mono">${kd(x.high)}</td><td class="mono" style="color:var(--teal-600)">${kd(x.mid - contributed)}</td>
+        <td>${dots(x.a.liquidity, 5)}</td><td>${dots(x.a.risk, 5, true)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="note wine">الأصل الأعلى عائداً متوقعاً هو <b>${top.a.name}</b> بهذي المدة والمبلغ .. وهذا <b>لا يعني إنه الأنسب</b>. اقرئيه مع مبلغ الدخول (<b>${kd(top.a.minEntry)}</b> د.ك) والسيولة والأفق الزمني (${top.a.horizon}) وهوية العميل.</div>`;
+}
+function dots(v, max, risk) { return `<span class="dots ${risk ? 'risk' : ''}">${Array.from({ length: max }, (_, i) => `<span class="${i < v ? 'on' : ''}"></span>`).join('')}</span>`; }
+function paintAssets() {
+  const rates = currentRates();
+  const list = ASSETS.map(a => ({ a, mid: (rates[a.id] || [0, 0, 0])[1] })).sort((x, y) => y.mid - x.mid);
+  $('#assetGrid').innerHTML = list.map(({ a }, k) => { const r = rates[a.id] || [0, 0, 0];
+    return `<div class="asset ${k === 0 ? 'top' : ''}"><div class="fam">${a.family}</div><h4>${a.name}</h4>
+      <div class="kv"><span>العائد المتوقع</span><span>${r[0]}% · ${r[1]}% · ${r[2]}%</span></div>
+      <div class="kv"><span>مبلغ الدخول التقريبي</span><span>${kd(a.minEntry)} د.ك</span></div>
+      <div class="kv"><span>الأفق الزمني</span><span>${a.horizon}</span></div><div class="kv"><span>التوزيع</span><span>${a.payout}</span></div>
+      <div class="kv"><span>السيولة</span><span>${dots(a.liquidity, 5)}</span></div><div class="kv"><span>المخاطرة</span><span>${dots(a.risk, 5, true)}</span></div>
+      <div style="margin-top:9px"><b style="font-size:var(--text-2xs);color:var(--teal-600)">مزايا</b><ul>${a.pros.map(p => `<li>${p}</li>`).join('')}</ul></div>
+      <div style="margin-top:7px"><b style="font-size:var(--text-2xs);color:var(--wine-500)">عيوب</b><ul>${a.cons.map(p => `<li>${p}</li>`).join('')}</ul></div>
+      <div class="note ice" style="margin:9px 0 0;padding:8px 11px"><b>يناسب:</b> ${a.fit}</div></div>`; }).join('');
+}
+function paintPassive() {
+  const P = goalPlan();
+  const passives = P.rows.filter(r => r.source === 'passive');
+  const rates = currentRates();
+  if (!passives.length) { $('#passiveOut').innerHTML = `<div class="note ice">ما فيه هدف مصدر تمويله عائد استثماري. حددي مصدر التمويل بجدول الأهداف بـ«عائد استثماري» عشان يظهر هنا بالمبلغ والمدة المطلوبة.</div>`; return; }
+  $('#passiveOut').innerHTML = passives.map(g => {
+    const yearly = g.amount;
+    const opts = ASSETS.filter(a => a.payout.includes('توزيع') || a.payout.includes('إيجار') || a.payout.includes('دورية'))
+      .map(a => { const r = (rates[a.id] || [0, 0, 0])[1]; return { a, r, capital: r > 0 ? (yearly / (r / 100)) : Infinity }; }).sort((x, y) => x.capital - y.capital);
+    return `<div style="margin-bottom:18px"><h4 style="font-size:var(--text-md);font-weight:500">${esc(g.name)}</h4>
+      <p class="hint">الهدف يحتاج <b>${kd(yearly)}</b> د.ك سنوياً من دخل سلبي · هذا يعني رأس مال بحجم كافٍ يولّد المبلغ من توزيعاته لا من بيعه</p>
+      <div class="tw"><table><thead><tr><th>الأصل المولّد للدخل</th><th>العائد المتوسط</th><th>رأس المال المطلوب</th><th>موعد التوزيع</th><th>السيولة</th></tr></thead><tbody>
+        ${opts.map(o => `<tr><td>${o.a.name}</td><td class="mono">${o.r}%</td><td class="mono">${isFinite(o.capital) ? kd(o.capital) + ' د.ك' : 'ما ينطبق'}</td><td>${o.a.payout}</td><td>${dots(o.a.liquidity, 5)}</td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="note ice">الهدف المحاسبي هنا واضح: توزيعات تنزل قبل موعد الصرف بوقت كافٍ. لو الصرف بشهر 8، يُختار أصل توزيعه بالربع الثاني عشان المبلغ يوصل قبل الموعد بثلاثة أشهر .. فما نلمس الراتب ولا المصروفات المتغيرة، والهدف يتحقق من الأصل نفسه.</div></div>`;
+  }).join('');
+}
+
+/* ============ 05 المؤشرات ============ */
+function paintIndex() {
+  const I = indicators();
+  const rec = readRec(I.recovery), ind = reading(I.independence);
+  $('#indexStats').innerHTML = `
+    <div class="stat"><div class="lbl">مؤشر التعافي المالي · من 100</div><div class="val ${rec.tone}">${ar(I.recovery)}</div><div class="meter ${rec.tone}"><i style="width:${I.recovery}%"></i></div><div class="sub" style="margin-top:6px">${rec.label} · 60% محاسبي و40% سلوكي</div></div>
+    <div class="stat"><div class="lbl">مؤشر الاستقلال المالي · من 100</div><div class="val ${ind.tone}">${ar(I.independence)}</div><div class="meter ${ind.tone}"><i style="width:${I.independence}%"></i></div><div class="sub" style="margin-top:6px">${ind.label} · تغطية بلا سلف وتعدد مصادر</div></div>
+    <div class="stat"><div class="lbl">المرحلة المالية</div><div class="val">${PHASES[I.phase - 1].name}</div><div class="meter"><i style="width:${(I.phase / 5) * 100}%"></i></div><div class="sub" style="margin-top:6px">المرحلة ${ar(I.phase)} من ${ar(5)}</div></div>`;
+  $('#habitsBox').innerHTML = HABITS.map((h, i) => `<label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;color:var(--text-body);font-size:var(--text-sm)"><input type="checkbox" data-habit="${i}" ${S.habits.includes(i) ? 'checked' : ''} style="width:auto">${h}</label>`).join('') +
+    `<div class="note ${S.habits.length >= 5 ? 'teal' : 'amber'}" style="margin-bottom:0">تحسّنت <b>${ar(S.habits.length)}</b> عادات من ${ar(7)}</div>`;
+  $('#flagsBox').innerHTML = RISK_FLAGS.map((f, i) => `<label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;color:var(--text-body);font-size:var(--text-sm)"><input type="checkbox" data-flag="${i}" ${S.flags.includes(i) ? 'checked' : ''} style="width:auto">${f}</label>`).join('') +
+    `<div class="note ${S.flags.length <= 2 ? 'teal' : 'wine'}" style="margin-bottom:0">علامات الخطر القائمة <b>${ar(S.flags.length)}</b> من ${ar(7)} · الحد المقبول ${ar(2)} فأقل</div>`;
+  $('#phaseBox').innerHTML = `<div class="grid g3">${PHASES.map(p => `<div class="card" style="${p.id === I.phase ? 'outline:1.5px solid var(--teal-400)' : 'opacity:.72'}">
+      <div class="eyebrow">المرحلة ${ar(p.id)}</div><h4 style="font-size:var(--text-md);font-weight:500;margin-bottom:5px">${p.name}${p.id === I.phase ? ' <span class="tag teal">الحالية</span>' : ''}</h4>
+      <p style="font-size:var(--text-2xs);color:var(--text-body);margin:0 0 6px">${p.test}</p><p style="font-size:var(--text-2xs);color:var(--teal-600);margin:0">${p.note}</p></div>`).join('')}</div>`;
+  const worst = [ { k: 'نسبة الأقساط', bad: I.instRatio > 40 }, { k: 'صندوق الطوارئ', bad: I.resilience < 3 }, { k: 'الفائض الشهري', bad: I.available <= 0 }, { k: 'الانضباط السلوكي', bad: I.flagsN > 2 } ].filter(x => x.bad);
+  $('#readingBox').innerHTML = `
+    <div class="note ${rec.tone === 'teal' ? 'teal' : rec.tone === 'wine' ? 'wine' : 'amber'}"><b>التعافي ${ar(I.recovery)} · ${rec.label}.</b> ${rec.action}.</div>
+    <div class="note ${ind.tone === 'teal' ? 'teal' : ind.tone === 'wine' ? 'wine' : 'amber'}"><b>الاستقلال ${ar(I.independence)} · ${ind.label}.</b> ${
+      I.independence >= 70 ? 'العميل يغطي التزاماته من دخله بلا سلف، والمسار التالي بناء الأصول.'
+      : I.independence >= 55 ? 'التغطية قائمة بس هشة · أي طارئ يرجّع الاعتمادية. الأولوية صندوق الطوارئ وتنويع الدخل.'
+      : 'التغطية ناقصة · الأولوية إعادة ترتيب الالتزامات قبل أي هدف أو استثمار.'}</div>
+    ${worst.length ? `<div class="note ice"><b>البنود اللي تسحب المؤشر لتحت:</b> ${worst.map(w => w.k).join(' · ')}. اشتغلي عليها بالترتيب، والمؤشر يرتفع بلا ما نزيد دينار على الدخل.</div>` : `<div class="note teal">ما فيه بند حرج · الحالة مستقرة على أرقام اليوم.</div>`}
+    <div class="note amber" style="margin-bottom:0">القياس يُعاد بعد <b>90</b> يوماً · والمقارنة بين القراءتين هي اللي تقول إن الخطة تشتغل ولا لا.</div>`;
+}
+
+/* ============ 06 المتابعة ============ */
+function paintTrackPanel() {
+  paintTrack();
+  const c = calc();
+  const rows = S.track.filter(t => t.month).sort((a, b) => String(a.month).localeCompare(String(b.month)));
+  if (rows.length < 2) { $('#trackChart').innerHTML = `<div class="note ice">سجّلي شهرين على الأقل عشان يظهر المنحنى. المنحنى هو أول من يقول إن الالتزام بدأ ينزل.</div>`; $('#trackRead').innerHTML = ''; }
+  else {
+    const surplus = rows.map(t => num(t.income) - num(t.spend) - num(t.directed));
+    $('#trackChart').innerHTML = lineChart(surplus.map(v => Math.max(0, v)), 'الفائض الشهري الفعلي · د.ك', '#2f1749');
+    const last = surplus[surplus.length - 1], prev = surplus[surplus.length - 2];
+    const avg = surplus.reduce((a, b) => a + b, 0) / surplus.length;
+    const drop = last < prev && last < avg * 0.7;
+    const directedAvg = rows.reduce((t, r) => t + num(r.directed), 0) / rows.length;
+    $('#trackRead').innerHTML = `<div class="grid g4" style="margin:16px 0">
+        ${stat('متوسط الفائض', kd(avg) + ' د.ك', '', ar(rows.length) + ' أشهر مسجلة')}
+        ${stat('آخر شهر', kd(last) + ' د.ك', last < 0 ? 'wine' : last < avg ? 'amber' : 'teal', last < prev ? 'نزول عن الشهر السابق' : 'ثابت أو صاعد')}
+        ${stat('متوسط الموجه للسداد', kd(directedAvg) + ' د.ك', 'teal', 'للأهداف والديون')}
+        ${stat('الالتزام بالخطة', pct(Math.min(100, c.available ? (directedAvg / c.available) * 100 : 0)), directedAvg >= c.available * 0.8 ? 'teal' : 'wine', 'الفعلي مقارنة بالمخطط')}
+      </div>
+      ${drop ? `<div class="note wine"><b>المنحنى بدأ ينزل.</b> آخر شهر <b>${kd(last)}</b> د.ك مقابل متوسط <b>${kd(avg)}</b> د.ك. هذي اللحظة اللي تستدعي جلسة مراجعة قبل ما تتحول لتعثر .. اضغطي زر الطوارئ بصفحة الملف.</div>` : ''}
+      ${directedAvg < c.available * 0.6 && c.available > 0 ? `<div class="note amber">الموجه الفعلي للسداد <b>${kd(directedAvg)}</b> د.ك، والمخطط <b>${kd(c.available)}</b> د.ك. الفرق يعني إن جزء من الفائض يُصرف على بنود غير مجدولة .. والفائض بلا وجهة محددة يُصرف بلا أثر.</div>` : ''}`;
+  }
+  $('#pauseGoals').checked = S.pause.goals; $('#pauseInvest').checked = S.pause.invest; $('#pauseNote').value = S.pause.note || '';
+  $('#pauseOut').innerHTML = (S.pause.goals || S.pause.invest)
+    ? `<div class="note amber"><b>في إيقاف مؤقت قائم:</b> ${[S.pause.goals ? 'الأهداف' : '', S.pause.invest ? 'الاستثمار' : ''].filter(Boolean).join(' و')}${S.pause.note ? ' · ' + esc(S.pause.note) : ''}. الإيقاف المؤقت قرار صحيح بوقته، بشرط يكون له تاريخ مراجعة. الأقساط البنكية لا تدخل الإيقاف أبداً .. تأجيلها يحوّل الملف النظيف لملف قضايا.</div>`
+    : `<div class="note teal" style="margin-bottom:0">ما فيه إيقاف · الخطة شغالة على وضعها الطبيعي.</div>`;
+}
+/* ============ مدير الحياة ============ */
+const L = () => S.life;
+function lvLevel(v) { return v >= 7 ? 'teal' : v >= 4 ? 'amber' : 'wine'; }
+function finNumbers() { return Math.round(indicators().recovery) / 10; }
+function finSelf() { const v = LV_FIN.map(f => num(L().fin[f.id])); return Math.round(v.reduce((a, b) => a + b, 0) / v.length * 10) / 10; }
+function lvScores() { const o = { finance: finNumbers() }; LV_AXES.forEach(a => { if (a.id !== 'finance') o[a.id] = num(L().scores[a.id]); }); return o; }
+function lvAvg(sc) { const v = Object.values(sc); return Math.round(v.reduce((a, b) => a + b, 0) / v.length * 10) / 10; }
+function lvGet(p) { return p.split('.').reduce((o, k) => o?.[k], L()); }
+function lvSet(p, v) { const ks = p.split('.'); let o = L(); for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]]; o[ks.at(-1)] = v; }
+
+function drawWheel() {
+  const cx = 210, cy = 210, R = 140, sc = lvScores(), n = LV_AXES.length, step = 2 * Math.PI / n;
+  const pt = (a, r) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  let g = '';
+  for (let k = 2; k <= 10; k += 2) g += `<circle cx="${cx}" cy="${cy}" r="${R * k / 10}" fill="none" stroke="#dde4ea" stroke-width="1"/>`;
+  LV_AXES.forEach((ax, i) => {
+    const a0 = -Math.PI / 2 + i * step, a1 = a0 + step;
+    const [x0, y0] = pt(a0, R); g += `<line x1="${cx}" y1="${cy}" x2="${x0}" y2="${y0}" stroke="#dde4ea"/>`;
+    const r = R * Math.max(0, Math.min(10, sc[ax.id])) / 10;
+    if (r > 0) { const [p0x, p0y] = pt(a0 + .02, r), [p1x, p1y] = pt(a1 - .02, r);
+      g += `<path d="M${cx},${cy} L${p0x},${p0y} A${r},${r} 0 0 1 ${p1x},${p1y} Z" fill="${ax.c}" fill-opacity=".88"/>`; }
+    if (ax.id === 'finance') {
+      const rs = R * finSelf() / 10, [s0x, s0y] = pt(a0 + .04, rs), [s1x, s1y] = pt(a1 - .04, rs);
+      g += `<path d="M${s0x},${s0y} A${rs},${rs} 0 0 1 ${s1x},${s1y}" fill="none" stroke="#d69223" stroke-width="3" stroke-dasharray="4 3"/>`;
+    }
+    const [lx, ly] = pt(a0 + step / 2, R + 34);
+    g += `<text x="${lx}" y="${ly - 4}" text-anchor="middle" font-size="13" font-weight="500" fill="#2f1749" font-family="IBM Plex Sans Arabic,sans-serif">${ax.n}</text>`;
+    g += `<text x="${lx}" y="${ly + 13}" text-anchor="middle" font-size="13" font-weight="300" fill="${ax.c}" font-family="IBM Plex Sans Arabic,sans-serif">${ar(sc[ax.id])}</text>`;
+  });
+  const last = L().snapshots.at(-1);
+  if (last) {
+    const ps = LV_AXES.map((ax, i) => pt(-Math.PI / 2 + i * step + step / 2, R * num(last.s[ax.id]) / 10).join(',')).join(' ');
+    g += `<polygon points="${ps}" fill="none" stroke="#1a0c29" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  }
+  g += `<circle cx="${cx}" cy="${cy}" r="24" fill="#fff" stroke="#dde4ea"/><text x="${cx}" y="${cy + 6}" text-anchor="middle" font-size="17" font-weight="300" fill="#2f1749" font-family="IBM Plex Sans Arabic,sans-serif">${ar(lvAvg(sc))}</text>`;
+  $('#wheelSvg').innerHTML = g;
+  $('#wheelLegend').innerHTML = `محور المالية ملوّن حسب الأرقام الحقيقية · الخط العنبري المنقط = تقييم العميل لنفسه${last ? ' · الخط الداكن المنقط = قياس ' + esc(last.d) : ''} · الرقم بالنص = متوسط العجلة`;
+}
+function paintLvScores() {
+  const self = finSelf(), numbers = finNumbers();
+  $('#lvScores').innerHTML = `<div class="lv-fin"><div class="lv-score" style="margin:0 0 4px"><span class="nm"><i style="background:${LV_AXES[0].c}"></i>المالية</span><span></span><span></span></div>
+      <div class="two"><span>من أرقامك <b id="lvFinNum">${ar(numbers)}</b></span><span>تقييمك <b id="lvFinSelf">${ar(self)}</b></span></div>
+      <p class="hint" style="margin:4px 0 0">رقم الأرقام من مؤشر التعافي بصفحة المؤشرات · وتقييمك من المؤشرات الثمانية تحت</p></div>` +
+    LV_AXES.filter(a => a.id !== 'finance').map(ax => `<div class="lv-score"><label class="nm" for="lvr-${ax.id}"><i style="background:${ax.c}"></i>${ax.n}</label>
+      <input type="range" min="1" max="10" step="1" id="lvr-${ax.id}" data-lvaxis="${ax.id}" value="${L().scores[ax.id]}"><output id="lvo-${ax.id}">${ar(L().scores[ax.id])}</output></div>`).join('');
+}
+function paintLvFin() {
+  $('#lvFin').innerHTML = LV_FIN.map(f => `<div class="fin-row"><div class="top"><label for="lvf-${f.id}">${f.n}</label><span class="tag ${lvLevel(L().fin[f.id])}" id="lvft-${f.id}">${ar(L().fin[f.id])} من 10</span></div>
+      <input type="range" min="1" max="10" id="lvf-${f.id}" data-lvfin="${f.id}" value="${L().fin[f.id]}"><div class="hint">${f.h}</div></div>`).join('');
+}
+function paintLvStats() {
+  const sc = lvScores(), entries = LV_AXES.map(a => [a, sc[a.id]]);
+  const strong = entries.reduce((m, x) => x[1] > m[1] ? x : m), weak = entries.reduce((m, x) => x[1] < m[1] ? x : m);
+  const gap = Math.round((strong[1] - weak[1]) * 10) / 10, a = lvAvg(sc);
+  const gapT = gap <= 3 ? ['teal', 'متوازنة'] : gap <= 5 ? ['amber', 'فيها ميلان'] : ['wine', 'عجلة مايلة'];
+  const pg = Math.round((finSelf() - finNumbers()) * 10) / 10;
+  const pgT = pg > 2 ? ['wine', 'يشوف وضعه أحسن من أرقامه'] : pg < -2 ? ['amber', 'أرقامه أحسن من إحساسه'] : ['teal', 'إحساسه مطابق لأرقامه'];
+  $('#lvStats').innerHTML =
+    stat('متوسط العجلة', ar(a) + ' من 10', lvLevel(a), a >= 7 ? 'زين' : a >= 4 ? 'متوسط' : 'يبيله شغل') +
+    stat('فجوة التوازن', ar(gap), gapT[0], gapT[1]) +
+    stat('أقوى محور / أضعف محور', strong[0].n + ' / ' + weak[0].n, '', 'ارفع الأضعف نقطة وحدة الشهر الجاي') +
+    stat('فجوة الإدراك المالي', (pg > 0 ? '+' : '') + ar(pg), pgT[0], pgT[1]);
+}
+function paintLvRecs() {
+  const sc = lvScores(), out = [];
+  const pg = finSelf() - finNumbers();
+  if (pg > 2) out.push(['wine', 'المالية: الإحساس أعلى من الأرقام', 'تقييمك لوضعك المالي أعلى من أرقامك الحقيقية. هذي الفجوة تخلي القرارات تنبني على إحساس مو على كشف حساب، ونناقشها بالجلسة.']);
+  const order = ['debt', 'emerg', 'spend', 'income', 'save', 'fgoals', 'behav', 'invest'];
+  LV_FIN.filter(f => num(L().fin[f.id]) <= 5).sort((x, y) => order.indexOf(x.id) - order.indexOf(y.id)).slice(0, 3)
+    .forEach(f => out.push(['', 'المالية: ' + f.n, LV_FIN_TIPS[f.id]]));
+  LV_AXES.filter(a => a.id !== 'finance' && sc[a.id] <= 5).sort((x, y) => sc[x.id] - sc[y.id]).slice(0, 2)
+    .forEach(a => out.push(['', a.n, LV_LIFE_TIPS[a.id]]));
+  if (!out.length) out.push(['', 'عجلتك متوازنة', 'حافظ على اللي وصلت له، وارفع أضعف محور نقطة وحدة الشهر الجاي.']);
+  $('#lvRecs').innerHTML = out.map(r => `<li class="${r[0]}"><b>${esc(r[1])}</b>${esc(r[2])}</li>`).join('');
+}
+function paintLvSnaps() {
+  const s = L().snapshots;
+  $('#lvSnaps').innerHTML = s.length ? s.map((x, i) => `<span class="snap">${esc(x.d)} · المتوسط ${ar(lvAvg(x.s))} · المالية ${ar(x.s.finance)}<button class="x" data-lvdelsnap="${i}" aria-label="حذف القياس">×</button></span>`).join('')
+    : '<p class="hint">ما فيه قياسات محفوظة للحين.</p>';
+}
+function paintWheel() { drawWheel(); paintLvStats(); paintLvRecs(); const a = $('#lvFinNum'), b = $('#lvFinSelf'); if (a) a.textContent = ar(finNumbers()); if (b) b.textContent = ar(finSelf()); }
+
+$('#p-wheel').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.lvaxis) { L().scores[t.dataset.lvaxis] = +t.value; $('#lvo-' + t.dataset.lvaxis).textContent = ar(t.value); save(true); paintWheel(); }
+  if (t.dataset.lvfin) { L().fin[t.dataset.lvfin] = +t.value; const tg = $('#lvft-' + t.dataset.lvfin); tg.textContent = ar(t.value) + ' من 10'; tg.className = 'tag ' + lvLevel(+t.value); save(true); paintWheel(); }
+});
+$('#lvSnapBtn').onclick = () => { L().snapshots.push({ d: new Date().toISOString().slice(0, 10), s: lvScores(), self: finSelf() }); save(true); paintLvSnaps(); drawWheel(); toast('انحفظ قياس اليوم'); };
+$('#lvSnaps').addEventListener('click', e => { const i = e.target.dataset.lvdelsnap; if (i === undefined) return; if (confirm('تبين تحذفين هالقياس؟')) { L().snapshots.splice(+i, 1); save(true); paintLvSnaps(); drawWheel(); } });
+
+/* الرؤية والأهداف السنوية */
+function paintLvGoals() {
+  $('#lvGoals').innerHTML = L().goals.map((g, i) => {
+    const st = num(g.status), p = Math.max(0, Math.min(100, num(g.progress)));
+    const col = st === 2 ? 'var(--teal-500)' : st === 1 ? 'var(--amber-400)' : 'var(--wine-400)';
+    return `<tr class="row-in" data-i="${i}"><td style="text-align:center">${ar(i + 1)}</td>
+      <td><select data-lvg="area">${LV_AXES.map(a => `<option value="${a.id}" ${g.area === a.id ? 'selected' : ''}>${a.n}</option>`).join('')}</select></td>
+      <td><input data-lvg="what" value="${esc(g.what)}" placeholder="مثال: أرجع للرياضة"></td>
+      <td><input data-lvg="how" value="${esc(g.how)}" placeholder="مثال: 3 مرات بالأسبوع"></td>
+      <td><input data-lvg="target" value="${esc(g.target)}"></td>
+      <td><input type="date" data-lvg="start" value="${esc(g.start)}"></td>
+      <td><select data-lvg="status">${LV_STATUS.map((s, k) => `<option value="${k}" ${st === k ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+      <td><div style="display:flex;align-items:center;gap:6px"><input type="number" min="0" max="100" data-lvg="progress" value="${esc(g.progress)}" style="width:58px">%<div class="pbar" style="flex:1"><span style="width:${p}%;background:${col}"></span></div></div></td>
+      <td><button class="x" data-lvdelgoal="${i}" aria-label="حذف الهدف">×</button></td></tr>`;
+  }).join('') || `<tr><td colspan="9" class="hint">ما فيه أهداف · اضغطي إضافة هدف</td></tr>`;
+}
+$('#lvGoals').addEventListener('input', e => { const t = e.target; if (!t.dataset.lvg) return; L().goals[+t.closest('tr').dataset.i][t.dataset.lvg] = t.value; save(true); });
+$('#lvGoals').addEventListener('change', e => { const t = e.target; if (!t.dataset.lvg) return; const g = L().goals[+t.closest('tr').dataset.i]; if (t.dataset.lvg === 'status' && t.value === '2') g.progress = 100; save(true); paintLvGoals(); });
+$('#lvGoals').addEventListener('click', e => { const i = e.target.dataset.lvdelgoal; if (i !== undefined) { L().goals.splice(+i, 1); save(true); paintLvGoals(); } });
+$('#lvAddGoal').onclick = () => { L().goals.push({ area: 'health', what: '', how: '', target: '', start: '', status: 0, progress: 0 }); save(true); paintLvGoals(); };
+
+/* العادات الأسبوعية */
+function paintLvHabits() {
+  let h = '<thead><tr><th class="sticky">العادة</th><th>نسبة رائع</th>';
+  for (let w = 1; w <= 52; w++) h += `<th class="w">${ar(w)}</th>`;
+  h += '</tr></thead><tbody>';
+  L().habits.forEach((hb, i) => {
+    const rated = hb.weeks.filter(x => x > 0).length, great = hb.weeks.filter(x => x === 1).length;
+    h += `<tr data-i="${i}"><td class="sticky"><div style="display:flex;gap:4px;align-items:center"><input data-lvhn value="${esc(hb.name)}" placeholder="مثال: أسجل مصاريفي يومياً"><button class="x" data-lvdelhab="${i}" aria-label="حذف العادة">×</button></div></td><td class="mono">${rated ? ar(Math.round(great / rated * 100)) + '%' : '—'}</td>`;
+    hb.weeks.forEach((v, w) => h += `<td class="w"><button class="hab-cell s${v}" data-lvw="${w}" aria-label="الأسبوع ${w + 1}: ${LV_HAB[v] || 'بدون تقييم'}">${v === 1 ? '✓' : v === 2 ? '~' : v === 3 ? '✗' : ''}</button></td>`);
+    h += '</tr>';
+  });
+  $('#lvHabTable').innerHTML = h + '</tbody>';
+}
+$('#lvHabTable').addEventListener('click', e => {
+  const d = e.target.dataset.lvdelhab;
+  if (d !== undefined) { L().habits.splice(+d, 1); save(true); paintLvHabits(); return; }
+  const c = e.target.closest('.hab-cell'); if (!c) return;
+  const i = +c.closest('tr').dataset.i, w = +c.dataset.lvw;
+  L().habits[i].weeks[w] = (L().habits[i].weeks[w] + 1) % 4; save(true); paintLvHabits();
+  const nb = document.querySelector(`#lvHabTable tr[data-i="${i}"] .hab-cell[data-lvw="${w}"]`); nb && nb.focus();
+});
+$('#lvHabTable').addEventListener('input', e => { if (e.target.hasAttribute('data-lvhn')) { L().habits[+e.target.closest('tr').dataset.i].name = e.target.value; save(true); } });
+$('#lvAddHabit').onclick = () => { L().habits.push({ name: '', weeks: Array(52).fill(0) }); save(true); paintLvHabits(); };
+
+/* ميزانية الشهر */
+const LV_BG = [['income', 'الدخل', 'مثال: الراتب'], ['fixed', 'المصاريف الثابتة', 'مثال: الإيجار، القسط'], ['variable', 'المصاريف المتغيرة', 'مثال: الأكل، البنزين'], ['saving', 'الادخار والأهداف', 'مثال: صندوق الطوارئ']];
+const lvBs = k => L().budget[k].reduce((a, x) => a + num(x.a), 0);
+function paintLvBudget() {
+  $('#lvBudgetGrid').innerHTML = LV_BG.map(([k, t, ph]) => `<div class="sheet"><h3 style="display:flex;justify-content:space-between">${t}<span class="mono" id="lvbs-${k}" style="font-weight:200">${kd(lvBs(k))}</span></h3>
+      ${L().budget[k].map((x, i) => `<div class="bline"><input data-lvbk="${k}" data-lvbi="${i}" data-lvbf="n" value="${esc(x.n)}" placeholder="${ph}" aria-label="البند"><input type="number" data-lvbk="${k}" data-lvbi="${i}" data-lvbf="a" value="${esc(x.a)}" placeholder="0" aria-label="المبلغ"><button class="x" data-lvbdel="${k}" data-lvbi="${i}" aria-label="حذف البند">×</button></div>`).join('')}
+      <div class="bar"><button class="btn ghost sm" data-lvbadd="${k}">إضافة بند</button></div></div>`).join('');
+  paintLvEq();
+}
+function paintLvEq() {
+  const inc = lvBs('income'), fx = lvBs('fixed'), vr = lvBs('variable'), sv = lvBs('saving'), r = Math.round((inc - fx - vr - sv) * 1000) / 1000;
+  const st = r === 0 ? ['teal', 'ميزانية صفرية · كل دينار له وظيفة'] : r > 0 ? ['amber', `باقي ${kd(r)} د.ك بدون وظيفة · وزّعه على هدف`] : ['wine', `مصروفك أكثر من دخلك بـ ${kd(-r)} د.ك`];
+  const p = k => inc ? ar(Math.round(lvBs(k) / inc * 100)) + '%' : '—';
+  $('#lvEq').innerHTML = `<h3>المعادلة</h3><div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:var(--text-xl);font-weight:200;color:var(--brand);margin-top:8px">
+      <span class="mono">${kd(inc)}</span>−<span class="mono">${kd(fx)}</span>−<span class="mono">${kd(vr)}</span>−<span class="mono">${kd(sv)}</span>=<span class="tag ${st[0]}" style="font-size:var(--text-md)">${kd(r)}</span></div>
+    <div class="note ${st[0]}">${st[1]} · الثابت ${p('fixed')} · المتغير ${p('variable')} · الادخار ${p('saving')} من الدخل</div>`;
+  LV_BG.forEach(([k]) => { const el = $('#lvbs-' + k); if (el) el.textContent = kd(lvBs(k)); });
+}
+$('#lvBudgetGrid').addEventListener('input', e => { const t = e.target; if (!t.dataset.lvbk) return; L().budget[t.dataset.lvbk][+t.dataset.lvbi][t.dataset.lvbf] = t.value; save(true); paintLvEq(); });
+$('#lvBudgetGrid').addEventListener('click', e => { const t = e.target;
+  if (t.dataset.lvbadd) { L().budget[t.dataset.lvbadd].push({ n: '', a: '' }); save(true); paintLvBudget(); }
+  if (t.dataset.lvbdel) { L().budget[t.dataset.lvbdel].splice(+t.dataset.lvbi, 1); save(true); paintLvBudget(); } });
+
+/* المدخرات والاستثمار */
+function paintLvSavings(build) {
+  const body = $('#lvSavBody'), Sv = L().savings;
+  if (build || !body.children.length) body.innerHTML = Sv.rows.map((r, i) => `<tr class="row-in" data-i="${i}"><td>${MONTHS[i]}</td>${['sal', 'sav', 'inv'].map(f => `<td><input type="number" data-lvsf="${f}" value="${esc(r[f])}" placeholder="0"></td>`).join('')}<td class="mono" data-c="cs"></td><td class="mono" data-c="ci"></td><td class="mono" data-c="nw"></td><td data-c="rt"></td></tr>`).join('');
+  let cs = num(Sv.startSaved), ci = num(Sv.startInvested), tSal = 0, tSav = 0, tInv = 0;
+  Sv.rows.forEach((r, i) => {
+    const sal = num(r.sal), sv = num(r.sav), iv = num(r.inv), has = r.sal !== '' || r.sav !== '' || r.inv !== '';
+    cs += sv; ci += iv; tSal += sal; tSav += sv; tInv += iv;
+    const tr = body.children[i], rate = sal ? Math.round((sv + iv) / sal * 100) : null;
+    tr.querySelector('[data-c=cs]').textContent = has ? kd(cs) : '—';
+    tr.querySelector('[data-c=ci]').textContent = has ? kd(ci) : '—';
+    tr.querySelector('[data-c=nw]').textContent = has ? kd(cs + ci) : '—';
+    tr.querySelector('[data-c=rt]').innerHTML = rate === null ? '—' : `<span class="tag ${rate >= 20 ? 'teal' : rate >= 10 ? 'amber' : 'wine'}">${ar(rate)}%</span>`;
+  });
+  const tr = tSal ? Math.round((tSav + tInv) / tSal * 100) : null;
+  $('#lvSavFoot').innerHTML = `<td>الإجمالي</td><td class="mono">${kd(tSal)}</td><td class="mono">${kd(tSav)}</td><td class="mono">${kd(tInv)}</td><td class="mono">${kd(cs)}</td><td class="mono">${kd(ci)}</td><td class="mono">${kd(cs + ci)}</td><td>${tr === null ? '—' : ar(tr) + '%'}</td>`;
+}
+$('#lvSavBody').addEventListener('input', e => { const t = e.target; if (!t.dataset.lvsf) return; L().savings.rows[+t.closest('tr').dataset.i][t.dataset.lvsf] = t.value; save(true); paintLvSavings(); });
+
+/* الرصيد الأسبوعي */
+function paintLvBalance() {
+  const B = L().balance, W = B.weeks;
+  let h = '<thead><tr><th style="min-width:160px">الحساب أو البند</th>' + W.map((w, j) => `<th><div style="display:flex;gap:2px;align-items:center"><input type="date" data-lvwk="${j}" value="${esc(w)}" aria-label="تاريخ الأسبوع ${j + 1}" style="min-width:130px"><button class="x" data-lvdelwk="${j}" aria-label="حذف الأسبوع">×</button></div></th>`).join('') + '</tr></thead><tbody>';
+  B.accounts.forEach((a, i) => {
+    h += `<tr class="row-in" data-i="${i}"><td><div style="display:flex;gap:2px"><input data-lvan value="${esc(a.n)}" placeholder="مثال: بنك بيتك، كاش، إيجار"><button class="x" data-lvdelacc="${i}" aria-label="حذف الحساب">×</button></div></td>` + W.map((_, j) => `<td><input type="number" data-lvav="${j}" value="${esc(a.v[j] ?? '')}" placeholder="0"></td>`).join('') + '</tr>';
+  });
+  h += '</tbody><tfoot><tr><td>الرصيد الإجمالي</td>' + W.map((_, j) => `<td class="mono" data-lvtot="${j}"></td>`).join('') + '</tr><tr><td>المتبقي من الهدف</td>' + W.map((_, j) => `<td data-lvrem="${j}"></td>`).join('') + '</tr></tfoot>';
+  $('#lvBalTable').innerHTML = h; lvBalTotals();
+}
+function lvBalTotals() {
+  const B = L().balance, goal = num(B.goal);
+  B.weeks.forEach((_, j) => {
+    const t = B.accounts.reduce((s, a) => s + num(a.v[j]), 0), r = t - goal;
+    const tc = document.querySelector(`[data-lvtot="${j}"]`), rc = document.querySelector(`[data-lvrem="${j}"]`);
+    if (tc) tc.textContent = kd(t);
+    if (rc) rc.innerHTML = B.goal === '' ? '—' : `<span class="tag ${r >= 0 ? 'teal' : 'wine'}">${kd(r)}</span>`;
+  });
+}
+$('#lvBalTable').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.lvwk !== undefined) { L().balance.weeks[+t.dataset.lvwk] = t.value; save(true); return; }
+  const tr = t.closest('tr'); if (!tr || tr.dataset.i === undefined) return;
+  const a = L().balance.accounts[+tr.dataset.i];
+  if (t.hasAttribute('data-lvan')) a.n = t.value;
+  if (t.dataset.lvav !== undefined) a.v[+t.dataset.lvav] = t.value;
+  save(true); lvBalTotals();
+});
+$('#lvBalTable').addEventListener('click', e => { const t = e.target;
+  if (t.dataset.lvdelacc !== undefined) { L().balance.accounts.splice(+t.dataset.lvdelacc, 1); save(true); paintLvBalance(); }
+  if (t.dataset.lvdelwk !== undefined) { const j = +t.dataset.lvdelwk; L().balance.weeks.splice(j, 1); L().balance.accounts.forEach(a => a.v.splice(j, 1)); save(true); paintLvBalance(); } });
+$('#lvAddAcc').onclick = () => { L().balance.accounts.push({ n: '', v: [] }); save(true); paintLvBalance(); };
+$('#lvAddWeek').onclick = () => { const last = L().balance.weeks.at(-1); let nd = ''; if (last) { const d = new Date(last); d.setDate(d.getDate() + 7); nd = d.toISOString().slice(0, 10); } L().balance.weeks.push(nd); save(true); paintLvBalance(); };
+
+/* الامتنان */
+function paintLvGrat() {
+  $('#lvGrat').innerHTML = L().gratitude.map((g, i) => `<div class="sheet" style="margin:0" data-i="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px">
+      <h3 style="font-size:var(--text-md);font-weight:500">الأسبوع ${ar(i + 1)}</h3><div style="display:flex;gap:4px;align-items:center"><input type="date" data-lvgd value="${esc(g.w)}" aria-label="تاريخ الأسبوع" style="width:140px"><button class="x" data-lvdelg="${i}" aria-label="حذف الأسبوع">×</button></div></div>
+      <textarea data-lvgt placeholder="ممتن لـ…&#10;ممتن لـ…">${esc(g.t)}</textarea></div>`).join('');
+}
+$('#lvGrat').addEventListener('input', e => { const c = e.target.closest('[data-i]'); if (!c) return; const g = L().gratitude[+c.dataset.i]; if (e.target.hasAttribute('data-lvgt')) g.t = e.target.value; if (e.target.hasAttribute('data-lvgd')) g.w = e.target.value; save(true); });
+$('#lvGrat').addEventListener('click', e => { const i = e.target.dataset.lvdelg; if (i !== undefined) { L().gratitude.splice(+i, 1); save(true); paintLvGrat(); } });
+$('#lvAddGrat').onclick = () => { L().gratitude.push({ w: '', t: '' }); save(true); paintLvGrat(); };
+
+/* الحقول المربوطة */
+function bindLv() { $$('[data-lv]').forEach(el => { el.value = lvGet(el.dataset.lv) ?? ''; }); }
+document.addEventListener('input', e => {
+  const t = e.target; if (!t.dataset || !t.dataset.lv) return;
+  lvSet(t.dataset.lv, t.value); save(true);
+  if (t.dataset.lv.startsWith('savings')) paintLvSavings();
+  if (t.dataset.lv === 'balance.goal') lvBalTotals();
+});
+
+/* ============ رسالة إلى المال ============ */
+const LETTER_PROMPTS = [
+  ['أول إحساس', 'شنو أول شي تحس فيه لما تفكر بالفلوس؟ راحة؟ خوف؟ ذنب؟'],
+  ['البداية', 'شنو كانوا يقولون عن الفلوس بالبيت وأنت صغير؟'],
+  ['العتاب', 'شنو تبي تعاتب المال عليه؟ أو شنو تبي تعتذر له عنه؟'],
+  ['الطلب', 'شنو تبي من المال بالضبط؟ مو رقم، إحساس أو حياة.'],
+  ['الوعد', 'شنو راح تعطيه أنت بالمقابل؟ شنو راح تغيّر بتعاملك معاه؟']
+];
+function paintLetter() {
+  $('#letterPrompts').innerHTML = LETTER_PROMPTS.map(p => `<li><b>${p[0]}</b>${p[1]}</li>`).join('');
+  const ls = L().letters;
+  $('#letterArchive').innerHTML = ls.length ? ls.map((x, i) => `<div class="card pale" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag ice">${esc(x.d)}</span><button class="x" data-lvdelletter="${i}" aria-label="حذف الرسالة">×</button></div>
+      <p style="white-space:pre-wrap;margin:8px 0 0;line-height:2">${esc(x.t)}</p></div>`).join('')
+    : '<p class="hint">ما فيه رسائل محفوظة للحين.</p>';
+}
+$('#letterSave').onclick = () => {
+  const t = (L().letterDraft || '').trim();
+  if (t.length < 15) { toast('اكتب رسالتك أول'); return; }
+  L().letters.push({ d: new Date().toISOString().slice(0, 10), t }); save(true); paintLetter(); toast('انحفظت الرسالة');
+};
+$('#letterArchive').addEventListener('click', e => { const i = e.target.dataset.lvdelletter; if (i !== undefined && confirm('تحذف هالرسالة؟')) { L().letters.splice(+i, 1); save(true); paintLetter(); } });
+
+/* ============ نمطك مع المال ============ */
+const MONEY_TYPES = {
+  avoid: { name: 'المتجنّب', c: 'wine', short: 'يبعد عن الفلوس عشان ما يتضايق',
+    desc: 'الفلوس عندك موضوع مزعج، فتبعد عنه. ما تفتح كشف الحساب، تأجل القرار، وأحياناً تحس إن الاهتمام بالفلوس شي مو زين.',
+    shows: 'كشف حساب مقفول · فواتير تتأخر · قرارات تنأجل لين تصير أزمة',
+    step: 'أول خطوة مو ميزانية. أول خطوة نفتح كشف الحساب سوا بالجلسة، بدون حكم، ونشوف الرقم كما هو.' },
+  worship: { name: 'الباحث عن الكفاية', c: 'amber', short: 'يحس إن الفلوس تحل كل شي وما تكفي أبداً',
+    desc: 'تحس لو زاد دخلك انحلت مشاكلك، ومهما زاد ما يكفي. وأحياناً الصرف صار طريقتك ترتاح فيها.',
+    shows: 'صرف عاطفي · دخل يزيد والضيق باقي · ديون استهلاكية تتكرر',
+    step: 'نثبت إن المشكلة مو بالدخل: نسد الثقوب السودا بالميزانية أول، ونحدد «الحد المريح» بنفسك.' },
+  status: { name: 'المهتم بالصورة', c: 'amber', short: 'قيمته عنده مربوطة باللي يملكه',
+    desc: 'يهمك شكلك قدام الناس: اللبس والسيارة والمناسبات. تقارن نفسك بغيرك، وتصرف عشان الصورة أكثر من قدرتك.',
+    shows: 'صرف للمقارنة والمناسبات · تقسيط لأشياء غير أساسية · هدايا فوق الطاقة',
+    step: 'نحط بند واضح للمناسبات والهدايا بسقف محدد، ونفرّق بين «أبيه» و«أبي الناس يشوفونه».' },
+  vigil: { name: 'الحذر اليقِظ', c: 'teal', short: 'منضبط ويدخر، بس يقلق',
+    desc: 'تعيش ضمن قدرتك وتدخر وتحسب حسابك. هذا أصح الأنماط، بس الزيادة فيه تتحول لقلق دايم وذنب لما تصرف على نفسك.',
+    shows: 'ادخار منتظم · سرية عن الدخل · ذنب من الصرف حتى لو متوفر',
+    step: 'نحط بند «راحة بدون ذنب» بالميزانية، ونخلي صندوق الطوارئ رقم واضح يطمنك بدل القلق المفتوح.' }
+};
+const TYPE_Q = [
+  ['avoid', 'أتجنب أفتح كشف حسابي لأني ما أبي أشوف الرقم'],
+  ['worship', 'أحس لو عندي فلوس أكثر كانت أغلب مشاكلي انحلت'],
+  ['status', 'يهمني شنو يقولون الناس عن لبسي وسيارتي وبيتي'],
+  ['vigil', 'أقلق إذا ما عندي مبلغ احتياطي حتى لو وضعي مستقر'],
+  ['avoid', 'أحس إن الاهتمام الزايد بالفلوس شي مو زين'],
+  ['worship', 'مهما زاد دخلي أحس إنه ما يكفي'],
+  ['status', 'أصرف على المناسبات والهدايا أكثر من قدرتي عشان الصورة'],
+  ['vigil', 'ما أحب أحد يعرف كم دخلي أو كم عندي'],
+  ['avoid', 'أأجل أي قرار مالي لين يصير متأخر'],
+  ['worship', 'لما أتضايق أصرف عشان أرتاح'],
+  ['status', 'أقارن مستوى معيشتي بمستوى اللي حولي'],
+  ['vigil', 'أحس بالذنب إذا صرفت على نفسي حتى لو المبلغ متوفر']
+];
+const SCALE5 = ['أبداً', 'نادراً', 'أحياناً', 'غالباً', 'تماماً'];
+function typeScores() {
+  const A = L().typeAnswers, sc = { avoid: [], worship: [], status: [], vigil: [] };
+  TYPE_Q.forEach((q, i) => { if (A[i] !== undefined) sc[q[0]].push(A[i] + 1); });
+  const out = {}; for (const k in sc) out[k] = sc[k].length ? Math.round((sc[k].reduce((a, b) => a + b, 0) / sc[k].length - 1) / 4 * 100) : 0;
+  return out;
+}
+function dominantType() {
+  if (Object.keys(L().typeAnswers).length < TYPE_Q.length) return null;
+  const s = typeScores(); return Object.keys(s).reduce((a, b) => s[b] > s[a] ? b : a);
+}
+function paintType() {
+  const A = L().typeAnswers;
+  $('#typeQuiz').innerHTML = TYPE_Q.map((q, i) => `<div class="qz"><p>${ar(i + 1)} · ${q[1]}</p><div class="opts">
+      ${SCALE5.map((s, k) => `<button class="opt ${A[i] === k ? 'on' : ''}" data-tq="${i}" data-to="${k}">${s}</button>`).join('')}</div></div>`).join('') +
+    `<p class="hint">جاوبت ${ar(Object.keys(A).length)} من ${ar(TYPE_Q.length)}</p>`;
+  const dom = dominantType();
+  if (!dom) { $('#typeResult').innerHTML = `<div class="note ice">كمّل كل العبارات عشان تطلع نتيجتك.</div>`; return; }
+  const s = typeScores(), T = MONEY_TYPES[dom];
+  const second = Object.keys(s).filter(k => k !== dom).reduce((a, b) => s[b] > s[a] ? b : a);
+  $('#typeResult').innerHTML = `<div class="hero">${WM}<div style="position:relative;z-index:1">
+      <div class="eyebrow" style="color:rgba(255,255,255,.7)">Your money pattern</div>
+      <h3 style="font-size:var(--text-3xl);font-weight:200;letter-spacing:-.02em">${T.name}</h3>
+      <p style="margin-top:4px;font-size:var(--text-md)">${T.short}</p>
+      <p style="margin-top:10px">${T.desc}</p></div></div>
+    <div class="grid g2">
+      <div class="sheet" style="margin:0"><h3>قوة كل نمط عندك</h3><p class="hint">أغلب الناس فيهم أكثر من نمط · المهم الأعلى</p>
+        ${Object.keys(MONEY_TYPES).map(k => `<div style="margin-bottom:10px"><div class="kv" style="border:0"><span>${MONEY_TYPES[k].name}</span><span>${ar(s[k])}%</span></div><div class="meter ${MONEY_TYPES[k].c}"><i style="width:${s[k]}%"></i></div></div>`).join('')}</div>
+      <div class="sheet" style="margin:0"><h3>شلون يبين بفلوسك</h3>
+        <div class="note ${T.c}">${T.shows}</div>
+        <h3 style="font-size:var(--text-md);font-weight:500;margin-top:12px">أول خطوة</h3>
+        <div class="note ice" style="margin-bottom:0">${T.step}</div>
+        ${s[second] >= 50 ? `<p class="hint" style="margin-top:10px">ومعاه نمط ثاني واضح: <b>${MONEY_TYPES[second].name}</b> بنسبة ${ar(s[second])}%</p>` : ''}</div>
+    </div>`;
+}
+$('#typeQuiz').addEventListener('click', e => { const b = e.target.closest('[data-tq]'); if (!b) return; L().typeAnswers[b.dataset.tq] = +b.dataset.to; save(true); paintType(); });
+
+function paintLife() { paintLetter(); paintType(); bindLv(); paintLvScores(); paintLvFin(); paintWheel(); paintLvSnaps(); paintLvGoals(); paintLvHabits(); paintLvBudget(); paintLvSavings(true); paintLvBalance(); paintLvGrat(); }
+
+/* ============ 14 الملف ============ */
+function paintFile() {
+  $('#cName').value = S.meta.name || ''; $('#cCode').value = S.meta.code || ''; $('#cPkg').value = S.meta.pkg || 'المرتاحين الأساسية';
+  const I = indicators(), R = riskAllowance(), rec = readRec(I.recovery);
+  $('#sosSummary').innerHTML = `<div style="display:flex;gap:26px;flex-wrap:wrap;font-size:var(--text-xs)">
+    <div><div style="opacity:.7">الفائض اليوم</div><div style="font-size:20px;font-weight:200" class="mono">${kd(I.available)} د.ك</div></div>
+    <div><div style="opacity:.7">نسبة الأقساط</div><div style="font-size:20px;font-weight:200" class="mono">${pct(I.instRatio)}</div></div>
+    <div><div style="opacity:.7">أشهر الصمود</div><div style="font-size:20px;font-weight:200" class="mono">${I.resilience.toFixed(1)}</div></div>
+    <div><div style="opacity:.7">مؤشر التعافي</div><div style="font-size:20px;font-weight:200" class="mono">${ar(I.recovery)}</div></div></div>`;
+  const P = goalPlan(), first = P.rows.find(r => r.active);
+  const sc = lvScores(), weak = LV_AXES.reduce((m, a) => sc[a.id] < sc[m.id] ? a : m);
+  $('#summaryOut').innerHTML = `<div class="tw"><table><tbody>
+      <tr><td>الاسم ورمز الحالة</td><td>${esc(S.meta.name || 'بلا اسم')} · ${esc(S.meta.code || '—')}</td></tr>
+      <tr><td>الباقة</td><td>${esc(S.meta.pkg)}</td></tr>
+      <tr><td>المدخول الشهري</td><td class="mono">${kd(I.income)} د.ك</td></tr>
+      <tr><td>الالتزامات الثابتة</td><td class="mono">${kd(I.fixed)} د.ك · ${pct(I.fixedRatio)} من الدخل</td></tr>
+      <tr><td>الحد المريح للمعيشة</td><td class="mono">${kd(I.comfort)} د.ك</td></tr>
+      <tr><td>الفائض المتاح</td><td class="mono">${kd(I.available)} د.ك</td></tr>
+      <tr><td>إجمالي المديونية</td><td class="mono">${kd(I.debtBal)} د.ك · قسط ${kd(I.debtPay)} د.ك</td></tr>
+      <tr><td>عدد الأهداف المالية</td><td>${ar(S.goals.length)} · إجمالي ${kd(I.goalsTotal)} د.ك</td></tr>
+      <tr><td>أول هدف يقفل</td><td>${first ? monthLabel(first.end) : 'ما فيه هدف قابل للتنفيذ من الراتب'}</td></tr>
+      <tr><td>المرحلة المالية</td><td>${PHASES[I.phase - 1].name}</td></tr>
+      <tr><td>مؤشر التعافي</td><td>${ar(I.recovery)} من 100 · ${rec.label}</td></tr>
+      <tr><td>مؤشر الاستقلال</td><td>${ar(I.independence)} من 100</td></tr>
+      <tr><td>الهوية المالية</td><td>${(IDENTITIES.find(x => x.id === S.identity) || {}).name || 'ما تحددت'}</td></tr>
+      <tr><td>المسموح استثماره شهرياً</td><td class="mono">${kd(R.amount)} د.ك</td></tr>
+      <tr><td>نمطه مع المال</td><td>${dominantType() ? MONEY_TYPES[dominantType()].name : 'ما كمّل الأسئلة'}</td></tr>
+      <tr><td>رسائل إلى المال</td><td>${ar(L().letters.length)}</td></tr>
+      <tr><td>متوسط عجلة الحياة</td><td>${ar(lvAvg(sc))} من 10 · أضعف محور ${weak.n}</td></tr>
+      <tr><td>المالية بالعجلة</td><td>من الأرقام ${ar(finNumbers())} · تقييم العميل ${ar(finSelf())}</td></tr>
+      <tr><td>إيقاف مؤقت</td><td>${S.pause.goals || S.pause.invest ? 'نعم · ' + esc(S.pause.note || 'بلا سبب مكتوب') : 'لا'}</td></tr>
+    </tbody></table></div>`;
+}
+function paintFoot() {
+  $('#railName').textContent = S.meta.name ? S.meta.name + (S.meta.code ? ' · ' + S.meta.code : '') : 'ملف بلا اسم';
+  $('#railSave').textContent = S.meta.saved ? 'آخر حفظ ' + new Date(S.meta.saved).toLocaleString('ar-KW-u-nu-latn', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) : 'لم يُحفظ بعد';
+}
+
+/* ============ تصدير واستيراد ============ */
+let downloads = null;
+if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {});
+async function exportFile() {
+  const data = JSON.stringify(S, null, 1);
+  const nm = String(S.meta.code || S.meta.name || 'plan').trim().replace(/[\\/:*?"<>|\s]+/g, '-');
+  const filename = 'cash-clinic-' + nm + '-' + new Date().toISOString().slice(0, 10) + '.json';
+  if (downloads) {
+    try { await downloads.save({ filename, data }); toast('انصدّر الملف'); return; }
+    catch (e) { if (e && e.code === 'declined') return; }
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000); toast('انصدّر الملف'); return;
+  } catch (e) { }
+  $('#dmText').textContent = 'التنزيل المباشر مو متاح هني. انسخي النص واحفظيه بملف وأرسليه، والطرف الثاني يستورده من صفحة الملف.';
+  $('#dmArea').value = data; $('#dataModal').classList.add('on');
+}
+$('#dmClose').onclick = () => $('#dataModal').classList.remove('on');
+$('#dataModal').addEventListener('click', e => { if (e.target.id === 'dataModal') e.currentTarget.classList.remove('on'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#dataModal').classList.remove('on'); });
+$('#dmOk').onclick = async () => { try { await navigator.clipboard.writeText($('#dmArea').value); toast('انتسخت البيانات'); } catch (e) { $('#dmArea').select(); toast('حددي النص وانسخيه'); } };
+function importData(txt) {
+  let d; try { d = JSON.parse(txt); } catch (e) { toast('الملف غير صالح'); return; }
+  if (!d || typeof d !== 'object') { toast('الملف غير صالح'); return; }
+  if (d.app === 'cc-life') {
+    const nl = lifeBlank();
+    ['scores', 'fin', 'snapshots', 'letters', 'letterDraft', 'typeAnswers', 'vision', 'goals', 'habits', 'budget', 'savings', 'balance', 'gratitude'].forEach(k => { if (d[k] !== undefined) nl[k] = d[k]; });
+    nl.recommendation = d.client && d.client.recommendation || '';
+    nl.snapshots = (nl.snapshots || []).map(s => ({ d: s.d, s: s.s }));
+    S.life = fixLife(nl);
+    if (d.client && d.client.name && !S.meta.name) S.meta.name = d.client.name;
+    toast('انضافت بيانات مدير الحياة للملف');
+  } else if (d.meta || d.income) {
+    S = Object.assign(blank(), d); S.life = fixLife(d.life); S.app = 'cc-system';
+    toast('انفتح الملف');
+  } else { toast('الملف مو ملف كاش كلينك'); return; }
+  save(); paintAll();
+}
+
+/* ============ إعادة الرسم ============ */
+function paintAll() { paintBudget(); paintGoals(); paintGoalsPlan(); paintDebt(); paintInvest(); paintIndex(); paintTrackPanel(); paintLife(); paintFile(); }
+
+/* ============ الأحداث ============ */
+document.addEventListener('click', e => {
+  const t = e.target;
+  const nav = t.closest('.nav button');
+  if (nav) {
+    $$('.nav button').forEach(b => b.classList.remove('on')); nav.classList.add('on');
+    $$('.panel').forEach(p => p.classList.remove('on')); $('#p-' + nav.dataset.p).classList.add('on');
+    if (nav.dataset.p === 'wheel') paintWheel();
+    if (nav.dataset.p === 'file') paintFile();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  if (t.dataset.add) {
+    const l = t.dataset.add;
+    const blanks = { income: { name: '', amount: 0 }, fixed: { name: '', amount: 0 }, variable: { name: '', amount: 0 },
+      goals: { name: '', amount: 0, date: '', source: 'salary', term: 'short' }, debts: { name: '', balance: 0, payment: 0, cost: 0 },
+      track: { month: '', income: 0, spend: 0, directed: 0, note: '' } };
+    S[l].push({ ...blanks[l] }); save(true); paintAll(); return;
+  }
+  if (t.dataset.del) { S[t.dataset.del].splice(+t.dataset.i, 1); save(true); paintAll(); return; }
+  if (t.classList.contains('opt')) { S.quizAnswers[t.dataset.q] = +t.dataset.o; save(true); paintQuiz(); return; }
+  if (t.id === 'quizDone') {
+    const raw = Object.entries(S.quizAnswers).reduce((s, [q, o]) => s + (QUIZ[q].a[o][1] || 0), 0);
+    const score = Math.round((raw / QUIZ_MAX) * 100);
+    const id = IDENTITIES.find(x => score >= x.band[0] && score <= x.band[1]) || IDENTITIES[0];
+    S.identity = id.id; save(); paintQuiz(); toast('نتيجتك ' + score + ' من 100 · الهوية: ' + id.name); return;
+  }
+  if (t.closest('[data-pick]')) { S.identity = t.closest('[data-pick]').dataset.pick; save(); paintQuiz(); return; }
+  if (t.id === 'tabQuiz') { $('#quizBox').style.display = ''; $('#pickBox').style.display = 'none'; return; }
+  if (t.id === 'tabPick') { $('#quizBox').style.display = 'none'; $('#pickBox').style.display = ''; return; }
+  if (t.id === 'runGoals') { paintGoalsPlan(); paintBudget(); toast('انحسبت الخطة الزمنية'); return; }
+  if (t.id === 'runDebt') { runDebtSim(); return; }
+  if (t.id === 'runInv') { runInvest(); return; }
+  if (t.id === 'editRates') { const box = $('#ratesEditor'); box.style.display = box.style.display === 'none' ? '' : 'none'; return; }
+  if (t.id === 'save') { save(); toast('انحفظ الملف'); return; }
+  if (t.id === 'print') { window.print(); return; }
+  if (t.id === 'export') { exportFile(); return; }
+  if (t.id === 'importBtn') { $('#importFile').click(); return; }
+  if (t.id === 'reset') { if (confirm('يتفرّغ الملف كامل بالتخطيط ومدير الحياة، وما نقدر نرجعه. متأكدة؟')) { S = blank(); S.comfort = 0; save(); paintAll(); toast('انفرّغ الملف'); } return; }
+  if (t.id === 'sos') {
+    const I = indicators();
+    const msg = `طلب جلسة طارئة · كاش كلينك\nالاسم: ${S.meta.name || '—'} · رمز الحالة: ${S.meta.code || '—'}\nالباقة: ${S.meta.pkg}\nالمدخول: ${kd(I.income)} د.ك · الالتزامات الثابتة: ${kd(I.fixed)} د.ك\nالفائض المتاح: ${kd(I.available)} د.ك · نسبة الأقساط: ${pct(I.instRatio)}\nمؤشر التعافي: ${I.recovery} من 100\nالسبب: `;
+    window.open('https://wa.me/96522260820?text=' + encodeURIComponent(msg), '_blank'); return;
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.classList.contains('row-in-i')) {
+    const { l, i, k } = t.dataset; S[l][+i][k] = t.type === 'number' ? num(t.value) : t.value; save(true);
+    if (l === 'income' || l === 'fixed' || l === 'variable') updateFooters(); return;
+  }
+  if (t.classList.contains('rate-i')) {
+    if (!S.customRates) S.customRates = JSON.parse(JSON.stringify(currentRates()));
+    S.customRates[t.dataset.a][+t.dataset.k] = num(t.value); S.rateSet = 'manual'; RATE_SETS.manual.rates = S.customRates; save(true); return;
+  }
+  if (t.id === 'comfort') { S.comfort = num(t.value); save(true); paintBudget(); return; }
+  if (t.id === 'cashNow') { S.cashNow = num(t.value); save(true); paintRisk(); return; }
+  if (t.id === 'pauseNote') { S.pause.note = t.value; save(true); return; }
+  if (['cName', 'cCode'].includes(t.id)) { S.meta[t.id === 'cName' ? 'name' : 'code'] = t.value; save(true); paintFoot(); return; }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.habit !== undefined) { const i = +t.dataset.habit; S.habits = t.checked ? [...new Set([...S.habits, i])] : S.habits.filter(x => x !== i); save(true); paintIndex(); paintRisk(); return; }
+  if (t.dataset.flag !== undefined) { const i = +t.dataset.flag; S.flags = t.checked ? [...new Set([...S.flags, i])] : S.flags.filter(x => x !== i); save(true); paintIndex(); return; }
+  if (t.id === 'incomeStab') { S.incomeStab = num(t.value); save(true); paintRisk(); return; }
+  if (t.id === 'careLoad') { S.careLoad = num(t.value); save(true); paintRisk(); return; }
+  if (t.id === 'rateSet') { S.rateSet = t.value; if (t.value !== 'manual') S.customRates = null; save(true); paintRatesUI(); paintAssets(); return; }
+  if (t.id === 'strategy') { S.strategy = t.value; save(true); return; }
+  if (t.id === 'cPkg') { S.meta.pkg = t.value; save(true); return; }
+  if (t.id === 'pauseGoals') { S.pause.goals = t.checked; save(true); paintTrackPanel(); return; }
+  if (t.id === 'pauseInvest') { S.pause.invest = t.checked; save(true); paintTrackPanel(); return; }
+  if (t.id === 'importFile' && t.files[0]) { const fr = new FileReader(); fr.onload = () => importData(fr.result); fr.onerror = () => toast('ما قدرنا نقرأ الملف'); fr.readAsText(t.files[0]); t.value = ''; return; }
+  if (t.classList.contains('row-in-i')) { const { l, i, k } = t.dataset; S[l][+i][k] = t.type === 'number' ? num(t.value) : t.value; save(true); paintAll(); return; }
+});
+function updateFooters() { const c = calc(); $('#fIncome').textContent = kd(c.income); $('#fFixed').textContent = kd(c.fixed); $('#fVar').textContent = kd(c.varActual); }
+document.addEventListener('focusout', e => {
+  if (e.target.classList && e.target.classList.contains('row-in-i')) {
+    const p = $('.panel.on');
+    if (p && p.id === 'p-budget') paintBudget();
+    if (p && p.id === 'p-goals') { paintGoals(); paintGoalsPlan(); }
+    if (p && p.id === 'p-debt') paintDebt();
+    if (p && p.id === 'p-track') paintTrackPanel();
+  }
+});
+
+/* ============ الإقلاع ============ */
+$('#strategy').innerHTML = DEBT_STRATEGIES.map(s => `<option value="${s.id}" ${S.strategy === s.id ? 'selected' : ''}>${s.name}</option>`).join('');
+$('#extra').value = S.extra || 0;
+paintAll();
+
+window.ccApp = {
+  /* the saved file, or a fresh one named after the client */
+  open(json, info) {
+    let d = null; try { d = json ? JSON.parse(json) : null; } catch (e) { d = null; }
+    if (d && typeof d === 'object' && (d.meta || d.income)) { S = Object.assign(blank(), d); S.life = fixLife(d.life); }
+    else { S = load(); S.meta.name = (info && info.name) || ''; }
+    if (info && info.pkgName) {
+      S.meta.pkg = S.meta.pkg && S.meta.pkg !== 'المرتاحين الأساسية' ? S.meta.pkg : info.pkgName;
+      const sel = $('#cPkg');
+      if (sel && ![...sel.options].some(o => o.value === S.meta.pkg)) sel.insertAdjacentHTML('afterbegin', `<option>${esc(S.meta.pkg)}</option>`);
+    }
+    $('#strategy').value = S.strategy || 'ratio';
+    $('#extra').value = S.extra || 0;
+    paintAll(); paintFoot();
+  },
+  get() { return S; }
+};
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+const fbApp=initializeApp(CONFIG.firebase);
+const auth=getAuth(fbApp);
+const fns=getFunctions(fbApp,CONFIG.functionsRegion);
+const getMyApp=httpsCallable(fns,"getMyApp"), saveMyApp=httpsCallable(fns,"saveMyApp"), getClinicAs=httpsCallable(fns,"getClinicAs");
+const q=s=>document.querySelector(s);
+const escH=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const AS=(new URLSearchParams(location.search).get("as")||"").trim().toLowerCase();
+const WA="https://wa.me/96522260820";
+
+function gate(icon,title,text,btns){
+  q("#ccGateIcon").textContent=icon; q("#ccGateTitle").textContent=title;
+  q("#ccGateText").innerHTML=text||""; q("#ccGateBtns").innerHTML=btns||""; q("#ccGate").hidden=false;
+}
+const back=`<a class="btn" href="./">رجوع لعيادتي</a>`;
+const kwDate=ms=>new Date(ms).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"});
+
+/* only the package's pages: the rest of the menu, its empty headings and
+   their sections go, on screen and on paper */
+function onlyPages(pages){
+  const ok=new Set(pages||[]);
+  document.querySelectorAll("#nav li").forEach(li=>{ const b=li.querySelector("button[data-p]"); if(b) li.classList.toggle("ccoff",!ok.has(b.dataset.p)); });
+  let head=null, any=false;
+  const close=()=>{ if(head) head.classList.toggle("ccoff",!any); };
+  document.querySelectorAll("#nav li").forEach(li=>{
+    if(li.classList.contains("nav-group")){ close(); head=li; any=false; }
+    else if(!li.classList.contains("ccoff")) any=true;
+  });
+  close();
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("ccoff",!ok.has(p.id.replace(/^p-/,""))));
+  const first=document.querySelector("#nav li:not(.ccoff) button[data-p]");
+  if(first) first.click();
+}
+
+/* ---- saving: a moment after the last change, and before the tab goes ---- */
+let pending=null, saving=false, timer=null;
+function pill(msg,err){ const p=q("#ccPill"); p.textContent=msg||""; p.classList.toggle("err",!!err); }
+async function flush(){
+  clearTimeout(timer);
+  if(!pending || saving) return;
+  const st=pending; pending=null; saving=true; pill("جاري الحفظ…");
+  try{
+    await saveMyApp({ state:st });
+    pill("انحفظ ✓ "+new Date().toLocaleTimeString("ar-KW-u-nu-latn",{hour:"numeric",minute:"2-digit"}));
+  }catch(e){
+    if(!pending) pending=st;
+    pill("ما انحفظ — "+((e&&e.message)||"تحقق من الاتصال")+" · بنحاول مرة ثانية", true);
+    timer=setTimeout(flush, 8000);
+  }finally{ saving=false; if(pending && !timer) flush(); }
+}
+window.ccSync=(json,quiet)=>{ pending=json; clearTimeout(timer); timer=null; pill("فيه تعديل ما انحفظ…"); timer=setTimeout(()=>{ timer=null; flush(); }, quiet?1200:0); };
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") flush(); });
+window.addEventListener("beforeunload",e=>{ if(pending||saving){ flush(); e.preventDefault(); e.returnValue=""; } });
+
+/* the team's view: everything as the client sees it, nothing can be changed */
+function readOnly(who){
+  window.ccReadOnly=true; window.ccSync=()=>{};
+  document.body.classList.add("ccro");
+  const bk=q(".ccback"); if(bk){ bk.href="./?as="+encodeURIComponent(who); bk.textContent="→ رجوع لعيادته"; }
+  const bar=q("#ccAsBar"); bar.hidden=false;
+  bar.innerHTML=`👁️ تشوف متابعة كاش حق <b dir="ltr">${escH(who)}</b> مثل ما يشوفها — للقراءة فقط، ما ينحفظ شي <a class="btn ghost sm" href="./?as=${encodeURIComponent(who)}" style="text-decoration:none">عيادته</a>`;
+  ["beforeinput","keydown","paste","drop"].forEach(t=>document.addEventListener(t,e=>{
+    const el=e.target; if(el&&el.closest&&el.closest(".main")&&/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)&&!(t==="keydown"&&e.key==="Tab")) e.preventDefault();
+  },true));
+}
+
+function openApp(access, json, info){
+  q("#ccPkgName").textContent=access.pkgName||"";
+  onlyPages(access.pages);
+  window.ccApp.open(json, info);
+  q("#ccGate").hidden=true;
+}
+
+onAuthStateChanged(auth, async (u)=>{
+  if(!u){ location.replace("./"+(AS?"?as="+encodeURIComponent(AS):"")); return; }
+  try{
+    if(AS){
+      const d=(await getClinicAs({ email:AS })).data||{};
+      readOnly(AS);
+      const a=d.app||{};
+      if(!a.open && !d.appState){
+        return gate("🔒","متابعة كاش مقفولة عنده",
+          a.reason==="before"?`عنده ${escH(a.pkgName)} — تنفتح له بعد جلسته الأولى (${escH(kwDate(a.nextMs))}).`
+                             :"ما عنده باقة أساس الحرية المالية ولا باقة الوفرة المالية، فما تنفتح له.",
+          `<a class="btn" href="./?as=${encodeURIComponent(AS)}">عيادته</a>`);
+      }
+      return openApp(a.open?a:Object.assign({},a,{pages:(a.pkg==="wafra"?["budget","mbudget","debt","track","balance","index","file","goals","savings","invest"]:["budget","mbudget","debt","track","balance","index","file"])}),
+        d.appState, { name:d.name||"", pkgName:a.pkgName||"" });
+    }
+    if(!u.emailVerified){
+      try{ await u.reload(); }catch(e){}
+      if(!auth.currentUser.emailVerified) return gate("✉️","أكّد إيميلك أول","متابعة كاش ملفك المالي الخاص، فتنفتح بعد ما تأكّد إيميلك من عيادتي.",back);
+    }
+    const d=(await getMyApp({})).data||{};
+    const a=d.access||{};
+    if(!a.open){
+      if(a.reason==="before") return gate("🔒","تنفتح بعد جلستك الأولى",
+        `متابعة كاش جزء من <b>${escH(a.pkgName)}</b> — تنفتح لك بعد ما تخلص جلستك الأولى${a.nextMs?` (${escH(kwDate(a.nextMs))})`:""}، عشان نبنيها سوا على أرقامك.`, back);
+      return gate("🔒","متابعة كاش لعملاء كاش ناس",
+        "تنفتح لعملاء <b>باقة أساس الحرية المالية</b> و<b>باقة الوفرة المالية</b> بعد أول جلسة. تبي تعرف أي باقة تناسبك؟ كلّمنا واتساب.",
+        back+`<a class="btn ghost" href="${WA}" target="_blank" rel="noopener">واتساب</a>`);
+    }
+    openApp(a, d.state, { name:d.name||"", pkgName:a.pkgName||"" });
+    if(!d.state) pill("ملف جديد — يتحفظ تلقائياً أول ما تكتب");
+  }catch(e){
+    gate("⚠️","ما قدرنا نفتح متابعة كاش", escH((e&&e.message)||"صار خطأ")+" — حاول مرة ثانية بعد شوي.", back);
+  }
+});
+</script>
+</body>
+</html>

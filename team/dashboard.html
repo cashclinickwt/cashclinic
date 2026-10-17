@@ -751,11 +751,11 @@
     <button data-tab="bookings">المواعيد</button>
     <button data-tab="quiz">الاختبارات</button>
     <button data-tab="feedback">تقييم الجلسات</button>
+    <button data-tab="myclinic">عيادتي</button>
     <div class="navgrp" data-grp="events">الفعاليات</div>
     <button data-tab="events" data-family="meet">اللقاءات والبث</button>
     <button data-tab="live" data-child="meet" hidden>البث المباشر</button>
     <button data-tab="courses">الدورات</button>
-    <button data-tab="bassma">بصمتك المالية</button>
     <div class="navgrp" data-grp="comms">التواصل</div>
     <button data-tab="composer">مراسلة العملاء</button>
     <button data-tab="subscribers">المشتركين بالنشرة</button>
@@ -869,6 +869,26 @@
   </div>
 
   <!-- ===== متابعة الفريق (للصلاحية الكاملة فقط) ===== -->
+  <!-- ===== عيادتي: every client account, opened as the client sees it ===== -->
+  <div class="sec" id="mcSec" data-panel="myclinic" hidden>
+    <h2><span></span> عيادتي</h2>
+    <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل اللي سوّوا حساب بعيادتي. «افتح عيادته» يفتحها مثل ما يشوفها العميل بالضبط — للقراءة فقط.
+      متابعة كاش تنفتح لعملاء أساس الحرية والوفرة بعد أول جلسة.</p>
+    <div class="kpis" id="mcKpis"></div>
+    <div class="pfbar">
+      <div class="f" style="flex:1;min-width:200px"><label>بحث</label><input id="mcQ" type="search" placeholder="الاسم أو الإيميل"></div>
+      <div class="f"><label>&nbsp;</label><button class="pfbtn" id="mcReload">حدّث</button></div>
+    </div>
+    <div class="flt" id="mcFlt">
+      <button data-mc="all" class="on">الكل</button>
+      <button data-mc="open">متابعة كاش مفتوحة</button>
+      <button data-mc="before">بانتظار أول جلسة</button>
+      <button data-mc="unverified">ما أكّد إيميله</button>
+    </div>
+    <div class="addmsg" id="mcMsg"></div>
+    <div id="mcBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
+  </div>
+
   <div class="sec" id="fuSec" data-panel="followup" hidden>
     <h2><span></span> متابعة الفريق</h2>
     <div class="pfbar">
@@ -1790,7 +1810,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null; BS=null; RF=null; BG=null;
+  ST=null; FU=null; BS=null; RF=null; BG=null; MC=null;
 }
 
 async function refreshAll(opt){
@@ -2637,6 +2657,51 @@ document.addEventListener("click", async (e)=>{
 
 /* ================= متابعة الفريق ================= */
 function fuMsg(t,ok){ const m=$("#fuMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
+
+/* ================= عيادتي (17 Oct 2026) ================= */
+const listClinicUsers=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listClinicUsers");
+let MC=null, MCF="all";
+function mcMsg(m,ok){ const e=$("#mcMsg"); if(!e) return; e.textContent=m||""; e.className="addmsg"+(m?(ok?" ok":" err"):""); }
+async function loadMyClinic(){
+  mcMsg("");
+  try{ const r=await listClinicUsers({}); MC=(r&&r.data)||{ list:[] }; renderMyClinic(); }
+  catch(err){ mcMsg((err&&err.message)||"تعذّر التحميل", false); }
+}
+function renderMyClinic(){
+  const box=$("#mcBody"); if(!box || !MC) return;
+  const T=MC.totals||{};
+  $("#mcKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(T.count||0)}</div><div class="l">حساب بعيادتي</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(T.verified||0)}</div><div class="l">أكّدوا إيميلهم</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(T.appOpen||0)}</div><div class="l">متابعة كاش مفتوحة</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(T.appWaiting||0)}</div><div class="l">بانتظار أول جلسة</div></div>`;
+  const q=String(($("#mcQ")||{}).value||"").trim().toLowerCase();
+  const rows=(MC.list||[]).filter(u=>
+    (MCF==="all" || (MCF==="open"&&u.app.open) || (MCF==="before"&&u.app.reason==="before") || (MCF==="unverified"&&!u.verified)) &&
+    (!q || (u.email+" "+(u.name||"")).toLowerCase().indexOf(q)!==-1));
+  const day=ms=>ms?new Date(ms).toLocaleDateString("en-GB"):"—";
+  box.innerHTML = rows.length
+    ? `<div style="overflow-x:auto;max-width:100%"><table class="pftab"><thead><tr><th>العميل</th><th>سجّل</th><th>آخر دخول</th><th>متابعة كاش</th><th>آخر حفظ</th><th></th></tr></thead><tbody>`+
+      rows.map(u=>{
+        const a=u.app||{};
+        const st=a.open?`<span style="color:#128C4A;font-weight:700">مفتوحة</span><div class="pfrule">${esc(a.pkgName)}</div>`
+          : a.reason==="before"?`<span style="color:#A87A2A;font-weight:700">بعد أول جلسة</span><div class="pfrule">${esc(a.pkgName)} · ${esc(dt(a.nextMs))}</div>`
+          : `<span class="muted">ما تنطبق</span>`;
+        return `<tr>
+          <td><b>${esc(u.name||"—")}</b><div class="pfrule" dir="ltr" style="text-align:right">${esc(u.email)}</div>${u.verified?"":`<div class="pfrule" style="color:#962E37">ما أكّد إيميله</div>`}</td>
+          <td class="num">${esc(day(u.createdMs))}</td>
+          <td class="num">${esc(day(u.lastMs))}</td>
+          <td>${st}</td>
+          <td class="num">${u.appSavedMs?esc(dt(u.appSavedMs)):"—"}</td>
+          <td style="white-space:nowrap"><a class="pfbtn" target="_blank" rel="noopener" href="../clinic/?as=${encodeURIComponent(u.email)}" style="text-decoration:none">افتح عيادته</a>
+            ${a.open||u.appSavedMs?` <a class="pfbtn" target="_blank" rel="noopener" href="../clinic/app.html?as=${encodeURIComponent(u.email)}" style="text-decoration:none">متابعة كاش</a>`:""}</td></tr>`;
+      }).join("")+`</tbody></table></div>`
+    : `<div class="muted" style="font-size:13px;padding:10px">${(MC.list||[]).length?"ما في نتائج بهالبحث.":"ما في حسابات بعيادتي للحين."}</div>`;
+}
+$("#mcQ") && $("#mcQ").addEventListener("input", ()=>renderMyClinic());
+$("#mcReload") && $("#mcReload").addEventListener("click", ()=>loadMyClinic());
+$("#mcFlt") && $("#mcFlt").addEventListener("click", e=>{ const b=e.target.closest("button[data-mc]"); if(!b) return;
+  MCF=b.dataset.mc; $("#mcFlt").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderMyClinic(); });
 
 async function loadFollowUp(){
   const n=bkNowKw(), cur=`${n.y}-${bkPad2(n.m)}`;
@@ -5124,9 +5189,9 @@ const PANELS = [
   { id:"salesteam",   group:"sales",  icon:"🤝", allowed:()=>!!(DATA&&["all","sales","service"].indexOf(DATA.role)!==-1),
     load:()=>{ if(!ST) loadSalesTeam(); },
     count:()=>((ST&&ST.leads)||[]).filter(l=>l.state==="جديد").length },
-  /* نورة runs the pilot, so sales sees it alongside full access */
-  { id:"bassma",      group:"events", icon:"🧭", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")),
-    load:()=>{ if(!BS) loadBassma(); } },
+  /* بصمتك المالية left the dashboard on 17 Oct — its records stay where they are */
+  /* full access only: a client's file is their finances */
+  { id:"myclinic",    group:"clients",icon:"🩺", allowed:()=>!!(DATA&&DATA.role==="all"), load:()=>{ if(!MC) loadMyClinic(); } },
   /* full access only: the four who can already read every other number */
   { id:"followup",    group:"team",   icon:"📋", allowed:()=>!!(DATA&&DATA.role==="all"),
     load:()=>{ if(!FU) loadFollowUp(); } },

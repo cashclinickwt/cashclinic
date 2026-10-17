@@ -125,6 +125,7 @@
 
   <!-- 3 · عيادتي -->
   <section id="vClinic" hidden>
+    <div id="cAsBar" hidden style="background:#FFF6E3;border:1.5px solid #D3A146;color:#7A5410;border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:14px;line-height:1.8"></div>
     <div class="ck-hello">
       <div><h1 id="cHello">هلا 👋</h1><div class="e" id="cEmail"></div></div>
       <button class="ck-link" id="cOut" type="button">تسجيل خروج</button>
@@ -132,12 +133,8 @@
     <div class="ck-stats" id="cStats"></div>
     <div id="cBody"></div>
 
-    <div class="ck-sec">
-      <div class="ck-item ck-lock">
-        <div class="t">🔒 متابعة كاش <span class="ck-soon">قريباً</span></div>
-        <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. بيكون ضمن باقات عيادتي.</div>
-      </div>
-    </div>
+    <!-- متابعة كاش: open, waiting for the first session, or not part of their package -->
+    <div class="ck-sec" id="cApp"></div>
 
     <div class="ck-sec ck-miss">
       <h2>شي ناقص؟</h2>
@@ -204,6 +201,9 @@ const fns=getFunctions(app,CONFIG.functionsRegion);
 const getMyClinic=httpsCallable(fns,"getMyClinic"), portalMissing=httpsCallable(fns,"portalMissing");
 const clinicSendVerify=httpsCallable(fns,"clinicSendVerify"), clinicSendReset=httpsCallable(fns,"clinicSendReset");
 const getMyReport=httpsCallable(fns,"getMyReport");
+/* the team's view of a client's clinic — ?as=their@email, full access only */
+const getClinicAs=httpsCallable(fns,"getClinicAs"), openReport=httpsCallable(fns,"openReport");
+const AS=(new URLSearchParams(location.search).get("as")||"").trim().toLowerCase();
 const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const RETURN={url:"https://cashclinic.net/clinic/"};
@@ -309,8 +309,21 @@ function sec(title, items, row, empty){
   return `<div class="ck-sec"><h2>${title}</h2>${
     items.length ? items.map(row).join("") : `<div class="ck-empty">${empty}</div>`}</div>`;
 }
+/* متابعة كاش — the card that opens the planning app */
+function appCard(a){
+  a=a||{};
+  const link="app.html"+(AS?"?as="+encodeURIComponent(AS):"");
+  if(a.open) return `<div class="ck-item"><div class="t">📊 متابعة كاش <span class="ck-tag up">مفتوحة</span></div>
+      <div class="m">نظامك المالي الشخصي ضمن ${esc(a.pkgName)}: ميزانيتك وديونك وتدفقك النقدي${a.pkg==="wafra"?"، وأهدافك وأصولك واستثمارك":""} — وتتابع تقدمك شهر بشهر. كل شي ينحفظ لحاله.</div>
+      <a class="ck-btn" href="${link}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">افتح متابعة كاش</a></div>`;
+  if(a.reason==="before") return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش <span class="ck-soon">بعد جلستك الأولى</span></div>
+      <div class="m">جزء من ${esc(a.pkgName)} — تنفتح لك بعد ما تخلص جلستك الأولى${a.nextMs?` (${esc(new Date(a.nextMs).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"}))})`:""}، عشان نبنيها سوا على أرقامك.</div></div>`;
+  return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش</div>
+      <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. تنفتح لعملاء باقة أساس الحرية المالية وباقة الوفرة المالية بعد أول جلسة.</div></div>`;
+}
 function render(D){
-  $("#cHello").textContent="هلا "+(D.name||auth.currentUser.displayName||"")+" 👋";
+  $("#cHello").textContent="هلا "+(D.name||(AS?"":auth.currentUser.displayName)||"")+" 👋";
+  $("#cApp").innerHTML=appCard(D.app);
   $("#cEmail").textContent=D.email;
   const n=(l)=>(l||[]).length;
   $("#cStats").innerHTML=[["استشارات",n(D.consults)],["كتب",n(D.books)],["اختبارات",n(D.quizzes)],["لقاءات",n(D.events)],["دورات",n(D.courses)]]
@@ -365,15 +378,32 @@ document.addEventListener("click", async (e)=>{
   const b=e.target.closest("button[data-report]"); if(!b) return;
   const was=b.textContent; b.disabled=true; b.textContent="جاري الفتح…";
   try{
-    const d=(await getMyReport({ orderId:b.dataset.report, reportId:b.dataset.rid||"" })).data||{};
+    const d=(await (AS?openReport:getMyReport)({ orderId:b.dataset.report, reportId:b.dataset.rid||"" })).data||{};
     if(!d.url) throw new Error("ما قدرنا نفتح التقرير");
     window.open(d.url, "_blank", "noopener");
   }catch(err){ alert((err&&err.message)||"ما قدرنا نفتح التقرير — كلّمنا واتساب"); }
   finally{ b.disabled=false; b.textContent=was; }
 });
 
+/* the team opens a client's clinic: the same page, filled from the client's
+   records, with nothing that writes — no «شي ناقص», nothing saved */
+async function loadAs(){
+  show("vLoad");
+  try{
+    const D=(await getClinicAs({ email:AS })).data||{};
+    const acc=D.account||{};
+    const bar=$("#cAsBar"); bar.hidden=false;
+    bar.innerHTML=`👁️ تشوف عيادة <b dir="ltr">${esc(AS)}</b> مثل ما يشوفها العميل — للقراءة فقط.`+
+      (acc.known?(acc.verified?"":" · <b>ما أكّد إيميله للحين</b>، فهو نفسه ما يقدر يشوفها"):" · <b>ما سوّى حساب بعيادتي</b> — هذا اللي بيلقاه لما يسجّل");
+    const miss=document.querySelector(".ck-miss"); if(miss) miss.style.display="none";
+    render(D);
+  }catch(e){
+    show("vLoad"); $("#vLoad").textContent=((e&&e.message)||"تعذّر التحميل")+" — هذي الصفحة للفريق بالصلاحية الكاملة.";
+  }
+}
 onAuthStateChanged(auth, async (u)=>{
   if(!u){ show("vAuth"); return; }
+  if(AS) return loadAs();
   if(!u.emailVerified){ $("#vEmail").textContent=u.email; show("vVerify"); return; }
   load();
 });
