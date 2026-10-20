@@ -6451,9 +6451,34 @@ function intakeBlock(b){
       <span class="rpchip" style="background:#2F8789">📋 عبّى أسئلة ما قبل الجلسة ✓</span>
       ${b.canIntake?` <button class="rpup" data-intake="${esc(b.id)}" style="margin-inline-start:6px">اعرض الإجابات</button>`:""}</div>`;
   if(bkEnded(b)) return "";
-  return `<div class="rpbox"><span class="rpchip" style="background:#A87A2A">📋 ما عبّى أسئلة ما قبل الجلسة للحين</span>
-      <div class="rpmeta" style="margin-top:6px">الرابط وصله بإيميل الحجز، ويتذكّره قبل الموعد بيوم، وموجود بعيادتي.</div></div>`;
+  return `<div class="rpbox" data-ikbox="${esc(b.id)}"><span class="rpchip" style="background:#A87A2A">📋 ما عبّى أسئلة ما قبل الجلسة للحين</span>
+      <div class="rpmeta" style="margin-top:6px">الرابط وصله بإيميل الحجز، ويتذكّره قبل الموعد بيوم، وموجود بعيادتي.</div>
+      ${b.canSendIntake?`<button class="rpup" data-iklink="${esc(b.id)}" style="margin-top:8px">📲 أرسل الأسئلة واتساب</button>`:""}</div>`;
 }
+/* the link for WhatsApp: fetched on the first tap, then shown with two
+   buttons of its own — a fresh tap each, so copying and opening WhatsApp
+   work on a phone too */
+const getIntakeLink=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIntakeLink");
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-iklink]"); if(b){
+    const was=b.textContent; b.disabled=true; b.textContent="…";
+    try{
+      const d=(await getIntakeLink({ orderId:b.dataset.iklink })).data||{};
+      const msg=`هلا ${d.name||""} 👋\nقبل جلستك مع كاش كلينك، عبّ هالأسئلة القصيرة عن وضعك المالي عشان غالية تعرف وضعك قبل الجلسة:\n${d.url}\nما تاخذ منك إلا دقايق 🌿`;
+      const wa=`https://wa.me/${d.phone||""}?text=${encodeURIComponent(msg)}`;
+      b.outerHTML=`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <a class="rpup" href="${esc(wa)}" target="_blank" rel="noopener" style="text-decoration:none;background:#25D366;border-color:#25D366;color:#fff">💬 افتح واتساب ${d.phone?"للعميل":""}</a>
+          <button class="rpup" data-ikcopy="${esc(msg)}">انسخ الرسالة</button>
+          <input readonly value="${esc(d.url)}" dir="ltr" style="flex:1;min-width:180px;font-size:12px;padding:6px 8px;border:1px solid #D2D3E1;border-radius:8px">
+        </div>${d.done?`<div class="rpmeta" style="color:#2F8789">عبّاها خلاص ✓</div>`:""}${d.phone?"":`<div class="rpmeta">ما في رقم على الحجز — انسخ الرسالة وأرسلها بنفسك.</div>`}`;
+    }catch(err){ b.disabled=false; b.textContent=was; bkMsg((err&&err.message)||"تعذّر جيب الرابط",false); }
+    return;
+  }
+  const c=e.target.closest("button[data-ikcopy]"); if(c){
+    try{ await navigator.clipboard.writeText(c.dataset.ikcopy); c.textContent="انتسخت ✓"; }
+    catch(_){ const i=c.parentNode.querySelector("input"); if(i){ i.focus(); i.select(); } c.textContent="انسخ الرابط من الخانة"; }
+  }
+});
 function ikModal(html){
   let m=document.getElementById("ikModal");
   if(!m){ m=document.createElement("div"); m.id="ikModal";
