@@ -875,6 +875,16 @@
     <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل اللي سوّوا حساب بعيادتي. «افتح عيادته» يفتحها مثل ما يشوفها العميل بالضبط — للقراءة فقط.
       متابعة كاش تنفتح لعملاء أساس الحرية والوفرة بعد أول جلسة.</p>
     <div class="kpis" id="mcKpis"></div>
+    <!-- a client who forgot her password: send the link and see what really happened -->
+    <div class="pxbox" style="margin-bottom:14px">
+      <h3 style="margin:0 0 6px;font-size:15px">🔑 عميل نسي كلمة السر؟</h3>
+      <p class="muted" style="font-size:12.5px;margin:0 0 8px;line-height:1.8">اكتب الإيميل اللي يقوله العميل. نرسل الرابط من إيميلنا ونقولك بالضبط شنو صار — وإذا ما في حساب بهالإيميل، نقولك أقرب حساب له.</p>
+      <div class="pfbar" style="margin:0">
+        <div class="f" style="flex:1;min-width:220px"><label>إيميل العميل</label><input id="mcRsEmail" type="email" dir="ltr" placeholder="name@gmail.com"></div>
+        <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="mcRsGo">أرسل رابط تغيير كلمة السر</button></div>
+      </div>
+      <div id="mcRsOut" style="margin-top:8px;font-size:13.5px;line-height:1.8"></div>
+    </div>
     <div class="pfbar">
       <div class="f" style="flex:1;min-width:200px"><label>بحث</label><input id="mcQ" type="search" placeholder="الاسم أو الإيميل"></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn" id="mcReload">حدّث</button></div>
@@ -2660,6 +2670,26 @@ function fuMsg(t,ok){ const m=$("#fuMsg"); if(!m) return; m.textContent=t; m.cla
 
 /* ================= عيادتي (17 Oct 2026) ================= */
 const listClinicUsers=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listClinicUsers");
+const staffSendReset=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"staffSendReset");
+const RS_OUT={ sent:["#128C4A","انرسل ✓"], "no-account":["#962E37","ما في حساب بهالإيميل"], "mail-failed":["#962E37","ما انرسل — خطأ بالإيميل"], error:["#962E37","ما انرسل — خطأ"] };
+async function mcSendReset(email, btn){
+  const out=$("#mcRsOut"); if(!email) return;
+  const was=btn?btn.textContent:""; if(btn){ btn.disabled=true; btn.textContent="…"; }
+  out.innerHTML="جاري الإرسال…";
+  try{
+    const d=(await staffSendReset({ email })).data||{};
+    if(d.outcome==="sent") out.innerHTML=`<b style="color:#128C4A">انرسل الرابط ✓</b> إلى <b dir="ltr">${esc(d.to)}</b>${d.twin?` — الحساب مسجّل بهالشكل (جيميل ما يفرّق بالنقاط، فيوصل لنفس الإيميل)`:""}. قول للعميل يشيّك الوارد والـSpam، والرابط صالح لمدة ساعة.`;
+    else if(d.outcome==="no-account") out.innerHTML=`<b style="color:#962E37">ما في حساب بعيادتي بهالإيميل.</b> ${
+      (d.similar||[]).length?`أقرب حساب: ${d.similar.map(e=>`<button class="pfbtn" data-mcrs="${esc(e)}" dir="ltr" style="padding:2px 10px">${esc(e)}</button>`).join(" ")} — اضغطه عشان نرسل له.`
+      :"يمكن سجّل بإيميل ثاني، أو ما سوّى حساب — يقدر يسوي «حساب جديد» بعيادتي."}`;
+    else out.innerHTML=`<b style="color:#962E37">ما انرسل.</b> ${esc(d.error||"")} — بلّغ عبدالله.`;
+    if(MC) loadMyClinic();
+  }catch(err){ out.innerHTML=`<b style="color:#962E37">${esc((err&&err.message)||"صار خطأ")}</b>`; }
+  finally{ if(btn){ btn.disabled=false; btn.textContent=was; } }
+}
+$("#mcRsGo") && $("#mcRsGo").addEventListener("click", e=>mcSendReset(String($("#mcRsEmail").value||"").trim().toLowerCase(), e.currentTarget));
+document.addEventListener("click", e=>{ const b=e.target.closest("button[data-mcrs]"); if(!b) return;
+  $("#mcRsEmail").value=b.dataset.mcrs; $("#mcRsEmail").scrollIntoView({behavior:"smooth",block:"center"}); mcSendReset(b.dataset.mcrs, b); });
 let MC=null, MCF="all";
 function mcMsg(m,ok){ const e=$("#mcMsg"); if(!e) return; e.textContent=m||""; e.className="addmsg"+(m?(ok?" ok":" err"):""); }
 async function loadMyClinic(){
@@ -2688,12 +2718,14 @@ function renderMyClinic(){
           : a.reason==="before"?`<span style="color:#A87A2A;font-weight:700">بعد أول جلسة</span><div class="pfrule">${esc(a.pkgName)} · ${esc(dt(a.nextMs))}</div>`
           : `<span class="muted">ما تنطبق</span>`;
         return `<tr>
-          <td><b>${esc(u.name||"—")}</b><div class="pfrule" dir="ltr" style="text-align:right">${esc(u.email)}</div>${u.verified?"":`<div class="pfrule" style="color:#962E37">ما أكّد إيميله</div>`}</td>
+          <td><b>${esc(u.name||"—")}</b><div class="pfrule" dir="ltr" style="text-align:right">${esc(u.email)}</div>${u.verified?"":`<div class="pfrule" style="color:#962E37">ما أكّد إيميله</div>`}${
+            u.reset&&(u.reset.today||u.reset.outcome)?`<div class="pfrule" style="color:${(RS_OUT[u.reset.outcome]||["#614588"])[0]}">🔑 نسي كلمة السر${u.reset.today?` · ${fmt(u.reset.today)} مرة اليوم`:""}${u.reset.outcome?` · آخر مرة: ${esc((RS_OUT[u.reset.outcome]||["",u.reset.outcome])[1])}`:""}</div>`:""}</td>
           <td class="num">${esc(day(u.createdMs))}</td>
           <td class="num">${esc(day(u.lastMs))}</td>
           <td>${st}</td>
           <td class="num">${u.appSavedMs?esc(dt(u.appSavedMs)):"—"}</td>
-          <td style="white-space:nowrap"><a class="pfbtn" target="_blank" rel="noopener" href="../clinic/?as=${encodeURIComponent(u.email)}" style="text-decoration:none">افتح عيادته</a>
+          <td style="white-space:nowrap"><button class="pfbtn" data-mcrs="${esc(u.email)}" title="أرسل رابط تغيير كلمة السر">🔑</button>
+            <a class="pfbtn" target="_blank" rel="noopener" href="../clinic/?as=${encodeURIComponent(u.email)}" style="text-decoration:none">افتح عيادته</a>
             ${a.open||u.appSavedMs?` <a class="pfbtn" target="_blank" rel="noopener" href="../clinic/app.html?as=${encodeURIComponent(u.email)}" style="text-decoration:none">متابعة كاش</a>`:""}</td></tr>`;
       }).join("")+`</tbody></table></div>`
     : `<div class="muted" style="font-size:13px;padding:10px">${(MC.list||[]).length?"ما في نتائج بهالبحث.":"ما في حسابات بعيادتي للحين."}</div>`;
