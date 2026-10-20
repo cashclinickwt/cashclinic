@@ -1123,6 +1123,24 @@
       <a class="report-btn" id="rptNasReports" href="reports/index.html" hidden>تقارير كاش ناس ←</a>
       <a class="report-btn" id="rptHiring" href="reports/hiring.html" hidden>نظام المقابلة المهيكلة ←</a>
     </div>
+
+    <!-- رفع التقارير: every finished session and whether its report is up -->
+    <div id="rdSec" hidden>
+      <h2 style="font-size:19px;margin-top:26px"><span></span> رفع التقارير</h2>
+      <p class="muted" id="rdLead" style="font-size:13px;line-height:1.8;margin:-2px 0 10px"></p>
+      <div class="kpis" id="rdKpis"></div>
+      <div class="flt" id="rdPeople"></div>
+      <div class="flt" id="rdFlt">
+        <button data-rd="todo" class="on">باقي عليّ</button>
+        <button data-rd="missing">ما انرفع</button>
+        <button data-rd="pending">بانتظار الاعتماد</button>
+        <button data-rd="rejected">مرفوض</button>
+        <button data-rd="approved">خلص ✓</button>
+        <button data-rd="all">الكل</button>
+      </div>
+      <div class="addmsg" id="rdMsg"></div>
+      <div id="rdBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
+    </div>
   </div>
 
   <div class="sec" id="composerSec" data-panel="composer">
@@ -1820,7 +1838,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null; BS=null; RF=null; BG=null; MC=null;
+  ST=null; FU=null; BS=null; RF=null; BG=null; MC=null; RD=null;
 }
 
 async function refreshAll(opt){
@@ -1980,6 +1998,8 @@ onAuthStateChanged(auth, async (user)=>{
        from appearing where it would always fail */
     const HIRE_OK=["ghalia.n@cashclinic.net","sarah.h@cashclinic.net","abdullah.a@cashclinic.net"];
     if(HIRE_OK.indexOf(String((DATA&&DATA.email)||"").toLowerCase())!==-1) $("#rptHiring").hidden=false;
+    /* رفع التقارير: consultants and full access */
+    if(DATA&&DATA.reportDuty){ $("#rdSec").hidden=false; $("#reportsSec").hidden=false; if(!RD) loadReportDuty(); }   /* early, for the sidebar badge */
     if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden||!$("#rptHiring").hidden) $("#reportsSec").hidden=false;
     /* the build this page was served as, captured on the first load only:
        every later refresh compares against it, so a deploy that happens while
@@ -5184,7 +5204,7 @@ function gsOpen(r){
 const SALES_PANELS = ["home","sales","addsale","salesteam","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
-const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify"];
+const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify","reports"];
 /* أشواق — customer service: the diary like نورة, the client list, and the
    team's shared board. No leads, no vouchers tab, no events, no targets — and
    no money anywhere, which the server enforces by never sending it. */
@@ -5231,7 +5251,8 @@ const PANELS = [
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
-  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports") },
+  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
+    count:()=>((RD&&RD.list)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
 ];
 let ST=null, FU=null, BS=null, RF=null;
 const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
@@ -6372,6 +6393,101 @@ const RP_STATE={ pending:["بانتظار موافقة غالية","#A87A2A"], a
 const RP_MAX=4;
 function bkEnded(b){ return ((Date.parse(b.startIso||"")||0) + (Number(b.minutes)||60)*60000) < Date.now(); }
 function bkReports(b){ return Array.isArray(b.reports) ? b.reports : (b.report ? [Object.assign({ id:"" }, b.report, { canApprove:!!b.canApprove, canChange:true })] : []); }
+/* ================= رفع التقارير (20 Oct 2026) =================
+   Every finished consultation and, per consultant on it, whether the report
+   is up. A consultant sees his own; full access sees everyone's and can pick
+   one consultant. Upload goes through the same «ارفع تقرير» flow as المواعيد. */
+const getReportDuty=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getReportDuty");
+let RD=null, RDF="todo", RDWHO="";
+const RD_ST={ missing:["ما انرفع","#962E37"], pending:["بانتظار الاعتماد","#A87A2A"], rejected:["مرفوض — ارفعه من جديد","#962E37"], approved:["انرفع واعتُمد ✓","#2F8789"] };
+async function loadReportDuty(){
+  try{ RD=(await getReportDuty({})).data||{ list:[] }; renderReportDuty(); if(typeof syncTabs==="function") syncTabs(); }
+  catch(e){ const m=$("#rdMsg"); if(m){ m.textContent=(e&&e.message)||"تعذّر التحميل"; m.className="addmsg err"; } }
+}
+function renderReportDuty(){
+  const box=$("#rdBody"); if(!box||!RD) return;
+  $("#rdLead").textContent = RD.all
+    ? "كل جلسة خلصت، ولكل استشاري عليها: انرفع تقريره ولا لا. الاتصال السريع والتواصل التفاعلي والمراجعة ما تحتاج تقرير. يوصل تذكير للاستشاري بعد الجلسة بساعتين."
+    : "جلساتك اللي خلصت وتقاريرها. يوصلك تذكير بعد الجلسة بساعتين إذا التقرير ما انرفع.";
+  const people=RD.people||[];
+  $("#rdPeople").innerHTML = RD.all && people.length>1
+    ? [`<button data-rdwho=""${RDWHO?"":' class="on"'}>كل الاستشاريين</button>`].concat(people.map(p=>
+        `<button data-rdwho="${esc(p.id)}"${RDWHO===p.id?' class="on"':""}>${esc(p.name)}${p.missing+p.rejected?` · ${fmt(p.missing+p.rejected)} باقي`:" ✅"}</button>`)).join("")
+    : "";
+  const scoped=(RD.list||[]).filter(r=>!RDWHO||r.consultantId===RDWHO);
+  const c=k=>scoped.filter(r=>r.status===k).length;
+  $("#rdKpis").innerHTML=
+    `<div class="kpi"><div class="n" style="color:#962E37">${fmt(c("missing"))}</div><div class="l">ما انرفع</div></div>`+
+    `<div class="kpi"><div class="n" style="color:#A87A2A">${fmt(c("pending"))}</div><div class="l">بانتظار الاعتماد</div></div>`+
+    `<div class="kpi"><div class="n" style="color:#962E37">${fmt(c("rejected"))}</div><div class="l">مرفوض</div></div>`+
+    `<div class="kpi"><div class="n" style="color:#2F8789">${fmt(c("approved"))}</div><div class="l">خلص ✓</div></div>`;
+  $("#rdFlt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.rd===RDF));
+  const td=$('#rdFlt button[data-rd="todo"]'); if(td) td.textContent=RD.all?"باقي":"باقي عليّ";
+  const rows=scoped.filter(r=>RDF==="all"||(RDF==="todo"?(r.status==="missing"||r.status==="rejected"):r.status===RDF));
+  box.innerHTML = rows.length
+    ? `<div style="overflow-x:auto;max-width:100%"><table class="pftab"><thead><tr><th>العميل</th>${RD.all?"<th>الاستشاري</th>":""}<th>الجلسة خلصت</th><th>التقرير</th><th></th></tr></thead><tbody>`+
+      rows.map(r=>{ const st=RD_ST[r.status]||RD_ST.missing;
+        const late=r.status==="missing"?Math.floor((Date.now()-r.endMs)/864e5):0;
+        return `<tr><td><b>${esc(r.client||"—")}</b><div class="pfrule">${esc(r.packageName)}</div></td>
+          ${RD.all?`<td>${esc(r.consultantName)}</td>`:""}
+          <td class="num">${esc(dt(r.endMs))}${late>=1?`<div class="pfrule" style="color:#962E37">من ${fmt(late)} يوم</div>`:""}</td>
+          <td><span style="color:${st[1]};font-weight:700">${st[0]}</span>${r.status==="pending"?`<div class="pfrule">عند ${esc(r.approverName)}</div>`:""}${
+            r.reason?`<div class="pfrule">السبب: ${esc(r.reason)}</div>`:""}${r.reportName?`<div class="pfrule">${esc(r.reportName)}</div>`:""}</td>
+          <td style="white-space:nowrap">${r.mine&&(r.status==="missing"||r.status==="rejected")?`<button class="pfbtn go" data-rup="${esc(r.orderId)}">⬆️ ارفع التقرير</button>`:""}</td></tr>`;
+      }).join("")+`</tbody></table></div>`
+    : `<div class="muted" style="font-size:13px;padding:10px">${RDF==="todo"?"ما عليك تقارير باقية ✅":"ما في جلسات بهالقائمة."}</div>`;
+}
+$("#rdFlt") && $("#rdFlt").addEventListener("click",e=>{ const b=e.target.closest("button[data-rd]"); if(!b) return; RDF=b.dataset.rd; renderReportDuty(); });
+$("#rdPeople") && $("#rdPeople").addEventListener("click",e=>{ const b=e.target.closest("button[data-rdwho]"); if(!b) return; RDWHO=b.dataset.rdwho; renderReportDuty(); });
+
+/* ================= أسئلة ما قبل الجلسة (20 Oct 2026) =================
+   Answered or not, on every booking card; the answers open only for غالية
+   and the consultant(s) on the booking — the server decides, the button just
+   follows what it said. */
+const getIntakeAnswers=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIntakeAnswers");
+function intakeBlock(b){
+  if(b.status==="cancelled" || !b.intake) return "";
+  if(b.intake.done) return `<div class="rpbox" style="border-color:#2F8789;background:#F2F9F8">
+      <span class="rpchip" style="background:#2F8789">📋 عبّى أسئلة ما قبل الجلسة ✓</span>
+      ${b.canIntake?` <button class="rpup" data-intake="${esc(b.id)}" style="margin-inline-start:6px">اعرض الإجابات</button>`:""}</div>`;
+  if(bkEnded(b)) return "";
+  return `<div class="rpbox"><span class="rpchip" style="background:#A87A2A">📋 ما عبّى أسئلة ما قبل الجلسة للحين</span>
+      <div class="rpmeta" style="margin-top:6px">الرابط وصله بإيميل الحجز، ويتذكّره قبل الموعد بيوم، وموجود بعيادتي.</div></div>`;
+}
+function ikModal(html){
+  let m=document.getElementById("ikModal");
+  if(!m){ m=document.createElement("div"); m.id="ikModal";
+    m.style.cssText="position:fixed;inset:0;z-index:300;background:rgba(26,12,41,.55);display:flex;align-items:center;justify-content:center;padding:16px";
+    m.addEventListener("click",e=>{ if(e.target===m||e.target.closest("[data-ikclose]")) m.remove(); });
+    document.body.appendChild(m); }
+  m.innerHTML=`<div style="background:#fff;border-radius:20px;max-width:620px;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px">${html}
+    <div style="text-align:left;margin-top:12px"><button class="pfbtn" data-ikclose="1">سكّر</button></div></div>`;
+}
+function ikHtml(d){
+  const A=d.answers||{}, k=v=>v?kwd(v):"—";
+  const row=(l,v)=>v===""||v==null?"":`<tr><td style="padding:7px 8px;color:#6B6478;white-space:nowrap;vertical-align:top">${l}</td><td style="padding:7px 8px;font-weight:600;white-space:pre-wrap">${v}</td></tr>`;
+  const list=(a,f)=>(a||[]).length?(a||[]).map(f).join("<br>"):"";
+  return `<h3 style="margin:0 0 4px">📋 أسئلة ما قبل الجلسة · ${esc(d.name||"")}</h3>
+    <div class="muted" style="font-size:12.5px;margin-bottom:8px">أرسلها ${esc(dt(d.submittedMs))}${d.edits?` · عدّلها ${fmt(d.edits)} مرة`:""}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+    ${row("الحالة الاجتماعية",esc(A.status))}${row("الأبناء",esc(A.kids))}${row("الراتب",A.salary?k(A.salary):"")}
+    ${row("ينزل يوم",A.payDay||"")}${row("العمر",A.age||"")}${row("الأصول",esc(A.assets))}${row("المشكلة",esc(A.problem))}
+    ${row("قروض",list(A.loans,(r,i)=>`${i+1}- المتبقي ${k(r.left)} · القسط ${k(r.pay)}${r.end?` · ينتهي ${esc(r.end)}`:""}`))}
+    ${row("جمعية",list(A.jamiya,(r,i)=>`${i+1}- الاستلام ${esc(r.get)} · القسط ${k(r.pay)}${r.end?` · تنتهي ${esc(r.end)}`:""}`))}
+    ${row("تقسيط (BNPL)",list(A.bnpl,(r,i)=>`${i+1}- ${esc(r.who)} · القسط ${k(r.pay)} · باقي ${fmt(r.left||0)} دفعات`))}
+    ${row("ديون أشخاص",list(A.people,(r,i)=>`${i+1}- ${esc(r.who)} · ${k(r.amount)}${r.note?` · ${esc(r.note)}`:""}`))}
+    ${row("الأهداف",esc(A.goals))}${row("المصروفات الثابتة",list(A.fixed,r=>`${esc(r.name)} · ${k(r.amount)}`))}
+    ${row("أقل مبلغ يعيش فيه مرتاح",A.comfort?k(A.comfort):"")}</table>`;
+}
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-intake]"); if(!b) return;
+  const was=b.textContent; b.disabled=true; b.textContent="…";
+  try{
+    const d=(await getIntakeAnswers({ orderId:b.dataset.intake })).data||{};
+    ikModal(d.done?ikHtml(d):`<p>ما عبّى الأسئلة للحين.</p>`);
+  }catch(err){ ikModal(`<p style="color:#962E37">${esc((err&&err.message)||"صار خطأ")}</p>`); }
+  finally{ b.disabled=false; b.textContent=was; }
+});
 function reportBlock(b){
   if(b.status==="cancelled" || !b.canReport || !bkEnded(b)) return "";
   const list=bkReports(b), id=esc(b.id);
@@ -6452,6 +6568,7 @@ $("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
     bkMsg(d.status==="approved"
       ? (d.mailed?"انرفع التقرير ✅ ووصل للعميل إيميل إنه جاهز في عيادتي":"انرفع التقرير ✅ وصار بعيادتي العميل — بس الإيميل ما انرسل")
       : `انرفع التقرير ✅ — ينتظر موافقة ${d.approverName||"غالية"} قبل ما يشوفه العميل`, true);
+    if(RD) loadReportDuty();
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"تعذّر رفع التقرير",false); }
   finally{ RP_ID=""; RP_RID=""; }
@@ -6831,7 +6948,7 @@ function renderBkList(){
         <button data-edit="${esc(b.id)}">أرجع الموعد</button>
         ${b.wasPaid?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
       </div>`:""}
-      ${reportBlock(b)}
+      ${intakeBlock(b)}${reportBlock(b)}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
@@ -7298,7 +7415,7 @@ function renderBkCalDay(){
            passed still needs correcting, noting, or turning into a voucher.
            Hiding them once the start time passed is what locked نورة and
            أشواق out of past and current appointments. */
-        reportBlock(b) + (b.status!=="cancelled"?`<div class="bkacts">
+        intakeBlock(b) + reportBlock(b) + (b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
         <button data-note="${esc(b.id)}">أضف ملاحظة</button>

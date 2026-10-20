@@ -333,7 +333,10 @@ function render(D){
       <div class="m">${esc(c.clinic)} · ${esc(c.mode)}</div>
       ${c.sessions.map(s=>`<div class="m">• ${esc(s.label)} — مع ${esc(s.with)}${s.date?` · ${esc(s.date)} ${esc(s.time)}`:""}${s.done?" ✓":""}</div>`).join("")}
       ${(Array.isArray(c.reports)?c.reports:(c.report?[Object.assign({id:""},c.report)]:[])).map((r,i,all)=>
-        `<button class="ck-report" data-report="${esc(c.id)}" data-rid="${esc(r.id||"")}">📄 ${all.length>1?`تقرير ${esc(r.byName||String(i+1))}`:"افتح تقرير جلستك"}</button>`).join(" ")}</div>`,
+        `<button class="ck-report" data-report="${esc(c.id)}" data-rid="${esc(r.id||"")}">📄 ${all.length>1?`تقرير ${esc(r.byName||String(i+1))}`:"افتح تقرير جلستك"}</button>`).join(" ")}
+      ${c.intake&&c.intake.done?`<div class="m" style="color:#1F5B45">📋 عبّيت أسئلة ما قبل الجلسة ✓</div>`
+        :(c.intake&&c.intake.url?(AS?`<div class="m" style="color:#962E37">📋 ما عبّى أسئلة ما قبل الجلسة للحين</div>`
+          :`<a class="ck-report" href="${esc(c.intake.url)}" style="display:inline-block;text-decoration:none;background:#FFF6E3;border-color:#D3A146">📋 عبّ أسئلة ما قبل الجلسة</a>`):"")}</div>`,
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
   h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
