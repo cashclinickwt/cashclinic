@@ -967,12 +967,13 @@
         <option value="book">كتيّب</option><option value="consult">استشارة</option>
         <option value="call">اتصال سريع</option><option value="course">ورشة / دورة</option>
         <option value="contract">عقد</option></select></div>
+      <div class="f" id="tgBookWrap"><label>الكتيّب</label><select id="tgBook"><option value="">الكتيّبات كلها</option></select></div>
       <div class="f"><label>المبلغ (د.ك)</label><input id="tgAmount" type="number" min="1" step="1"></div>
       <div class="f"><label>يبدأ يوم</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
       <div class="f"><label>صاحب الهدف</label><select id="tgOwner"></select></div>
       <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tgAdd">احفظ الهدف</button></div>
       <div class="f" style="flex:1 1 100%">
-        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. الأهداف ما تنحذف — تنسكّر، عشان الشهر اللي راح يظل مفهوم.</div></div>
+        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. هدف الكتيّب تقدر تخليه لكتيّب واحد أو للكتيّبات كلها. «احذف» يشيل الهدف من القائمة ويوقف عدّه.</div></div>
     </div>
     <div class="addmsg" id="tgMsg"></div>
     <div id="tgList"></div>
@@ -2406,6 +2407,10 @@ document.addEventListener("click", async e=>{
 
 function tgMsg(t,ok){ const m=$("#tgMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
 
+/* the book picker only means something for a book goal */
+function tgBookShow(){ const w=$("#tgBookWrap"); if(w) w.hidden=$("#tgKind").value!=="book"; }
+$("#tgKind") && $("#tgKind").addEventListener("change", tgBookShow);
+
 $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
   const label=($("#tgLabel").value||"").trim();
   const amount=Number($("#tgAmount").value)||0;
@@ -2414,6 +2419,7 @@ $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
   const b=$("#tgAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
   try{
     await setSalesTarget({ id:tgSlug(label), label, kind:$("#tgKind").value,
+      product:$("#tgKind").value==="book"?($("#tgBook").value||""):"",
       amount, currency:"KWD", cycleDay:Number($("#tgDay").value)||1,
       owner:$("#tgOwner").value||"", active:true });
     $("#tgLabel").value=""; $("#tgAmount").value="";
@@ -2427,6 +2433,7 @@ document.addEventListener("click", async (e)=>{
   if(ed){
     const t=((TG&&TG.targets)||[]).find(x=>x.id===ed.dataset.tgedit); if(!t) return;
     $("#tgLabel").value=t.label||""; $("#tgKind").value=t.kind||"book";
+    $("#tgBook").value=t.product||""; tgBookShow();
     $("#tgAmount").value=t.target||""; $("#tgDay").value=t.cycleDay||1;
     if($("#tgOwner")) $("#tgOwner").value=t.owner||"";
     $("#tgLabel").scrollIntoView({behavior:"smooth",block:"center"});
@@ -2435,9 +2442,9 @@ document.addEventListener("click", async (e)=>{
   }
   const off=e.target.closest("[data-tgoff]");
   if(off){
-    if(!confirm("تسكّر هذا الهدف؟ ما ينحذف — بس يوقف عن العد.")) return;
+    if(!confirm("تحذف هذا الهدف؟ يختفي من القائمة ويوقف عدّه.")) return;
     off.disabled=true;
-    try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انسكّر الهدف",true); }
+    try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انحذف الهدف",true); }
     catch(err){ tgMsg((err&&err.message)||"تعذّر",false); }
     finally{ off.disabled=false; }
   }
@@ -3436,10 +3443,14 @@ function tgSlug(label){
 
 function renderTarget(){
   const box=$("#tgList"); if(!box||!TG) return;
-  /* full access and نورة add and edit goals (13 Oct 2026); closing one
-     stays with full access */
+  /* full access and نورة add, edit (13 Oct 2026) and delete (22 Oct 2026) goals */
   const mayEdit = !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
   const form=$("#tgForm"); if(form) form.hidden=!mayEdit;
+  const bsel=$("#tgBook");
+  if(mayEdit && bsel && bsel.options.length<2 && (TG.books||[]).length){
+    bsel.innerHTML='<option value="">الكتيّبات كلها</option>'+TG.books.map(b=>`<option value="${esc(b.key)}">${esc(b.name)}</option>`).join("");
+    tgBookShow();
+  }
   const osel=$("#tgOwner");
   if(mayEdit && osel && !osel.options.length){
     osel.innerHTML='<option value="">— بدون صاحب —</option>'+
@@ -3458,6 +3469,7 @@ function renderTarget(){
     const w=Math.min(100, Math.max(0, Number(t.pct)||0));
     return `<div class="tgcard">
       <h3>${esc(t.label)}</h3>
+      ${t.kind==="book"?`<div class="tgwin">📘 ${t.productName?esc(t.productName):"الكتيّبات كلها"}</div>`:""}
       <div class="tgwin">من ${esc(t.from)} إلى ${esc(t.to)} · باقي ${fmt(t.daysLeft)} يوم</div>
       <div class="tgbig">
         <span class="pct">${fmt(t.pct)}%</span>
@@ -3472,7 +3484,7 @@ function renderTarget(){
       ${t.hit?`<div class="tghit">🎉 وصلنا الهدف! ${TG.money?esc(kwd(t.achieved))+" من "+esc(kwd(t.target)):fmt(t.pct)+"%"}</div>`:""}
       ${mayEdit?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="pfbtn" data-tgedit="${esc(t.id)}">عدّل</button>
-        ${DATA.role==="all"?`<button class="pfbtn" data-tgoff="${esc(t.id)}">سكّره</button>`:""}</div>`:""}
+        <button class="pfbtn" data-tgoff="${esc(t.id)}">احذف</button></div>`:""}
       ${TG.money&&(t.byProduct||[]).length?`<table class="pftab" style="margin-top:16px">
         <thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>`+
         t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")+
