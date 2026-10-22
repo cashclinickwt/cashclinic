@@ -1219,7 +1219,7 @@
     <h2><span></span> إضافة عمليات البيع</h2>
     <div class="addbox" id="addBox" hidden>
       <h3>➕ أضف عملية بيع</h3>
-      <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر: الكتب، و«رفع الميزانية». تنضاف للمبيعات مثل أي عملية ثانية، وتطلع بملف العميل في «كل العملاء»، وتقدر ترسل الكتاب للعميل على طول.</p>
+      <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر: الكتب، و«رفع الميزانية»، و«خدمات تقنية». تنضاف للمبيعات مثل أي عملية ثانية، وتطلع بملف العميل في «كل العملاء»، وتقدر ترسل الكتاب للعميل على طول.</p>
       <div class="addgrid">
         <div class="addf"><label id="asProdLbl">الكتاب أو الخدمة</label><select id="asProduct"></select></div>
         <div class="addf"><label>اسم العميل</label><input id="asName" type="text" placeholder="الاسم الكامل"></div>
@@ -1230,6 +1230,7 @@
         <div class="addf" id="asExpF" hidden><label>مصاريف <span>(اختياري — تنخصم قبل الشركة)</span></label><input id="asExpense" type="number" min="0" step="0.5"></div>
       </div>
       <p class="muted" id="asBudgetHint" hidden style="font-size:12.5px;margin:8px 0 0">رفع الميزانية يروح كامل للشركة ويتسجّل بهذا الشهر، ويطلع بملف العميل في «كل العملاء» — لازم رقمه أو إيميله.</p>
+      <p class="muted" id="asTechHint" hidden style="font-size:12.5px;margin:8px 0 0">خدمات تقنية: اكتب المبلغ اللي دفعه العميل. تطلع بملف العميل في «كل العملاء» — لازم رقمه أو إيميله.</p>
       <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="asNote" type="text" placeholder="مثال: بيع عبر واتساب"></div>
       <div class="addrow">
         <label id="asDeliverL"><input type="checkbox" id="asDeliver" checked> أرسل الكتاب على إيميله</label>
@@ -1561,6 +1562,7 @@
       <button data-c="course">دورات</button>
       <button data-c="diwaniya">الديوانية</button>
       <button data-c="event">سجّلوا بلقاء</button>
+      <button data-c="tech">خدمات تقنية</button>
       <button data-c="paid">دفعوا لنا</button>
       <button data-c="month">هالشهر</button>
     </div>
@@ -3671,7 +3673,7 @@ let BKX="";
 const r3=(n)=>Math.round((Number(n)||0)*1000)/1000;
 const KX_TARGET={ gross:"#bkxLines", fees:"#bkxLines", company:"#bkxLines", shares:"#bkxDue", costs:"#bkxCosts", net:"#bkxCosts" };
 const KX_KINDS=[["book","الكتيّبات"],["consult","الاستشارات"],["call","الاتصال السريع"],["course","الورش والدورات"],
-                ["contract","العقود"],["budget","رفع للميزانية"]];
+                ["contract","العقود"],["budget","رفع للميزانية"],["tech","خدمات تقنية"]];
 function kxKindName(k){ const f=KX_KINDS.find(x=>x[0]===k); return f?f[1]:(PF_KIND[k]||k||"أخرى"); }
 function kxNameOf(id){
   if(id==="company") return "الشركة";
@@ -4179,7 +4181,7 @@ function renderBooks(){
   document.querySelectorAll("#bkRules .rulecard").forEach(ruleTotal);
 }
 
-const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد",budget:"رفع للميزانية"};
+const PF_KIND={book:"كتيّب",consult:"استشارة",call:"اتصال سريع",course:"ورشة / دورة",contract:"عقد",budget:"رفع للميزانية",tech:"خدمات تقنية"};
 const DELIV_AR={done:"خلّص جلساته",voucher:"ألغى وأخذ رصيد",pending:"لم تنتهي حتى الآن"};
 
 $("#bkMonth") && $("#bkMonth").addEventListener("change", ()=>loadBooks($("#bkMonth").value));
@@ -5895,6 +5897,8 @@ const CL_TYPE = {
   past:      { label:"عملية سابقة", color:"#3EADAD" },
   /* رفع الميزانية sold through «أضف عملية بيع» — a service, 100% company */
   budget:    { label:"رفع الميزانية", color:"#A87A2A" },
+  /* خدمات تقنية — عبدالله's websites and apps (22 Oct 2026) */
+  tech:      { label:"خدمات تقنية", color:"#2F8789" },
 };
 let CLQ="", CLFILTER="all";
 
@@ -6090,10 +6094,12 @@ function renderAddSale(){
   /* رفع الميزانية: a service sold like a book (13 Oct 2026) — sales and
      full access, as the old form was */
   const budget = DATA.role==="all" || DATA.role==="sales";
-  const want = cat.length + (budget?1:0);
+  /* خدمات تقنية (22 Oct 2026): the same people as رفع الميزانية */
+  const want = cat.length + (budget?2:0);
   if(sel && sel.options.length!==want){
     sel.innerHTML=cat.map(c=>`<option value="${esc(c.key)}" data-price="${c.price}">${esc(c.name)} · ${fmt(c.price)} ${esc(c.currency)}</option>`).join("")
-      + (budget?`<option value="budget" data-price="">رفع الميزانية · خدمة (اكتب المبلغ)</option>`:"");
+      + (budget?`<option value="budget" data-price="">رفع الميزانية · خدمة (اكتب المبلغ)</option>`:"")
+      + (budget?`<option value="tech" data-price="">خدمات تقنية (اكتب المبلغ)</option>`:"");
     syncPrice();
   }
 }
@@ -6103,11 +6109,12 @@ function syncPrice(){
   /* prefill the list price, but leave it editable for a WhatsApp discount */
   if(o) amt.value=o.dataset.price;
   /* the service has no book to send and is always this month */
-  const isB = sel.value==="budget";
+  const isBudget = sel.value==="budget", isTech = sel.value==="tech", isB = isBudget||isTech;
   /* the date stays for رفع الميزانية too — older ones go in their own month */
   ["#asDeliverL"].forEach(id=>{ const e=$(id); if(e) e.hidden=isB; });
   const dl=$("#asDateF label"); if(dl) dl.innerHTML = isB ? 'التاريخ <span>(اختياري — للقديمة)</span>' : 'تاريخ البيع <span>(اختياري)</span>';
-  ["#asExpF","#asBudgetHint"].forEach(id=>{ const e=$(id); if(e) e.hidden=!isB; });
+  ["#asExpF","#asBudgetHint"].forEach(id=>{ const e=$(id); if(e) e.hidden=!isBudget; });
+  const th=$("#asTechHint"); if(th) th.hidden=!isTech;
   if(isB){ amt.placeholder="المبلغ اللي دفعه"; amt.focus(); } else amt.placeholder="";
 }
 $("#asProduct") && $("#asProduct").addEventListener("change", syncPrice);
@@ -6122,7 +6129,8 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
     const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
     if(fix) return asMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
   }
-  if(productKey==="budget"){
+  if(productKey==="budget"||productKey==="tech"){
+    const isTech=productKey==="tech", what=isTech?"خدمات تقنية":"رفع الميزانية";
     const amount=Number($("#asAmount").value);
     if(!(amount>0)) return asMsg("اكتب المبلغ اللي دفعه","err");
     if(!email && !$("#asPhone").value.trim()) return asMsg("اكتب رقم العميل أو إيميله — عشان تطلع الخدمة بملفه","err");
@@ -6131,8 +6139,8 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
       const soldOn=$("#asDate").value||"";
       if(soldOn && soldOn > new Date(Date.now()+3*3600e3).toISOString().slice(0,10)) return asMsg("التاريخ ما يصير يكون بالمستقبل","err");
       await addManualSale({ productKey, name, email, phone:$("#asPhone").value.trim(), note:$("#asNote").value.trim(),
-                            amount:$("#asAmount").value, expense:$("#asExpense").value||0, soldOn });
-      asMsg(`انضاف «رفع الميزانية» ${fmt(amount)} د.ك لحسابات الشركة${soldOn?" بشهر "+soldOn.slice(0,7):""} ✅ وطلع بملف العميل`,"ok");
+                            amount:$("#asAmount").value, expense:isTech?0:($("#asExpense").value||0), soldOn });
+      asMsg(`انضاف «${what}» ${fmt(amount)} د.ك لحسابات الشركة${soldOn?" بشهر "+soldOn.slice(0,7):""} ✅ وطلع بملف العميل`,"ok");
       ["#asName","#asEmail","#asPhone","#asNote","#asAmount","#asExpense","#asDate"].forEach(id=>{ $(id).value=""; });
       await refreshSections(["sales","clients"]); render();
     }catch(e){ asMsg((e&&e.message)||"تعذّر الإضافة","err"); }
