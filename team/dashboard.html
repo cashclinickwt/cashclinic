@@ -1131,20 +1131,6 @@
         style="width:100%;max-width:560px;font:inherit;font-size:15px;padding:12px 16px;border:1.5px solid #D2D3E1;border-radius:14px;background:#fff">
     </div>
 
-    <!-- تقارير العملاء: every uploaded report, whoever wrote it, and whether it reached the client -->
-    <div id="crSec" hidden>
-      <h2 style="font-size:19px;margin-top:22px"><span></span> تقارير العملاء</h2>
-      <p class="muted" id="crLead" style="font-size:13px;line-height:1.8;margin:-2px 0 10px"></p>
-      <div class="kpis" id="crKpis"></div>
-      <div class="flt" id="crFlt">
-        <button data-cr="all" class="on">الكل</button>
-        <button data-cr="ok">وصل للعميل ✓</button>
-        <button data-cr="no">ما وصل</button>
-      </div>
-      <div class="addmsg" id="crMsg"></div>
-      <div id="crBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
-    </div>
-
     <!-- رفع التقارير: every finished session and whether its report is up -->
     <div id="rdSec" hidden>
       <h2 style="font-size:19px;margin-top:26px"><span></span> رفع التقارير</h2>
@@ -1162,6 +1148,24 @@
       <div class="addmsg" id="rdMsg"></div>
       <div id="rdBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
     </div>
+
+    <!-- تقارير العملاء: every uploaded report, whoever wrote it, and whether it reached the client -->
+    <div id="crSec" hidden>
+      <h2 style="font-size:19px;margin-top:22px"><span></span> تقارير العملاء</h2>
+      <p class="muted" id="crLead" style="font-size:13px;line-height:1.8;margin:-2px 0 10px"></p>
+      <div class="kpis" id="crKpis"></div>
+      <div class="flt" id="crPeople"></div>
+      <div class="flt" id="crFlt">
+        <button data-cr="all" class="on">الكل</button>
+        <button data-cr="ok">وصل للعميل ✓</button>
+        <button data-cr="no">ما وصل</button>
+        <button data-cr="pending">بانتظار الاعتماد</button>
+        <button data-cr="rejected">مرفوض</button>
+      </div>
+      <div class="addmsg" id="crMsg"></div>
+      <div id="crBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
+    </div>
+
   </div>
 
   <div class="sec" id="composerSec" data-panel="composer">
@@ -6431,6 +6435,7 @@ function bkReports(b){ return Array.isArray(b.reports) ? b.reports : (b.report ?
    one consultant. Upload goes through the same «ارفع تقرير» flow as المواعيد. */
 const getReportDuty=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getReportDuty");
 let RD=null, RDF="todo", RDWHO="";
+let CR=null, CRF="all", CRWHO="", RPQ="";
 const RD_ST={ missing:["ما انرفع","#962E37"], pending:["بانتظار الاعتماد","#A87A2A"], rejected:["مرفوض — ارفعه من جديد","#962E37"], approved:["انرفع واعتُمد ✓","#2F8789"] };
 async function loadReportDuty(){
   try{ RD=(await getReportDuty({})).data||{ list:[] }; renderReportDuty(); if(typeof syncTabs==="function") syncTabs(); }
@@ -6476,7 +6481,6 @@ function renderReportDuty(){
    سارة reads غالية's — with whether it reached the client and, if not, why. */
 const listSessionReports=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listSessionReports");
 const resendReportMail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"resendReportMail");
-let CR=null, CRF="all", RPQ="";
 /* Arabic typed loosely still matches: hamzas, ta marbuta, alef maqsura, tashkeel, Arabic digits */
 function rpNorm(v){
   return String(v||"").toLowerCase()
@@ -6506,7 +6510,17 @@ function renderClientReports(){
   $("#crLead").textContent = CR.all
     ? "كل تقرير انرفع على أي جلسة، أي استشاري كتبه — ووصل للعميل ولا لا، وإذا ما وصل ليش."
     : "تقارير جلساتك، ووصلت للعميل ولا لا.";
-  const scoped=(CR.list||[]).filter(rpHit);
+  /* by who wrote it: غالية's, سارة's … */
+  const writers=[...new Set((CR.list||[]).map(r=>r.byName||"—"))];
+  if(CRWHO && writers.indexOf(CRWHO)===-1) CRWHO="";
+  $("#crPeople").innerHTML = writers.length>1
+    ? [`<button data-crwho=""${CRWHO?"":' class="on"'}>كل الاستشاريين</button>`].concat(writers.map(w=>{
+        const k=(CR.list||[]).filter(r=>(r.byName||"—")===w);
+        const bad=k.filter(r=>!r.inClinic).length;
+        return `<button data-crwho="${esc(w)}"${CRWHO===w?' class="on"':""}>${esc(w)} · ${fmt(k.length)}${bad?` · ${fmt(bad)} ما وصل`:" ✅"}</button>`;
+      })).join("")
+    : "";
+  const scoped=(CR.list||[]).filter(r=>rpHit(r)&&(!CRWHO||(r.byName||"—")===CRWHO));
   const ok=r=>r.inClinic, n=k=>scoped.filter(k).length;
   $("#crKpis").innerHTML=
     `<div class="kpi"><div class="n">${fmt(scoped.length)}</div><div class="l">تقرير</div></div>`+
@@ -6514,7 +6528,7 @@ function renderClientReports(){
     `<div class="kpi"><div class="n" style="color:#962E37">${fmt(n(r=>!ok(r)))}</div><div class="l">ما وصل</div></div>`+
     `<div class="kpi"><div class="n">${fmt(new Set(scoped.map(r=>(r.email||r.client||"").toLowerCase())).size)}</div><div class="l">عميل</div></div>`;
   $("#crFlt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.cr===CRF));
-  const rows=scoped.filter(r=>CRF==="all"||(CRF==="ok"?ok(r):!ok(r)));
+  const rows=scoped.filter(r=>CRF==="all"||(CRF==="ok"?ok(r):CRF==="no"?!ok(r):r.status===CRF));
   box.innerHTML = rows.length
     ? `<div style="overflow-x:auto;max-width:100%"><table class="pftab"><thead><tr><th>العميل</th><th>الجلسة</th><th>كتبه</th><th>وصل للعميل؟</th><th></th></tr></thead><tbody>`+
       rows.map(r=>{
@@ -6534,6 +6548,9 @@ function renderClientReports(){
 }
 $("#rpSearch") && $("#rpSearch").addEventListener("input", e=>{
   RPQ=rpNorm(e.target.value); renderClientReports(); renderReportDuty();
+});
+$("#crPeople") && $("#crPeople").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-crwho]"); if(!b) return; CRWHO=b.dataset.crwho; renderClientReports();
 });
 $("#crFlt") && $("#crFlt").addEventListener("click", e=>{
   const b=e.target.closest("button[data-cr]"); if(!b) return; CRF=b.dataset.cr; renderClientReports();
