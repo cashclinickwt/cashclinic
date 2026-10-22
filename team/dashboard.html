@@ -1125,6 +1125,26 @@
       <a class="report-btn" id="rptHiring" href="reports/hiring.html" hidden>نظام المقابلة المهيكلة ←</a>
     </div>
 
+    <!-- one search for both lists below (22 Oct 2026) -->
+    <div id="rpSearchWrap" hidden style="margin-top:22px">
+      <input id="rpSearch" type="search" autocomplete="off" placeholder="🔎 دوّر على عميل: الاسم، الإيميل، الرقم، أو رقم الملف"
+        style="width:100%;max-width:560px;font:inherit;font-size:15px;padding:12px 16px;border:1.5px solid #D2D3E1;border-radius:14px;background:#fff">
+    </div>
+
+    <!-- تقارير العملاء: every uploaded report, whoever wrote it, and whether it reached the client -->
+    <div id="crSec" hidden>
+      <h2 style="font-size:19px;margin-top:22px"><span></span> تقارير العملاء</h2>
+      <p class="muted" id="crLead" style="font-size:13px;line-height:1.8;margin:-2px 0 10px"></p>
+      <div class="kpis" id="crKpis"></div>
+      <div class="flt" id="crFlt">
+        <button data-cr="all" class="on">الكل</button>
+        <button data-cr="ok">وصل للعميل ✓</button>
+        <button data-cr="no">ما وصل</button>
+      </div>
+      <div class="addmsg" id="crMsg"></div>
+      <div id="crBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
+    </div>
+
     <!-- رفع التقارير: every finished session and whether its report is up -->
     <div id="rdSec" hidden>
       <h2 style="font-size:19px;margin-top:26px"><span></span> رفع التقارير</h2>
@@ -1839,7 +1859,7 @@ let PAGE_BUILD = "", LAST_REFRESH = 0, REFRESHING = false;
 /* the panels that fetch their own data and cache it in a module variable */
 function clearPanelCaches(){
   MT=null; ID=null; PF=null; BK=null; TG=null; TK=null; FB=null; PFPIE=null; NF=null;
-  ST=null; FU=null; BS=null; RF=null; BG=null; MC=null; RD=null;
+  ST=null; FU=null; BS=null; RF=null; BG=null; MC=null; RD=null; CR=null;
 }
 
 async function refreshAll(opt){
@@ -2000,7 +2020,7 @@ onAuthStateChanged(auth, async (user)=>{
     const HIRE_OK=["ghalia.n@cashclinic.net","sarah.h@cashclinic.net","abdullah.a@cashclinic.net"];
     if(HIRE_OK.indexOf(String((DATA&&DATA.email)||"").toLowerCase())!==-1) $("#rptHiring").hidden=false;
     /* رفع التقارير: consultants and full access */
-    if(DATA&&DATA.reportDuty){ $("#rdSec").hidden=false; $("#reportsSec").hidden=false; if(!RD) loadReportDuty(); }   /* early, for the sidebar badge */
+    if(DATA&&DATA.reportDuty){ $("#rdSec").hidden=false; $("#crSec").hidden=false; $("#rpSearchWrap").hidden=false; $("#reportsSec").hidden=false; if(!RD) loadReportDuty(); }   /* early, for the sidebar badge */
     if(!$("#rptRiyada").hidden||!$("#rptNas").hidden||!$("#rptNasReports").hidden||!$("#rptHiring").hidden) $("#reportsSec").hidden=false;
     /* the build this page was served as, captured on the first load only:
        every later refresh compares against it, so a deploy that happens while
@@ -5263,7 +5283,7 @@ const PANELS = [
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
-  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
+  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); if(DATA&&DATA.reportDuty&&!CR) loadClientReports(); },
     count:()=>((RD&&RD.list)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
 ];
 let ST=null, FU=null, BS=null, RF=null;
@@ -6426,7 +6446,7 @@ function renderReportDuty(){
     ? [`<button data-rdwho=""${RDWHO?"":' class="on"'}>كل الاستشاريين</button>`].concat(people.map(p=>
         `<button data-rdwho="${esc(p.id)}"${RDWHO===p.id?' class="on"':""}>${esc(p.name)}${p.missing+p.rejected?` · ${fmt(p.missing+p.rejected)} باقي`:" ✅"}</button>`)).join("")
     : "";
-  const scoped=(RD.list||[]).filter(r=>!RDWHO||r.consultantId===RDWHO);
+  const scoped=(RD.list||[]).filter(r=>(!RDWHO||r.consultantId===RDWHO)&&rpHit(r));
   const c=k=>scoped.filter(r=>r.status===k).length;
   $("#rdKpis").innerHTML=
     `<div class="kpi"><div class="n" style="color:#962E37">${fmt(c("missing"))}</div><div class="l">ما انرفع</div></div>`+
@@ -6445,10 +6465,90 @@ function renderReportDuty(){
           <td class="num">${esc(dt(r.endMs))}${late>=1?`<div class="pfrule" style="color:#962E37">من ${fmt(late)} يوم</div>`:""}</td>
           <td><span style="color:${st[1]};font-weight:700">${st[0]}</span>${r.status==="pending"?`<div class="pfrule">عند ${esc(r.approverName)}</div>`:""}${
             r.reason?`<div class="pfrule">السبب: ${esc(r.reason)}</div>`:""}${r.reportName?`<div class="pfrule">${esc(r.reportName)}</div>`:""}</td>
-          <td style="white-space:nowrap">${r.mine&&(r.status==="missing"||r.status==="rejected")?`<button class="pfbtn go" data-rup="${esc(r.orderId)}">⬆️ ارفع التقرير</button>`:""}</td></tr>`;
+          <td style="white-space:nowrap">${r.mine&&(r.status==="missing"||r.status==="rejected")?`<button class="pfbtn go" data-rup="${esc(r.orderId)}">⬆️ ارفع التقرير</button>`:""}${
+            r.reportId&&r.status!=="missing"?` <button class="pfbtn" data-ropen="${esc(r.orderId)}" data-rid="${esc(r.reportId)}">افتح</button>`:""}</td></tr>`;
       }).join("")+`</tbody></table></div>`
-    : `<div class="muted" style="font-size:13px;padding:10px">${RDF==="todo"?"ما عليك تقارير باقية ✅":"ما في جلسات بهالقائمة."}</div>`;
+    : `<div class="muted" style="font-size:13px;padding:10px">${RPQ?"ما في جلسات لهالبحث.":RDF==="todo"?"ما عليك تقارير باقية ✅":"ما في جلسات بهالقائمة."}</div>`;
 }
+
+/* ---------- تقارير العملاء (22 Oct 2026) ----------
+   Every report anybody uploaded, on any session — so غالية reads سارة's and
+   سارة reads غالية's — with whether it reached the client and, if not, why. */
+const listSessionReports=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listSessionReports");
+const resendReportMail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"resendReportMail");
+let CR=null, CRF="all", RPQ="";
+/* Arabic typed loosely still matches: hamzas, ta marbuta, alef maqsura, tashkeel, Arabic digits */
+function rpNorm(v){
+  return String(v||"").toLowerCase()
+    .replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي")
+    .replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\s+/g," ").trim();
+}
+function rpHit(r){
+  if(!RPQ) return true;
+  const hay=rpNorm([r.client,r.email,r.fileNo,r.packageName,r.byName,r.consultantName].join(" "));
+  const digits=String(r.phone||"").replace(/\D/g,""), qd=RPQ.replace(/\D/g,"");
+  return RPQ.split(" ").every(w=>hay.indexOf(w)!==-1) || (qd.length>=4 && digits.indexOf(qd)!==-1);
+}
+async function loadClientReports(){
+  try{ CR=(await listSessionReports({})).data||{ list:[] }; renderClientReports(); }
+  catch(e){ const m=$("#crMsg"); if(m){ m.textContent=(e&&e.message)||"تعذّر التحميل"; m.className="addmsg err"; } }
+}
+const CR_WHY={
+  pending:r=>`بانتظار موافقة ${r.approverName||"غالية"} — العميل ما يشوفه للحين`,
+  rejected:()=>"مرفوض — ما وصل للعميل",
+  cancelled:()=>"الحجز ملغي",
+  "no-email":()=>"ما في إيميل على الحجز — العميل ما يقدر يوصله. عدّل الحجز وحط إيميله",
+  "no-account":()=>"العميل ما سوّى حساب بعيادتي بهالإيميل — التقرير بيطلع له أول ما يسجّل",
+  "other-account":r=>`حساب العميل بإيميل ثاني (${r.accountEmail}) — ما يطلع له. صحّح الإيميل بالحجز`,
+};
+function renderClientReports(){
+  const box=$("#crBody"); if(!box||!CR) return;
+  $("#crLead").textContent = CR.all
+    ? "كل تقرير انرفع على أي جلسة، أي استشاري كتبه — ووصل للعميل ولا لا، وإذا ما وصل ليش."
+    : "تقارير جلساتك، ووصلت للعميل ولا لا.";
+  const scoped=(CR.list||[]).filter(rpHit);
+  const ok=r=>r.inClinic, n=k=>scoped.filter(k).length;
+  $("#crKpis").innerHTML=
+    `<div class="kpi"><div class="n">${fmt(scoped.length)}</div><div class="l">تقرير</div></div>`+
+    `<div class="kpi"><div class="n" style="color:#2F8789">${fmt(n(ok))}</div><div class="l">وصل للعميل</div></div>`+
+    `<div class="kpi"><div class="n" style="color:#962E37">${fmt(n(r=>!ok(r)))}</div><div class="l">ما وصل</div></div>`+
+    `<div class="kpi"><div class="n">${fmt(new Set(scoped.map(r=>(r.email||r.client||"").toLowerCase())).size)}</div><div class="l">عميل</div></div>`;
+  $("#crFlt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.cr===CRF));
+  const rows=scoped.filter(r=>CRF==="all"||(CRF==="ok"?ok(r):!ok(r)));
+  box.innerHTML = rows.length
+    ? `<div style="overflow-x:auto;max-width:100%"><table class="pftab"><thead><tr><th>العميل</th><th>الجلسة</th><th>كتبه</th><th>وصل للعميل؟</th><th></th></tr></thead><tbody>`+
+      rows.map(r=>{
+        const why=CR_WHY[r.why]?CR_WHY[r.why](r):"";
+        const mail=r.mailedMs?`إيميل «تقريرك جاهز» انرسل ${esc(dt(r.mailedMs))}`
+          : r.mailError==="failed"?"الإيميل ما انرسل (خطأ إرسال)":r.mailError==="no-email"?"":"الإيميل: ما في سجل (انرفع قبل ٢٢ أكتوبر)";
+        return `<tr><td><b>${esc(r.client||"—")}</b>${r.fileNo?` <span class="pfrule">#${esc(r.fileNo)}</span>`:""}
+            <div class="pfrule" style="direction:ltr;text-align:right">${esc(r.email||"بدون إيميل")}${r.phone?" · "+esc(r.phone):""}</div></td>
+          <td>${esc(r.packageName)}<div class="pfrule">${esc(r.consultantName)} · ${esc(dt(Date.parse(r.startIso)||0))}</div></td>
+          <td>${esc(r.byName||"—")}<div class="pfrule">${esc(dt(r.ms))}</div></td>
+          <td>${r.inClinic?`<span style="color:#2F8789;font-weight:700">✓ بعيادتي</span>`:`<span style="color:#962E37;font-weight:700">✕ ما وصل</span><div class="pfrule">${esc(why)}</div>`}
+            ${r.status==="approved"&&mail&&r.why!=="no-email"?`<div class="pfrule">${mail}</div>`:""}</td>
+          <td style="white-space:nowrap"><button class="pfbtn" data-ropen="${esc(r.orderId)}" data-rid="${esc(r.reportId)}">افتح</button>
+            ${r.canResend?` <button class="pfbtn" data-rsend="${esc(r.orderId)}" data-rid="${esc(r.reportId)}">✉️ أرسل له مرة ثانية</button>`:""}</td></tr>`;
+      }).join("")+`</tbody></table></div>`
+    : `<div class="muted" style="font-size:13px;padding:10px">${RPQ?"ما لقينا تقارير لهالبحث.":"ما في تقارير بهالقائمة."}</div>`;
+}
+$("#rpSearch") && $("#rpSearch").addEventListener("input", e=>{
+  RPQ=rpNorm(e.target.value); renderClientReports(); renderReportDuty();
+});
+$("#crFlt") && $("#crFlt").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-cr]"); if(!b) return; CRF=b.dataset.cr; renderClientReports();
+});
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("button[data-rsend]"); if(!b) return;
+  const was=b.textContent; b.disabled=true; b.textContent="…";
+  const m=$("#crMsg");
+  try{
+    const d=(await resendReportMail({ orderId:b.dataset.rsend, reportId:b.dataset.rid })).data||{};
+    if(m){ m.textContent=`انرسل للعميل على ${d.to||"إيميله"} ✅`; m.className="addmsg ok"; }
+    await loadClientReports();
+  }catch(err){ if(m){ m.textContent=(err&&err.message)||"تعذّر الإرسال"; m.className="addmsg err"; } }
+  finally{ b.disabled=false; b.textContent=was; }
+});
 $("#rdFlt") && $("#rdFlt").addEventListener("click",e=>{ const b=e.target.closest("button[data-rd]"); if(!b) return; RDF=b.dataset.rd; renderReportDuty(); });
 $("#rdPeople") && $("#rdPeople").addEventListener("click",e=>{ const b=e.target.closest("button[data-rdwho]"); if(!b) return; RDWHO=b.dataset.rdwho; renderReportDuty(); });
 
@@ -6590,6 +6690,7 @@ document.addEventListener("click", async (e)=>{
       const why=prompt("سبب الرفض — يوصل للمستشار:"); if(!why||why.trim().length<3) return;
       b.disabled=true; b.textContent="…"; await reviewReport({ orderId:id, reportId:rid, approve:false, reason:why.trim() }); bkMsg("انرفض التقرير ورجع للمستشار",true);
     }
+    if(CR) loadClientReports(); if(RD) loadReportDuty();
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"صار خطأ",false); }
   finally{ b.disabled=false; b.textContent=was; }
@@ -6606,6 +6707,7 @@ $("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
       ? (d.mailed?"انرفع التقرير ✅ ووصل للعميل إيميل إنه جاهز في عيادتي":"انرفع التقرير ✅ وصار بعيادتي العميل — بس الإيميل ما انرسل")
       : `انرفع التقرير ✅ — ينتظر موافقة ${d.approverName||"غالية"} قبل ما يشوفه العميل`, true);
     if(RD) loadReportDuty();
+    if(CR) loadClientReports();
     await refreshSections(["bookings"]); render();
   }catch(err){ bkMsg((err&&err.message)||"تعذّر رفع التقرير",false); }
   finally{ RP_ID=""; RP_RID=""; }
