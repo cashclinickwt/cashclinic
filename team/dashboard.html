@@ -1139,8 +1139,7 @@
       <div class="kpis" id="rdKpis"></div>
       <div class="flt" id="rdPeople"></div>
       <div class="flt" id="rdFlt">
-        <button data-rd="todo" class="on">باقي عليّ</button>
-        <button data-rd="missing">ما انرفع</button>
+        <button data-rd="missing" class="on">ما انرفع</button>
         <button data-rd="pending">بانتظار الاعتماد</button>
         <button data-rd="rejected">مرفوض</button>
         <button data-rd="approved">خلص ✓</button>
@@ -6460,7 +6459,7 @@ function bkReports(b){ return Array.isArray(b.reports) ? b.reports : (b.report ?
    access sees everyone's. */
 const listSessionReports=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listSessionReports");
 const resendReportMail=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"resendReportMail");
-let RD=null, RDF="todo", RDWHO="", RPQ="";
+let RD=null, RDF="missing", RDWHO="", RPQ="";
 const RD_ST={ missing:["ما انرفع","#962E37"], pending:["بانتظار الاعتماد","#A87A2A"], rejected:["مرفوض — ارفعه من جديد","#962E37"], approved:["انرفع واعتُمد ✓","#2F8789"], none:["—","#8E8899"] };
 const CR_WHY={
   pending:r=>`بانتظار موافقة ${r.approverName||"غالية"} — العميل ما يشوفه للحين`,
@@ -6513,7 +6512,6 @@ function renderReportDuty(){
     `<div class="kpi"><div class="n" style="color:#2F8789">${fmt(c(r=>r.status==="approved"&&r.inClinic))}</div><div class="l">وصل للعميل ✓</div></div>`+
     `<div class="kpi"><div class="n" style="color:#962E37">${fmt(c(r=>r.status==="approved"&&!r.inClinic))}</div><div class="l">انرفع بس ما وصل</div></div>`;
   $("#rdFlt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.rd===RDF));
-  const td=$('#rdFlt button[data-rd="todo"]'); if(td) td.textContent=RD.all?"باقي":"باقي عليّ";
   const rows=scoped.filter(rdMatch);
   box.innerHTML = rows.length
     ? `<div style="overflow-x:auto;max-width:100%"><table class="pftab"><thead><tr><th>العميل</th><th>الجلسة</th><th>التقرير</th><th>وصل للعميل؟</th><th></th></tr></thead><tbody>`+
@@ -6555,7 +6553,7 @@ function renderReportDuty(){
           <td>${deliverCell}</td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap">${acts.join("")}</div></td></tr>`;
       }).join("")+`</tbody></table></div>`
-    : `<div class="muted" style="font-size:13px;padding:10px">${RPQ?"ما في جلسات لهالبحث.":RDF==="todo"?"ما عليك تقارير باقية ✅":"ما في جلسات بهالقائمة."}</div>`;
+    : `<div class="muted" style="font-size:13px;padding:10px">${RPQ?"ما في جلسات لهالبحث.":RDF==="missing"?"كل التقارير انرفعت ✅":"ما في جلسات بهالقائمة."}</div>`;
 }
 $("#rpSearch") && $("#rpSearch").addEventListener("input", e=>{ RPQ=rpNorm(e.target.value); renderReportDuty(); });
 document.addEventListener("click", async e=>{
