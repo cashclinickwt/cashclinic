@@ -510,10 +510,11 @@
          alt:"…", cta:"… ←" }
      and it retires itself at `until`. */
   var ADS=[
-    /* ديوانية كاش كلينك — stops at 6 PM on the day, when its sales close */
-    { until:"2026-10-24T18:00:00+03:00", href:"courses/diwaniya.html",
-      img:"courses/img/diwaniya-promo.jpg", w:1000, h:1250,
-      alt:"ديوانية كاش كلينك — السبت 24/10/2026، مجمع جوهرة الخليج", cta:"احجز مكانك في الديوانية ←" }
+    /* رمضان بلا ضغوطات مالية — free, online; off once the لقاء starts.
+       (The ديوانية came off on 23 Oct: it is full.) */
+    { until:"2026-10-31T19:00:00+03:00", href:"courses/ramadan.html",
+      img:"courses/img/ramadan-promo.jpg", w:1080, h:1350,
+      alt:"لقاء مجاني: رمضان بلا ضغوطات مالية — السبت 31/10/2026، 7 مساءً، أونلاين", cta:"سجّل مقعدك المجاني ←" }
   ];
   var now=Date.now(), ad=null;
   for(var i=0;i<ADS.length;i++){ if(now < Date.parse(ADS[i].until)){ ad=ADS[i]; break; } }
