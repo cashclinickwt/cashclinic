@@ -6072,7 +6072,7 @@ function openClient(c){
             <div class="t">${esc(ty.label)} · ${esc(t.title)}</div>
             ${t.detail?`<div class="d">${esc(t.detail)}</div>`:""}
             ${t.vch?clVch(t.vch):""}
-            <div class="w">${t.type==="booking"||t.type==="budget"||t.type==="attempt"?"موعد الجلسة: ":""}${dt(t.when)}${seesMoney()&&t.amount?` · <span class="a">${money(t.amount)}</span>`:""}</div>
+            <div class="w">${t.at?`موعد الجلسة: ${dt(t.at)}${t.when?" · انحجز "+dt(t.when):""}`:dt(t.when)}${seesMoney()&&t.amount?` · <span class="a">${money(t.amount)}</span>`:""}</div>
           </div>`;
         }).join("")}
       </div>
