@@ -1571,6 +1571,18 @@
     <div id="nfState"></div>
     <div class="addmsg" id="nfMsg"></div>
     <div id="nfList"></div>
+    <!-- تيليجرام (24 Oct 2026): غالية، سارة، عبدالله -->
+    <div id="tgBox" hidden style="margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <b style="font-size:16px">✈️ بوت تيليجرام</b>
+        <span id="tgState" class="pfrule"></span>
+      </div>
+      <p class="muted" style="font-size:13.5px;line-height:1.9;margin:8px 0 12px">
+        اسأل اللوحة من تيليجرام: مواعيد اليوم والأسبوع، مهامك، الاجتماعات، المبيعات، الأرباح، الأهداف، التقارير، وملف أي عميل — بالأزرار أو بكلامك.
+        والإشعارات اللي فوق توصلك هناك بعد، وملخّص كل يوم الساعة ٨ الصبح. البوت للأسئلة بس، ما يعدّل شي.</p>
+      <div id="tgActs" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+      <div class="addmsg" id="tgMsg2" style="margin-top:10px"></div>
+    </div>
     <div id="nfHelp" style="margin-top:22px;background:#fff;border:1px solid var(--line);
          border-radius:14px;padding:16px 18px;font-size:13.5px;line-height:2;color:var(--muted)">
       <b style="color:var(--ink)">على الآيفون</b><br>
@@ -3210,6 +3222,50 @@ async function nfRegister(){
   await navigator.serviceWorker.ready;
   return NFREG;
 }
+
+/* ---------- تيليجرام ---------- */
+const getTelegramStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getTelegramStatus");
+const telegramLinkStart=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"telegramLinkStart");
+const telegramUnlink=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"telegramUnlink");
+const telegramSetup=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"telegramSetup");
+let TGS=null;
+function tgNote(m,ok){ const e=$("#tgMsg2"); if(e){ e.textContent=m; e.className="addmsg "+(ok?"ok":"err"); } }
+async function loadTelegram(){
+  const box=$("#tgBox"); if(!box) return;
+  try{ TGS=(await getTelegramStatus({})).data||{}; }catch(e){ box.hidden=true; return; }
+  if(!TGS.allowed && !TGS.canSetup){ box.hidden=true; return; }
+  box.hidden=false; renderTelegram();
+}
+function renderTelegram(){
+  const st=$("#tgState"), acts=$("#tgActs"); if(!st||!acts||!TGS) return;
+  st.innerHTML = TGS.linked ? `<span style="color:#2F8789;font-weight:700">مربوط ✅</span>${TGS.linkedAt?" · من "+esc(dt(TGS.linkedAt)):""}` : `<span style="color:#A87A2A;font-weight:700">مو مربوط</span>`;
+  const b=[];
+  if(TGS.allowed) b.push(TGS.linked
+    ? `<a class="pfbtn" href="https://t.me/${esc(TGS.bot)}" target="_blank" rel="noopener" style="text-decoration:none">افتح البوت</a><button class="pfbtn" id="tgUnlinkBtn">فك الربط</button>`
+    : `<button class="pfbtn go" id="tgLinkBtn">✈️ اربط تيليجرام</button>`);
+  if(TGS.canSetup) b.push(`<button class="pfbtn" id="tgSetupBtn" title="مرة وحدة بعد أول نشر">⚙️ فعّل البوت</button>`);
+  acts.innerHTML=b.join("");
+}
+document.addEventListener("click", async e=>{
+  const t=e.target.closest("#tgLinkBtn,#tgUnlinkBtn,#tgSetupBtn"); if(!t) return;
+  const was=t.textContent; t.disabled=true; t.textContent="…";
+  try{
+    if(t.id==="tgLinkBtn"){
+      const d=(await telegramLinkStart({})).data||{};
+      /* a real link: a fresh tap opens Telegram on a phone without a popup blocker in the way */
+      t.outerHTML=`<a class="pfbtn go" href="${esc(d.url)}" target="_blank" rel="noopener" style="text-decoration:none">✈️ افتح تيليجرام واضغط Start</a>`;
+      tgNote(`الرابط صالح ${d.minutes||15} دقيقة. بعد ما تضغط Start ارجع هني وحدّث الصفحة.`,true);
+      return;
+    }
+    if(t.id==="tgUnlinkBtn"){
+      if(!confirm("تفك ربط تيليجرام؟ ما بيوصلك شي هناك لين تربطه مرة ثانية.")) return;
+      await telegramUnlink({}); tgNote("انفك الربط",true); await loadTelegram(); return;
+    }
+    const d=(await telegramSetup({})).data||{};
+    tgNote(`البوت شغّال ✅ @${d.bot||""} — كل الرسايل توصل للوحة الحين.`,true);
+  }catch(err){ tgNote((err&&err.message)||"صار خطأ",false); }
+  finally{ if(document.body.contains(t)){ t.disabled=false; t.textContent=was; } }
+});
 
 async function loadNotify(){
   const box=$("#nfList"), st=$("#nfState");
@@ -5274,7 +5330,7 @@ const PANELS = [
   { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
   /* everyone with a login gets this one: the point of it is deciding what
      reaches your own phone */
-  { id:"notify",      group:"team",   icon:"🔔", allowed:()=>true, load:()=>loadNotify() },
+  { id:"notify",      group:"team",   icon:"🔔", allowed:()=>true, load:()=>{ loadNotify(); loadTelegram(); } },
   { id:"tasks",       group:"team",   icon:"✅", allowed:()=>true, load:()=>{ if(!TK) loadTasks(); },
     count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
   { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
