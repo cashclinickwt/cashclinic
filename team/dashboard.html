@@ -309,6 +309,8 @@
   .rpmeta{font-size:12px;color:var(--muted);margin-top:5px}
   .rpwhy{font-size:13px;color:#962E37;margin-top:6px}
   .rpone{padding:8px 0;border-top:1px solid #ECEAF1}.rpone:first-of-type{border-top:0;padding-top:0}
+  #rdBody tr.rpdrop td{background:#EAF6F4!important;outline:2px dashed #2F8789;outline-offset:-2px}
+  #rdBody tr.rpdrop td:first-child::before{content:"⬇️ فلّت الملف هني  ";color:#2F8789;font-weight:700}
   .rpup{border:1.5px solid #2F1749;background:#fff;color:#2F1749;font-weight:700;border-radius:999px;padding:6px 14px;cursor:pointer;font-family:inherit}
   .rpq{padding:7px 0;border-top:1px solid #F1E2B8;font-size:13.5px}
   .clpkg{margin-top:8px;font-size:13px;color:#614588;font-weight:600}
@@ -6554,6 +6556,7 @@ function renderReportDuty(){
   $("#rdLead").textContent = RD.all
     ? "كل جلسة خلصت، لكل استشاري عليها: التقرير انرفع ولا لا، اعتُمد ولا لا، ووصل للعميل بعيادتي ولا لا. ترفع وتبدّل وتعتمد من هني. الاتصال السريع والتواصل التفاعلي والمراجعة ما تحتاج تقرير."
     : "جلساتك اللي خلصت وتقاريرها — ترفع وتبدّل من هني. يوصلك تذكير بعد الجلسة بساعتين إذا التقرير ما انرفع.";
+  $("#rdLead").textContent += " 💡 تقدر تسحب ملف الـPDF من جهازك وتفلته على صف الجلسة.";
   const people=RD.people||[];
   $("#rdPeople").innerHTML = RD.all && people.length>1
     ? [`<button data-rdwho=""${RDWHO?"":' class="on"'}>كل الاستشاريين</button>`].concat(people.map(p=>
@@ -6601,7 +6604,13 @@ function renderReportDuty(){
           if(x.canChange&&x.status==="rejected") acts.push(`<button class="pfbtn go" data-rup="${oid}" data-rid="${rid}">⬆️ ارفعه من جديد</button>`);
           if(x.canResend) acts.push(`<button class="pfbtn" data-rsend="${oid}" data-rid="${rid}">✉️ أرسل له مرة ثانية</button>`);
         });
-        return `<tr><td><b>${esc(r.client||"—")}</b>${r.fileNo?` <span class="pfrule">#${esc(r.fileNo)}</span>`:""}
+        /* where a dropped PDF goes on this row: your rejected one is replaced,
+           an empty row gets a new one, and over one already up it asks */
+        const mineR=(r.reports||[]).filter(x=>x.canChange), rej=mineR.find(x=>x.status==="rejected");
+        const drop = r.canUpload
+          ? (r.status==="missing" ? {rid:"",ask:0} : rej ? {rid:rej.id,ask:0} : mineR[0] ? {rid:mineR[0].id,ask:1} : null) : null;
+        const dAttr = drop ? ` data-dorder="${oid}" data-drid="${esc(drop.rid)}" data-dask="${drop.ask}" data-dname="${esc(r.client||"")}" title="اسحب ملف PDF هني عشان ترفعه"` : "";
+        return `<tr${dAttr}><td><b>${esc(r.client||"—")}</b>${r.fileNo?` <span class="pfrule">#${esc(r.fileNo)}</span>`:""}
             <div class="pfrule" style="direction:ltr;text-align:right">${esc(r.email||"بدون إيميل")}${r.phone?" · "+esc(r.phone):""}</div></td>
           <td>${esc(r.packageName)}<div class="pfrule">${esc(r.consultantName)} · ${esc(dt(r.endMs))}</div>
             ${r.bookingStatus&&r.bookingStatus!=="paid"&&r.bookingStatus!=="cancelled"?`<div class="pfrule" style="color:#A87A2A">الحجز مو مسجّل مدفوع بالسستم</div>`:""}</td>
@@ -6768,8 +6777,12 @@ document.addEventListener("click", async (e)=>{
   }catch(err){ rpNote((err&&err.message)||"صار خطأ",false); }
   finally{ b.disabled=false; b.textContent=was; }
 });
-$("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
+$("#rpFile") && $("#rpFile").addEventListener("change", (e)=>{
   const file=e.target.files&&e.target.files[0]; if(!file||!RP_ID) return;
+  rpUpload(file);
+});
+/* one upload, from the file picker or from a file dropped on a row */
+async function rpUpload(file){
   if(!/\.pdf$/i.test(file.name) || (file.type&&file.type!=="application/pdf")) return rpNote("التقرير لازم يكون PDF",false);
   if(file.size>20*1024*1024) return rpNote("حجم التقرير أكبر من ٢٠ ميجا",false);
   try{
@@ -6783,6 +6796,34 @@ $("#rpFile") && $("#rpFile").addEventListener("change", async (e)=>{
     await refreshSections(["bookings"]); render();
   }catch(err){ rpNote((err&&err.message)||"تعذّر رفع التقرير",false); }
   finally{ RP_ID=""; RP_RID=""; }
+}
+
+/* Drag and drop (24 Oct 2026, غالية's ask): drop a PDF on a session's row in
+   تقارير الجلسات and it uploads to that row — a new report where none is up,
+   or in place of your rejected one; over one already up it asks first. */
+document.addEventListener("dragover", e=>{
+  if(!e.target.closest || !e.target.closest("#rdSec")) return;
+  e.preventDefault();
+  const tr=e.target.closest("tr[data-dorder]");
+  document.querySelectorAll("#rdBody tr.rpdrop").forEach(x=>{ if(x!==tr) x.classList.remove("rpdrop"); });
+  if(tr){ tr.classList.add("rpdrop"); e.dataTransfer.dropEffect="copy"; } else e.dataTransfer.dropEffect="none";
+});
+document.addEventListener("dragleave", e=>{
+  const tr=e.target.closest&&e.target.closest("tr[data-dorder]");
+  if(tr && !tr.contains(e.relatedTarget)) tr.classList.remove("rpdrop");
+});
+document.addEventListener("drop", e=>{
+  if(!e.target.closest || !e.target.closest("#rdSec")) return;
+  e.preventDefault();
+  document.querySelectorAll("#rdBody tr.rpdrop").forEach(x=>x.classList.remove("rpdrop"));
+  const tr=e.target.closest("tr[data-dorder]");
+  const files=[...((e.dataTransfer&&e.dataTransfer.files)||[])];
+  if(!tr) return rpNote(files.length?"اسحب الملف على صف الجلسة نفسه":"",false);
+  if(files.length!==1) return rpNote("اسحب ملف وحد بس",false);
+  const name=tr.dataset.dname||"هالجلسة";
+  if(tr.dataset.dask==="1" && !confirm(`عندك تقرير مرفوع لـ${name}. تبدّله بهذا الملف؟`)) return;
+  RP_ID=tr.dataset.dorder; RP_RID=tr.dataset.drid||"";
+  rpUpload(files[0]);
 });
 function renderBookings(){
   const B=DATA.bookings; const sec=$("#bookingsSec"); if(!B||!sec) return;
