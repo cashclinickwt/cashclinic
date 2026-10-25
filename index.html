@@ -514,7 +514,15 @@
        (The ديوانية came off on 23 Oct: it is full.) */
     { until:"2026-10-31T19:00:00+03:00", href:"courses/ramadan.html",
       img:"courses/img/ramadan-promo.jpg", w:1080, h:1350,
-      alt:"لقاء مجاني: رمضان بلا ضغوطات مالية — السبت 31/10/2026، 7 مساءً، أونلاين", cta:"سجّل مقعدك المجاني ←" }
+      alt:"لقاء مجاني: رمضان بلا ضغوطات مالية — السبت 31/10/2026، 7 مساءً، أونلاين", cta:"سجّل مقعدك المجاني ←" },
+    /* then the second ديوانية, until its checkout closes */
+    { until:"2026-11-14T18:00:00+03:00", href:"courses/diwaniya-ramadan.html",
+      img:"courses/img/diwaniya-ramadan-promo.jpg", w:1080, h:1350,
+      alt:"ديوانية كاش كلينك · رمضان بلا ضغوطات مالية — السبت 14/11/2026، 6–8 مساءً، مجمع جوهرة الخليج", cta:"احجز مكانك في الديوانية ←" },
+    /* then the free in-person لقاء */
+    { until:"2026-11-28T18:00:00+03:00", href:"courses/hayatak.html",
+      img:"courses/img/hayatak-promo.jpg", w:1080, h:1350,
+      alt:"لقاء حضوري مجاني: حياتك بدون ضغوطات مالية — السبت 28/11/2026، 6 مساءً", cta:"احجز مقعدك المجاني ←" }
   ];
   var now=Date.now(), ad=null;
   for(var i=0;i<ADS.length;i++){ if(now < Date.parse(ADS[i].until)){ ad=ADS[i]; break; } }
