@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>عيادتي | كاش كلينك</title>
-<meta name="description" content="عيادتي — كل اللي أخذته من كاش كلينك في مكان واحد: كتبك، نتائج اختباراتك، لقاءاتك واستشاراتك.">
+<meta name="description" content="عيادتي — كل اللي أخذته من كاش كلينك في مكان واحد: كتيّباتك، نتائج اختباراتك، لقاءاتك واستشاراتك.">
 <!-- signed-in pages have nothing to index; the sign-up screen alone is public -->
 <meta name="robots" content="noindex,follow">
 <link rel="icon" href="../brand/mark/mark-purple.png">
@@ -73,8 +73,8 @@
       <a class="cc-navlink" href="../index.html#clinics">عياداتنا</a>
       <a class="cc-navlink" href="../index.html#consultants">استشاريونا</a>
       <a class="cc-navlink" href="../quiz/index.html">الاختبارات</a>
-      <a class="cc-navlink" href="index.html" style="color:var(--cc-olive);font-weight:700;">دورات</a>
-      <a class="cc-navlink" href="../books/index.html">الكتب</a>
+      <a class="cc-navlink" href="index.html" style="color:var(--cc-olive);font-weight:700;">اللقاءات والورش</a>
+      <a class="cc-navlink" href="../books/index.html">الكتيّبات</a>
       <a class="cc-navlink" href="../newsletters/index.html">نشراتنا</a>
       <a class="cc-navlink cc-navclinic" href="../clinic/index.html" data-ar="عيادتي" data-en="My Clinic">عيادتي</a>
     </nav>
@@ -92,7 +92,7 @@
   <!-- 1 · signed out -->
   <section id="vAuth" class="ck-card" hidden>
     <h1 class="ck-title">عيادتي</h1>
-    <p class="ck-sub">كل اللي أخذته من كاش كلينك في مكان واحد — كتبك، نتائج اختباراتك، لقاءاتك واستشاراتك.</p>
+    <p class="ck-sub">كل اللي أخذته من كاش كلينك في مكان واحد — كتيّباتك، نتائج اختباراتك، لقاءاتك واستشاراتك.</p>
     <div class="ck-tabs" role="tablist">
       <button type="button" data-tab="in" class="on" role="tab">دخول</button>
       <button type="button" data-tab="up" role="tab">حساب جديد</button>
@@ -161,7 +161,7 @@
         <h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--cc-cream);margin:0 0 16px;">روابط</h4>
         <div style="display:flex;flex-direction:column;gap:11px;">
           <a href="../index.html" style="font-size:15px;color:var(--cc-purple-200);">الرئيسية</a>
-          <a href="index.html" style="font-size:15px;color:var(--cc-purple-200);">الدورات</a>
+          <a href="index.html" style="font-size:15px;color:var(--cc-purple-200);">اللقاءات والورش</a>
           <a href="../quiz/index.html" style="font-size:15px;color:var(--cc-purple-200);">الاختبارات</a>
           <a href="../careers.html" style="font-size:15px;color:var(--cc-purple-200);" data-ar="التوظيف" data-en="Careers">التوظيف</a>
           <a href="../index.html#newsletter" style="font-size:15px;color:var(--cc-purple-200);" data-ar="النشرة البريدية" data-en="Newsletter">النشرة البريدية</a>
@@ -321,12 +321,21 @@ function appCard(a){
   return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش</div>
       <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. تنفتح لعملاء باقة أساس الحرية المالية وباقة الوفرة المالية بعد أول جلسة.</div></div>`;
 }
+/* tools that come with a package — «تأسيس المشروع» for باقة المؤسس */
+function toolCards(T){
+  const t=(T||{}).muassis; if(!t) return "";
+  const link="muassis.html"+(AS?"?as="+encodeURIComponent(AS):"");
+  if(t.open) return `<div class="ck-item"><div class="t">🌱 تأسيس المشروع <span class="ck-tag up">مفتوحة</span></div>
+      <div class="m">ضمن ${esc(t.pkgName||"باقة المؤسس")}: تحط أفكارك، تقيّمها، وتستقر على فكرة — وبعدها رؤيتك ورسالتك وأهدافك ونموذج العمل والأرقام وخطة السنة. كل شي ينحفظ بحسابك.</div>
+      <a class="ck-btn" href="${link}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">افتح تأسيس المشروع</a></div>`;
+  return "";
+}
 function render(D){
   $("#cHello").textContent="هلا "+(D.name||(AS?"":auth.currentUser.displayName)||"")+" 👋";
-  $("#cApp").innerHTML=appCard(D.app);
+  $("#cApp").innerHTML=toolCards(D.tools)+appCard(D.app);
   $("#cEmail").textContent=D.email;
   const n=(l)=>(l||[]).length;
-  $("#cStats").innerHTML=[["استشارات",n(D.consults)],["كتب",n(D.books)],["اختبارات",n(D.quizzes)],["لقاءات",n(D.events)],["دورات",n(D.courses)]]
+  $("#cStats").innerHTML=[["استشارات",n(D.consults)],["كتيّبات",n(D.books)],["اختبارات",n(D.quizzes)],["لقاءات",n(D.events)],["ورش",n(D.courses)]]
     .map(([l,v])=>`<div class="ck-stat"><b>${v}</b><span>${l}</span></div>`).join("");
   let h="";
   h+=sec("استشاراتي", D.consults, c=>`<div class="ck-item"><div class="t">${esc(c.what)}${c.upcoming?'<span class="ck-tag up">جاية</span>':'<span class="ck-tag done">خلصت</span>'}</div>
@@ -340,7 +349,7 @@ function render(D){
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
   h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
-    'ما اشتريت كتب للحين. <a href="../books/index.html">شوف الكتب ←</a>');
+    'ما اشتريت كتيّبات للحين. <a href="../books/index.html">شوف الكتيّبات ←</a>');
   h+=sec("اختباراتي", D.quizzes, q=>`<div class="ck-item"><div class="t">${esc(q.what)}${q.band?` — <span style="color:var(--cc-burgundy,#962E37)">${esc(q.band)}</span>`:""}</div>
       <div class="m">${esc(d8(q.when))}</div>${q.diagnosis?`<details><summary class="m" style="cursor:pointer">اعرض نتيجتك</summary><div class="ck-diag">${esc(q.diagnosis)}</div></details>`:""}</div>`,
     'ما سويت اختبار للحين. <a href="../index.html#quiz">سوّ الاختبار ←</a>');
@@ -348,10 +357,10 @@ function render(D){
       <div class="m">${esc(e.date)}${e.time?` · ${esc(e.time)}`:""}${e.place?` · ${esc(e.place)}`:""}</div>
       ${e.join?`<div class="m"><a href="${esc(e.join)}">ادخل اللقاء ←</a></div>`:""}</div>`,
     'ما سجّلت بلقاء للحين. <a href="../courses/index.html">شوف اللقاءات ←</a>');
-  h+=sec("دوراتي", D.courses, c=>`<div class="ck-item"><div class="t">${esc(c.what)}</div>
+  h+=sec("ورشي", D.courses, c=>`<div class="ck-item"><div class="t">${esc(c.what)}</div>
       <div class="m">${esc(c.mode)}${(c.dates||[]).length?` · ${esc(c.dates.join("، "))}`:""}</div>
       ${c.replay?`<div class="m"><a href="${esc(c.replay)}">شاهد التسجيلات ←</a></div>`:""}</div>`,
-    'ما عندك دورات للحين. <a href="../courses/index.html">شوف الدورات ←</a>');
+    'ما عندك ورش للحين. <a href="../courses/index.html">شوف اللقاءات والورش ←</a>');
   $("#cBody").innerHTML=h;
   show("vClinic");
 }
