@@ -974,6 +974,7 @@
         <option value="call">اتصال سريع</option><option value="course">ورشة / دورة</option>
         <option value="contract">عقد</option></select></div>
       <div class="f" id="tgBookWrap"><label>الكتيّب</label><select id="tgBook"><option value="">الكتيّبات كلها</option></select></div>
+      <div class="f" id="tgPkgWrap" hidden><label id="tgPkgL">الباقة</label><select id="tgPkg"><option value="">الكل</option></select></div>
       <div class="f"><label>الهدف بـ</label><select id="tgUnit"><option value="money">مبلغ (د.ك)</option><option value="count">عدد</option></select></div>
       <div class="f"><label id="tgAmountL">المبلغ (د.ك)</label><input id="tgAmount" type="number" min="1" step="1"></div>
       <div class="f"><label>يبدأ يوم</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
@@ -2432,7 +2433,20 @@ document.addEventListener("click", async e=>{
 function tgMsg(t,ok){ const m=$("#tgMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
 
 /* the book picker only means something for a book goal */
-function tgBookShow(){ const w=$("#tgBookWrap"); if(w) w.hidden=$("#tgKind").value!=="book"; }
+function tgBookShow(){
+  const k=$("#tgKind").value;
+  const w=$("#tgBookWrap"); if(w) w.hidden=k!=="book";
+  /* a package goal follows one package, a workshop goal one workshop (28 Oct 2026) */
+  const pw=$("#tgPkgWrap"), ps=$("#tgPkg");
+  const list=((TG&&TG.packages)||[]).filter(x=>x.kind===k);
+  if(pw) pw.hidden=!list.length;
+  if(ps && ps.dataset.kind!==k){
+    const keep=ps.value; ps.dataset.kind=k;
+    ps.innerHTML=`<option value="">${k==="course"?"الورش كلها":"الباقات كلها"}</option>`+list.map(x=>`<option value="${esc(x.key)}">${esc(x.name)}</option>`).join("");
+    ps.value=keep; if(ps.value!==keep) ps.value="";
+  }
+  const pl=$("#tgPkgL"); if(pl) pl.textContent=k==="course"?"الورشة":"الباقة";
+}
 $("#tgKind") && $("#tgKind").addEventListener("change", tgBookShow);
 
 $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
@@ -2445,6 +2459,7 @@ $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
   try{
     await setSalesTarget({ id:tgSlug(label), label, kind:$("#tgKind").value,
       product:$("#tgKind").value==="book"?($("#tgBook").value||""):"",
+      pkg:$("#tgPkgWrap")&&!$("#tgPkgWrap").hidden?($("#tgPkg").value||""):"",
       amount, unit, currency:"KWD", cycleDay:Number($("#tgDay").value)||1,
       owner:$("#tgOwner").value||"", active:true });
     $("#tgLabel").value=""; $("#tgAmount").value="";
@@ -2459,6 +2474,7 @@ document.addEventListener("click", async (e)=>{
     const t=((TG&&TG.targets)||[]).find(x=>x.id===ed.dataset.tgedit); if(!t) return;
     $("#tgLabel").value=t.label||""; $("#tgKind").value=t.kind||"book";
     $("#tgBook").value=t.product||""; tgBookShow();
+    if($("#tgPkg")) $("#tgPkg").value=t.pkg||"";
     $("#tgUnit").value=t.unit==="count"?"count":"money"; tgUnitSync();
     $("#tgAmount").value=t.target||""; $("#tgDay").value=t.cycleDay||1;
     if($("#tgOwner")) $("#tgOwner").value=t.owner||"";
@@ -2843,7 +2859,7 @@ function pxPeople(){
     .concat([{id:"external",name:"مستشار خارجي"}], PX_HISTORY)
     .filter((m,i,a)=>a.findIndex(x=>x.id===m.id)===i);
 }
-function pxPkgs(){ return ((DATA&&DATA.nasPackages)||[]).concat((DATA&&DATA.riyadaPackages)||[]); }
+function pxPkgs(){ return ((DATA&&DATA.nasPackages)||[]).concat((DATA&&DATA.riyadaPackages)||[]).concat((DATA&&DATA.investPackages)||[]); }
 function pxToday(){ return new Date(Date.now()+180*60000).toISOString().slice(0,10); }
 function pxInit(){
   const d=$("#pxDate"); if(!d) return;
@@ -3535,6 +3551,7 @@ function renderTarget(){
     bsel.innerHTML='<option value="">الكتيّبات كلها</option>'+TG.books.map(b=>`<option value="${esc(b.key)}">${esc(b.name)}</option>`).join("");
     tgBookShow();
   }
+  if(mayEdit) tgBookShow();      // the package list arrives with the goals
   const osel=$("#tgOwner");
   if(mayEdit && osel && !osel.options.length){
     osel.innerHTML='<option value="">— بدون صاحب —</option>'+
@@ -3559,6 +3576,8 @@ function renderTarget(){
     return `<div class="tgcard">
       <h3>${esc(t.label)}</h3>
       ${t.kind==="book"?`<div class="tgwin">📘 ${t.productName?esc(t.productName):"الكتيّبات كلها"}</div>`:""}
+      ${(t.kind==="consult"||t.kind==="call")?`<div class="tgwin">📦 ${t.pkgName?esc(t.pkgName):"الباقات كلها"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر الباقة عشان تثبت)</span>':""}</div>`:""}
+      ${t.kind==="course"?`<div class="tgwin">🎟️ ${t.pkgName?esc(t.pkgName):"الورش كلها"}</div>`:""}
       <div class="tgwin">من ${esc(t.from)} إلى ${esc(t.to)} · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
       <div class="tgbig">
         <span class="pct">${fmt(t.pct)}%</span>
@@ -4677,7 +4696,7 @@ function render(){
 const SECTION_KEYS = {
   sales:["sales","catalog","salesFix","courses"], quiz:["quiz"], events:["events"],
   subscribers:["subscribers","bookQuestions"], careers:["careers"],
-  bookings:["bookings","nasPackages","riyadaPackages"], ratings:["ratings"], live:["live"], clients:["clients"],
+  bookings:["bookings","nasPackages","riyadaPackages","investPackages"], ratings:["ratings"], live:["live"], clients:["clients"],
 };
 async function refreshSections(list){
   const r=await getDashboard({ sections:list });
@@ -5740,7 +5759,7 @@ function nbMsg(m,kind){
   if(kind==="ok") setTimeout(()=>{ if(e.textContent===m) e.className="addmsg"; },10000);
 }
 /* every package the dashboard can sell, both clinics */
-function nbAll(){ return (DATA.nasPackages||[]).concat(DATA.riyadaPackages||[]); }
+function nbAll(){ return (DATA.nasPackages||[]).concat(DATA.riyadaPackages||[]).concat(DATA.investPackages||[]); }
 
 /* which clinic a consultant belongs to — حسن runs Cash Riyada, the rest
    run Cash Nas */
@@ -5748,7 +5767,7 @@ function nbAll(){ return (DATA.nasPackages||[]).concat(DATA.riyadaPackages||[]);
    name — otherwise every new كاش ريادة consultant is filed under كاش ناس */
 function nbClinicOf(id){
   const c=(((DATA||{}).bookings||{}).consultants||[]).find(x=>x.id===id);
-  if(c && c.clinic) return String(c.clinic).indexOf("ريادة")!==-1 ? "riyada" : "nas";
+  if(c && c.clinic) return String(c.clinic).indexOf("ريادة")!==-1 ? "riyada" : (id==="aziz" ? "invest" : "nas");
   return id==="hasan" ? "riyada" : "nas";      // fallback for an older payload
 }
 
@@ -5776,7 +5795,8 @@ function renderNasBooking(){
   if(!pkgs.length){ box.hidden=true; return; }
   box.hidden=false;
   const cl=$("#nbClinic");
-  if(cl) cl.textContent = nbClinicOf(BKWHO||"ghalia")==="riyada" ? "· كاش ريادة" : "· كاش ناس";
+  const hc=nbClinicOf(BKWHO||"ghalia");
+  if(cl) cl.textContent = hc==="riyada" ? "· كاش ريادة" : hc==="invest" ? "· كاش إنفست" : "· كاش ناس";
 
   /* Sales do not price a booking — the server applies the package price — so
      the amount stays hidden. How it was paid is a different question: نورة
@@ -5796,7 +5816,7 @@ function renderNasBooking(){
     sel.innerHTML=pkgs.map(p=>{
       /* غالية sits in the Riyada joint sessions, so those show on her list
          too — tagged, so it is never a surprise which clinic she is selling */
-      const tag = p.clinic!==home ? (p.clinic==="riyada" ? " · كاش ريادة" : " · كاش ناس") : "";
+      const tag = p.clinic!==home ? (p.clinic==="riyada" ? " · كاش ريادة" : p.clinic==="invest" ? " · كاش إنفست" : " · كاش ناس") : "";
       const online = Number(p.amountOnline) > 0 ? ` / ${fmt(p.amountOnline)} أونلاين` : "";
       const price = seesMoney() ? ` · ${fmt(p.amount)}${online} ${esc(p.currency)}${p.monthly?" / شهر":""}` : "";
       return `<option value="${esc(p.key)}">${esc(p.name)}${price}${tag}</option>`;
