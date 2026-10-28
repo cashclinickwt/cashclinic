@@ -3576,6 +3576,7 @@ function renderTarget(){
     return `<div class="tgcard">
       <h3>${esc(t.label)}</h3>
       ${t.kind==="book"?`<div class="tgwin">📘 ${t.productName?esc(t.productName):"الكتيّبات كلها"}</div>`:""}
+      ${t.kind==="book"&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">بيع هالفترة: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}
       ${(t.kind==="consult"||t.kind==="call")?`<div class="tgwin">📦 ${t.pkgName?esc(t.pkgName):"الباقات كلها"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر الباقة عشان تثبت)</span>':""}</div>`:""}
       ${t.kind==="course"?`<div class="tgwin">🎟️ ${t.pkgName?esc(t.pkgName):"الورش كلها"}</div>`:""}
       <div class="tgwin">من ${esc(t.from)} إلى ${esc(t.to)} · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
