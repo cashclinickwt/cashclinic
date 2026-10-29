@@ -5781,7 +5781,7 @@ function nbPkgs(){
   const home = nbClinicOf(who);
   return nbAll().filter(p =>
     p.clinic === home ||
-    (p.sessions||[]).some(x => x.consultantId===who || (x.with||[]).indexOf(who)!==-1));
+    (p.sessions||[]).some(x => x.consultantId===who || (x.with||[]).indexOf(who)!==-1 || (x.choices||[]).indexOf(who)!==-1));
 }
 function nbCurrent(){ return nbAll().find(p=>p.key===($("#nbPkg")||{}).value); }
 /* Returns "" when nothing is ticked, and the caller refuses to save.
@@ -5847,7 +5847,9 @@ function nbSyncSession(){
   const i=Number($("#nbSession").value||0);
   const cur=ss[i];
   /* the consultant the package expects for this session, still overridable */
-  if(cur && cur.consultantId) $("#nbConsultant").value=cur.consultantId;
+  /* a session either of two may take (الوفرة: سارة or عبدالعزيز) opens on
+     whoever's diary this is, when they are one of them */
+  if(cur && cur.consultantId) $("#nbConsultant").value=((cur.choices||[]).indexOf(BKWHO)!==-1 ? BKWHO : cur.consultantId);
 
   /* the package price is charged once. Session 1 carries it; a later session
      is already covered, so it defaults to zero and to "already paid" —
