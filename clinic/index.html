@@ -322,8 +322,22 @@ function appCard(a){
       <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. تنفتح لعملاء باقة أساس الحرية المالية وباقة الوفرة المالية بعد أول جلسة.</div></div>`;
 }
 /* tools that come with a package — «تأسيس المشروع» for باقة المؤسس */
-function toolCards(T){
-  const t=(T||{}).muassis; if(!t) return "";
+function toolCards(T){ return planCard((T||{}).ramadan)+muassisCard((T||{}).muassis); }
+/* «خطة ضغوطات رمضان» — bought, open while its month is paid; locked after, data kept */
+function planCard(t){
+  if(!t || !t.until) return "";
+  const qs=AS?"?as="+encodeURIComponent(AS):"";
+  const day=ms=>{ try{ return new Date(ms).toLocaleDateString("ar-KW-u-nu-latn",{day:"numeric",month:"long"}); }catch(e){ return ""; } };
+  const btn=(href,txt)=>`<a class="ck-btn" href="${href}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">${txt}</a>`;
+  if(t.open) return `<div class="ck-item"><div class="t">🌙 خطة ضغوطات رمضان <span class="ck-tag up">مفتوحة</span></div>
+      <div class="m">مناسباتك وأهدافك وكم تحط من كل راتب لين رمضان والعيد — تنحفظ بحسابك. الاشتراك لين ${esc(day(t.until))}${t.daysLeft<=5?` · باقي ${t.daysLeft===2?"يومين":t.daysLeft+" "+(t.daysLeft===1?"يوم":"أيام")}`:""}.</div>
+      ${btn("ramadan.html"+qs,"افتح الخطة")}</div>`;
+  return `<div class="ck-item"><div class="t">🌙 خطة ضغوطات رمضان <span class="ck-tag done">منتهي</span></div>
+      <div class="m">${AS?"انتهى اشتراكه":"خلص اشتراكك"} يوم ${esc(day(t.until))}. ${AS?"خطته محفوظة.":"خطتك محفوظة، جدّد وترجع لك مثل ما خليتها."}</div>
+      ${btn("ramadan.html"+(AS?qs:"?renew=1"),AS?"شوف خطته":"جدّد الاشتراك")}</div>`;
+}
+function muassisCard(t){
+  if(!t) return "";
   const link="muassis.html"+(AS?"?as="+encodeURIComponent(AS):"");
   if(t.open) return `<div class="ck-item"><div class="t">🌱 تأسيس المشروع <span class="ck-tag up">مفتوحة</span></div>
       <div class="m">ضمن ${esc(t.pkgName||"باقة المؤسس")}: تحط أفكارك، تقيّمها، وتستقر على فكرة — وبعدها رؤيتك ورسالتك وأهدافك ونموذج العمل والأرقام وخطة السنة. كل شي ينحفظ بحسابك.</div>

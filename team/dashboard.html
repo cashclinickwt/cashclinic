@@ -8365,7 +8365,7 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
     const d=(r&&r.data)||{};
     /* a draft that has gone out is not a draft any more */
     if(CMPDRAFT){ try{ await deleteCampaignDraft({ id:CMPDRAFT }); }catch(e){} CMPDRAFT=""; await cmpLoadDrafts(); }
-    cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":""));
+    cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":"")+(d.queued?" · و"+d.queued+" بالانتظار، ينرسلون باچر الساعة ١٠ الصبح تلقائياً (حد جوجل اليومي)":""));
   }catch(e){ cStat("err",(e&&e.message)||"صار خطأ، حاول مرة ثانية"); }
   finally{ $("#cmpSend").disabled=false; }
 });

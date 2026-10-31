@@ -47,7 +47,7 @@
 <div class="card">
   <div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b id="wmWord">clinic</b></span></div>
   <h1>إتمام الطلب</h1>
-  <p class="sub">عبي بياناتك وبتوصلك نسخة الكتاب على إيميلك مباشرة بعد الدفع.</p>
+  <p class="sub" id="coSub">عبي بياناتك وبتوصلك نسخة الكتاب على إيميلك مباشرة بعد الدفع.</p>
 
   <div class="book">
     <span class="ic" id="bookIc">📘</span>
@@ -58,7 +58,7 @@
   </div>
 
   <div class="field"><label for="bName">الاسم</label><input id="bName" autocomplete="name" placeholder="اسمك الكامل" /></div>
-  <div class="field"><label for="bEmail">الإيميل</label><input id="bEmail" type="email" inputmode="email" autocomplete="email" placeholder="example@email.com" /></div>
+  <div class="field"><label for="bEmail">الإيميل</label><input id="bEmail" type="email" inputmode="email" autocomplete="email" placeholder="example@email.com" /><div id="bNote" hidden style="margin-top:8px;font-size:13.5px;line-height:1.8;color:#5b4a73;background:#F3F0F8;border-radius:10px;padding:8px 12px"></div></div>
   <div class="field"><label for="bPhone">رقم الواتساب (اختياري)</label><input id="bPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xxxxxxx" /></div>
   <div class="cc-agree" id="agreeBox">
     <label><input type="checkbox" id="termsChk">
@@ -85,6 +85,8 @@ const CONFIG = {
 const PRODUCTS = {
   dalil:  { title:"دليل الوفرة المالية", price:"20 د.ك بدل 30 د.ك... نسخة رقمية (PDF)", pay:"ادفع 20 د.ك", ic:"📘", word:"clinic" },
   ahdafi: { title:"كتيّب أهدافي المالية", price:"25 د.ك بدل 35 د.ك... نسخة رقمية (PDF)", pay:"ادفع 25 د.ك", ic:"🎯", word:"clinic" },
+  ramadan:{ title:"خطة ضغوطات رمضان", price:"15 د.ك... أول شهر مشمول، وتنفتح في عيادتي", pay:"ادفع 15 د.ك", ic:"🌙", word:"clinic",
+            note:"الخطة تنفتح في <b>عيادتي</b> بهذا الإيميل.. استخدم نفس الإيميل اللي بتدخل فيه (أو بتسوي فيه حسابك)." },
   riyada: { title:"سحر إدارة الكاش",      price:"25 د.ك... نسخة رقمية (PDF)", pay:"ادفع 25 د.ك", ic:"📗", word:"riyada" }
 };
 
@@ -101,6 +103,8 @@ document.getElementById("bookIc").textContent    = P.ic;
 document.getElementById("bookTitle").textContent = P.title;
 document.getElementById("bookPrice").textContent = P.price;
 document.getElementById("pay").textContent       = P.pay;
+if(P.note){ const n=document.getElementById("bNote"); n.innerHTML=P.note; n.hidden=false;
+  document.getElementById("coSub").textContent="عبي بياناتك وبتنفتح لك الخطة في عيادتي مباشرة بعد الدفع."; }
 
 const first=(q.get("first_name")||"").trim(), last=(q.get("last_name")||"").trim();
 const name=(q.get("name")|| (first+" "+last)).trim();
