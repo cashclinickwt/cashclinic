@@ -72,6 +72,6 @@
     if (e.key === 'Escape' && isOpen()) close();
   });
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 900 && isOpen()) close();
+    if (window.innerWidth > 1060 && isOpen()) close();
   });
 })();

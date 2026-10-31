@@ -7210,10 +7210,10 @@ function renderBkList(){
         ${b.paymentMethod==="online"&&b.status==="paid"?'<span class="bkpill" style="background:#2F8789">مدفوع أونلاين</span>':""}
         ${b.voucher?`<span class="bkpill" style="background:#614588">قسيمة ${esc(b.voucher.code)}</span>`:""}
         ${b.fromVoucher?`<span class="bkpill" style="background:#614588">بقسيمة ${esc(b.fromVoucher.code)}</span>`:""}
-        ${b.slotClash?`<span class="bkpill" style="background:#962E37" title="دفع بعد ما خلصت مهلة الـ٣٠ دقيقة والموعد راح لعميل ثاني — ما وصله تأكيد">⚠️ دفع بعد ما راح موعده — غيّر الموعد</span>`:""}
+        ${b.slotClash?`<span class="bkpill" style="background:#962E37" title="دفع بعد ما خلصت مهلة الساعة والموعد راح لعميل ثاني — ما وصله تأكيد">⚠️ دفع بعد ما راح موعده — غيّر الموعد</span>`:""}
         ${b.manual?'<span class="bkpill" style="background:#6B6577">يدوي</span>':""}
         ${b.rescheduled?'<span class="bkpill" style="background:#505632">مُعدّل</span>':""}
-        ${b.status==="cancelled"?'<span class="bkpill" style="background:#962E37">ملغي</span>':""}
+        ${b.status==="cancelled"?(b.unpaidCancel?'<span class="bkpill" style="background:#962E37" title="انلغى تلقائياً — ما انْدفع خلال ساعة من الحجز، والموعد انفتح">ملغي · ما دفع خلال ساعة</span>':'<span class="bkpill" style="background:#962E37">ملغي</span>'):""}
         ${b.status==="pending"&&!b.payExpired?'<span class="bkpill" style="background:#D3A146">بانتظار الدفع</span>':""}
         ${b.status==="pending"&&b.payExpired?'<span class="bkpill" style="background:#962E37">انتهت مهلة الدفع</span>':""}
         ${b.voucher?`<span class="bkpill" style="background:#614588">قسيمة ${esc(b.voucher.code)} · ${esc(vchUntil(b.voucher.until))}</span>`:""}
@@ -7689,7 +7689,7 @@ function renderBkCalDay(){
         <span class="bkpill" style="background:#D3A146">${esc(b.packageName)}</span>
         ${b.sessionLabel?`<span class="bkpill" style="background:#614588">${esc(b.sessionLabel)}</span>`:""}
         ${b.fromVoucher?`<span class="bkpill" style="background:#614588">بقسيمة ${esc(b.fromVoucher.code)}</span>`:""}
-        ${b.slotClash?`<span class="bkpill" style="background:#962E37" title="دفع بعد ما خلصت مهلة الـ٣٠ دقيقة والموعد راح لعميل ثاني — ما وصله تأكيد">⚠️ دفع بعد ما راح موعده — غيّر الموعد</span>`:""}
+        ${b.slotClash?`<span class="bkpill" style="background:#962E37" title="دفع بعد ما خلصت مهلة الساعة والموعد راح لعميل ثاني — ما وصله تأكيد">⚠️ دفع بعد ما راح موعده — غيّر الموعد</span>`:""}
         ${(b.withNames&&b.withNames.length)?`<span class="bkpill" style="background:#962E37">مع ${esc(b.withNames.join(" + "))}</span>`:""}
         <span class="num">${esc(b.email)}</span>
         ${seesMoney()?`<span>· ${fmt(b.amount)} د.ك</span>`:""}

@@ -87,7 +87,7 @@
           <div class="cc-agree" id="agreeBox"><label><input type="checkbox" id="termsChk"><span>إتمام الدفع يعتبر موافقة على جميع <a href="policy.html" target="_blank" rel="noopener">الشروط والسياسات</a> الخاصة بكاش كلينيك.</span></label></div>
           <button class="pay" id="payBtn">ادفع وأكّد الحجز</button>
           <div class="note">
-            الدفع آمن عبر Tap. موعدك محجوز لك، وما يتأكد إلا بعد الدفع.
+            الدفع آمن عبر Tap. موعدك محجوز لك <b>لمدة ساعة</b> من وقت الحجز، وإذا ما تم الدفع خلالها ينلغى الحجز وينفتح الموعد لغيرك.
           </div>
         </div>
         <div class="msg" id="msg"></div>
@@ -170,7 +170,7 @@ async function load(){
 
     if(o.status === "cancelled"){
       $("#details").hidden = true;
-      msg("هذا الحجز ملغي. راسلنا لو تبي تحجز من جديد.", "err");
+      msg(o.unpaidCancel ? "انتهت مهلة الدفع (ساعة) وانلغى الحجز، وانفتح الموعد لغيرك. راسلنا ونرتب لك موعد جديد." : "هذا الحجز ملغي. راسلنا لو تبي تحجز من جديد.", "err");
     } else if(o.paid){
       $("#details").hidden = true;
       $("#paidBox").hidden = false;
@@ -202,5 +202,6 @@ $("#payBtn").addEventListener("click", async () => {
 
 load();
 </script>
+<script src="assets/js/hit.js" defer></script>
 </body>
 </html>
