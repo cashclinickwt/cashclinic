@@ -1805,6 +1805,9 @@ const seesMoney = () => DATA && DATA.seesMoney !== false;
 /* Nora edits and cancels the same as anyone; only the schedule editor and
    the money stay out of her reach. */
 const mayEdit = () => true;
+/* a consultant (عبدالعزيز) runs his own diary: no vouchers, no second
+   sessions booked for the client, no prices or client details to change */
+const isCons = () => !!(DATA && DATA.role==="consultant");
 
 /* the subscriptions — a package billed by the month rather than by session */
 function bkIsMonthly(b){
@@ -5441,7 +5444,9 @@ function gsOpen(r){
 const SALES_PANELS = ["home","sales","addsale","salesteam","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
-const CONSULTANT_PANELS = ["home","composer","subscribers","tasks","meetings","ideas","notify","reports"];
+/* 1 Nov 2026: and his own diary — his working week, his calendar, moving
+   and cancelling his own sessions — plus the reports on his package files */
+const CONSULTANT_PANELS = ["home","bookings","composer","subscribers","tasks","meetings","ideas","notify","reports"];
 /* أشواق — customer service: the diary like نورة, the client list, and the
    team's shared board. No leads, no vouchers tab, no events, no targets — and
    no money anywhere, which the server enforces by never sending it. */
@@ -6715,7 +6720,7 @@ function renderReportDuty(){
   const box=$("#rdBody"); if(!box||!RD) return;
   $("#rdLead").textContent = RD.all
     ? "كل جلسة خلصت، لكل استشاري عليها: التقرير انرفع ولا لا، اعتُمد ولا لا، ووصل للعميل بعيادتي ولا لا. ترفع وتبدّل وتعتمد من هني. الاتصال السريع والتواصل التفاعلي والمراجعة ما تحتاج تقرير."
-    : "جلساتك اللي خلصت وتقاريرها — ترفع وتبدّل من هني. يوصلك تذكير بعد الجلسة بساعتين إذا التقرير ما انرفع.";
+    : "جلساتك اللي خلصت وتقاريرها — ترفع وتبدّل من هني، وتشوف وتفتح تقارير المستشارين الثانيين على ملفات الباقات اللي أنت فيها. يوصلك تذكير بعد الجلسة بساعتين، وثاني بعد ٤٨ ساعة إذا التقرير ما انرفع.";
   $("#rdLead").textContent += " 💡 تقدر تسحب ملف الـPDF من جهازك وتفلته على صف الجلسة.";
   const people=RD.people||[];
   $("#rdPeople").innerHTML = RD.all && people.length>1
@@ -7377,16 +7382,16 @@ function renderBkList(){
         b.status==="cancelled"&&!b.voucher&&mayEdit()?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
         <button data-edit="${esc(b.id)}">أرجع الموعد</button>
-        ${b.wasPaid?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
+        ${b.wasPaid&&!isCons()?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
       </div>`:""}
       ${intakeBlock(b)}${reportBlock(b)}
       ${b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
-        ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
+        ${mayEdit()&&!isCons()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
         <button data-note="${esc(b.id)}">أضف ملاحظة</button>
         ${bkIsMonthly(b)&&mayEdit()?`<button data-sub="${esc(b.id)}">${b.subStart?"عدّل تاريخ البداية":"حدّد تاريخ البداية"}</button>`:""}
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
-        ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
+        ${mayEdit()&&!isCons()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:""}
     </div>`;
@@ -7500,6 +7505,9 @@ function bkEditOpen(b){
   if($("#beNotify")) $("#beNotify").checked=true;
   $("#beMsg").className="addmsg"; $("#beMsg").textContent=reviving?"اختر الموعد الجديد واحفظ — يرجع الحجز للمواعيد":"";
   BE_REVIVE=reviving;
+  /* a consultant changes when and how — the rest is the desk's */
+  ["beConsultant","beName","beEmail","bePhone","beAmount","bePay","bePaid"].forEach(id=>{
+    const el=$("#"+id); if(!el) return; const w=el.closest(".addf")||el.closest("label")||el; w.hidden=isCons(); });
   document.getElementById("bkEditOvl").classList.add("on");
 }
 function bkEditClose(){ document.getElementById("bkEditOvl").classList.remove("on"); }
@@ -7858,10 +7866,10 @@ function renderBkCalDay(){
            أشواق out of past and current appointments. */
         intakeBlock(b) + reportBlock(b) + (b.status!=="cancelled"?`<div class="bkacts">
         ${wa?`<a class="wa" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a>`:""}
-        ${mayEdit()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
+        ${mayEdit()&&!isCons()&&b.status==="paid"&&!b.voucher?`<button data-vch="${esc(b.id)}">حوّل لقسيمة</button>`:""}
         <button data-note="${esc(b.id)}">أضف ملاحظة</button>
         ${mayEdit()?`<button data-edit="${esc(b.id)}">تعديل</button>`:""}
-        ${mayEdit()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
+        ${mayEdit()&&!isCons()&&bkNeedsSecond(b)?`<button data-second="${esc(b.id)}">أضف الجلسة الثانية</button>`:""}
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:"")}
     </div>`;
