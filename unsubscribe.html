@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>إلغاء الاشتراك | كاش كلينك</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="quiz/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--page:#f3f0f8;--card:#fff;--ink:#2f1748;--body:#4a3a62;--muted:#6f6880;--wine:#972e38;--line:#e2dcec;--teal:#23908c;--tealbg:#e3f2f0}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--page);color:var(--body);font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;line-height:1.9;
+    display:grid;place-items:center;padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 16px 40px rgba(47,23,72,.10);max-width:480px;width:100%;padding:32px 26px;text-align:center}
+  .card img{height:46px;width:auto;margin:0 auto 18px;display:block}
+  h1{margin:0 0 8px;color:var(--ink);font-weight:500;font-size:1.45rem;text-wrap:balance}
+  p{margin:0 0 6px}
+  .em{display:inline-block;background:var(--page);border-radius:999px;padding:4px 14px;margin:6px 0 4px;font-size:.92rem;color:var(--ink);direction:ltr}
+  .note{font-size:.85rem;color:var(--muted);margin-top:12px}
+  .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  button,a.btn{appearance:none;border:0;border-radius:999px;padding:12px 26px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+  .go{background:var(--wine);color:#fff}
+  button.gh,a.btn.gh{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+  .ok{background:var(--tealbg);color:#1c6e6b;border-radius:14px;padding:12px 16px;margin-top:16px}
+  .err{color:var(--wine);margin-top:12px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="card">
+  <img src="brand/logo/logo-primary.png" alt="كاش كلينك">
+  <div id="ask">
+    <h1>ما تبي توصلك رسايلنا؟</h1>
+    <p>بنوقف نرسل لك عروضنا وأخبار لقاءاتنا وفعالياتنا على</p>
+    <div class="em" id="em"></div>
+    <p class="note">اللي طلبته بنفسك يظل يوصلك: كتيّباتك، تأكيد مواعيدك، تذكير فعالية سجّلت فيها، وتقاريرك.</p>
+    <div class="btns"><button class="go" id="off">إلغاء الاشتراك</button><a class="btn gh" href="https://cashclinic.net">لا، خلّني</a></div>
+  </div>
+  <div id="done" hidden>
+    <h1>تم 🌿</h1>
+    <p>ما بنرسل لك رسايل العروض والفعاليات بعد اليوم.</p>
+    <div class="em" id="em2"></div>
+    <p class="note">غيّرت رايك؟ ترجع بضغطة.</p>
+    <div class="btns"><button class="gh" id="back">رجّعني للقائمة</button></div>
+  </div>
+  <div id="again" hidden>
+    <h1>رجعت معانا 💜</h1>
+    <p>بتوصلك عروضنا وأخبار فعالياتنا من جديد.</p>
+  </div>
+  <div class="err" id="err" hidden></div>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+const call=httpsCallable(getFunctions(initializeApp(CONFIG.firebase),CONFIG.functionsRegion),"unsubscribeEmail");
+const q=new URLSearchParams(location.search), e=(q.get("e")||"").trim().toLowerCase(), t=(q.get("t")||"").trim();
+const $=id=>document.getElementById(id);
+$("em").textContent=e||"—"; $("em2").textContent=e;
+const fail=(m)=>{ $("err").textContent=m; $("err").hidden=false; };
+if(!e||!t){ $("off").disabled=true; fail("الرابط ناقص. افتح رابط «إلغاء الاشتراك» من آخر إيميل وصلك منا، أو راسلنا واتساب 22260820."); }
+async function go(back, btn){
+  $("err").hidden=true; btn.disabled=true; const t0=btn.textContent; btn.textContent="لحظة…";
+  try{ await call({ e, t, back }); $("ask").hidden=true; $("done").hidden=back; $("again").hidden=!back; }
+  catch(x){ fail((x&&x.message)||"ما قدرنا نكمل، جرّب مرة ثانية."); }
+  finally{ btn.disabled=false; btn.textContent=t0; }
+}
+$("off").addEventListener("click",()=>go(false,$("off")));
+$("back").addEventListener("click",()=>go(true,$("back")));
+</script>
+</body>
+</html>
