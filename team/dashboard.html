@@ -991,11 +991,14 @@
       <div class="f" id="tgPkgWrap" hidden><label id="tgPkgL">الباقة</label><select id="tgPkg"><option value="">الكل</option></select></div>
       <div class="f"><label>الهدف بـ</label><select id="tgUnit"><option value="money">مبلغ (د.ك)</option><option value="count">عدد</option></select></div>
       <div class="f"><label id="tgAmountL">المبلغ (د.ك)</label><input id="tgAmount" type="number" min="1" step="1"></div>
-      <div class="f"><label>يبدأ يوم</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
+      <div class="f" id="tgDayWrap"><label>يبدأ يوم (كل شهر)</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
+      <div class="f"><label>من تاريخ <span class="muted">(اختياري)</span></label><input id="tgFrom" type="date"></div>
+      <div class="f"><label>إلى تاريخ</label><input id="tgTo" type="date"></div>
       <div class="f"><label>صاحب الهدف</label><select id="tgOwner"></select></div>
-      <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="tgAdd">احفظ الهدف</button></div>
+      <div class="f"><label>&nbsp;</label><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pfbtn go" id="tgAdd">احفظ الهدف</button>
+        <button class="pfbtn" id="tgCancel" type="button" hidden>هدف جديد بدل التعديل</button></div></div>
       <div class="f" style="flex:1 1 100%">
-        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. هدف الكتيّب تقدر تخليه لكتيّب واحد أو للكتيّبات كلها. «احذف» يشيل الهدف من القائمة ويوقف عدّه.</div></div>
+        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. «عدّل» يعدّل نفس الهدف حتى لو غيّرت اسمه. حطّ «من تاريخ» و«إلى تاريخ» إذا تبي الهدف لفترة محددة، وخلّهم فاضيين إذا يتجدد كل شهر من «يبدأ يوم». هدف الكتيّب تقدر تخليه لكتيّب واحد أو للكتيّبات كلها. «احذف» يشيل الهدف من القائمة ويوقف عدّه.</div></div>
     </div>
     <div class="addmsg" id="tgMsg"></div>
     <div id="tgList"></div>
@@ -2526,6 +2529,24 @@ function tgBookShow(){
   const pl=$("#tgPkgL"); if(pl) pl.textContent=k==="course"?"الورشة":"الباقة";
 }
 $("#tgKind") && $("#tgKind").addEventListener("change", tgBookShow);
+/* a goal with its own dates does not use the monthly start day (4 Nov 2026) */
+function tgDatesSync(){
+  const fixed=!!(($("#tgFrom")||{}).value||($("#tgTo")||{}).value);
+  const w=$("#tgDayWrap"); if(w) w.style.opacity=fixed?".45":"";
+  const d=$("#tgDay"); if(d) d.disabled=fixed;
+}
+["#tgFrom","#tgTo"].forEach(k=>{ const x=$(k); if(x) x.addEventListener("input", tgDatesSync); });
+/* «عدّل» keeps the goal it opened, even if its name is changed */
+function tgEditing(id,label){
+  const f=$("#tgForm"); if(!f) return;
+  if(id){ f.dataset.editId=id; } else { delete f.dataset.editId; }
+  const a=$("#tgAdd"); if(a) a.textContent=id?"احفظ التعديل":"احفظ الهدف";
+  const c=$("#tgCancel"); if(c) c.hidden=!id;
+}
+$("#tgCancel") && $("#tgCancel").addEventListener("click", ()=>{
+  tgEditing(""); ["#tgLabel","#tgAmount","#tgFrom","#tgTo"].forEach(k=>{ const x=$(k); if(x) x.value=""; });
+  tgDatesSync(); tgMsg("",true);
+});
 
 $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
   const label=($("#tgLabel").value||"").trim();
@@ -2533,17 +2554,22 @@ $("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
   const unit=$("#tgUnit").value==="count"?"count":"money";
   if(label.length<2) return tgMsg("اكتب اسم الهدف",false);
   if(!(amount>0))    return tgMsg(unit==="count"?"العدد لازم يكون أكبر من صفر":"المبلغ لازم يكون أكبر من صفر",false);
+  const fromDate=($("#tgFrom")||{}).value||"", toDate=($("#tgTo")||{}).value||"";
+  if(!!fromDate!==!!toDate) return tgMsg("اختر تاريخ البداية والنهاية مع بعض، أو خلّهم فاضيين",false);
+  if(fromDate && toDate<fromDate) return tgMsg("تاريخ النهاية قبل البداية",false);
+  const editId=($("#tgForm")||{dataset:{}}).dataset.editId||"";
   const b=$("#tgAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
   try{
-    await setSalesTarget({ id:tgSlug(label), label, kind:$("#tgKind").value,
+    await setSalesTarget({ id:editId||tgSlug(label), label, kind:$("#tgKind").value, fromDate, toDate,
       product:$("#tgKind").value==="book"?($("#tgBook").value||""):"",
       pkg:$("#tgPkgWrap")&&!$("#tgPkgWrap").hidden?($("#tgPkg").value||""):"",
       amount, unit, currency:"KWD", cycleDay:Number($("#tgDay").value)||1,
       owner:$("#tgOwner").value||"", active:true });
-    $("#tgLabel").value=""; $("#tgAmount").value="";
+    $("#tgLabel").value=""; $("#tgAmount").value=""; $("#tgFrom").value=""; $("#tgTo").value="";
+    tgEditing(""); tgDatesSync();
     TG=null; await loadTarget(); tgMsg("انحفظ الهدف ✅",true);
-  }catch(e){ tgMsg((e&&e.message)||"تعذّر الحفظ",false); }
-  finally{ b.disabled=false; b.textContent=t0; }
+  }catch(e){ tgMsg((e&&e.message)||"تعذّر الحفظ",false); b.textContent=t0; }
+  finally{ b.disabled=false; }
 });
 
 document.addEventListener("click", async (e)=>{
@@ -2555,7 +2581,9 @@ document.addEventListener("click", async (e)=>{
     if($("#tgPkg")) $("#tgPkg").value=t.pkg||"";
     $("#tgUnit").value=t.unit==="count"?"count":"money"; tgUnitSync();
     $("#tgAmount").value=t.target||""; $("#tgDay").value=t.cycleDay||1;
+    $("#tgFrom").value=t.fromDate||""; $("#tgTo").value=t.toDate||""; tgDatesSync();
     if($("#tgOwner")) $("#tgOwner").value=t.owner||"";
+    tgEditing(t.id);
     $("#tgLabel").scrollIntoView({behavior:"smooth",block:"center"});
     tgMsg("عدّل اللي تبيه واضغط «احفظ الهدف»",true);
     return;
@@ -3697,7 +3725,7 @@ function renderTarget(){
       ${t.kind==="book"&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">بيع هالفترة: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}
       ${(t.kind==="consult"||t.kind==="call")?`<div class="tgwin">📦 ${t.pkgName?esc(t.pkgName):"الباقات كلها"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر الباقة عشان تثبت)</span>':""}</div>`:""}
       ${t.kind==="course"?`<div class="tgwin">🎟️ ${t.pkgName?esc(t.pkgName):"الورش كلها"}</div>`:""}
-      <div class="tgwin">من ${esc(t.from)} إلى ${esc(t.to)} · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
+      <div class="tgwin">${t.fixed?"📅 فترة محددة · ":""}من <bdi>${esc(t.from)}</bdi> إلى <bdi>${esc(t.to)}</bdi> · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
       <div class="tgbig">
         <span class="pct">${fmt(t.pct)}%</span>
         <span class="of">${t.unit==="count"?`${fmt(t.count)} من هدف ${fmt(t.target)} ${esc(tgUnitWord(t.kind))}`:`من هدف ${kwd(t.target)}`}</span>
@@ -6804,7 +6832,17 @@ $("#rdPeople") && $("#rdPeople").addEventListener("click",e=>{ const b=e.target.
    and the consultant(s) on the booking — the server decides, the button just
    follows what it said. */
 const getIntakeAnswers=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getIntakeAnswers");
-function intakeBlock(b){
+function intakeBlock(b){ return intakeOnly(b)+feedbackBlock(b); }
+/* تقييم ما بعد الجلسة (4 Nov 2026): rated or not, and a WhatsApp nudge */
+function feedbackBlock(b){
+  if(b.status==="cancelled" || b.payExpired || !b.feedback || !bkEnded(b)) return "";
+  if(b.feedback.done) return `<div class="rpbox" style="border-color:#2F8789;background:#F2F9F8">
+      <span class="rpchip" style="background:#2F8789">⭐ قيّم الجلسة ✓</span></div>`;
+  return `<div class="rpbox"><span class="rpchip" style="background:#A87A2A">⭐ ما قيّم الجلسة للحين</span>
+      <div class="rpmeta" style="margin-top:6px">${b.feedback.mailed?"رابط التقييم وصله بالإيميل بعد الجلسة بساعة.":"إيميل التقييم ما وصله — أرسله له واتساب."}</div>
+      ${b.canSendIntake?`<button class="rpup" data-fblink="${esc(b.id)}" style="margin-top:8px">📲 أرسل التقييم واتساب</button>`:""}</div>`;
+}
+function intakeOnly(b){
   if(b.status==="cancelled" || !b.intake) return "";
   if(b.intake.done) return `<div class="rpbox" style="border-color:#2F8789;background:#F2F9F8">
       <span class="rpchip" style="background:#2F8789">📋 عبّى أسئلة ما قبل الجلسة ✓</span>
@@ -6831,6 +6869,20 @@ document.addEventListener("click", async e=>{
           <input readonly value="${esc(d.url)}" dir="ltr" style="flex:1;min-width:180px;font-size:12px;padding:6px 8px;border:1px solid #D2D3E1;border-radius:8px">
         </div>${d.done?`<div class="rpmeta" style="color:#2F8789">عبّاها خلاص ✓</div>`:""}${d.phone?"":`<div class="rpmeta">ما في رقم على الحجز — انسخ الرسالة وأرسلها بنفسك.</div>`}`;
     }catch(err){ b.disabled=false; b.textContent=was; bkMsg((err&&err.message)||"تعذّر جيب الرابط",false); }
+    return;
+  }
+  const f=e.target.closest("button[data-fblink]"); if(f){
+    const was=f.textContent; f.disabled=true; f.textContent="…";
+    try{
+      const d=(await getIntakeLink({ orderId:f.dataset.fblink, feedback:true })).data||{};
+      const msg=`هلا ${d.name||""} 👋\nشكراً على جلستك مع كاش كلينك${d.consultant?" مع "+d.consultant:""} 🌷\nيهمنا رأيك، قيّم الجلسة من هالرابط:\n${d.url}\nما ياخذ منك دقيقتين 🌿`;
+      const wa=`https://wa.me/${d.phone||""}?text=${encodeURIComponent(msg)}`;
+      f.outerHTML=`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <a class="rpup" href="${esc(wa)}" target="_blank" rel="noopener" style="text-decoration:none;background:#25D366;border-color:#25D366;color:#fff">💬 افتح واتساب ${d.phone?"للعميل":""}</a>
+          <button class="rpup" data-ikcopy="${esc(msg)}">انسخ الرسالة</button>
+          <input readonly value="${esc(d.url)}" dir="ltr" style="flex:1;min-width:180px;font-size:12px;padding:6px 8px;border:1px solid #D2D3E1;border-radius:8px">
+        </div>${d.done?`<div class="rpmeta" style="color:#2F8789">قيّم خلاص ✓</div>`:""}${d.phone?"":`<div class="rpmeta">ما في رقم على الحجز — انسخ الرسالة وأرسلها بنفسك.</div>`}`;
+    }catch(err){ f.disabled=false; f.textContent=was; bkMsg((err&&err.message)||"تعذّر جيب الرابط",false); }
     return;
   }
   const c=e.target.closest("button[data-ikcopy]"); if(c){
