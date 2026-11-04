@@ -779,7 +779,8 @@
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
     <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
     <button data-tab="careers">التوظيف</button>
-    <button data-tab="reports">التقارير</button>
+    <button data-tab="reports" data-family="rep">التقارير</button>
+    <button data-tab="inreports" data-child="rep" hidden>التقارير الداخلية</button>
   </nav>
   <div class="shellbody">
 
@@ -1142,6 +1143,7 @@
   </div>
 
   <div class="sec" id="reportsSec" data-panel="reports" hidden>
+    <div class="subtabs" data-fam="rep"></div>
     <h2><span></span> أنظمة التقارير</h2>
     <div class="report-links">
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
@@ -1170,6 +1172,29 @@
       <div class="addmsg" id="rdMsg"></div>
       <div id="rdBody"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
     </div>
+  </div>
+
+  <!-- ===== التقارير الداخلية (5 Nov 2026) — the team's weekly reports ===== -->
+  <div class="sec" id="inrepSec" data-panel="inreports">
+    <div class="subtabs" data-fam="rep"></div>
+    <h2><span></span> التقارير الداخلية</h2>
+    <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل سبت يوصل تذكير لنورة (المبيعات) وأشواق (خدمة العملاء) يرفعون تقرير الأسبوع. الفريق كله يشوف التقارير هني. التقرير ملف، أو مكتوب، أو الاثنين.</p>
+    <div id="irDue"></div>
+    <div class="pfcard" style="margin:12px 0">
+      <h4 style="margin:0 0 10px">⬆️ ارفع تقرير</h4>
+      <div class="pfbar" style="margin:0">
+        <div class="f" style="flex:1 1 220px"><label>العنوان</label><input id="irTitle" type="text" maxlength="140" placeholder="مثال: تقرير المبيعات الأسبوعي"></div>
+        <div class="f"><label>النوع</label><select id="irKind"><option value="sales">المبيعات</option><option value="service">خدمة العملاء</option><option value="other">تقرير ثاني</option></select></div>
+        <div class="f"><label>أسبوع السبت <span class="muted">(اختياري)</span></label><input id="irWeek" type="date"></div>
+        <div class="f" style="flex:1 1 100%"><label>التقرير مكتوب <span class="muted">(اختياري إذا رفعت ملف)</span></label>
+          <textarea id="irText" rows="5" maxlength="6000" style="width:100%;box-sizing:border-box;font:inherit;padding:10px 12px;border:1.5px solid #D2D3E1;border-radius:12px" placeholder="شنو صار هالأسبوع: الأرقام، المشاكل، اللي يحتاج متابعة…"></textarea></div>
+        <div class="f" style="flex:1 1 260px"><label>ملف <span class="muted">(PDF، إكسل، صورة — لين ٤ ملفات)</span></label><input id="irFiles" type="file" multiple></div>
+        <div class="f"><label>&nbsp;</label><button class="pfbtn go" id="irSend">ارفع التقرير</button></div>
+      </div>
+      <div class="addmsg" id="irMsg"></div>
+    </div>
+    <div class="flt" id="irFlt"></div>
+    <div id="irList"><div class="muted" style="padding:10px">جاري التحميل…</div></div>
   </div>
 
   <div class="sec" id="composerSec" data-panel="composer">
@@ -2190,10 +2215,14 @@ function renderSurveys(){
   if(!SVKIND || kinds.indexOf(SVKIND)===-1) SVKIND = kinds.find(k=>all.some(r=>r.kind===k)) || kinds[0] || "";
   $("#svKind").innerHTML=kinds.map(k=>`<button data-svkind="${k}"${k===SVKIND?' class="on"':''}>${esc(defs[k].name)} · ${fmt(all.filter(r=>r.kind===k).length)}</button>`).join("");
   let rows=all.filter(r=>r.kind===SVKIND);
+  /* pick a consultant to read only theirs — offered always, as before the new
+     form, not only once two of them have answers (5 Nov 2026) */
   const ids=[...new Set(rows.map(r=>r.consultantId).filter(Boolean))];
-  $("#svWho").innerHTML=(SVKIND==="consult" && SV.seesAll && ids.length>1)
-    ? [["all","كل المستشارين"]].concat(ids.map(id=>[id,(rows.find(r=>r.consultantId===id)||{}).consultant||id]))
-        .map(([v,l])=>`<button data-svwho="${esc(v)}"${v===SVWHO?' class="on"':''}>${esc(l)}</button>`).join("") : "";
+  const people=(SV.consultants||[]).slice();
+  ids.forEach(id=>{ if(!people.some(p=>p.id===id)) people.push({ id, name:(rows.find(r=>r.consultantId===id)||{}).consultant||id }); });
+  $("#svWho").innerHTML=(SVKIND==="consult" && SV.seesAll && people.length)
+    ? [["all","كل المستشارين",rows.length]].concat(people.map(p=>[p.id,p.name,rows.filter(r=>r.consultantId===p.id).length]))
+        .map(([v,l,n])=>`<button data-svwho="${esc(v)}"${v===SVWHO?' class="on"':''}>${esc(l)} · ${fmt(n)}</button>`).join("") : "";
   if(SVKIND==="consult" && SVWHO!=="all") rows=rows.filter(r=>r.consultantId===SVWHO);
   const n=npsOf(rows), first=(defs[SVKIND]||{}).qs||[];
   const topQ=first[0], topGood=rows.filter(r=>{ const a=(r.answers||[])[0]; return a && topQ && Array.isArray(topQ.opts) && topQ.opts.indexOf(a.a)<=1; }).length;
@@ -2224,7 +2253,10 @@ function renderSurveys(){
     : `<div class="muted" style="font-size:13px;padding:10px">ما وصل رد على هالاستبيان بعد.</div>`;
 }
 $("#svKind") && $("#svKind").addEventListener("click", e=>{ const b=e.target.closest("button[data-svkind]"); if(!b) return; SVKIND=b.dataset.svkind; SVWHO="all"; renderSurveys(); });
-$("#svWho") && $("#svWho").addEventListener("click", e=>{ const b=e.target.closest("button[data-svwho]"); if(!b) return; SVWHO=b.dataset.svwho; renderSurveys(); });
+$("#svWho") && $("#svWho").addEventListener("click", e=>{ const b=e.target.closest("button[data-svwho]"); if(!b) return; SVWHO=b.dataset.svwho;
+  /* the older form below follows the same pick */
+  if(typeof FBWHO!=="undefined"){ FBWHO=SVWHO; try{ renderFeedback(); }catch(_){} }
+  renderSurveys(); });
 
 async function loadFeedback(){
   loadSurveys();
@@ -2258,9 +2290,9 @@ function renderFeedback(){
   const flt=$("#fbWhoFlt");
   if(flt){
     /* only worth offering when there is more than one person to compare */
-    const ids=[...new Set(all.map(r=>r.consultantId).filter(Boolean))];
-    flt.innerHTML = (FB.seesAll && ids.length>1)
-      ? [["all","الكل"]].concat(ids.map(id=>[id,((FB.consultants||[]).find(c=>c.id===id)||{}).name||id]))
+    const ids=[...new Set(all.map(r=>r.consultantId).filter(Boolean).concat(((SV&&SV.consultants)||[]).map(c=>c.id)))];
+    flt.innerHTML = (FB.seesAll && ids.length)
+      ? [["all","الكل"]].concat(ids.map(id=>[id,((FB.consultants||[]).find(c=>c.id===id)||((SV&&SV.consultants)||[]).find(c=>c.id===id)||{}).name||id]))
           .map(([v,l])=>`<button data-fbwho="${esc(v)}"${v===FBWHO?' class="on"':''}>${esc(l)}</button>`).join("")
       : "";
   }
@@ -5469,18 +5501,18 @@ function gsOpen(r){
    newsletter and the courses — and never see المبيعات، الاختبارات، التوظيف،
    البث or التقارير. Consultants see their own diary, their own feedback,
    their own money. Full access sees everything. */
-const SALES_PANELS = ["home","sales","addsale","salesteam","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify"];
+const SALES_PANELS = ["home","sales","addsale","salesteam","clients","bookings","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","target","profit","notify","inreports"];
 /* عبدالعزيز — his own work, writing to the list, and the shared board.
    No diary: he takes no bookings. */
 /* 1 Nov 2026: and his own diary — his working week, his calendar, moving
    and cancelling his own sessions — plus the reports on his package files */
-const CONSULTANT_PANELS = ["home","bookings","composer","subscribers","tasks","meetings","ideas","notify","reports"];
+const CONSULTANT_PANELS = ["home","bookings","composer","subscribers","tasks","meetings","ideas","notify","reports","inreports"];
 /* أشواق — customer service: the diary like نورة, the client list, and the
    team's shared board. No leads, no vouchers tab, no events, no targets — and
    no money anywhere, which the server enforces by never sending it. */
-const SERVICE_PANELS = ["home","sales","addsale","salesteam","clients","bookings","tasks","meetings","ideas","notify"];
+const SERVICE_PANELS = ["home","sales","addsale","salesteam","clients","bookings","tasks","meetings","ideas","notify","inreports"];
 /* عبدالرحمن — the reach sales has, minus the diary and every price */
-const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify"];
+const MARKETING_PANELS = ["home","clients","events","subscribers","courses","composer","feedback","bookrate","tasks","meetings","ideas","notify","inreports"];
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
@@ -5497,7 +5529,7 @@ const PANELS = [
   { id:"events",      group:"events", icon:"🎟️", family:"meet", allowed:()=>gated("events") },
   { id:"live",        group:"events", icon:"🔴", family:"meet", allowed:()=>true },
   { id:"courses",     group:"events", icon:"🎓", allowed:()=>gated("courses") },
-  { id:"composer",    group:"comms",  icon:"📣", allowed:()=>true },
+  { id:"composer",    group:"comms",  icon:"📣", allowed:()=>true, load:()=>{ const b=$("#cmpCheck"); if(b) b.hidden=!(DATA&&DATA.role==="all"); } },
   { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
   /* everyone with a login gets this one: the point of it is deciding what
      reaches your own phone */
@@ -5521,11 +5553,15 @@ const PANELS = [
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
-  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
+  { id:"reports",     group:"team",   icon:"📄", family:"rep", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
     count:()=>((RD&&RD.rows)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
+  { id:"inreports",   group:"team",   icon:"📊", family:"rep", allowed:()=>true, load:()=>{ loadInReports(); },
+    count:()=>((IR&&IR.due)||[]).filter(x=>x.mine&&!x.done).length },
 ];
 let ST=null, FU=null, BS=null, RF=null;
-const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
+let IR=null, IRF="all", IROPEN=null;
+const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات",
+  reports:"تقارير الجلسات", inreports:"التقارير الداخلية" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
 /* a tapped notification opens the dashboard at …#salesteam, #tasks … — start
@@ -7399,7 +7435,32 @@ function renderBkList(){
     : all.filter(x=>x.status==="cancelled");
   const box=$("#bkList");
   if(!rows.length){ box.innerHTML='<div class="empty">ما في مواعيد بهذي القائمة.</div>'; return; }
-  box.innerHTML=rows.map(b=>{
+  /* السابقة grows every day, so it is grouped by month like كل العملاء —
+     the latest month open, the rest drawn only when opened (5 Nov 2026) */
+  if(BKFILTER==="past"){
+    const AMN=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    const mk=ms=>{ if(!ms) return "0000-00"; const k=new Date(Number(ms)+3*3600e3); return k.getUTCFullYear()+"-"+String(k.getUTCMonth()+1).padStart(2,"0"); };
+    const groups={}; rows.forEach(b=>{ const k=mk(b.startMs); (groups[k]=groups[k]||[]).push(b); });
+    const keys=Object.keys(groups).sort().reverse();
+    if(!BKOPEN) BKOPEN=new Set([keys[0]]);
+    box.innerHTML=keys.map(k=>{
+      const list=groups[k].slice().sort((a,b)=>(b.startMs||0)-(a.startMs||0)), open=BKOPEN.has(k);
+      const title=k==="0000-00"?"بدون تاريخ":AMN[Number(k.slice(5,7))-1]+" "+k.slice(0,4);
+      return `<details class="clmonth" data-bkm="${k}"${open?" open":""}><summary><b>${esc(title)}</b> <span class="pfrule">· ${fmt(list.length)} موعد</span></summary>
+        ${open?list.map(bkCard).join(""):""}</details>`;
+    }).join("");
+    return;
+  }
+  box.innerHTML=rows.map(bkCard).join("");
+}
+let BKOPEN=null;
+document.addEventListener("toggle", e=>{
+  const d=e.target; if(!d||!d.dataset||!d.dataset.bkm) return;
+  const k=d.dataset.bkm; if(!BKOPEN) BKOPEN=new Set();
+  if(d.open){ if(!BKOPEN.has(k)){ BKOPEN.add(k); renderBkList(); } } else BKOPEN.delete(k);
+}, true);
+function bkCard(b){
+    const now=Date.now();
     const upcoming=b.status!=="cancelled"&&b.startMs>=now;
     const cls=b.status==="cancelled"?"cx":(upcoming?"soon":"gone");
     const wa=String(b.phone||"").replace(/\D/g,"");
@@ -7447,7 +7508,6 @@ function renderBkList(){
         ${mayEdit()?`<button class="no" data-cx="${esc(b.id)}">ألغِ الموعد</button>`:""}
       </div>`:""}
     </div>`;
-  }).join("");
 }
 
 /* القسائم: every voucher, the ones still to use on top. A used one says
@@ -8582,9 +8642,98 @@ $("#cmpSend") && $("#cmpSend").addEventListener("click", async ()=>{
     const d=(r&&r.data)||{};
     /* a draft that has gone out is not a draft any more */
     if(CMPDRAFT){ try{ await deleteCampaignDraft({ id:CMPDRAFT }); }catch(e){} CMPDRAFT=""; await cmpLoadDrafts(); }
-    cStat("ok","تم الإرسال ✓ — "+(d.sent||0)+" مستلم"+(d.failed?" (تعذّر إرسال "+d.failed+")":"")+(d.queued?" · و"+d.queued+" بالانتظار، ينرسلون باچر الساعة ١٠ الصبح تلقائياً (حد جوجل اليومي)":"")+(d.skippedUnsub?" · "+d.skippedUnsub+" ما انرسل لهم لأنهم ألغوا اشتراكهم":""));
+    const probs=d.problems||[];
+    cStat(d.sent?"ok":"err",(d.sent?"تم الإرسال ✓ — ":"ما انرسل شي للحين — ")+(d.sent||0)+" مستلم"+(d.failed?" (و"+d.failed+" رجّعت خطأ — شيك «المرسل» بالإيميل قبل ما تعيد، يمكن وصلت)":"")+(d.queued?" · و"+d.queued+" بالانتظار، ينرسلون باچر الساعة ١٠ الصبح تلقائياً":"")+(d.alreadyQueued?" · "+d.alreadyQueued+" كانوا بالانتظار من قبل لنفس الرسالة، ما تكررت لهم":"")+(d.skippedUnsub?" · "+d.skippedUnsub+" ما انرسل لهم لأنهم ألغوا اشتراكهم":""));
+    cmpProblems(probs);
   }catch(e){ cStat("err",(e&&e.message)||"صار خطأ، حاول مرة ثانية"); }
   finally{ $("#cmpSend").disabled=false; }
+});
+
+/* ================= التقارير الداخلية (5 Nov 2026) ================= */
+const listInternalReports=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listInternalReports");
+const addInternalReport=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addInternalReport");
+const openInternalReport=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"openInternalReport");
+const removeInternalReport=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"removeInternalReport");
+function irMsg(t,ok){ const m=$("#irMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
+async function loadInReports(){
+  try{ IR=(await listInternalReports({})).data||null; renderInReports(); }
+  catch(e){ const b=$("#irList"); if(b) b.innerHTML=`<div class="muted" style="padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+}
+function renderInReports(){
+  if(!IR || !$("#irList")) return;
+  const k=$("#irKind"); if(k && !k.dataset.set){ k.value=IR.myKind||"other"; k.dataset.set="1"; }
+  $("#irDue").innerHTML=(IR.due||[]).map(x=>`<span class="rpchip" style="background:${x.done?"#2F8789":"#A87A2A"};margin:0 0 6px 6px;display:inline-block">${x.done?"✓":"⏳"} ${esc(x.name)} · ${esc(x.label)} · أسبوع <bdi>${esc(IR.week)}</bdi>${x.done?"":" — ما انرفع للحين"}</span>`).join("");
+  const kinds=IR.kinds||{}, all=IR.rows||[];
+  $("#irFlt").innerHTML=[["all","الكل"],["mine","تقاريري"]].concat(Object.keys(kinds).map(k=>[k,kinds[k]]))
+    .map(([v,l])=>`<button data-irf="${esc(v)}"${v===IRF?' class="on"':''}>${esc(l)} · ${fmt(v==="all"?all.length:v==="mine"?all.filter(r=>r.canRemove&&r.by===((auth.currentUser&&auth.currentUser.email)||"").toLowerCase()).length:all.filter(r=>r.kind===v).length)}</button>`).join("");
+  const me=((auth.currentUser&&auth.currentUser.email)||"").toLowerCase();
+  const rows=all.filter(r=>IRF==="all"||(IRF==="mine"?r.by===me:r.kind===IRF));
+  if(!rows.length){ $("#irList").innerHTML='<div class="muted" style="padding:10px">ما في تقارير بهالقائمة للحين.</div>'; return; }
+  const groups={}; rows.forEach(r=>{ (groups[r.week||"—"]=groups[r.week||"—"]||[]).push(r); });
+  const keys=Object.keys(groups).sort().reverse();
+  if(!IROPEN) IROPEN=new Set([keys[0]]);
+  $("#irList").innerHTML=keys.map(w=>{
+    const open=IROPEN.has(w);
+    return `<details class="clmonth" data-irw="${esc(w)}"${open?" open":""}><summary><b>أسبوع السبت <bdi>${esc(w)}</bdi></b> <span class="pfrule">· ${fmt(groups[w].length)} تقرير</span></summary>
+      ${open?groups[w].map(r=>`<div class="rpbox" style="margin-top:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <b>${esc(r.title)}</b><span class="rpchip" style="background:${r.kind==="sales"?"#614588":r.kind==="service"?"#2F8789":"#6B6577"}">${esc(r.kindName||"")}</span>
+          <span class="rpmeta">${esc(r.byName)} · ${esc(dt(r.ms))}</span>
+          ${r.canRemove?`<button class="rpup" data-irdel="${esc(r.id)}" style="margin-inline-start:auto">شيله</button>`:""}
+        </div>
+        ${r.text?`<div style="white-space:pre-wrap;line-height:1.8;margin-top:8px;font-size:14px">${esc(r.text)}</div>`:""}
+        ${(r.files||[]).length?`<div class="bkacts" style="margin-top:8px">${r.files.map(f=>`<button data-iropen="${esc(r.id)}" data-iri="${f.i}">📎 ${esc(f.name)}</button>`).join("")}</div>`:""}
+      </div>`).join(""):""}</details>`;
+  }).join("");
+}
+document.addEventListener("toggle", e=>{
+  const d=e.target; if(!d||!d.dataset||!d.dataset.irw) return;
+  if(!IROPEN) IROPEN=new Set();
+  if(d.open){ if(!IROPEN.has(d.dataset.irw)){ IROPEN.add(d.dataset.irw); renderInReports(); } } else IROPEN.delete(d.dataset.irw);
+}, true);
+$("#irFlt") && $("#irFlt").addEventListener("click", e=>{ const b=e.target.closest("button[data-irf]"); if(!b) return; IRF=b.dataset.irf; renderInReports(); });
+$("#irList") && $("#irList").addEventListener("click", async e=>{
+  const o=e.target.closest("button[data-iropen]");
+  if(o){ await ccOpenFile(openInternalReport, { id:o.dataset.iropen, i:Number(o.dataset.iri)||0 }, o); return; }
+  const x=e.target.closest("button[data-irdel]"); if(!x) return;
+  if(!confirm("تشيل هالتقرير من القائمة؟ الملف ما ينحذف.")) return;
+  x.disabled=true;
+  try{ await removeInternalReport({ id:x.dataset.irdel }); await loadInReports(); irMsg("انشال من القائمة",true); }
+  catch(err){ irMsg((err&&err.message)||"تعذّر",false); x.disabled=false; }
+});
+$("#irSend") && $("#irSend").addEventListener("click", async ()=>{
+  const b=$("#irSend"), text=($("#irText").value||"").trim(), picked=Array.from(($("#irFiles").files)||[]);
+  if(!picked.length && text.length<10) return irMsg("ارفع ملف التقرير أو اكتبه",false);
+  if(picked.length>4) return irMsg("لين ٤ ملفات بس",false);
+  b.disabled=true; const t0=b.textContent;
+  try{
+    const files=[];
+    for(let i=0;i<picked.length;i++){ b.textContent=`يرفع ${i+1}/${picked.length}…`; files.push(await ccUpload(picked[i], p=>{ b.textContent=`يرفع ${i+1}/${picked.length} · ${p}%`; })); }
+    b.textContent="يحفظ…";
+    const r=(await addInternalReport({ title:$("#irTitle").value||"", kind:$("#irKind").value, week:$("#irWeek").value||"", text, files })).data||{};
+    $("#irTitle").value=""; $("#irText").value=""; $("#irFiles").value=""; $("#irWeek").value="";
+    IROPEN=null; await loadInReports(); irMsg("انرفع التقرير ✅ أسبوع "+(r.week||""),true);
+  }catch(err){ irMsg((err&&err.message)||"تعذّر الرفع",false); }
+  finally{ b.disabled=false; b.textContent=t0; }
+});
+
+/* which mailbox Google refused, and what it said (5 Nov 2026) */
+function cmpProblems(probs){
+  const box=$("#cmpProblems"); if(!box) return;
+  box.innerHTML=(probs||[]).map(p=>`<div class="cmp-status err" style="display:block;margin-top:6px">
+    📮 <b dir="ltr">${esc(p.user)}</b> — ${p.login===false?"جوجل رفض الدخول (كلمة مرور التطبيق غلط أو انلغت). ما انحسب عليه شي، والمستلمين تحوّلوا للصندوق الثاني أو لباچر.":fmt(p.failed||0)+" رسالة رجّعت خطأ منه. ما تنعاد تلقائياً عشان محد توصله مرتين — شيك «المرسل» بالإيميل."}
+    <div dir="ltr" style="font-size:11.5px;opacity:.8;margin-top:4px;text-align:left">${esc(p.error||"")}</div></div>`).join("");
+}
+const checkCampaignSenders=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"checkCampaignSenders");
+$("#cmpCheck") && $("#cmpCheck").addEventListener("click", async ()=>{
+  const b=$("#cmpCheck"), box=$("#cmpSenders"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+  try{
+    const d=(await checkCampaignSenders({})).data||{};
+    box.innerHTML=`<div class="cmp-hint" style="margin-top:8px;line-height:2">`+(d.senders||[]).map(x=>
+      `${x.ok?"✅":"⛔"} <b dir="ltr">${esc(x.user)}</b>${x.main?" (صندوق الكتب)":""} — ${x.ok?"يدخل عادي · باقي له اليوم "+fmt(x.left)+" من "+fmt(x.cap):"جوجل رافض الدخول: "+`<span dir="ltr">${esc(x.error)}</span>`}`).join("<br>")+
+      (d.waiting?`<br>⏳ ${fmt(d.waiting)} مستلم بالانتظار لباچر الساعة ١٠ الصبح`:"")+`</div>`;
+  }catch(e){ box.innerHTML=`<div class="cmp-status err" style="display:block">${esc((e&&e.message)||"تعذّر الفحص")}</div>`; }
+  finally{ b.disabled=false; b.textContent=t0; }
 });
 
 /* the last entry is what leads recorded before صغير and متوسط were split;
@@ -8784,6 +8933,9 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
         <div class="cmp-hint">الحد الأقصى حوالي 7 ميجابايت لكل الملفات.</div>
       </div>
       <div class="cmp-status" id="cmpStatus"></div>
+      <div id="cmpProblems"></div>
+      <button class="report-btn" id="cmpCheck" type="button" hidden style="background:none;border:1.5px solid var(--line);color:var(--ink)">📮 افحص صناديق الإرسال</button>
+      <div id="cmpSenders"></div>
       <button class="report-btn" id="cmpSaveDraft" style="background:none;border:1.5px solid var(--line);color:var(--ink)">احفظ كمسودة</button>
       <button class="report-btn cmp-send" id="cmpSend">إرسال الرسالة</button>
     </div>
