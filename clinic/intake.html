@@ -80,7 +80,7 @@
   <form id="iqForm" hidden novalidate>
     <div class="iq-hero">
       <h1>📋 أسئلة ما قبل الجلسة</h1>
-      <p>عشان غالية تعرف وضعك قبل ما تلتقون، فالجلسة تبدأ من الحل مو من التعارف. ما تاخذ منك إلا دقايق، وكل اللي تكتبه سري ويوصل لمستشارتك بس.</p>
+      <p>عشان مستشارك يعرف وضعك قبل ما تلتقون، فالجلسة تبدأ من الحل مو من التعارف. ما تاخذ منك إلا دقايق، وكل اللي تكتبه سري ويوصل لمستشارك بس.</p>
       <div class="who" id="iqWho"></div>
     </div>
     <div class="iq-note" id="iqAgain" hidden>عبّيتها قبل ✓ — تقدر تعدّل أي شي وترسلها مرة ثانية.</div>
@@ -136,12 +136,12 @@
       <div class="iq-hint">بعد الالتزامات الثابتة — للأكل والبنزين والمشاوير وكل شي يومي.</div>
     </div>
 
-    <button class="iq-btn" id="iqGo" type="submit">أرسل لغالية</button>
+    <button class="iq-btn" id="iqGo" type="submit">أرسل</button>
     <div class="iq-msg" id="iqMsg"></div>
   </form>
 
   <div id="iqThanks" class="iq-card iq-done" hidden><div class="big">✅</div><h2>وصلت إجاباتك</h2>
-    <p id="iqThanksMsg">شكراً لك. غالية بتطّلع عليها قبل جلستك، ونشوفك بالموعد.</p>
+    <p id="iqThanksMsg">شكراً لك. مستشارك بيطّلع عليها قبل جلستك، ونشوفك بالموعد.</p>
     <a href="./">افتح عيادتي</a></div>
 </main>
 
@@ -245,10 +245,10 @@ $("#iqForm").addEventListener("submit",async e=>{
   try{
     const r=(await submitIntake({ o:O, k:K, answers:A })).data||{};
     $("#iqForm").hidden=true; $("#iqThanks").hidden=false;
-    if(r.updated) $("#iqThanksMsg").textContent="انحفظ التعديل ✓ وغالية بتشوف آخر نسخة قبل جلستك.";
+    if(r.updated) $("#iqThanksMsg").textContent="انحفظ التعديل ✓ ومستشارك بيشوف آخر نسخة قبل جلستك.";
     window.scrollTo({ top:0, behavior:"smooth" });
   }catch(err){ msg((err&&err.message)||"ما قدرنا نرسلها — حاول مرة ثانية"); }
-  finally{ b.disabled=false; b.textContent="أرسل لغالية"; }
+  finally{ b.disabled=false; b.textContent="أرسل"; }
 });
 </script>
 </body>

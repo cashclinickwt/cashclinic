@@ -779,8 +779,8 @@
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
     <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
     <button data-tab="careers">التوظيف</button>
-    <button data-tab="reports" data-family="rep">التقارير</button>
-    <button data-tab="inreports" data-child="rep" hidden>التقارير الداخلية</button>
+    <button data-tab="reports">التقارير</button>
+    <button data-tab="inreports">التقارير الداخلية</button>
   </nav>
   <div class="shellbody">
 
@@ -1143,7 +1143,6 @@
   </div>
 
   <div class="sec" id="reportsSec" data-panel="reports" hidden>
-    <div class="subtabs" data-fam="rep"></div>
     <h2><span></span> أنظمة التقارير</h2>
     <div class="report-links">
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
@@ -1176,7 +1175,6 @@
 
   <!-- ===== التقارير الداخلية (5 Nov 2026) — the team's weekly reports ===== -->
   <div class="sec" id="inrepSec" data-panel="inreports">
-    <div class="subtabs" data-fam="rep"></div>
     <h2><span></span> التقارير الداخلية</h2>
     <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل سبت يوصل تذكير لنورة (المبيعات) وأشواق (خدمة العملاء) يرفعون تقرير الأسبوع. الفريق كله يشوف التقارير هني. التقرير ملف، أو مكتوب، أو الاثنين.</p>
     <div id="irDue"></div>
@@ -5553,15 +5551,14 @@ const PANELS = [
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
-  { id:"reports",     group:"team",   icon:"📄", family:"rep", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
+  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
     count:()=>((RD&&RD.rows)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
-  { id:"inreports",   group:"team",   icon:"📊", family:"rep", allowed:()=>true, load:()=>{ loadInReports(); },
+  { id:"inreports",   group:"team",   icon:"📊", allowed:()=>true, load:()=>{ loadInReports(); },
     count:()=>((IR&&IR.due)||[]).filter(x=>x.mine&&!x.done).length },
 ];
 let ST=null, FU=null, BS=null, RF=null;
 let IR=null, IRF="all", IROPEN=null;
-const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات",
-  reports:"تقارير الجلسات", inreports:"التقارير الداخلية" };
+const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
 /* a tapped notification opens the dashboard at …#salesteam, #tasks … — start
