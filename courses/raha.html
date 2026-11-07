@@ -164,10 +164,15 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const CC_CFG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
   projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
   messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
-const replay = httpsCallable(getFunctions(initializeApp(CC_CFG.firebase), CC_CFG.functionsRegion), "getRahaReplay");
+const ccApp = initializeApp(CC_CFG.firebase);
+const replay = httpsCallable(getFunctions(ccApp, CC_CFG.functionsRegion), "getRahaReplay");
+/* signed in to عيادتي on this site? then the replays open with that account,
+   no email to type (and the team's own accounts open here — 7 Nov 2026) */
+const ccAuth = getAuth(ccApp);
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -225,7 +230,12 @@ $("#out").addEventListener("click", () => {
   $("#frame").innerHTML = ""; $("#watch").hidden = true; $("#gate").hidden = false; $("#em").value = ""; $("#em").focus();
 });
 
-try{ const saved = localStorage.getItem(KEY); if(saved){ $("#em").value = saved; check(saved, true); } }catch(_){}
+let tried = false;
+onAuthStateChanged(ccAuth, (u) => {
+  if (tried) return; tried = true;
+  if (u && u.emailVerified && u.email) { $("#em").value = u.email.toLowerCase(); check(u.email.toLowerCase(), true); return; }
+  try{ const saved = localStorage.getItem(KEY); if(saved){ $("#em").value = saved; check(saved, true); } }catch(_){}
+});
 </script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/hit.js" defer></script>

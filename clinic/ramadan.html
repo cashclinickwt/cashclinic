@@ -873,6 +873,7 @@ document.addEventListener("click",async (e)=>{
 function subLine(a){
   let el=q("#ccSub");
   if(!el){ el=document.createElement("div"); el.id="ccSub"; const m=document.querySelector("main.wrap"); m.insertBefore(el,m.firstChild); }
+  if(a.staff){ el.className=""; el.innerHTML=`<a href="./${AS?"?as="+encodeURIComponent(AS):""}">→ عيادتي</a><span>مفتوحة لفريق كاش كلينك بدون اشتراك</span>`; return; }
   const soon=a.open!==false && a.daysLeft<=5, gone=a.open===false;
   const days=n=>n===1?"يوم واحد":n===2?"يومين":(n>=3&&n<=10)?n+" أيام":n+" يوم";
   el.className=(soon||gone)?"soon":"";

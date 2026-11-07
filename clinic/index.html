@@ -315,7 +315,7 @@ function appCard(a){
   a=a||{};
   const link="app.html"+(AS?"?as="+encodeURIComponent(AS):"");
   if(a.open) return `<div class="ck-item"><div class="t">📊 متابعة كاش <span class="ck-tag up">مفتوحة</span></div>
-      <div class="m">نظامك المالي الشخصي ضمن ${esc(a.pkgName)}: ميزانيتك وديونك وتدفقك النقدي${a.pkg==="wafra"?"، وأهدافك وأصولك واستثمارك":""} — وتتابع تقدمك شهر بشهر. كل شي ينحفظ لحاله.</div>
+      <div class="m">${a.staff?"مفتوحة لفريق كاش كلينك بكل صفحاتها: ":"نظامك المالي الشخصي ضمن "+esc(a.pkgName)+": "}ميزانيتك وديونك وتدفقك النقدي${a.pkg==="wafra"?"، وأهدافك وأصولك واستثمارك":""} — وتتابع تقدمك شهر بشهر. كل شي ينحفظ لحاله.</div>
       <a class="ck-btn" href="${link}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">افتح متابعة كاش</a></div>`;
   if(a.reason==="before") return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش <span class="ck-soon">بعد جلستك الأولى</span></div>
       <div class="m">جزء من ${esc(a.pkgName)} — تنفتح لك بعد ما تخلص جلستك الأولى${a.nextMs?` (${esc(new Date(a.nextMs).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"}))})`:""}، عشان نبنيها سوا على أرقامك.</div></div>`;
@@ -330,6 +330,8 @@ function planCard(t){
   const qs=AS?"?as="+encodeURIComponent(AS):"";
   const day=ms=>{ try{ return new Date(ms).toLocaleDateString("ar-KW-u-nu-latn",{day:"numeric",month:"long"}); }catch(e){ return ""; } };
   const btn=(href,txt)=>`<a class="ck-btn" href="${href}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">${txt}</a>`;
+  if(t.staff) return `<div class="ck-item"><div class="t">🌙 خطة ضغوطات رمضان <span class="ck-tag up">مفتوحة</span></div>
+      <div class="m">مفتوحة لفريق كاش كلينك بدون اشتراك.</div>${btn("ramadan.html"+qs,"افتح الخطة")}</div>`;
   if(t.open) return `<div class="ck-item"><div class="t">🌙 خطة ضغوطات رمضان <span class="ck-tag up">مفتوحة</span></div>
       <div class="m">مناسباتك وأهدافك وكم تحط من كل راتب لين رمضان والعيد — تنحفظ بحسابك. الاشتراك لين ${esc(day(t.until))}${t.daysLeft<=5?` · باقي ${t.daysLeft===2?"يومين":t.daysLeft+" "+(t.daysLeft===1?"يوم":"أيام")}`:""}.</div>
       ${btn("ramadan.html"+qs,"افتح الخطة")}</div>`;
@@ -341,7 +343,7 @@ function muassisCard(t){
   if(!t) return "";
   const link="muassis.html"+(AS?"?as="+encodeURIComponent(AS):"");
   if(t.open) return `<div class="ck-item"><div class="t">🌱 تأسيس المشروع <span class="ck-tag up">مفتوحة</span></div>
-      <div class="m">ضمن ${esc(t.pkgName||"باقة المؤسس")}: تحط أفكارك، تقيّمها، وتستقر على فكرة — وبعدها رؤيتك ورسالتك وأهدافك ونموذج العمل والأرقام وخطة السنة. كل شي ينحفظ بحسابك.</div>
+      <div class="m">${t.staff?"مفتوحة لفريق كاش كلينك":"ضمن "+esc(t.pkgName||"باقة المؤسس")}: تحط أفكارك، تقيّمها، وتستقر على فكرة — وبعدها رؤيتك ورسالتك وأهدافك ونموذج العمل والأرقام وخطة السنة. كل شي ينحفظ بحسابك.</div>
       <a class="ck-btn" href="${link}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">افتح تأسيس المشروع</a></div>`;
   return "";
 }
@@ -363,7 +365,9 @@ function render(D){
           :`<a class="ck-report" href="${esc(c.intake.url)}" style="display:inline-block;text-decoration:none;background:#FFF6E3;border-color:#D3A146">📋 عبّ أسئلة ما قبل الجلسة</a>`):"")}</div>`,
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
-  h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}</div><div class="m">اشتريته ${esc(d8(b.when))} · وصلك على إيميلك</div></div>`,
+  h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}${b.staff?'<span class="ck-tag up">مفتوح للفريق</span>':""}</div>
+      <div class="m">${b.staff?"مفتوح لفريق كاش كلينك":`اشتريته ${esc(d8(b.when))} · وصلك على إيميلك`}</div>
+      ${b.file&&D.staff&&!AS?`<button class="ck-report" data-book="${esc(b.key)}">📖 افتح الكتيّب</button>`:""}</div>`,
     'ما اشتريت كتيّبات للحين. <a href="../books/index.html">شوف الكتيّبات ←</a>');
   h+=sec("اختباراتي", D.quizzes, q=>`<div class="ck-item"><div class="t">${esc(q.what)}${q.band?` — <span style="color:var(--cc-burgundy,#962E37)">${esc(q.band)}</span>`:""}</div>
       <div class="m">${esc(d8(q.when))}</div>${q.diagnosis?`<details><summary class="m" style="cursor:pointer">اعرض نتيجتك</summary><div class="ck-diag">${esc(q.diagnosis)}</div></details>`:""}</div>`,
@@ -372,7 +376,7 @@ function render(D){
       <div class="m">${esc(e.date)}${e.time?` · ${esc(e.time)}`:""}${e.place?` · ${esc(e.place)}`:""}</div>
       ${e.join?`<div class="m"><a href="${esc(e.join)}">ادخل اللقاء ←</a></div>`:""}</div>`,
     'ما سجّلت بلقاء للحين. <a href="../courses/index.html">شوف اللقاءات ←</a>');
-  h+=sec("ورشي", D.courses, c=>`<div class="ck-item"><div class="t">${esc(c.what)}</div>
+  h+=sec("ورشي", D.courses, c=>`<div class="ck-item"><div class="t">${esc(c.what)}${c.staff?'<span class="ck-tag up">مفتوحة للفريق</span>':""}</div>
       <div class="m">${esc(c.mode)}${(c.dates||[]).length?` · ${esc(c.dates.join("، "))}`:""}</div>
       ${c.replay?`<div class="m"><a href="${esc(c.replay)}">شاهد التسجيلات ←</a></div>`:""}</div>`,
     'ما عندك ورش للحين. <a href="../courses/index.html">شوف اللقاءات والورش ←</a>');
@@ -409,6 +413,19 @@ document.addEventListener("click", async (e)=>{
     if(!d.url) throw new Error("ما قدرنا نفتح التقرير");
     window.open(d.url, "_blank", "noopener");
   }catch(err){ alert((err&&err.message)||"ما قدرنا نفتح التقرير — كلّمنا واتساب"); }
+  finally{ b.disabled=false; b.textContent=was; }
+});
+
+/* the team's own clinic: a book's PDF straight from here (7 Nov 2026) */
+const getMyBookFile=httpsCallable(fns,"getMyBookFile");
+document.addEventListener("click", async (e)=>{
+  const b=e.target.closest("button[data-book]"); if(!b) return;
+  const was=b.textContent; b.disabled=true; b.textContent="جاري الفتح…";
+  try{
+    const d=(await getMyBookFile({ key:b.dataset.book })).data||{};
+    if(!d.url) throw new Error("ما قدرنا نفتح الكتيّب");
+    window.open(d.url, "_blank", "noopener");
+  }catch(err){ alert((err&&err.message)||"ما قدرنا نفتح الكتيّب"); }
   finally{ b.disabled=false; b.textContent=was; }
 });
 
