@@ -345,7 +345,7 @@ try{
   if(d.amount) $("#cTotal").textContent=d.amount+" د.ك";
   if(d.seatsLeft!=null){
     if(d.seatsLeft<=0) markFull();
-    else $("#dwSeats").textContent="باقي "+d.seatsLeft+" من 15";
+    /* how many are left is not shown to the client (8 Nov 2026) — only «اكتملت» once it is full */
   }
 }catch(e){ /* the printed 15 د.ك stands */ }
 
