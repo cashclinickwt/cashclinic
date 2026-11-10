@@ -551,6 +551,10 @@ h3 small.at{font-size:.66rem}
 .eqmini>div{background:#f4f1f8}.eqmini>div.res{background:#fce5ea}
 .callout{background:#f4f1f8}.callout.good{background:#e3f2f0}.callout.bad{background:#fce5ea}
 .allow2,.a3>div,.ixf>div{background:#f4f1f8}
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.note{background:var(--sunk);border-radius:16px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.note h3{margin:0;font-size:1rem;color:var(--strong)}.note p{margin:0;line-height:1.9;color:var(--fg);white-space:normal}
+.note .pill{justify-self:start}.nfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
 </style>
 
 <style>
@@ -649,13 +653,13 @@ const LOCKED=['charts','analysis','ai','scan','decSugg','ics','score'];
 const LS='cc-wafra-'+EDITION+'-v1';
 
 const blank=()=>({v:1,profile:{name:'',start:CUR,months:24,countWear:false,usd:0.307,setup:false,minLiving:0},
-  incomes:[],budget:[],goals:[],contrib:[],months:{},assets:[],gold:[],gold24:0,stocks:[],debts:[],snaps:{},coach:null,demo:false,rules:[],reminders:[],sub:null,trialStart:null,reviews:{},matrix:[],baseline:null});
+  incomes:[],budget:[],goals:[],contrib:[],months:{},assets:[],gold:[],gold24:0,stocks:[],debts:[],snaps:{},coach:null,demo:false,rules:[],reminders:[],sub:null,trialStart:null,reviews:{},matrix:[],baseline:null,notes:[]});
 function merge(o){const b=blank();o=o||{};const r=Object.assign(b,o);r.profile=Object.assign(blank().profile,o.profile||{});
-  ['incomes','budget','goals','contrib','assets','gold','stocks','debts','rules','reminders','matrix'].forEach(k=>{if(!Array.isArray(r[k]))r[k]=[]});
+  ['incomes','budget','goals','contrib','assets','gold','stocks','debts','rules','reminders','matrix','notes'].forEach(k=>{if(!Array.isArray(r[k]))r[k]=[]});
   if(!r.months||typeof r.months!=='object')r.months={}; if(!r.snaps||typeof r.snaps!=='object')r.snaps={}; if(!r.reviews||typeof r.reviews!=='object')r.reviews={}; return r}
 
 let S=blank();
-let wizEdit=false, pendingEdit=null;
+let wizEdit=false, pendingEdit=null, noteEdit=null, noteFilter='';
 let view='home', month=CUR, wizStep=0, confirmKey=null, toastT=null, coachBusy=false, coachCtl=null;
 let partOpen=null, scan=null, imgOK=false, planBusy=false, aiSugg=null;
 let mode='loading', docRef=null, saveT=null;
@@ -932,7 +936,7 @@ function statusPill(){
 }
 function toast(t){clearTimeout(toastT);let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;toastT=setTimeout(()=>el.remove(),2600)}
 
-const TABS=[['home','الرئيسية'],['base','المدخلات الأساسية'],['month','الشهر'],['goals','الأهداف'],['wealth','إدارة الأصول الشخصية'],['debts','إدارة الديون الشخصية'],['insights','التحليل والنصائح'],['rules','القواعد والقرارات'],['remind','التذكيرات'],['plan','اشتراكي']];
+const TABS=[['home','الرئيسية'],['base','المدخلات الأساسية'],['month','الشهر'],['goals','الأهداف'],['wealth','إدارة الأصول الشخصية'],['debts','إدارة الديون الشخصية'],['insights','التحليل والنصائح'],['rules','القواعد والقرارات'],['notes','نوتة كاش'],['remind','التذكيرات'],['plan','اشتراكي']];
 const tabsNow=()=>TABS.filter(([k])=>k!=='plan'&&!(k==='wealth'&&isAsas()));
 const TSHORT={base:'المدخلات',wealth:'الأصول',debts:'الديون',insights:'التحليل',rules:'القواعد',remind:'التذكيرات'};
 const TICON={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
@@ -944,6 +948,7 @@ const TICON={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1
  insights:'<path d="M4 20V11M10 20V5M16 20v-6M2 20h20"/>',
  rules:'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/>',
  remind:'<path d="M6 9a6 6 0 0 1 12 0c0 6 3 8 3 8H3s3-2 3-8"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+ notes:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/>',
  plan:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>'};
 function readHash(){const h=(location.hash||'').slice(1);if(tabsNow().some(t=>t[0]===h))view=h}
 /* الأساس: what belongs to باقة الوفرة shows as a door to it, not as an error */
@@ -959,7 +964,7 @@ function render(){
   if(mode==='loading'&&!hasContent(S))body=`<div class="loading">${svgMark()}<span>نجهز مساحتك الخاصة…</span></div>`;
   else if(showWiz)body=vWizard();
   else body=(isOwner?`<div class="banner" style="background:var(--ice);color:var(--strong)"><span>${previewLock?'تشوفين الحين الدفتر مثل ما يشوفه عميل اشتراكه منتهي.':'انتي صاحبة الدفتر، فكل شي مفتوح لج.'}</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn line" data-act="preview-lock">${previewLock?'رجّعي كل شي مفتوح':'شوفي الدفتر وهو مقفول'}</button>${S.demo?'':'<button class="btn line" data-act="demo">شوفي الخطة التجريبية</button>'}</span></div>`:'')+(S.demo?`<div class="banner"><span>${hasBak()?'هذي الخطة التجريبية. بياناتك محفوظة وترجع لها بضغطة.':'هذي بيانات تجريبية للعرض. امسحها وابدأ ببياناتك.'}</span><button class="btn line" data-act="clear-demo">${hasBak()?'رجعني لبياناتي':'ابدأ ببياناتي'}</button></div>`:'')+
-    ({home:vHome,base:vBase,month:vMonth,goals:vGoals,wealth:isAsas()?(()=>pkgLock('إدارة الأصول الشخصية','أصولك وذهبك وأسهمك وصافي ثروتك ومؤشر الاستثمار.')):vWealth,debts:vDebts,insights:vInsights,rules:vRules,remind:vRemind}[view]||vHome)();
+    ({home:vHome,base:vBase,month:vMonth,goals:vGoals,notes:vNotes,wealth:isAsas()?(()=>pkgLock('إدارة الأصول الشخصية','أصولك وذهبك وأسهمك وصافي ثروتك ومؤشر الاستثمار.')):vWealth,debts:vDebts,insights:vInsights,rules:vRules,remind:vRemind}[view]||vHome)();
   app.innerHTML=`<header class="topbar"><div class="in"><div class="brandrow"><div class="brand">${svgLock()}<i></i><b>متابعة كاش</b></div><div style="display:flex;gap:6px;flex-wrap:wrap">${mode==='loading'?'':subPill()}${statusPill()}</div></div>
   ${showWiz||(mode==='loading'&&!hasContent(S))?'<div style="height:8px"></div>':`<nav class="tabs nav2" aria-label="الأقسام">${tabsNow().map(([k,v])=>`<button data-tab="${k}" title="${v}" ${k===view?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${TICON[k]||''}</svg><span>${TSHORT[k]||v}</span>${k==='goals'&&S.profile.setup&&pendingReviews().length?'<span class="tbadge">'+pendingReviews().length+'</span>':''}</button>`).join('')}</nav>`}
   </div></header><main>${body}<footer class="foot">${svgMark()}<span>كاش كلينك · عيادة الصحة المالية</span></footer></main>${S.profile.setup&&!showWiz?`<button class="sos" data-act="sos-open" aria-label="زر الطوارئ: تبي أحد معاك؟"><span class="dot"></span><span class="lbl"><b>زر الطوارئ</b><small>تبي أحد معاك؟</small></span></button>`:''}${sos?vSos():''}`;
@@ -1910,10 +1915,27 @@ function loadDemo(){
 }
 
 /* ---------- AI coach ---------- */
+const NTAGS=['فكرة','مذكرة يومية','شعور','قرار','درس تعلمته','هدف جديد'];
+function vNotes(){const all=(S.notes||[]).slice().sort((a,b)=>N(b.at)-N(a.at)),L=noteFilter?all.filter(n=>n.tag===noteFilter):all;
+  const used=NTAGS.filter(t=>all.some(n=>n.tag===t));
+  return `<div class="panel-head"><h1 style="font-weight:200;font-size:2rem">نوتة كاش</h1></div>
+  <p class="lead">مكانك الخاص تكتب فيه مذكراتك المالية وأفكارك: موقف صار، شعور حسيت فيه وانت تصرف، فكرة مشروع، أو درس تعلمته.</p>
+  <section class="panel"><form id="f-note" style="display:grid;gap:10px">
+    ${fld('العنوان (اختياري)','<input id="nt-title" placeholder="مثال: اليوم قاومت عرض الجمعة البيضا">')}
+    <div class="fld"><label for="nt-text">اكتب اللي في بالك</label><textarea id="nt-text" rows="5" placeholder="شنو صار؟ شنو حسيت؟ شنو تبي تتذكره بعدين؟"></textarea></div>
+    <div class="fld"><label>نوعها</label><div class="chips pick" id="nt-tags">${NTAGS.map(t=>`<button type="button" class="chip" data-act="nt-tag" data-v="${t}" aria-pressed="false">${t}</button>`).join('')}</div></div>
+    <div><button class="btn teal">احفظ في النوتة</button></div></form></section>
+  ${all.length?`<section class="panel"><div class="panel-head"><h2>مذكراتي</h2><span class="small muted">${all.length} ${all.length===1?'ملاحظة':'ملاحظات'}</span></div>
+    ${used.length?`<div class="chips pick"><button type="button" class="chip" data-act="nt-filter" data-v="" aria-pressed="${!noteFilter}">الكل</button>${used.map(t=>`<button type="button" class="chip" data-act="nt-filter" data-v="${t}" aria-pressed="${noteFilter===t}">${t}</button>`).join('')}</div>`:''}
+    <div class="notes">${L.map(n=>noteEdit===n.id?`<form class="note" id="f-note-e" data-id="${n.id}" style="display:grid;gap:8px"><input id="ne-title" value="${esc(n.title||'')}" placeholder="العنوان"><textarea id="ne-text" rows="5">${esc(n.text)}</textarea><div style="display:flex;gap:8px"><button class="btn teal">حفظ</button><button type="button" class="btn line" data-act="nt-cancel">إلغاء</button></div></form>`
+      :`<article class="note">${n.tag?`<span class="pill">${esc(n.tag)}</span>`:''}${n.title?`<h3>${esc(n.title)}</h3>`:''}<p>${esc(n.text).replace(/\n/g,'<br>')}</p>
+        <div class="nfoot"><small class="at" style="display:inline">${tsTxt(n.at)}${n.ed?' · عدلت '+tsTxt(n.ed):''}</small><span><button class="x" data-act="nt-edit" data-id="${n.id}">تعديل</button> <button class="x" data-act="del-note" data-id="${n.id}">حذف</button></span></div></article>`).join('')||'<p class="empty">ما في ملاحظات بهالنوع.</p>'}</div></section>`
+  :'<div class="emptybox">نوتتك فاضية. اكتب أول ملاحظة، حتى لو سطر واحد.</div>'}`;
+}
 function coachData(){
   const w=wealth(),m=lastDataMonth(),c=m?calc(m):null;
   return{دخل_شهري_مخطط:planInc(),مصادر_الدخل:S.incomes.map(i=>({مصدر:i.name,نوع:ikLbl(i),مبلغ:N(i.amount),متغير:!!i.variable})),
-    قواعد_الاستشارة:S.rules.map(r=>r.t),مصاريف_شهرية_مخططة:planExp(),معادلة_الميزانية:(b=>({الدخل:b.inc,الثابتة:b.fx,أقل_مبلغ_للمعيشة:b.mn,المتاح_للأهداف:b.cap,الأهداف_تحتاج:Math.round(b.need)}))(budgetBase()),
+    قواعد_الاستشارة:S.rules.map(r=>r.t),آخر_ملاحظات_العميل_المالية:(S.notes||[]).slice(-5).map(n=>(n.tag?n.tag+': ':'')+(n.title?n.title+' - ':'')+n.text),مصاريف_شهرية_مخططة:planExp(),معادلة_الميزانية:(b=>({الدخل:b.inc,الثابتة:b.fx,أقل_مبلغ_للمعيشة:b.mn,المتاح_للأهداف:b.cap,الأهداف_تحتاج:Math.round(b.need)}))(budgetBase()),
     الميزانية:S.budget.map(b=>({بند:b.name,نوع:bKind(b)==='fixed'?'ثابت':'متغير',تصنيف:CATS[b.cat],مبلغ:N(b.amount)})),
     آخر_شهر:c?{الشهر:mLabel(m),دخل_فعلي:c.gotInc,صرف_فعلي:c.spent,مصاريف_متغيرة:c.extras,المتاح_للمتغيرة:c.varPlan,للأهداف:c.saved,
       تجاوزات:Object.entries(c.byCat).filter(([,v])=>v.plan&&v.act>v.plan).map(([k,v])=>CATS[k]+': '+v.act+' من '+v.plan),تأمل_العميل:md(m).note||null}:null,
@@ -1953,7 +1975,7 @@ ${q.trim()?'سؤال العميل: '+q.trim():'العميل يبي قراءة ع
 
 /* ---------- events ---------- */
 const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
-const EDIT_LBL={'edit-inc':'الدخل','del-inc':'الدخل','f-inc':'الدخل','edit-bud':'المصاريف','del-bud':'المصاريف','swap-kind':'المصاريف','bud':'المصاريف','f-min':'أقل مبلغ للمعيشة','edit-debt':'القروض','edit-debt-extra':'القروض','edit-debt-inst':'القروض','edit-debt-end':'القروض','del-debt':'القروض','f-debt':'القروض','edit-asset':'الأصول','del-asset':'الأصول','f-asset':'الأصول','f-gold':'الذهب','del-gold':'الذهب','f-gold24':'الذهب','edit-price':'الأسهم','del-stock':'الأسهم','f-stock':'الأسهم','f-usd':'الأسهم','f-goal':'الأهداف','goal':'الأهداف','del-goal':'الأهداف','f-prof':'معلوماتك'};
+const EDIT_LBL={'edit-inc':'الدخل','del-inc':'الدخل','f-inc':'الدخل','edit-bud':'المصاريف','del-bud':'المصاريف','swap-kind':'المصاريف','bud':'المصاريف','f-min':'أقل مبلغ للمعيشة','edit-debt':'القروض','edit-debt-extra':'القروض','edit-debt-inst':'القروض','edit-debt-end':'القروض','del-debt':'القروض','f-debt':'القروض','edit-asset':'الأصول','del-asset':'الأصول','f-asset':'الأصول','f-gold':'الذهب','del-gold':'الذهب','f-gold24':'الذهب','edit-price':'الأسهم','del-stock':'الأسهم','f-stock':'الأسهم','f-usd':'الأسهم','f-goal':'الأهداف','f-note':'نوتة كاش','del-note':'نوتة كاش','goal':'الأهداف','del-goal':'الأهداف','f-prof':'معلوماتك'};
 function logEdit(what){if(!S.profile.setup||!what)return;const L=S.log=S.log||{edits:[]};L.edits=L.edits||[];const now=Date.now(),last=L.edits[L.edits.length-1];
   if(last&&now-last.last<30*60e3){last.last=now;last.n++;if(!last.what.includes(what))last.what.push(what)}else L.edits.push({at:now,last:now,n:1,what:[what]});
   if(L.edits.length>300)L.edits=L.edits.slice(-300)}
@@ -1997,6 +2019,11 @@ app.addEventListener('click',e=>{
     case 'wiz-back':if(wizEdit&&wizStep<=1){wizEdit=false;view='base';render();window.scrollTo(0,0);break}wizStep=Math.max(0,wizStep-1);render();break;
     case 'inc-dec':act(()=>{S.profile.incDec=t.dataset.v||''});break;
     case 'wiz-goto':wizStep=+t.dataset.v;render();window.scrollTo(0,0);{const el=document.getElementById('in-name');if(el)el.focus()}break;
+    case 'nt-tag':{const on=t.getAttribute('aria-pressed')==='true';document.querySelectorAll('#nt-tags .chip').forEach(b=>b.setAttribute('aria-pressed','false'));t.setAttribute('aria-pressed',on?'false':'true');break}
+    case 'nt-filter':noteFilter=t.dataset.v||'';render();break;
+    case 'nt-edit':noteEdit=id;render();{const e=document.getElementById('ne-text');if(e)e.focus()}break;
+    case 'nt-cancel':noteEdit=null;render();break;
+    case 'del-note':act(()=>{S.notes=(S.notes||[]).filter(n=>n.id!==id)},'انحذفت');break;
     case 'wiz-edit':wizEdit=true;wizStep=1;render();window.scrollTo(0,0);break;
     case 'wiz-done':if(wizEdit){wizEdit=false;view='base';persist();render();window.scrollTo(0,0);toast('انحفظت تعديلاتك');break}
       S.profile.setup=true;view='home';if(TRIAL_DAYS&&S.trialStart==null)S.trialStart=todayN();S.baseline=baseSnap();S.log=S.log||{edits:[]};S.log.start=Date.now();
@@ -2070,6 +2097,7 @@ app.addEventListener('submit',e=>{
   e.preventDefault();const f=e.target;pendingEdit=EDIT_LBL[f.id]||(f.dataset.goal?'goal':null)&&'الأهداف'||(f.dataset.bud?'المصاريف':null);
   if(f.dataset.goal){const g=S.goals.find(x=>x.id===f.dataset.goal);if(!g)return;const i=g.id;
     const gm=pickedM('ge-m-'+i);act(()=>{g.name=val('ge-n-'+i)||g.name;g.target=N(val('ge-t-'+i));const d=val('ge-d-'+i);if(/^\d{4}-\d{2}$/.test(d))g.deadline=d;g.start=N(val('ge-s-'+i));const w=document.getElementById('ge-w-'+i);if(w)g.why=w.value.trim();g.method=gm;g.how=val('ge-h-'+i);g.prio=val('ge-p-'+i);g.fund=val('ge-f-'+i)},'انحفظ الهدف');return}
+  if(f.id==='f-note-e'){const n=(S.notes||[]).find(x=>x.id===f.dataset.id),tx=val('ne-text');if(!n||!tx)return;pendingEdit='نوتة كاش';noteEdit=null;act(()=>{n.title=val('ne-title');n.text=tx;n.ed=Date.now()},'انحفظ التعديل');return}
   if(f.dataset.bud){const k=f.dataset.bud,n=val('bd-name-'+k),a=N(val('bd-amt-'+k));if(!n||!a){toast('اكتب البند والمبلغ');return}act(()=>S.budget.push({id:uid(),at:Date.now(),name:n,cat:val('bd-cat-'+k),kind:k,amount:a,day:clamp(Math.round(N(val('bd-day-'+k))),0,31)}));const el=document.getElementById('bd-name-'+k);if(el)el.focus();return}
   if(f.id==='f-sos'){sosKeep();
     if(!sos.name){toast('اكتب اسمك');return}
@@ -2094,6 +2122,7 @@ app.addEventListener('submit',e=>{
       act(()=>S.reminders.push(once?{id:uid(),at:Date.now(),t:x,date:dt}:{id:uid(),at:Date.now(),t:x,day:dy}),'انضاف التذكير');break}
     case 'f-goal':{const n=val('g-name'),a=N(val('g-target'));let d=val('g-dl');if(!/^\d{4}-\d{2}$/.test(d))d=addM(CUR,12);if(!n||!a){toast('اكتب اسم الهدف والمبلغ');return}const why=(document.getElementById('g-why')||{}).value||'';if(!why.trim()){toast('اكتب ليش تبي هالهدف، هذا اللي بيخليك تكمل');document.getElementById('g-why').focus();return}const gm=pickedM('g-meth');act(()=>S.goals.push({id:uid(),at:Date.now(),name:n,target:a,deadline:d,start:N(val('g-start')),why:why.trim(),method:gm,how:val('g-how'),prio:val('g-prio'),fund:val('g-fund'),created:CUR}),'انضاف الهدف');break}
     case 'f-min':act(()=>{S.profile.minLiving=N(val('ml-amt'))},'انحفظ أقل مبلغ تعيش فيه');break;
+    case 'f-note':{const x=val('nt-text');if(!x){toast('اكتب شي في النوتة');return}const tg=(document.querySelector('#nt-tags [aria-pressed="true"]')||{}).dataset;act(()=>{S.notes=S.notes||[];S.notes.push({id:uid(),at:Date.now(),title:val('nt-title'),text:x,tag:tg?tg.v:''})},'انحفظت في نوتة كاش');break}
     case 'f-mx':{const x=val('mx-t');if(!x){toast('اكتب الشي اللي تبي ترتبه');return}act(()=>S.matrix.push({id:uid(),at:Date.now(),t:x,q:val('mx-q')}));break}
     case 'f-xinc':{const n=val('xi-name'),a=N(val('xi-amt'));if(!n||!a)return;act(()=>mw(month).xinc.push({id:uid(),at:Date.now(),name:n,amount:a}));break}
     case 'f-extra':{const n=val('ex-name'),a=N(val('ex-amt'));if(!n||!a)return;act(()=>mw(month).extras.push({id:uid(),at:Date.now(),name:n,cat:val('ex-cat'),amount:a}));break}
