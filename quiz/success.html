@@ -45,14 +45,36 @@ const getOrderStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"get
 const card=document.getElementById("card");
 const orderId=new URLSearchParams(location.search).get("order");
 let productName="الكتاب";
-  let orderKind="book", orderMode=null, orderTool="";
+  let orderKind="book", orderMode=null, orderTool="", orderWho="", orderStart="";
 const L='<div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>';
+/* a consultation: its own screen, not the book's (12 Nov 2026) */
+function whenLabel(){
+  if(!orderStart) return "";
+  try{ return new Date(orderStart).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"}); }catch(e){ return ""; }
+}
+function okBooking(){
+  const w=whenLabel();
+  const modeLine = orderMode==="onsite"
+    ? "الجلسة <b>حضوري</b> — بنرسل لك تفاصيل المكان قبل الموعد."
+    : "الجلسة <b>أونلاين</b> — رابط الاجتماع يوصلك على إيميلك قبل الموعد.";
+  card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم حجز موعدك 🎉</h1>
+  <p><span class="mail">${productName&&productName!=="الكتاب"?productName:"استشارتك"}</span>${orderWho?" مع "+orderWho:""}</p>
+  ${w?`<p>موعدك: <b>${w}</b></p>`:""}
+  <p>${modeLine}</p>
+  <p>وصلك تأكيد الموعد على إيميلك، وفيه أسئلة قصيرة قبل الجلسة — عبّها عشان مستشارك يعرف وضعك قبل ما تلتقون. لو ما لقيت الرسالة، تأكد من <b>Spam / المهملات</b>.</p>
+  <p style="margin-top:18px"><a href="../clinic/" style="display:inline-block;background:#2F1748;color:#fff;text-decoration:none;border-radius:999px;padding:12px 26px;font-weight:600">شوف موعدك في عيادتي</a></p>
+  <div class="wa">تبي تغيّر الموعد أو عندك سؤال؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;
+}
 function ok(){
+  if(orderKind==="booking"){ okBooking(); return; }
   if(orderKind==="digital"){
-    card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع بنجاح 🌙</h1>
-  <p><span class="mail">${productName}</span> انفتحت لك الحين في <b>عيادتي</b>.</p>
-  <p>ادخل بنفس الإيميل اللي دفعت فيه، وإذا ما عندك حساب سوّ واحد فيه وبتلقى الخطة جاهزة. وكل اللي تكتبه ينحفظ بحسابك.</p>
-  <p style="margin-top:18px"><a href="../clinic/${orderTool||"ramadan"}.html" style="display:inline-block;background:#2F1748;color:#fff;text-decoration:none;border-radius:999px;padding:12px 26px;font-weight:600">افتح الخطة في عيادتي</a></p>
+    /* متابعة كاش (tool "app") or خطة رمضان — each says what it is (12 Nov 2026) */
+    const isApp=orderTool==="app";
+    card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع بنجاح ${isApp?"📊":"🌙"}</h1>
+  <p><span class="mail">${productName}</span> انفتحت لك الحين في <b>عيادتي</b>${isApp?" بكل صفحاتها":""}.</p>
+  <p>ادخل بنفس الإيميل اللي دفعت فيه، وإذا ما عندك حساب سوّ واحد فيه وبتلقى ${isApp?"متابعة كاش":"الخطة"} جاهزة. وكل اللي تكتبه ينحفظ بحسابك.</p>
+  ${isApp?`<p>أول شهر مشمول، وبعدها تكمل بـ 7 د.ك بالشهر أو 15 د.ك لثلاث شهور — وبنذكرك قبل لا يخلص.</p>`:""}
+  <p style="margin-top:18px"><a href="../clinic/${isApp?"app":(orderTool||"ramadan")}.html" style="display:inline-block;background:#2F1748;color:#fff;text-decoration:none;border-radius:999px;padding:12px 26px;font-weight:600">${isApp?"افتح متابعة كاش":"افتح الخطة في عيادتي"}</a></p>
   <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;
     return;
   }
@@ -72,7 +94,7 @@ function ok(){
   <p>لو ما وصلتك الرسالة خلال دقائق، تأكد من صندوق <b>Spam / المهملات</b>.</p>
   <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;}
 function pending(){card.innerHTML=L+`<div class="ic wait">⏳</div><h1>استلمنا طلبك</h1>
-  <p>${orderKind==="course"?"نأكد الدفعة الحين، وبتوصلك رسالة تأكيد التسجيل على إيميلك خلال دقائق.":(orderKind==="digital"?"نأكد الدفعة الحين، وبتنفتح لك الخطة في عيادتي خلال دقائق.":"نأكد الدفعة الحين، وبيوصلك الكتاب على إيميلك خلال دقائق.")}</p>
+  <p>${orderKind==="course"?"نأكد الدفعة الحين، وبتوصلك رسالة تأكيد التسجيل على إيميلك خلال دقائق.":orderKind==="digital"?"نأكد الدفعة الحين، وبتنفتح لك في عيادتي خلال دقائق.":orderKind==="booking"?"نأكد الدفعة الحين، وبيوصلك تأكيد موعدك على إيميلك خلال دقائق.":orderKind==="book"?"نأكد الدفعة الحين، وبيوصلك الكتاب على إيميلك خلال دقائق.":"نأكد الدفعة الحين، وبتوصلك رسالة التأكيد على إيميلك خلال دقائق."}</p>
   <div class="wa">ما وصلك شي بعد 10 دقائق؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;}
 function fail(){card.innerHTML=L+`<div class="ic fail">!</div><h1>ما تمت الدفعة</h1>
   <p>يبدو إن العملية ما اكتملت. تقدر ترجع وتحاول مرة ثانية.</p>
@@ -84,6 +106,8 @@ async function poll(t=0){
       if(r.data.kind) orderKind=r.data.kind;
       if(r.data.mode) orderMode=r.data.mode;
       if(r.data.tool) orderTool=String(r.data.tool).replace(/[^a-z]/g,"");
+      if(r.data.consultant) orderWho=String(r.data.consultant);
+      if(r.data.startIso) orderStart=String(r.data.startIso);
     if(s==="paid"){ok();return;} if(["failed","declined","cancelled"].includes(s)){fail();return;}
   }catch(e){console.warn(e);}
   if(t<8){setTimeout(()=>poll(t+1),2500);}else{pending();}

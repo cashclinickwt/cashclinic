@@ -567,6 +567,20 @@ h3 small.at{font-size:.66rem}
 .ccgate .lockic{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#2f1748,#972e38);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:26px;margin-bottom:12px}
 .ccgate .cbtn{display:inline-block;margin:14px 4px 0;background:#2f1748;color:#fff;text-decoration:none;border-radius:999px;padding:10px 22px;font-weight:600}
 .ccgate .cbtn.gh{background:#fff;color:#2f1748;border:1.5px solid #2f1748}
+.ccgate button.cbtn{border:0;font:600 15px/1.4 inherit;font-family:inherit;cursor:pointer}
+.ccgate button.cbtn.gh{border:1.5px solid #2f1748}
+.ccgate button.cbtn:disabled{opacity:.6;cursor:wait}
+/* متابعة كاش bought on its own — renewing (12 Nov 2026) */
+.ccPlans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;text-align:right}
+.ccPlan{border:1.5px solid #e2dcec;border-radius:18px;padding:16px 14px;cursor:pointer;background:#fff;position:relative;font-family:inherit;text-align:right}
+.ccPlan[aria-pressed="true"]{border-color:#972e38;background:#fdf1f3;box-shadow:0 0 0 3px rgba(151,46,56,.12)}
+.ccPlan b{display:block;color:#2f1748;font-size:15.5px}
+.ccPlan .pr{font-size:26px;font-weight:700;color:#972e38;margin-top:4px}
+.ccPlan .pr small{font-size:13px;color:#6f6880;font-weight:500}
+.ccPlan span{display:block;color:#6f6880;font-size:13px;line-height:1.7;margin-top:4px}
+.ccPlan .chip{position:absolute;top:-10px;left:12px;background:#972e38;color:#fff;font-size:11.5px;border-radius:999px;padding:2px 10px;margin:0;font-style:normal}
+.ccErr{color:#972e38;font-size:14px;margin-top:10px;min-height:1em}
+@media (max-width:520px){ .ccPlans{grid-template-columns:1fr} }
 .ccasbar{position:sticky;top:0;z-index:60;background:#FFF6E3;color:#7A5410;border-bottom:1.5px solid #D3A146;padding:8px 16px;font-size:.85rem;text-align:center;font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
 .ccasbar[hidden]{display:none!important}
 .ccpill{position:fixed;left:14px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:90;background:#fff;color:#2f1748;border:1px solid #e2dcec;border-radius:999px;padding:4px 12px;font-size:.78rem;box-shadow:0 4px 12px rgba(47,23,72,.1);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
@@ -904,7 +918,8 @@ const lockMiniPkg=()=>`<div class="lockmini"><span>مؤشر الاستثمار �
 const lockMini=t=>`<div class="lockmini"><span>${t||'هالرسم'} للمشتركين</span><a class="addp" href="${CONTACT.web}" target="_blank" rel="noopener" style="text-decoration:none">اشترك</a></div>`;
 function subPill(){
   return `<a class="status" href="./${window.ccAs?"?as="+encodeURIComponent(window.ccAs):""}" style="text-decoration:none">→ ${window.ccAs?"عيادته":"عيادتي"}</a>`+
-    (window.ccPkgName?`<span class="status cloud">${esc(window.ccPkgName)}</span>`:"");
+    (window.ccPkgName?`<span class="status cloud">${esc(window.ccPkgName)}</span>`:"")+
+    (window.ccRenew?`<a class="status" href="#" data-cc-renew="1" style="text-decoration:none;background:#972e38;color:#fff">جدّد</a>`:"");
 }
 
 /* ---------- persistence ---------- */
@@ -2158,10 +2173,12 @@ const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDom
   messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
 const fbApp=initializeApp(CONFIG.firebase), auth=getAuth(fbApp), fns=getFunctions(fbApp,CONFIG.functionsRegion);
 const getMyApp=httpsCallable(fns,"getMyApp"), saveMyApp=httpsCallable(fns,"saveMyApp"), getClinicAs=httpsCallable(fns,"getClinicAs"),
-      appAi=httpsCallable(fns,"appAi",{timeout:120000});
+      appAi=httpsCallable(fns,"appAi",{timeout:120000}),
+      createDigitalRenewal=httpsCallable(fns,"createDigitalRenewal"), getOrderStatus=httpsCallable(fns,"getOrderStatus");
 const q=s=>document.querySelector(s);
 const escH=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const AS=(new URLSearchParams(location.search).get("as")||"").trim().toLowerCase();
+const QS=new URLSearchParams(location.search);
+const AS=(QS.get("as")||"").trim().toLowerCase(), PAID=(QS.get("paid")||"").trim(), WANT_RENEW=QS.get("renew")==="1";
 const WA="https://wa.me/96522260820";
 const back=`<a class="cbtn" href="./${AS?"?as="+encodeURIComponent(AS):""}">رجوع لعيادتي</a>`;
 const kwDate=ms=>new Date(ms).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"});
@@ -2176,7 +2193,10 @@ async function flush(){
   if(!pending || saving) return;
   const st=pending; pending=null; saving=true; pill("جاري الحفظ…");
   try{ await saveMyApp({ state:st }); pill(""); }
-  catch(e){ if(!pending) pending=st; pill("ما انحفظ — "+((e&&e.message)||"تحقق من الاتصال")+" · بنحاول مرة ثانية", true); timer=setTimeout(flush, 8000); }
+  catch(e){
+    const m=(e&&e.message)||"";
+    if(/منتهي/.test(m)){ pending=st; pill("ما انحفظ — اشتراكك منتهي", true); saving=false; renewGate(ACCESS,true); return; }
+    if(!pending) pending=st; pill("ما انحفظ — "+(m||"تحقق من الاتصال")+" · بنحاول مرة ثانية", true); timer=setTimeout(flush, 8000); }
   finally{ saving=false; if(pending && !timer) flush(); }
 }
 window.ccSync=(json,quiet)=>{ if(window.ccReadOnly) return; pending=json; clearTimeout(timer); timer=setTimeout(()=>{ timer=null; flush(); }, quiet?1000:0); };
@@ -2193,8 +2213,57 @@ function readOnly(who){
   const bar=q("#ccAsBar"); bar.hidden=false;
   bar.innerHTML=`👁️ تشوف متابعة كاش حق <b dir="ltr">${escH(who)}</b> مثل ما يشوفها — للقراءة فقط، ما ينحفظ شي`;
 }
+/* متابعة كاش bought on its own (12 Nov 2026): 7 KD for a month, or 15 KD
+   for three months at once. Unpaid, the app locks; the file is kept. */
+let ACCESS={}, PLAN="monthly";
+const dateOf=ms=>{ try{ return new Date(ms).toLocaleDateString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",timeZone:"Asia/Kuwait"}); }catch(e){ return ""; } };
+function plansHtml(a){
+  const pr=(a&&a.prices)||{monthly:7,quarter:15};
+  return `<div class="ccPlans">
+    <button type="button" class="ccPlan" data-plan="monthly" aria-pressed="${PLAN==="monthly"}"><b>شهر بشهر</b><div class="pr">${pr.monthly} <small>د.ك بالشهر</small></div><span>تجدد كل شهر بشهره وتوقف متى ما تبي</span></button>
+    <button type="button" class="ccPlan" data-plan="quarter" aria-pressed="${PLAN==="quarter"}"><em class="chip">الأوفر</em><b>3 شهور مرة وحدة</b><div class="pr">${pr.quarter} <small>د.ك لـ3 شهور</small></div><span>يعني ${Math.round(pr.quarter/3)} د.ك بس بالشهر بدل ${pr.monthly}</span></button>
+  </div><div class="ccErr" id="ccErr"></div>`;
+}
+function renewGate(a, expired){
+  if(a && a.plan==="quarter") PLAN="quarter";
+  const lead = expired
+    ? `خلص اشتراكك ومتابعة كاش انقفلت مؤقتاً — <b>بس ملفك كله محفوظ</b>، وأول ما تجدد يرجع لك مثل ما خليته.`
+    : `اشتراكك مفتوح لين <b>${escH(dateOf(a.until))}</b>. جدّد الحين وتنضاف المدة من بعده، ما يضيع عليك ولا يوم.`;
+  gate(expired?"🔒":"📊", expired?"جدّد اشتراكك في متابعة كاش":"تجديد الاشتراك", lead+plansHtml(a),
+    `<button type="button" class="cbtn" id="ccPay">ادفع وجدّد</button>`+(expired?back.replace('class="cbtn"','class="cbtn gh"'):`<button type="button" class="cbtn gh" id="ccLater">بعدين</button>`));
+}
+document.addEventListener("click",async (e)=>{
+  const pl=e.target.closest(".ccPlan");
+  if(pl){ PLAN=pl.dataset.plan; document.querySelectorAll(".ccPlan").forEach(b=>b.setAttribute("aria-pressed",b===pl)); return; }
+  if(e.target.closest("#ccLater")){ q("#ccGate").hidden=true; return; }
+  if(e.target.closest("[data-cc-renew]")){ e.preventDefault(); renewGate(ACCESS,false); return; }
+  const pay=e.target.closest("#ccPay");
+  if(pay){
+    pay.disabled=true; pay.textContent="جاري التحويل…";
+    try{ const r=(await createDigitalRenewal({ product:"mutaba", plan:PLAN })).data||{}; if(!r.url) throw new Error("ما وصلنا رابط الدفع"); location.href=r.url; }
+    catch(err){ const x=q("#ccErr"); if(x) x.textContent=(err&&err.message)||"صار خطأ، حاول مرة ثانية"; pay.disabled=false; pay.textContent="ادفع وجدّد"; }
+  }
+});
+async function waitPaid(){
+  gate("⏳","نأكد الدفعة…","لحظات وتنفتح لك متابعة كاش.","");
+  for(let i=0;i<12;i++){
+    try{ const st=((await getOrderStatus({ orderId:PAID })).data||{}).status;
+      if(st==="paid") return true;
+      if(["failed","declined","cancelled","abandoned"].indexOf(st)!==-1) return false;
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,2500));
+  }
+  return null;
+}
+/* the subscription's end date beside the package name, and a way to renew early */
+function subLabel(a){
+  if(!a.digital || !a.until) return a.pkgName||"";
+  const d=Number(a.daysLeft)||0, left=d===1?"يوم واحد":d===2?"يومين":d<=10?d+" أيام":d+" يوم";
+  return `اشتراكك لين ${dateOf(a.until)}`+(d<=5?` · باقي ${left}`:"");
+}
 function openApp(access, json, info){
-  window.ccPkg=access.pkg||""; window.ccPkgName=access.pkgName||"";
+  window.ccPkg=access.pkg||""; window.ccPkgName=AS?(access.pkgName||""):subLabel(access);
+  window.ccRenew=!AS && !!access.digital && !access.staff;
   window.ccApp.open(json, info);
   q("#ccGate").hidden=true;
 }
@@ -2209,7 +2278,8 @@ onAuthStateChanged(auth, async (u)=>{
       if(!a.open && !d.appState){
         return gate("🔒","متابعة كاش مقفولة عنده",
           a.reason==="before"?`عنده ${escH(a.pkgName)} — تنفتح له بعد جلسته الأولى (${escH(kwDate(a.nextMs))}).`
-                             :"ما عنده باقة أساس الحرية المالية ولا باقة الوفرة المالية، فما تنفتح له.",
+          :a.reason==="expired"?`اشتراكه في متابعة كاش انتهى يوم ${escH(dateOf(a.until))}، وما كتب فيها شي.`
+                             :"ما عنده باقة أساس الحرية المالية ولا باقة الوفرة المالية ولا اشتراك في متابعة كاش، فما تنفتح له.",
           `<a class="cbtn" href="./?as=${encodeURIComponent(AS)}">عيادته</a>`);
       }
       return openApp(a, d.appState, { name:d.name||"" });
@@ -2218,17 +2288,27 @@ onAuthStateChanged(auth, async (u)=>{
       try{ await u.reload(); }catch(e){}
       if(!auth.currentUser.emailVerified) return gate("✉️","أكّد إيميلك أول","متابعة كاش ملفك المالي الخاص، فتنفتح بعد ما تأكّد إيميلك من عيادتي.",back);
     }
+    let paidOk=null;
+    if(PAID){ paidOk=await waitPaid(); history.replaceState(null,"",location.pathname); }
     const d=(await getMyApp({})).data||{};
-    const a=d.access||{};
+    const a=d.access||{}; ACCESS=a;
     if(!a.open){
+      if(a.reason==="expired"){
+        renewGate(a,true);
+        if(paidOk===false) q("#ccErr").textContent="ما تمت الدفعة — جرّب مرة ثانية.";
+        if(paidOk===null && PAID) q("#ccErr").textContent="الدفعة لسّا تتأكد — إذا انسحبت الفلوس حدّث الصفحة بعد دقيقة.";
+        return;
+      }
       if(a.reason==="before") return gate("🔒","تنفتح بعد جلستك الأولى",
         `متابعة كاش جزء من <b>${escH(a.pkgName)}</b> — تنفتح لك بعد ما تخلص جلستك الأولى${a.nextMs?` (${escH(kwDate(a.nextMs))})`:""}، عشان نبنيها سوا على أرقامك.`, back);
-      return gate("🔒","متابعة كاش لعملاء كاش ناس",
-        "تنفتح لعملاء <b>باقة أساس الحرية المالية</b> و<b>باقة الوفرة المالية</b> بعد أول جلسة. تبي تعرف أي باقة تناسبك؟ كلّمنا واتساب.",
-        back+`<a class="cbtn gh" href="${WA}" target="_blank" rel="noopener">واتساب</a>`);
+      return gate("📊","متابعة كاش",
+        "نظامك المالي الشخصي: ميزانيتك وشهرك وأهدافك وديونك وأصولك واستثمارك بمكان واحد. تقدر تشترك فيها لحالك بـ <b>10 د.ك</b> وأول شهر مشمول، أو تنفتح لك مع <b>باقة أساس الحرية المالية</b> و<b>باقة الوفرة المالية</b> بعد أول جلسة.<br>إذا اشتركت بإيميل ثاني، ادخل عيادتي فيه أو كلّمنا واتساب ونحوّلها لك.",
+        `<a class="cbtn" href="../quiz/mutaba.html">اعرف أكثر واشترك</a>`+back+`<a class="cbtn gh" href="${WA}" target="_blank" rel="noopener">واتساب</a>`);
     }
     window.ccAiOn=true;
     openApp(a, d.state, { name:d.name||u.displayName||"" });
+    if(paidOk) pill("تم التجديد ✓");
+    if(WANT_RENEW && !paidOk && a.digital && !a.staff){ history.replaceState(null,"",location.pathname); renewGate(a,false); }
   }catch(e){
     gate("⚠️","ما قدرنا نفتح متابعة كاش", escH((e&&e.message)||"صار خطأ")+" — حاول مرة ثانية بعد شوي.", back);
   }

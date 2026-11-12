@@ -314,13 +314,24 @@ function sec(title, items, row, empty){
 function appCard(a){
   a=a||{};
   const link="app.html"+(AS?"?as="+encodeURIComponent(AS):"");
+  /* bought on its own (12 Nov 2026): open while paid, with its end date; renew when it runs out */
+  const btn=(href,txt)=>`<a class="ck-btn" href="${href}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">${txt}</a>`;
+  if(a.digital && a.open) return `<div class="ck-item"><div class="t">📊 متابعة كاش <span class="ck-tag up">مفتوحة</span></div>
+      <div class="m">${AS?"مشترك":"اشتراكك"} في متابعة كاش بكل صفحاتها: الميزانية والديون والتدفق النقدي، والأهداف والأصول والاستثمار — وكل شي ينحفظ لحاله.</div>
+      ${expLine(a,true)}
+      ${btn(link,"افتح متابعة كاش")}${AS?"":`<a href="app.html?renew=1" style="display:block;text-align:center;margin-top:8px;font-size:14px">جدّد الاشتراك (7 د.ك بالشهر أو 15 د.ك لـ3 شهور)</a>`}</div>`;
+  if(a.digital && a.reason==="expired") return `<div class="ck-item"><div class="t">📊 متابعة كاش <span class="ck-tag done">منتهي</span></div>
+      ${expLine(a,false)}
+      <div class="m">${AS?"ملفه محفوظ.":"ملفك محفوظ، جدّد ويرجع لك مثل ما خليته — 7 د.ك بالشهر أو 15 د.ك لثلاث شهور."}</div>
+      ${btn(AS?link:"app.html?renew=1",AS?"شوف ملفه":"جدّد الاشتراك")}</div>`;
   if(a.open) return `<div class="ck-item"><div class="t">📊 متابعة كاش <span class="ck-tag up">مفتوحة</span></div>
       <div class="m">${a.staff?"مفتوحة لفريق كاش كلينك بكل صفحاتها: ":"نظامك المالي الشخصي ضمن "+esc(a.pkgName)+": "}ميزانيتك وديونك وتدفقك النقدي${a.pkg==="wafra"?"، وأهدافك وأصولك واستثمارك":""} — وتتابع تقدمك شهر بشهر. كل شي ينحفظ لحاله.</div>
       <a class="ck-btn" href="${link}" style="display:block;box-sizing:border-box;text-align:center;margin-top:12px;text-decoration:none;color:var(--cc-cream,#FFE6BB)">افتح متابعة كاش</a></div>`;
   if(a.reason==="before") return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش <span class="ck-soon">بعد جلستك الأولى</span></div>
       <div class="m">جزء من ${esc(a.pkgName)} — تنفتح لك بعد ما تخلص جلستك الأولى${a.nextMs?` (${esc(new Date(a.nextMs).toLocaleString("ar-KW-u-nu-latn",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kuwait"}))})`:""}، عشان نبنيها سوا على أرقامك.</div></div>`;
   return `<div class="ck-item ck-lock"><div class="t">🔒 متابعة كاش</div>
-      <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. تنفتح لعملاء باقة أساس الحرية المالية وباقة الوفرة المالية بعد أول جلسة.</div></div>`;
+      <div class="m">نظامك المالي الشخصي: ميزانيتك، أهدافك، ديونك واستثمارك — وتتابع تقدمك شهر بشهر. تقدر تشترك فيها لحالك بـ 10 د.ك (أول شهر مشمول)، أو تنفتح لعملاء باقة أساس الحرية المالية وباقة الوفرة المالية بعد أول جلسة.</div>
+      ${AS?"":btn("../quiz/mutaba.html","اعرف أكثر واشترك")}</div>`;
 }
 /* tools that come with a package — «تأسيس المشروع» for باقة المؤسس */
 function toolCards(T){ return planCard((T||{}).ramadan)+muassisCard((T||{}).muassis); }
@@ -377,7 +388,7 @@ function render(D){
     'ما عندك استشارات للحين. <a href="../book.html">احجز استشارتك ←</a>');
   if(n(D.vouchers)) h+=sec("قسائمي", D.vouchers, v=>`<div class="ck-item"><div class="t">قسيمة ${esc(v.what)}</div><div class="m">صالحة لين ${esc(v.until)} — تواصل معنا واتساب لحجز موعدك</div></div>`, "");
   h+=sec("كتبي", D.books, b=>`<div class="ck-item"><div class="t">${esc(b.what)}${b.staff?'<span class="ck-tag up">مفتوح للفريق</span>':""}</div>
-      <div class="m">${b.staff?"مفتوح لفريق كاش كلينك":`اشتريته ${esc(d8(b.when))} · وصلك على إيميلك`}</div>
+      <div class="m">${b.staff?"مفتوح لفريق كاش كلينك":`اشتريته ${esc(d8(b.when))} · ${b.tool?"ينفتح هني في عيادتي":"وصلك على إيميلك"}`}</div>
       ${b.file&&D.staff&&!AS?`<button class="ck-report" data-book="${esc(b.key)}">📖 افتح الكتيّب</button>`:""}</div>`,
     'ما اشتريت كتيّبات للحين. <a href="../books/index.html">شوف الكتيّبات ←</a>');
   h+=sec("اختباراتي", D.quizzes, q=>`<div class="ck-item"><div class="t">${esc(q.what)}${q.band?` — <span style="color:var(--cc-burgundy,#962E37)">${esc(q.band)}</span>`:""}</div>
