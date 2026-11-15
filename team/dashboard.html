@@ -2553,7 +2553,8 @@ function tgBookShow(){
   if(pw) pw.hidden=!list.length;
   if(ps && ps.dataset.kind!==k){
     const keep=ps.value; ps.dataset.kind=k;
-    ps.innerHTML=`<option value="">${k==="course"?"الورش كلها":"الباقات كلها"}</option>`+list.map(x=>`<option value="${esc(x.key)}">${esc(x.name)}</option>`).join("");
+    /* 15 Nov 2026: a course goal follows one ورشة/ديوانية — «all of them» added رمضان's seats to الذهب's */
+    ps.innerHTML=`<option value="">${k==="course"?"— اختر الورشة أو الديوانية —":"الباقات كلها"}</option>`+list.map(x=>`<option value="${esc(x.key)}">${esc(x.name)}</option>`).join("");
     ps.value=keep; if(ps.value!==keep) ps.value="";
   }
   const pl=$("#tgPkgL"); if(pl) pl.textContent=k==="course"?"الورشة":"الباقة";
@@ -3753,6 +3754,7 @@ function renderTarget(){
       <h3>${esc(t.label)}</h3>
       ${t.kind==="book"?`<div class="tgwin">📘 ${t.productName?esc(t.productName):"الكتيّبات كلها"}</div>`:""}
       ${t.kind==="book"&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">بيع هالفترة: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}
+      ${t.kind==="course"?`<div class="tgwin">🎓 ${t.pkgName?esc(t.pkgName):"⚠️ ما اخترتوا ديوانية — يحسب كل الورش مع بعض، عدّل الهدف واختر وحدة"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر عشان تثبت)</span>':""}</div>${!t.pkg&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">انحسب: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}`:""}
       ${(t.kind==="consult"||t.kind==="call")?`<div class="tgwin">📦 ${t.pkgName?esc(t.pkgName):"الباقات كلها"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر الباقة عشان تثبت)</span>':""}</div>`:""}
       ${t.kind==="course"?`<div class="tgwin">🎟️ ${t.pkgName?esc(t.pkgName):"الورش كلها"}</div>`:""}
       <div class="tgwin">${t.fixed?"📅 فترة محددة · ":""}من <bdi>${esc(t.from)}</bdi> إلى <bdi>${esc(t.to)}</bdi> · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
