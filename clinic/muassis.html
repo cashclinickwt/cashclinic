@@ -1274,6 +1274,7 @@ secs.forEach((s,i)=>{const n=i===0?'':`<span class="n">${ar(String(i).padStart(2
 
 function persist(){if(window.ccSync)window.ccSync(JSON.stringify(S));
   const s=document.getElementById('saved');s.classList.add('on');clearTimeout(persist.t);persist.t=setTimeout(()=>s.classList.remove('on'),1200);refresh()}
+window.ccPersist=persist;   // the «احفظ» button saves through this
 function refresh(){
   const f=fields().filter(e=>e.type!=='number'&&e.dataset.k!=='cdate'&&!e.dataset.k.startsWith('cal_s')&&e.dataset.k!=='cal_year');const d=f.filter(e=>e.value.trim()).length;
   document.getElementById('progTxt').textContent=ar(d)+' من '+ar(f.length);
@@ -1403,6 +1404,32 @@ async function flush(){
   finally{ saving=false; if(pending && !timer) flush(); }
 }
 window.ccSync=(json)=>{ if(window.ccReadOnly) return; pending=json; clearTimeout(timer); timer=setTimeout(flush,1200); pill("فيه تعديل ما انحفظ…"); };
+
+/* «احفظ» (15 Nov 2026): every change already saves itself a moment later;
+   this saves right now and says so, so a client sees her work landed before
+   she closes the page. Shown only on her own open file, never read-only. */
+(()=>{
+  const b=document.createElement("button");
+  b.type="button"; b.id="ccSaveBtn"; b.hidden=true; b.textContent="💾 احفظ";
+  b.style.cssText="position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:70;border:0;border-radius:999px;padding:12px 20px;font:700 15px/1.2 'IBM Plex Sans Arabic',system-ui,sans-serif;background:#2F1748;color:#fff;box-shadow:0 6px 18px rgba(47,23,72,.28);cursor:pointer";
+  document.body.appendChild(b);
+  const gate=q("#ccGate");
+  const sync=()=>{ b.hidden=!gate.hidden || !!window.ccReadOnly; };
+  new MutationObserver(sync).observe(gate,{attributes:true,attributeFilter:["hidden"]}); sync();
+  const label=(t,keep)=>{ b.textContent=t; if(!keep) setTimeout(()=>{ b.textContent="💾 احفظ"; },2200); };
+  b.addEventListener("click", async ()=>{
+    if(window.ccReadOnly) return;
+    try{ window.ccPersist && window.ccPersist(); }catch(e){}
+    clearTimeout(timer); timer=null;
+    b.disabled=true; label("جاري الحفظ…",true);
+    while(saving) await new Promise((r)=>setTimeout(r,150));
+    if(pending) await flush();
+    b.disabled=false;
+    if(pending) label("ما انحفظ — اضغط مرة ثانية",true);
+    else label("انحفظ ✓ "+new Date().toLocaleTimeString("ar-KW-u-nu-latn",{hour:"numeric",minute:"2-digit"}));
+  });
+})();
+
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") flush(); });
 window.addEventListener("beforeunload",e=>{ if(pending||saving){ flush(); e.preventDefault(); e.returnValue=""; } });
 
