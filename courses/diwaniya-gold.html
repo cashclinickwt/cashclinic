@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ديوانية الذهب | شلون نشتري ذهب بذكاء؟ · حضوري للنساء فقط | كاش كلينك</title>
-<meta name="description" content="ديوانية الذهب مع أ. غالية النويف و م. سارة الهندي — شلون نشتري ذهب بذكاء؟ لقاء مميز: تعالي وانتي لابسة ذهبج. السبت 5/12/2026 · 6–8 مساءً · الجميرا · حضوري للنساء فقط · 20 د.ك · هدايا من دار السبائك.">
+<meta name="description" content="ديوانية الذهب مع أ. غالية النويف و م. سارة الهندي، وضيفاتنا أ. علياء أبوعيشة و أ. دانة الجدي — شلون نشتري ذهب بذكاء؟ لقاء مميز: تعالي وانتي لابسة ذهبج. السبت 5/12/2026 · 6–8 مساءً · الجميرا · حضوري للنساء فقط · 20 د.ك · هدايا من دار السبائك.">
 <link rel="icon" href="../brand/mark/mark-purple.png">
 <link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
 <link rel="stylesheet" href="../assets/ds/tokens/colors.css">
@@ -122,6 +122,20 @@
   .dw-women{max-width:560px;margin:0 auto 14px;background:#FBEFF0;border:1px solid #EBC7CB;border-radius:14px;padding:11px 14px;text-align:center;font-size:14.5px;font-weight:700;color:#962E37}
   .dw-gift{max-width:560px;margin:22px auto 0;background:#FFF7E8;border:1px solid #E8D6A8;border-radius:16px;padding:14px 18px;text-align:center;font-size:15.5px;color:#7A5608;line-height:1.8}
   .dw-story{max-width:560px;margin:12px auto 0;text-align:center;font-size:15px;color:var(--cc-grey-600)}
+  /* 15 Nov 2026: the two guests, from their posters */
+  .dw-guests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:760px;margin:0 auto}
+  .dw-guest{background:var(--cc-white);border:1px solid #EBC7CB;border-radius:22px;overflow:hidden;box-shadow:0 14px 36px rgba(150,46,55,.10)}
+  .dw-guest button{all:unset;display:block;width:100%;cursor:zoom-in}
+  .dw-gph{position:relative;aspect-ratio:4/5;background:radial-gradient(circle at 50% 30%,#B8424D 0%,#962E37 48%,#6E1F28 100%);overflow:hidden}
+  .dw-gph img{position:absolute;inset:auto 0 0 0;width:100%;height:94%;object-fit:contain;object-position:center bottom;display:block}
+  .dw-gph img.r{object-position:right bottom}
+  .dw-gtx{padding:16px 18px 20px;text-align:center}
+  .dw-gtag{display:inline-block;background:#FFF0D4;color:#7A5608;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700}
+  .dw-gname{font-size:21px;font-weight:700;color:#962E37;margin:10px 0 2px}
+  .dw-grole{font-size:15px;color:var(--cc-purple);font-weight:600}
+  .dw-gcert{font-size:12.5px;color:var(--cc-grey-500);margin-top:3px;direction:ltr}
+  .dw-gnote{text-align:center;font-size:13.5px;color:var(--cc-grey-500);margin:14px 0 0}
+  @media(max-width:560px){.dw-guests{gap:12px}.dw-gname{font-size:17px}.dw-grole{font-size:13.5px}.dw-gtx{padding:12px 10px 16px}}
 </style>
 </head>
 <body>
@@ -165,6 +179,7 @@
           <span class="chip">حضوري · للنساء فقط</span>
         </div>
         <div class="crs-hwho">مع أ. غالية النويف · م. سارة الهندي</div>
+        <div class="crs-hwho" style="margin-top:6px;font-weight:500">وضيفاتنا المميزات: أ. علياء أبوعيشة · أ. دانة الجدي</div>
         <div class="crs-hbtns">
           <a class="crs-hbtn p" href="#reg">احجز مكانك ↓</a>
           <a class="crs-hbtn g" href="https://wa.me/96522260820?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%AF%D9%8A%D9%88%D8%A7%D9%86%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B0%D9%87%D8%A8" target="_blank" rel="noopener">استفسار واتساب</a>
@@ -195,13 +210,42 @@
   </div>
 </section>
 
+<section class="crs-sec" id="guests" style="padding-top:8px;">
+  <div class="cc-wrap">
+    <h2 class="crs-sec-t">ضيفاتنا المميزات</h2>
+    <p class="crs-sec-sub">ويانا بديوانية الذهب ضيفتين مميزتين .. اضغطي على الصورة تشوفين البوستر.</p>
+    <div class="dw-guests">
+      <div class="dw-guest">
+        <button type="button" onclick="openLb('img/diwaniya-gold-poster-alyaa.jpg')" aria-label="بوستر أ. علياء أبوعيشة">
+          <div class="dw-gph"><img src="img/diwaniya-gold-guest-alyaa.webp" alt="أ. علياء أبوعيشة" loading="lazy"></div>
+        </button>
+        <div class="dw-gtx">
+          <span class="dw-gtag">ضيفتنا المميزة</span>
+          <div class="dw-gname">أ. علياء أبوعيشة</div>
+          <div class="dw-grole">مدرب الألوان والستايل</div>
+          <div class="dw-gcert">Certified Color Analysis Coach</div>
+        </div>
+      </div>
+      <div class="dw-guest">
+        <button type="button" onclick="openLb('img/diwaniya-gold-poster-dana.jpg')" aria-label="بوستر أ. دانة الجدي">
+          <div class="dw-gph"><img class="r" src="img/diwaniya-gold-guest-dana.webp" alt="أ. دانة الجدي" loading="lazy"></div>
+        </button>
+        <div class="dw-gtx">
+          <span class="dw-gtag">ضيفتنا المميزة</span>
+          <div class="dw-gname">أ. دانة الجدي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="crs-sec" style="background:var(--cc-grey-050);padding-top:52px;">
   <div class="cc-wrap">
     <h2 class="crs-sec-t">شنو ديوانية كاش كلينك؟</h2>
     <div class="dw-talk">
       <p>مساحة مالية تفاعلية نلتقي فيها ونتكلم عن مواضيع تمس حياتنا وقراراتنا المالية اليومية بأسلوب بسيط، واقعي وقريب من الناس.</p>
       <p>في كل لقاء نطرح موضوع مختلف، نتبادل الآراء والتجارب، ونناقش أفكار تساعدنا نفهم علاقتنا بالمال بشكل أوضح ونتخذ قرارات مالية أفضل.</p>
-      <p>وهالمرة السالفة عن <b>الذهب</b>: شلون نشتري ذهب بذكاء، مع أ. غالية النويف و م. سارة الهندي.</p>
+      <p>وهالمرة السالفة عن <b>الذهب</b>: شلون نشتري ذهب بذكاء، مع أ. غالية النويف و م. سارة الهندي، وضيفاتنا المميزات أ. علياء أبوعيشة و أ. دانة الجدي.</p>
       <p class="dw-close">مو محاضرة ولا دورة تدريبية…<br>هي ديوانية للنقاش، المشاركة والاستفادة في أجواء خفيفة وممتعة. 💛</p>
     </div>
   </div>
