@@ -6733,7 +6733,7 @@ document.addEventListener("change", e=>{
    uploader (or full access) replaces or deletes a report — a replacement
    waits for approval again. */
 const RP_STATE={ pending:["بانتظار موافقة غالية","#A87A2A"], approved:["معتمد ✓ وصل للعميل","#2F8789"], rejected:["مرفوض","#962E37"] };
-const RP_MAX=4;
+const RP_MAX=9;   // the server allows 3 per consultant, 9 per session (16 Nov 2026)
 function bkEnded(b){ return ((Date.parse(b.startIso||"")||0) + (Number(b.minutes)||60)*60000) < Date.now(); }
 function bkReports(b){ return Array.isArray(b.reports) ? b.reports : (b.report ? [Object.assign({ id:"" }, b.report, { canApprove:!!b.canApprove, canChange:true })] : []); }
 /* ================= تقارير الجلسات (23 Oct 2026) =================
@@ -6824,6 +6824,8 @@ function renderReportDuty(){
           : `<span class="pfrule">${r.status==="missing"?"—":"لما ينعتمد"}</span>`;
         const acts=[];
         if(r.canUpload && (r.status==="missing"||r.status==="rejected")) acts.push(`<button class="pfbtn go" data-rup="${oid}">⬆️ ارفع التقرير</button>`);
+        /* 16 Nov 2026: up to three reports each on one session */
+        else if(r.canAddMore) acts.push(`<button class="pfbtn go" data-rup="${oid}">➕ أضف تقرير آخر</button>`);
         reps.forEach(({x})=>{
           const rid=esc(x.id);
           acts.push(`<button class="pfbtn" data-ropen="${oid}" data-rid="${rid}">افتح</button>`);
@@ -6963,7 +6965,7 @@ function reportBlock(b){
   if(b.status==="cancelled" || !b.canReport || !bkEnded(b)) return "";
   const list=bkReports(b), id=esc(b.id);
   const add=list.length<RP_MAX
-    ? `<button class="rpup" data-rup="${id}">⬆️ ${list.length?"أضف تقرير ثاني (PDF)":"ارفع تقرير الجلسة (PDF)"}</button>` : "";
+    ? `<button class="rpup" data-rup="${id}">⬆️ ${list.length?"أضف تقرير آخر (PDF)":"ارفع تقرير الجلسة (PDF)"}</button>` : "";
   if(!list.length) return `<div class="rpbox">${add}</div>`;
   return `<div class="rpbox">
     <div class="rpmeta" style="margin-bottom:6px"><b>📄 تقارير الجلسة (${fmt(list.length)})</b></div>
