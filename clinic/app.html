@@ -2208,11 +2208,17 @@ window.ccSync=(json,quiet)=>{ if(window.ccReadOnly) return; pending=json; clearT
 (()=>{
   const b=document.createElement("button");
   b.type="button"; b.id="ccSaveBtn"; b.hidden=true; b.textContent="💾 احفظ";
-  b.style.cssText="position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;border:0;border-radius:999px;padding:12px 20px;font:700 15px/1.2 'IBM Plex Sans Arabic',system-ui,sans-serif;background:#2F1748;color:#fff;box-shadow:0 6px 18px rgba(47,23,72,.28);cursor:pointer";
+  b.style.cssText="position:fixed;left:calc(18px + env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;border:0;border-radius:999px;padding:12px 20px;font:700 15px/1.2 'IBM Plex Sans Arabic',system-ui,sans-serif;background:#2F1748;color:#fff;box-shadow:0 6px 18px rgba(47,23,72,.28);cursor:pointer";
   document.body.appendChild(b);
   const gate=q("#ccGate");
-  const sync=()=>{ b.hidden=!gate.hidden || !!window.ccReadOnly; };
+  /* 17 Nov 2026: sit on top of the 🚨 طوارئ button (same corner), not over it */
+  const place=()=>{ const s=document.querySelector(".sos"); const h=s ? s.getBoundingClientRect().height : 0;   // fixed, so no offsetParent; hidden reads 0
+    b.style.bottom=h ? `calc(${Math.round(18+h+12)}px + env(safe-area-inset-bottom,0px))` : "calc(18px + env(safe-area-inset-bottom,0px))"; };
+  const sync=()=>{ b.hidden=!gate.hidden || !!window.ccReadOnly; place(); };
   new MutationObserver(sync).observe(gate,{attributes:true,attributeFilter:["hidden"]}); sync();
+  window.addEventListener("resize", place);
+  /* the page redraws itself (the 🚨 button comes and goes with it) — follow it */
+  let raf=0; new MutationObserver(()=>{ if(!raf) raf=requestAnimationFrame(()=>{ raf=0; place(); }); }).observe(document.body,{childList:true,subtree:true});
   const label=(t,keep)=>{ b.textContent=t; if(!keep) setTimeout(()=>{ b.textContent="💾 احفظ"; },2200); };
   b.addEventListener("click", async ()=>{
     if(window.ccReadOnly) return;
