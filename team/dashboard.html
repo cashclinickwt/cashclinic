@@ -693,6 +693,123 @@
   .tghit{background:#EAF6EE;border:1px solid #BFE0CB;color:#14532D;border-radius:12px;
     padding:11px 14px;margin-top:14px;font-size:14px;font-weight:700}
   @media(max-width:640px){ .pftab{font-size:12.5px} .pftab th,.pftab td{padding:9px 8px} }
+  /* ---- الأهداف (rebuilt 21 Nov 2026) ---- */
+  .glhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .glhead h2{margin:0}
+  .glhead-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .glhead-r .addbtn{padding:10px 22px}
+  .glsel{border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink);max-width:100%}
+  .glsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  .glsum .s{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;min-width:0}
+  .glsum .s b{display:block;font-size:26px;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+  .glsum .s span{font-size:12.5px;color:var(--muted)}
+  .glsum .s.ok b{color:var(--teal)} .glsum .s.bh b{color:#962E37} .glsum .s.hit b{color:#128C4A}
+  .glbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+  .glseg{display:inline-flex;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap;max-width:100%}
+  .glseg button{border:0;background:transparent;border-radius:999px;padding:7px 15px;font-family:inherit;font-size:13.5px;color:var(--muted);cursor:pointer}
+  .glseg button.on{background:var(--auber);color:#fff}
+  .glseg button i{font-style:normal;font-size:11.5px;opacity:.75;margin-inline-start:4px}
+  .glchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .glchips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+  .glchips button.on{border-color:var(--auber);box-shadow:0 0 0 1px var(--auber) inset;font-weight:700}
+  .glchips button i{font-style:normal;color:var(--muted);font-size:12px;margin-inline-start:4px}
+  .glgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .glcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-width:0;
+    border-top:4px solid var(--glc,var(--line))}
+  .glcard.st-ok{--glc:var(--teal)} .glcard.st-behind{--glc:#962E37} .glcard.st-hit{--glc:#128C4A}
+  .glcard.st-future{--glc:#B9B3C4} .glcard.st-missed{--glc:#D7A6AB}
+  .glcard header{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+  .glk{font-size:12.5px;color:var(--muted);background:var(--bg);border-radius:999px;padding:3px 10px}
+  .glst{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff;background:var(--glc,var(--muted))}
+  .glcard.st-future .glst,.glcard.st-missed .glst{color:var(--ink)}
+  .glcard h3{margin:0;font-size:17px;color:var(--auber);line-height:1.5;text-wrap:balance}
+  .glfol{font-size:13px;color:var(--muted);line-height:1.7}
+  .glfol.warn{color:#8A6410}
+  .glnum{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .glnum b{font-size:34px;font-weight:800;line-height:1;color:var(--glc,var(--olive));direction:ltr;font-variant-numeric:tabular-nums}
+  .glnum span{font-size:13.5px;color:var(--muted)}
+  .gltrack{position:relative;height:12px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+  .glfill{position:absolute;inset-block:0;inset-inline-start:0;border-radius:999px;background:var(--glc,var(--olive));min-width:4px;transition:width .5s ease}
+  .glpace{position:absolute;top:-5px;bottom:-5px;width:2px;border-radius:2px;background:var(--auber);opacity:.55}
+  .gltrack{margin-bottom:12px}
+  .glpace::after{content:"اليوم";position:absolute;bottom:-17px;font-size:10px;color:var(--muted);transform:translateX(50%);white-space:nowrap}
+  .glmeta{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+  .glmeta b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .glneed{font-size:13px;background:#FFF7E8;color:#8A6410;border-radius:10px;padding:8px 12px;line-height:1.7}
+  .glneed.ok{background:#EAF6EE;color:#14532D}
+  .glcard footer{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+  .gldet{border-top:1px dashed var(--line);padding-top:10px;font-size:13px;color:var(--muted);line-height:1.8}
+  .gldet table{width:100%;border-collapse:collapse;margin-top:6px}
+  .gldet th{font-weight:700;color:var(--ink);text-align:start;border-bottom:1.5px solid var(--auber);padding:5px 4px}
+  .gldet td{border-bottom:1px solid var(--line);padding:5px 4px}
+  .glempty{grid-column:1/-1;background:#fff;border:1.5px dashed var(--line);border-radius:18px;padding:28px 20px;text-align:center;color:var(--muted);font-size:14px;line-height:1.9}
+  /* the add-goal steps */
+  .glwiz-t{margin:0 0 14px;font-size:19px}
+  .glsteps{display:flex;gap:4px;list-style:none;margin:0 0 18px;padding:0;flex-wrap:wrap}
+  .glsteps li{flex:1 1 0;min-width:64px;font-size:12px;color:var(--muted);text-align:center;border-bottom:3px solid var(--line);padding-bottom:6px;cursor:default}
+  .glsteps li span{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--bg);font-size:11px;margin-inline-end:4px}
+  .glsteps li.done{color:var(--ink);border-color:var(--teal);cursor:pointer}
+  .glsteps li.done span{background:var(--teal);color:#fff}
+  .glsteps li.on{color:var(--auber);font-weight:700;border-color:var(--auber)}
+  .glsteps li.on span{background:var(--auber);color:#fff}
+  .glq{margin:0 0 12px;font-size:15.5px;font-weight:700;color:var(--ink)}
+  .gltiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .gltile{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:14px;font-family:inherit;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+  .gltile .i{font-size:22px} .gltile b{font-size:14.5px} .gltile small{font-size:12px;color:var(--muted);line-height:1.6}
+  .gltile.on,.glopt.on{border-color:var(--auber);box-shadow:0 0 0 1px var(--auber) inset;background:#FBFAFD}
+  .gllist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto;padding:2px}
+  .glopt{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-size:14px;cursor:pointer;text-align:start;color:var(--ink);display:flex;justify-content:space-between;gap:10px}
+  .glopt small{color:var(--muted);font-size:12px}
+  .glamount{display:flex;align-items:center;gap:10px;margin:14px 0 10px}
+  .glamount input{flex:1 1 auto;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-size:24px;font-weight:700;font-family:inherit;direction:ltr;text-align:right}
+  .glamount input:focus{outline:0;border-color:var(--auber)}
+  .glamount span{font-size:15px;color:var(--muted);white-space:nowrap}
+  .glquick{display:flex;gap:6px;flex-wrap:wrap}
+  .glquick button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-family:inherit;font-size:12.5px;cursor:pointer}
+  .glhint{font-size:12.5px;color:var(--muted);line-height:1.8;margin:10px 0 0}
+  .glreview{margin-top:16px;background:var(--bg);border-radius:14px;padding:14px 16px;font-size:13.5px;line-height:2}
+  .glreview b{color:var(--auber)}
+  .glnav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+  .glnav .pfbtn{padding:10px 20px;font-size:14px}
+  @media(max-width:720px){ .glsum{grid-template-columns:repeat(2,minmax(0,1fr))} .glgrid{grid-template-columns:1fr} }
+  /* ---- قسائم الهدايا (21 Nov 2026) ---- */
+  .gvsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
+  .gvsum .s{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;min-width:0;font-family:inherit;text-align:start}
+  .gvsum .s.on{border-color:var(--auber);box-shadow:0 0 0 1px var(--auber) inset}
+  .gvsum .s b{display:block;font-size:22px;font-weight:800}
+  .gvsum .s span{font-size:12.5px;color:var(--muted)}
+  .gvform{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:16px}
+  .gvform h3{margin:0 0 4px;font-size:16px}
+  .gvform .gvp{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.8}
+  .gvsec{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .gvsec > h4{margin:0 0 10px;font-size:13.5px;color:var(--auber);display:flex;gap:6px;align-items:center}
+  .gvsec > h4 i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--auber);color:#fff;font-size:11.5px}
+  .gvprice{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--cream);border-radius:14px;padding:12px 16px;margin-top:12px}
+  .gvprice b{font-size:22px;color:var(--auber)}
+  .gvprice input{width:130px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:16px;font-family:inherit;direction:ltr}
+  .gvpay{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gvdone{background:#EAF6EE;border:1px solid #BFE0CB;border-radius:16px;padding:16px 18px;margin-top:14px;line-height:1.9;font-size:14px}
+  .gvdone .code{font-size:24px;font-weight:800;letter-spacing:.1em;direction:ltr;display:inline-block}
+  .gvlink{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .gvlink code{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;direction:ltr;word-break:break-all;flex:1 1 220px;min-width:0}
+  .gvlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+  .gvcard{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+  .gvtop{background:var(--auber);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .gvtop .w{font-size:12px;color:var(--cream)}
+  .gvtop .n{font-size:15px;font-weight:700;line-height:1.5}
+  .gvtop .c{font-size:17px;font-weight:800;letter-spacing:.08em;direction:ltr;white-space:nowrap}
+  .gvcard.s-unpaid .gvtop{background:#6B6577} .gvcard.s-used .gvtop{background:var(--olive)}
+  .gvcard.s-expired .gvtop,.gvcard.s-cancelled .gvtop{background:#962E37}
+  .gvbody{padding:12px 16px;font-size:13px;line-height:1.9;color:var(--muted);flex:1}
+  .gvbody b{color:var(--ink)}
+  .gvbody .arrow{color:var(--gold);font-weight:700}
+  .gvbody .q{background:var(--bg);border-radius:10px;padding:6px 10px;margin-top:6px;color:var(--ink)}
+  .gvacts{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 14px}
+  .gvacts .pfbtn.go{--acc:var(--teal)}
+  a.pfbtn{text-decoration:none;display:inline-block}
+  .gvtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .gvtools input{flex:1 1 220px;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;font-family:inherit;font-size:13.5px}
+  @media(max-width:720px){ .gvsum{grid-template-columns:repeat(2,minmax(0,1fr))} .gvlist{grid-template-columns:1fr} .gvpay{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -757,6 +874,7 @@
     <button data-tab="addsale">إضافة عمليات البيع</button>
     <button data-tab="clients">كل العملاء</button>
     <button data-tab="salesteam">فريق المبيعات</button>
+    <button data-tab="target">الأهداف</button>
     <div class="navgrp" data-grp="clients">العملاء</div>
     <button data-tab="bookings">المواعيد</button>
     <button data-tab="quiz">الاختبارات</button>
@@ -777,7 +895,6 @@
     <button data-tab="followup">متابعة الفريق</button>
     <button data-tab="profit" data-family="money">المال</button>
     <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
-    <button data-tab="target" data-child="money" hidden>هدف المبيعات</button>
     <button data-tab="careers">التوظيف</button>
     <button data-tab="reports">التقارير</button>
     <button data-tab="inreports">التقارير الداخلية</button>
@@ -880,6 +997,7 @@
     <div class="flt" id="stTabs">
       <button class="on" data-st="leads">متابعة العملاء</button>
       <button data-st="vouchers">القسائم</button>
+      <button data-st="gifts">🎁 قسائم الهدايا</button>
       <button data-st="report">التقارير</button>
     </div>
     <div class="addmsg" id="stMsg"></div>
@@ -974,35 +1092,28 @@
     <div id="tkSent"></div>
   </div>
 
-  <!-- ===== هدف المبيعات ===== -->
+  <!-- ===== الأهداف — its own section since 21 Nov 2026, rebuilt from scratch ===== -->
   <div class="sec" id="targetSec" data-panel="target" hidden>
-    <div class="subtabs" data-fam="money"></div>
-    <h2><span></span> هدف المبيعات</h2>
-    <div class="pfbar">
-      <div class="f"><label>الشهر</label><select id="tgMonth"><option value="">الشهر الحالي</option></select></div>
+    <div class="glhead">
+      <h2><span></span> الأهداف</h2>
+      <div class="glhead-r">
+        <select id="tgMonth" class="glsel" aria-label="الشهر"><option value="">الشهر الحالي</option></select>
+        <button class="addbtn" id="glNew" type="button" hidden>＋ هدف جديد</button>
+      </div>
     </div>
-    <div class="pfbar" id="tgForm" hidden>
-      <div class="f" style="flex:1 1 200px"><label>اسم الهدف</label>
-        <input id="tgLabel" type="text" placeholder="مثال: هدف بيع الكتيبات"></div>
-      <div class="f"><label>النوع</label><select id="tgKind">
-        <option value="book">كتيّب</option><option value="consult">استشارة</option>
-        <option value="call">اتصال سريع</option><option value="course">ورشة / دورة</option>
-        <option value="contract">عقد</option></select></div>
-      <div class="f" id="tgBookWrap"><label>الكتيّب</label><select id="tgBook"><option value="">الكتيّبات كلها</option></select></div>
-      <div class="f" id="tgPkgWrap" hidden><label id="tgPkgL">الباقة</label><select id="tgPkg"><option value="">الكل</option></select></div>
-      <div class="f"><label>الهدف بـ</label><select id="tgUnit"><option value="money">مبلغ (د.ك)</option><option value="count">عدد</option></select></div>
-      <div class="f"><label id="tgAmountL">المبلغ (د.ك)</label><input id="tgAmount" type="number" min="1" step="1"></div>
-      <div class="f" id="tgDayWrap"><label>يبدأ يوم (كل شهر)</label><input id="tgDay" type="number" min="1" max="28" value="1"></div>
-      <div class="f"><label>من تاريخ <span class="muted">(اختياري)</span></label><input id="tgFrom" type="date"></div>
-      <div class="f"><label>إلى تاريخ</label><input id="tgTo" type="date"></div>
-      <div class="f"><label>صاحب الهدف</label><select id="tgOwner"></select></div>
-      <div class="f"><label>&nbsp;</label><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pfbtn go" id="tgAdd">احفظ الهدف</button>
-        <button class="pfbtn" id="tgCancel" type="button" hidden>هدف جديد بدل التعديل</button></div></div>
-      <div class="f" style="flex:1 1 100%">
-        <div class="muted" style="font-size:12.5px;line-height:1.8">اسم موجود من قبل يتعدّل بدل ما ينضاف هدف ثاني. «عدّل» يعدّل نفس الهدف حتى لو غيّرت اسمه. حطّ «من تاريخ» و«إلى تاريخ» إذا تبي الهدف لفترة محددة، وخلّهم فاضيين إذا يتجدد كل شهر من «يبدأ يوم». هدف الكتيّب تقدر تخليه لكتيّب واحد أو للكتيّبات كلها. «احذف» يشيل الهدف من القائمة ويوقف عدّه.</div></div>
+    <div class="glsum" id="glSum"></div>
+    <div class="glbar">
+      <div class="glseg" id="glState" role="tablist" aria-label="حالة الهدف">
+        <button type="button" data-gls="live" class="on">جارية</button>
+        <button type="button" data-gls="future">قادمة</button>
+        <button type="button" data-gls="ended">منتهية</button>
+        <button type="button" data-gls="all">الكل</button>
+      </div>
+      <select id="glOwner" class="glsel" aria-label="صاحب الهدف"><option value="">كل الأشخاص</option></select>
     </div>
+    <div class="glchips" id="glKinds"></div>
     <div class="addmsg" id="tgMsg"></div>
-    <div id="tgList"></div>
+    <div class="glgrid" id="tgList"></div>
   </div>
 
   <!-- ===== أرباحي — every member sees only their own column ===== -->
@@ -2541,93 +2652,7 @@ document.addEventListener("click", async e=>{
   }
 });
 
-function tgMsg(t,ok){ const m=$("#tgMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"bad"); }
-
-/* the book picker only means something for a book goal */
-function tgBookShow(){
-  const k=$("#tgKind").value;
-  const w=$("#tgBookWrap"); if(w) w.hidden=k!=="book";
-  /* a package goal follows one package, a workshop goal one workshop (28 Oct 2026) */
-  const pw=$("#tgPkgWrap"), ps=$("#tgPkg");
-  const list=((TG&&TG.packages)||[]).filter(x=>x.kind===k);
-  if(pw) pw.hidden=!list.length;
-  if(ps && ps.dataset.kind!==k){
-    const keep=ps.value; ps.dataset.kind=k;
-    /* 15 Nov 2026: a course goal follows one ورشة/ديوانية — «all of them» added رمضان's seats to الذهب's */
-    ps.innerHTML=`<option value="">${k==="course"?"— اختر الورشة أو الديوانية —":"الباقات كلها"}</option>`+list.map(x=>`<option value="${esc(x.key)}">${esc(x.name)}</option>`).join("");
-    ps.value=keep; if(ps.value!==keep) ps.value="";
-  }
-  const pl=$("#tgPkgL"); if(pl) pl.textContent=k==="course"?"الورشة":"الباقة";
-}
-$("#tgKind") && $("#tgKind").addEventListener("change", tgBookShow);
-/* a goal with its own dates does not use the monthly start day (4 Nov 2026) */
-function tgDatesSync(){
-  const fixed=!!(($("#tgFrom")||{}).value||($("#tgTo")||{}).value);
-  const w=$("#tgDayWrap"); if(w) w.style.opacity=fixed?".45":"";
-  const d=$("#tgDay"); if(d) d.disabled=fixed;
-}
-["#tgFrom","#tgTo"].forEach(k=>{ const x=$(k); if(x) x.addEventListener("input", tgDatesSync); });
-/* «عدّل» keeps the goal it opened, even if its name is changed */
-function tgEditing(id,label){
-  const f=$("#tgForm"); if(!f) return;
-  if(id){ f.dataset.editId=id; } else { delete f.dataset.editId; }
-  const a=$("#tgAdd"); if(a) a.textContent=id?"احفظ التعديل":"احفظ الهدف";
-  const c=$("#tgCancel"); if(c) c.hidden=!id;
-}
-$("#tgCancel") && $("#tgCancel").addEventListener("click", ()=>{
-  tgEditing(""); ["#tgLabel","#tgAmount","#tgFrom","#tgTo"].forEach(k=>{ const x=$(k); if(x) x.value=""; });
-  tgDatesSync(); tgMsg("",true);
-});
-
-$("#tgAdd") && $("#tgAdd").addEventListener("click", async ()=>{
-  const label=($("#tgLabel").value||"").trim();
-  const amount=Number($("#tgAmount").value)||0;
-  const unit=$("#tgUnit").value==="count"?"count":"money";
-  if(label.length<2) return tgMsg("اكتب اسم الهدف",false);
-  if(!(amount>0))    return tgMsg(unit==="count"?"العدد لازم يكون أكبر من صفر":"المبلغ لازم يكون أكبر من صفر",false);
-  const fromDate=($("#tgFrom")||{}).value||"", toDate=($("#tgTo")||{}).value||"";
-  if(!!fromDate!==!!toDate) return tgMsg("اختر تاريخ البداية والنهاية مع بعض، أو خلّهم فاضيين",false);
-  if(fromDate && toDate<fromDate) return tgMsg("تاريخ النهاية قبل البداية",false);
-  const editId=($("#tgForm")||{dataset:{}}).dataset.editId||"";
-  const b=$("#tgAdd"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
-  try{
-    await setSalesTarget({ id:editId||tgSlug(label), label, kind:$("#tgKind").value, fromDate, toDate,
-      product:$("#tgKind").value==="book"?($("#tgBook").value||""):"",
-      pkg:$("#tgPkgWrap")&&!$("#tgPkgWrap").hidden?($("#tgPkg").value||""):"",
-      amount, unit, currency:"KWD", cycleDay:Number($("#tgDay").value)||1,
-      owner:$("#tgOwner").value||"", active:true });
-    $("#tgLabel").value=""; $("#tgAmount").value=""; $("#tgFrom").value=""; $("#tgTo").value="";
-    tgEditing(""); tgDatesSync();
-    TG=null; await loadTarget(); tgMsg("انحفظ الهدف ✅",true);
-  }catch(e){ tgMsg((e&&e.message)||"تعذّر الحفظ",false); b.textContent=t0; }
-  finally{ b.disabled=false; }
-});
-
-document.addEventListener("click", async (e)=>{
-  const ed=e.target.closest("[data-tgedit]");
-  if(ed){
-    const t=((TG&&TG.targets)||[]).find(x=>x.id===ed.dataset.tgedit); if(!t) return;
-    $("#tgLabel").value=t.label||""; $("#tgKind").value=t.kind||"book";
-    $("#tgBook").value=t.product||""; tgBookShow();
-    if($("#tgPkg")) $("#tgPkg").value=t.pkg||"";
-    $("#tgUnit").value=t.unit==="count"?"count":"money"; tgUnitSync();
-    $("#tgAmount").value=t.target||""; $("#tgDay").value=t.cycleDay||1;
-    $("#tgFrom").value=t.fromDate||""; $("#tgTo").value=t.toDate||""; tgDatesSync();
-    if($("#tgOwner")) $("#tgOwner").value=t.owner||"";
-    tgEditing(t.id);
-    $("#tgLabel").scrollIntoView({behavior:"smooth",block:"center"});
-    tgMsg("عدّل اللي تبيه واضغط «احفظ الهدف»",true);
-    return;
-  }
-  const off=e.target.closest("[data-tgoff]");
-  if(off){
-    if(!confirm("تحذف هذا الهدف؟ يختفي من القائمة ويوقف عدّه.")) return;
-    off.disabled=true;
-    try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انحذف الهدف",true); }
-    catch(err){ tgMsg((err&&err.message)||"تعذّر",false); }
-    finally{ off.disabled=false; }
-  }
-});
+function tgMsg(t,ok){ const m=$("#tgMsg"); if(!m) return; m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); }
 
 
 document.addEventListener("click", async (e)=>{
@@ -2792,6 +2817,237 @@ $("#stBody") && $("#stBody").addEventListener("click", async e=>{
   }
 });
 
+/* ---- فريق المبيعات › قسائم الهدايا (21 Nov 2026) ----
+   Somebody pays for a service for someone else and gets a code for it.
+   Tap: the buyer gets a payment page (with the terms tick). Deema: arranged
+   by hand as always, then marked paid here. The team uses the code. */
+const listGifts=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listGifts");
+const createGift=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createGift");
+const editGift=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"editGift");
+const redeemGift=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"redeemGift",{timeout:120000});
+let GV=null, GVF="all", GVQ="", GVFORM=null, GVDONE=null, GVDLG=null;
+const GV_WHAT=[["book","📘","كتيّب"],["digital","📊","منتج رقمي"],["consult","💬","استشارة"],["call","📞","اتصال سريع"],["course","🎓","ورشة / ديوانية"]];
+const GV_STATE={ unpaid:["بانتظار الدفع","#6B6577"], valid:["سارية","var(--teal)"], used:["استُخدمت","var(--olive)"], expired:["منتهية","#962E37"], cancelled:["ملغية","#962E37"] };
+const gvSite="https://cashclinic.net";
+async function loadGifts(){
+  try{ GV=((await listGifts({})).data)||{ gifts:[], catalog:[] }; if(STTAB==="gifts") renderSalesTeam(); }
+  catch(err){ stMsg((err&&err.message)||"تعذّر تحميل القسائم", false); }
+}
+function gvNewForm(){ return { what:"", key:"", mode:"", amount:"", pay:"link", months:(GV&&GV.months)||6,
+  bName:"", bPhone:"", bEmail:"", tName:"", tPhone:"", tEmail:"", msg:"" }; }
+function gvItem(){ const f=GVFORM||{}; return ((GV&&GV.catalog)||[]).find(x=>x.what===f.what&&x.key===f.key)||null; }
+function gvListed(it, mode){
+  if(!it) return 0;
+  if((it.what==="consult"||it.what==="call") && mode==="online" && it.priceOnline>0) return it.priceOnline;
+  return it.price;
+}
+const gvModeAr=m=>m==="online"?"أونلاين":m==="present"||m==="onsite"?"حضوري":"";
+function gvReadForm(){
+  if(!GVFORM) return;
+  const v=id=>{ const el=document.getElementById(id); return el?String(el.value||"").trim():""; };
+  Object.assign(GVFORM,{ bName:v("gvBName"), bPhone:v("gvBPhone"), bEmail:v("gvBEmail"), tName:v("gvTName"),
+    tPhone:v("gvTPhone"), tEmail:v("gvTEmail"), msg:v("gvMsgIn") });
+  const a=document.getElementById("gvAmount"); if(a) GVFORM.amount=a.value;
+  const mo=document.getElementById("gvMonths"); if(mo) GVFORM.months=Number(mo.value)||6;
+}
+function gvFormHtml(){
+  const f=GVFORM, it=gvItem(), cat=(GV&&GV.catalog)||[];
+  const items=cat.filter(x=>x.what===f.what);
+  const listed=gvListed(it,f.mode), canType=it&&(it.typed||(GV&&GV.canPrice));
+  const fld=(id,label,val,type,extra)=>`<div class="addf"><label>${label}</label><input id="${id}" type="${type||"text"}" value="${esc(val)}" ${extra||""}></div>`;
+  return `<div class="gvform">
+    <h3>🎁 قسيمة هدية جديدة</h3>
+    <p class="gvp">واحد يبي يدفع عن غيره — كتيّب، استشارة، ورشة، أو منتج رقمي. يدفع هو، وتطلع قسيمة بكود للي الهدية له.</p>
+    <div class="gvsec"><h4><i>١</i> شنو الهدية؟</h4>
+      <div class="glchips" style="margin-bottom:10px">${GV_WHAT.filter(([w])=>cat.some(x=>x.what===w)).map(([w,ic,ar])=>`<button type="button" data-gvwhat="${w}" class="${f.what===w?"on":""}">${ic} ${ar}</button>`).join("")}</div>
+      ${f.what?`<div class="gllist" style="max-height:240px">${items.map(x=>`<button type="button" class="glopt${f.key===x.key?" on":""}" data-gvkey="${esc(x.key)}"><span>${esc(x.name)}</span><small>${x.typed?"السعر حسب الاتفاق":fmt(x.price)+" د.ك"+(x.priceOnline>0?" · أونلاين "+fmt(x.priceOnline):"")}</small></button>`).join("")}</div>`:""}
+      ${it&&it.modes&&it.modes.length>1?`<div class="glseg" style="margin-top:10px">${it.modes.map(m=>`<button type="button" data-gvmode="${m}" class="${f.mode===m?"on":""}">${gvModeAr(m)}</button>`).join("")}</div>`:""}
+      ${it?`<div class="gvprice"><span>المبلغ</span>${canType?`<input id="gvAmount" type="number" min="1" step="0.5" inputmode="decimal" value="${esc(f.amount!==""?f.amount:(it.typed?"":listed))}" placeholder="${it.typed?"اكتب السعر":""}"> <span>د.ك</span>${it.typed?"":`<small class="muted">سعره ${fmt(listed)} د.ك</small>`}`:`<b>${fmt(listed)} د.ك</b>`}</div>`:""}
+    </div>
+    <div class="gvsec"><h4><i>٢</i> اللي بيدفع</h4><div class="addgrid">
+      ${fld("gvBName","الاسم",f.bName,"text",'maxlength="120" autocomplete="off"')}
+      ${fld("gvBPhone","الجوال",f.bPhone,"tel",'dir="ltr" maxlength="32"')}
+      ${fld("gvBEmail","الإيميل (توصله الفاتورة والقسيمة)",f.bEmail,"email",'dir="ltr" maxlength="160"')}</div></div>
+    <div class="gvsec"><h4><i>٣</i> الهدية لمين؟</h4><div class="addgrid">
+      ${fld("gvTName","الاسم",f.tName,"text",'maxlength="120" autocomplete="off"')}
+      ${fld("gvTPhone","الجوال (اختياري)",f.tPhone,"tel",'dir="ltr" maxlength="32"')}
+      ${fld("gvTEmail","الإيميل (اختياري — يوصله الكود)",f.tEmail,"email",'dir="ltr" maxlength="160"')}</div>
+      <div class="addf" style="margin-top:12px"><label>رسالة الهدية (اختياري)</label><input id="gvMsgIn" type="text" maxlength="400" value="${esc(f.msg)}" placeholder="مثال: كل عام وانتي بخير 🌿"></div>
+      <div class="addf" style="margin-top:12px;max-width:220px"><label>صلاحية القسيمة</label><select id="gvMonths">${[3,6,12].map(n=>`<option value="${n}"${Number(f.months)===n?" selected":""}>${n} شهور</option>`).join("")}</select></div></div>
+    <div class="gvsec"><h4><i>٤</i> طريقة الدفع</h4>
+      <div class="gvpay">
+        <button type="button" class="gltile${f.pay==="link"?" on":""}" data-gvpay="link"><span class="i">💳</span><b>رابط دفع Tap</b><small>يوصله رابط بإيميله، وترسله له واتساب. أول ما يدفع تطلع القسيمة.</small></button>
+        <button type="button" class="gltile${f.pay==="deema"?" on":""}" data-gvpay="deema"><span class="i">🟣</span><b>ديمة</b><small>رتبتوا الدفع مع ديمة؟ اختر هذا بعد ما تتأكد إن الدفعة تمت — القسيمة تطلع على طول.</small></button>
+      </div>
+      <div class="addrow"><button class="addbtn" type="button" data-gvcreate>${f.pay==="deema"?"تأكدت من ديمة — أصدر القسيمة":"أنشئ رابط الدفع"}</button></div>
+    </div>
+  </div>`;
+}
+function gvDoneHtml(){
+  const d=GVDONE; if(!d) return "";
+  const link=d.payPath?gvSite+d.payPath:"";
+  const wa=link?`https://wa.me/?text=${encodeURIComponent(`هلا ${d.buyer} 🌿 هذا رابط دفع قسيمة الهدية «${d.name}» لـ ${d.to}:\n${link}`)}`:"";
+  return `<div class="gvdone">${d.paid
+    ? `✅ القسيمة جاهزة: <span class="code">${esc(d.code)}</span><br>${d.mailed?"انرسلت بالإيميل"+(d.toMailed?" للي الهدية له وللي دفع.":" للي دفع."):"⚠️ ما انرسلت بالإيميل"+(d.mailError?" ("+esc(d.mailError)+")":"")+" — تقدر ترسلها من البطاقة تحت."}`
+    : `💳 رابط الدفع جاهز${d.linkMailed?" وانرسل لإيميل اللي بيدفع":""}. أول ما يدفع تطلع القسيمة <b>${esc(d.code)}</b> وتوصلهم بالإيميل.
+       <div class="gvlink"><code id="gvLinkTxt">${esc(link)}</code><button class="pfbtn" type="button" data-gvcopy="${esc(link)}">نسخ</button><a class="pfbtn" href="${esc(wa)}" target="_blank" rel="noopener">واتساب</a></div>`}
+    <div style="margin-top:8px"><button class="pfbtn" type="button" data-gvnew>قسيمة ثانية</button></div></div>`;
+}
+function gvCard(g){
+  const [stAr,stC]=GV_STATE[g.state]||["",""];
+  const W=(GV_WHAT.find(x=>x[0]===g.what)||["","🎁",""]);
+  const link=g.payPath?gvSite+g.payPath:"";
+  const wa=link?`https://wa.me/?text=${encodeURIComponent(`هلا ${g.buyer.name} 🌿 هذا رابط دفع قسيمة الهدية «${g.name}» لـ ${g.to.name}:\n${link}`)}`:"";
+  const session=g.what==="consult"||g.what==="call";
+  return `<div class="gvcard s-${g.state}">
+    <div class="gvtop"><div><div class="w">${W[1]} ${esc(W[2])}${g.mode?" · "+esc(gvModeAr(g.mode)):""} · <span class="pill" style="background:rgba(255,255,255,.18)">${esc(stAr)}</span></div>
+      <div class="n">${esc(g.name)}</div></div><div class="c">${esc(g.code)}</div></div>
+    <div class="gvbody">
+      <div><b>${esc(g.buyer.name)}</b> <span class="arrow">←</span> <b>${esc(g.to.name)}</b>${g.to.email?` · <bdi>${esc(g.to.email)}</bdi>`:` · <span style="color:#8A6410">بدون إيميل</span>`}</div>
+      <div>${fmt(g.amount)} د.ك · ${g.paymentMethod==="deema"?"ديمة":g.status==="paid"?"Tap":"رابط Tap"}${g.addedByName?" · سوّاها "+esc(g.addedByName):""}</div>
+      <div>${g.state==="used"?`انستخدمت <bdi dir="ltr">${esc(stDate(g.redeemedMs))}</bdi>${g.redeemedByName?" · "+esc(g.redeemedByName):""}`
+        :g.until?`صالحة لين <b><bdi dir="ltr">${esc(stDate(g.until))}</bdi></b>`:`تبدأ صلاحيتها (${fmt(g.months)} شهور) أول ما تندفع`}</div>
+      ${g.message?`<div class="q">«${esc(g.message)}»</div>`:""}
+      ${g.mailError&&g.state==="valid"?`<div style="color:#962E37">⚠️ آخر إرسال ما وصل: ${esc(g.mailError)}</div>`:""}
+    </div>
+    <div class="gvacts">
+      ${g.state==="unpaid"?`<button class="pfbtn" type="button" data-gvcopy="${esc(link)}">نسخ رابط الدفع</button><a class="pfbtn" href="${esc(wa)}" target="_blank" rel="noopener">واتساب</a>
+        <button class="pfbtn" type="button" data-gvdeema="${esc(g.id)}">دفع بديمة</button><button class="pfbtn" type="button" data-gvcancel="${esc(g.id)}">ألغها</button>`:""}
+      ${g.state==="valid"?`<button class="pfbtn go" type="button" data-gvuse="${esc(g.id)}">${session?"📅 احجز موعد بالقسيمة":"✓ استخدم القسيمة"}</button>
+        <button class="pfbtn" type="button" data-gvresend="${esc(g.id)}">أرسلها مرة ثانية</button>`:""}
+      ${g.state==="expired"?`<button class="pfbtn go" type="button" data-gvextend="${esc(g.id)}">مدّدها ٣ شهور</button>`:""}
+      ${g.state!=="cancelled"&&g.state!=="used"?`<button class="pfbtn" type="button" data-gvedit="${esc(g.id)}">عدّل</button>`:""}
+    </div>
+  </div>`;
+}
+function renderGifts(box){
+  if(!GV){ box.innerHTML='<div class="pfrule">لحظة…</div>'; return; }
+  const all=GV.gifts||[];
+  const n=s=>all.filter(g=>g.state===s).length;
+  const q=GVQ.toLowerCase();
+  const rows=all.filter(g=>(GVF==="all"||g.state===GVF) && (!q || [g.code,g.name,g.buyer.name,g.buyer.phone,g.buyer.email,g.to.name,g.to.phone,g.to.email].join(" ").toLowerCase().indexOf(q)!==-1));
+  box.innerHTML = (GVFORM?gvFormHtml():`<div class="gvtools"><button class="addbtn" type="button" data-gvnew>＋ قسيمة هدية جديدة</button></div>`)
+    + gvDoneHtml()
+    + `<div class="gvsum">${[["valid","سارية"],["unpaid","بانتظار الدفع"],["used","استُخدمت"],["expired","منتهية"]].map(([k,l])=>`<button type="button" class="s${GVF===k?" on":""}" data-gvf="${k}"><b>${fmt(n(k))}</b><span>${l}</span></button>`).join("")}</div>
+      <div class="gvtools"><input id="gvSearch" type="search" placeholder="ابحث بالكود أو الاسم أو الجوال" value="${esc(GVQ)}">${GVF!=="all"?`<button class="pfbtn" type="button" data-gvf="all">اعرض الكل</button>`:""}</div>
+      ${rows.length?`<div class="gvlist">${rows.map(gvCard).join("")}</div>`:`<div class="pfrule">${all.length?"ما في قسائم بهالاختيار.":"ما في قسائم هدايا للحين."}</div>`}`;
+}
+/* the search box keeps focus while the list redraws under it */
+document.addEventListener("input", e=>{
+  if(e.target && e.target.id==="gvSearch"){ GVQ=e.target.value; gvReadForm(); const pos=e.target.selectionStart; renderSalesTeam(); const s=$("#gvSearch"); if(s){ s.focus(); try{ s.setSelectionRange(pos,pos); }catch(_){} } }
+});
+async function gvCopy(t){
+  try{ await navigator.clipboard.writeText(t); stMsg("انسخ الرابط ✅", true); }
+  catch(_){ const c=$("#gvLinkTxt"); if(c){ const r=document.createRange(); r.selectNodeContents(c); const s=getSelection(); s.removeAllRanges(); s.addRange(r); } stMsg("انسخه من المربع", true); }
+}
+const gvFind=id=>((GV&&GV.gifts)||[]).find(x=>x.id===id);
+$("#stBody") && $("#stBody").addEventListener("click", async e=>{
+  if(STTAB!=="gifts") return;
+  const t=e.target;
+  if(t.closest("[data-gvnew]")){ GVFORM=gvNewForm(); GVDONE=null; renderSalesTeam(); return; }
+  const f=t.closest("[data-gvf]"); if(f){ GVF=f.dataset.gvf===GVF?"all":f.dataset.gvf; renderSalesTeam(); return; }
+  const w=t.closest("[data-gvwhat]"); if(w){ gvReadForm(); GVFORM.what=w.dataset.gvwhat; GVFORM.key=""; GVFORM.mode=""; GVFORM.amount=""; renderSalesTeam(); return; }
+  const k=t.closest("[data-gvkey]"); if(k){ gvReadForm(); GVFORM.key=k.dataset.gvkey; GVFORM.amount=""; const it=gvItem(); GVFORM.mode=it&&it.modes&&it.modes.length?it.modes[0]:""; renderSalesTeam(); return; }
+  const m=t.closest("[data-gvmode]"); if(m){ gvReadForm(); GVFORM.mode=m.dataset.gvmode; GVFORM.amount=""; renderSalesTeam(); return; }
+  const p=t.closest("[data-gvpay]"); if(p){ gvReadForm(); GVFORM.pay=p.dataset.gvpay; renderSalesTeam(); return; }
+  const cp=t.closest("[data-gvcopy]"); if(cp){ gvCopy(cp.dataset.gvcopy); return; }
+  if(t.closest("[data-gvcreate]")){
+    gvReadForm(); const F=GVFORM, it=gvItem();
+    if(!it) return stMsg("اختر شنو الهدية", false);
+    if(it.modes&&it.modes.length>1&&!F.mode) return stMsg("اختر أونلاين أو حضوري", false);
+    if(F.bName.length<2) return stMsg("اكتب اسم اللي بيدفع", false);
+    if(F.bPhone.replace(/\D/g,"").length<7) return stMsg("رقم جوال اللي بيدفع غير صحيح", false);
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(F.bEmail)) return stMsg("إيميل اللي بيدفع غير صحيح", false);
+    if(F.tName.length<2) return stMsg("اكتب اسم اللي الهدية له", false);
+    if(F.tEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(F.tEmail)) return stMsg("إيميل اللي الهدية له غير صحيح", false);
+    const canType=it.typed||(GV&&GV.canPrice);
+    const amount=canType?Number(F.amount):gvListed(it,F.mode);
+    if(!(amount>0)) return stMsg("اكتب المبلغ", false);
+    if(F.pay==="deema" && !confirm(`تأكدت إن دفعة ${fmt(amount)} د.ك وصلت عن طريق ديمة؟ القسيمة بتطلع وتنرسل على طول.`)) return;
+    const b=t.closest("[data-gvcreate]"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+    try{
+      const r=(await createGift({ what:F.what, key:F.key, mode:F.mode, paymentMethod:F.pay, months:F.months,
+        ...(canType?{ amount }:{}),
+        buyer:{ name:F.bName, phone:F.bPhone, email:F.bEmail }, to:{ name:F.tName, phone:F.tPhone, email:F.tEmail }, message:F.msg })).data||{};
+      GVDONE=Object.assign({ name:it.name, buyer:F.bName, to:F.tName, toMailed:!!F.tEmail }, r);
+      GVFORM=null; stMsg(r.paid?"طلعت القسيمة ✅":"انسوى رابط الدفع ✅", true);
+      await loadGifts();
+    }catch(err){ stMsg((err&&err.message)||"تعذّر", false); b.disabled=false; b.textContent=t0; }
+    return;
+  }
+  const dz=t.closest("[data-gvdeema]");
+  if(dz){ const g=gvFind(dz.dataset.gvdeema)||{};
+    if(!confirm(`تأكدت إن ${g.buyer?g.buyer.name:""} دفع ${fmt(g.amount)} د.ك عن طريق ديمة؟ القسيمة بتطلع وتنرسل على طول.`)) return;
+    dz.disabled=true;
+    try{ const r=(await editGift({ id:dz.dataset.gvdeema, action:"deema" })).data||{}; stMsg(r.mailed?"طلعت القسيمة وانرسلت ✅":"طلعت القسيمة — بس الإيميل ما انرسل", !!r.mailed); await loadGifts(); }
+    catch(err){ dz.disabled=false; stMsg((err&&err.message)||"تعذّر", false); } return; }
+  const cx=t.closest("[data-gvcancel]");
+  if(cx){ if(!confirm("تلغي رابط الدفع هذا؟ ما ينقدر يندفع بعدها.")) return;
+    try{ await editGift({ id:cx.dataset.gvcancel, action:"cancel" }); stMsg("انلغت", true); await loadGifts(); }
+    catch(err){ stMsg((err&&err.message)||"تعذّر", false); } return; }
+  const rs=t.closest("[data-gvresend]");
+  if(rs){ rs.disabled=true;
+    try{ const r=(await editGift({ id:rs.dataset.gvresend, action:"resend" })).data||{}; stMsg(`انرسلت (${fmt(r.mailed)} إيميل) ✅`, true); await loadGifts(); }
+    catch(err){ rs.disabled=false; stMsg((err&&err.message)||"تعذّر الإرسال", false); } return; }
+  const ex=t.closest("[data-gvextend]");
+  if(ex){ try{ await editGift({ id:ex.dataset.gvextend, addMonths:3 }); stMsg("تمددت ٣ شهور ✅", true); await loadGifts(); }
+    catch(err){ stMsg((err&&err.message)||"تعذّر", false); } return; }
+  const ed=t.closest("[data-gvedit]"); if(ed){ gvDialog(gvFind(ed.dataset.gvedit), "edit"); return; }
+  const us=t.closest("[data-gvuse]");
+  if(us){
+    const g=gvFind(us.dataset.gvuse); if(!g) return;
+    if(g.what==="consult"||g.what==="call"){
+      if(!g.to.email){ gvDialog(g, "edit", "اكتب إيميل اللي الهدية له أول — تأكيد الموعد يروح له"); return; }
+      const it=((GV&&GV.catalog)||[]).find(x=>x.key===g.key&&(x.what==="consult"||x.what==="call"))||{};
+      const fr=it.first||{};
+      vuOpen({ id:g.id, name:g.to.name, packageName:g.name, sessionLabel:fr.label||"", consultantId:fr.consultantId||"",
+        consultantName:"", mode:fr.mode||(g.mode==="present"?"present":"online"), voucher:{ code:g.code } });
+      return;
+    }
+    gvDialog(g, "use");
+  }
+});
+function gvDialog(g, kind, note){
+  if(!g) return;
+  GVDLG={ id:g.id, kind };
+  const use=kind==="use";
+  $("#gvDlgTitle").textContent = use ? "استخدم القسيمة" : "عدّل القسيمة";
+  $("#gvDlgSub").textContent = use
+    ? `${g.name} · ${g.code} — ${g.what==="course"?"بنسجّل المقعد باسمه ونرسل له التأكيد":"بنرسل "+(g.what==="digital"?"المنتج":"الكتيّب")+" لإيميله"}. تأكد من بياناته:`
+    : (note || `${g.name} · ${g.code}`);
+  $("#gvToName").value=g.to.name||""; $("#gvToEmail").value=g.to.email||""; $("#gvToPhone").value=g.to.phone||"";
+  $("#gvUntil").value=g.until?stDate(g.until):""; $("#gvMessage").value=g.message||"";
+  $("#gvUntilF").hidden=use||!g.until; $("#gvMsgF").hidden=use;
+  $("#gvDlgGo").textContent = use ? (g.what==="course"?"سجّل المقعد":"أرسله واستخدم القسيمة") : "احفظ";
+  $("#gvDlgMsg").className="addmsg"; $("#gvDlgMsg").textContent="";
+  document.getElementById("gvOvl").classList.add("on");
+}
+function gvClose(){ document.getElementById("gvOvl").classList.remove("on"); GVDLG=null; }
+window.gvClose=gvClose;
+$("#gvDlgGo") && $("#gvDlgGo").addEventListener("click", async ()=>{
+  if(!GVDLG) return;
+  const msg=(t,ok)=>{ const m=$("#gvDlgMsg"); m.textContent=t; m.className="addmsg "+(ok?"ok":"err"); };
+  const toName=$("#gvToName").value.trim(), toEmail=$("#gvToEmail").value.trim(), toPhone=$("#gvToPhone").value.trim();
+  if(toName.length<2) return msg("اكتب الاسم", false);
+  if(toEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(toEmail)) return msg("الإيميل غير صحيح", false);
+  const b=$("#gvDlgGo"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+  try{
+    if(GVDLG.kind==="use"){
+      if(!toEmail){ b.disabled=false; b.textContent=t0; return msg("اكتب إيميله — عليه يوصله", false); }
+      const r=(await redeemGift({ id:GVDLG.id, toName, toEmail, toPhone })).data||{};
+      msg(r.delivered?"✓ انستخدمت ووصله الإيميل":"✓ انستخدمت — بس الإيميل ما انرسل: "+(r.deliverError||""), !!r.delivered);
+    } else {
+      const g=gvFind(GVDLG.id)||{};
+      const until=$("#gvUntil").value;
+      await editGift({ id:GVDLG.id, toName, toEmail, toPhone, message:$("#gvMessage").value.trim(),
+        ...(until && g.until && until!==stDate(g.until) ? { until } : {}) });
+      msg("انحفظت ✅", true);
+    }
+    setTimeout(()=>{ gvClose(); loadGifts(); }, 900);
+  }catch(err){ msg((err&&err.message)||"تعذّر", false); }
+  finally{ b.disabled=false; b.textContent=t0; }
+});
+
 /* فريق المبيعات › التقارير: counts per week and per month, no money */
 const getActivityReport=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getActivityReport");
 let STREP=null;
@@ -2822,6 +3078,7 @@ function renderSalesTeam(){
   const box=$("#stBody"); if(!box || !ST) return;
   if(STTAB==="report"){ renderActivityReport(box); return; }
   if(STTAB==="budget"){ renderBudget(box); if(!BG) loadBudget(); return; }
+  if(STTAB==="gifts"){ renderGifts(box); if(!GV) loadGifts(); return; }
   if(STTAB==="leads"){
     const rows=(ST.leads||[]);
     box.innerHTML = rows.length ? rows.map(l=>`
@@ -3688,26 +3945,32 @@ navigator.serviceWorker && navigator.serviceWorker.addEventListener("message", e
   if(hash) try{ showPanel(hash); }catch(err){ console.error("panel switch failed:",err); }
 });
 
+/* ================= الأهداف (rebuilt 21 Nov 2026) =================
+   One screen: a summary strip, state tabs (جارية · قادمة · منتهية · الكل),
+   type chips and an owner filter over the goal cards; a goal is added or
+   edited one question at a time in a dialog. The server is unchanged in
+   what it stores: setSalesTarget / getSalesTarget, same fields. */
 async function loadTarget(){
   const box=$("#tgList"); if(!box) return;
-  box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">لحظة…</div>';
+  if(!TG) box.innerHTML='<div class="glempty">لحظة…</div>';
   try{ const r=await getSalesTarget(TGMONTH?{ month:TGMONTH }:{}); TG=r.data||null; renderTarget(); }
-  catch(e){ box.innerHTML=`<div class="muted" style="font-size:13px;padding:10px">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
+  catch(e){ box.innerHTML=`<div class="glempty">${esc((e&&e.message)||"تعذّر التحميل")}</div>`; }
 }
 
 /* which month's goals are on screen (23 Oct 2026); empty = the running cycle */
 let TGMONTH="";
 const TG_MONTHS_AR=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 const tgMonthName=k=>{ const [y,m]=String(k).split("-").map(Number); return (TG_MONTHS_AR[m-1]||k)+" "+y; };
-/* what one goal counts in: copies of a book, packages for a consultation */
-const tgUnitWord=kind=>kind==="book"?"قطعة":kind==="course"?"مقعد":kind==="contract"?"عقد":kind==="call"?"اتصال":"باقة";
-function tgUnitSync(){
-  const u=$("#tgUnit"), l=$("#tgAmountL"); if(!u||!l) return;
-  l.textContent = u.value==="count" ? `العدد (${tgUnitWord($("#tgKind").value)})` : "المبلغ (د.ك)";
-}
-$("#tgUnit") && $("#tgUnit").addEventListener("change", tgUnitSync);
-$("#tgKind") && $("#tgKind").addEventListener("change", tgUnitSync);
-$("#tgMonth") && $("#tgMonth").addEventListener("change", e=>{ TGMONTH=e.target.value; TG=null; loadTarget(); });
+const GL_KINDS={
+  book:    { ic:"📘", ar:"كتيّبات",        one:"كتيّب",          unit:"قطعة",  hint:"نسخ الكتيّبات اللي انباعت" },
+  consult: { ic:"💬", ar:"استشارات",       one:"استشارة",        unit:"باقة",  hint:"باقات الاستشارة" },
+  call:    { ic:"📞", ar:"اتصال سريع",     one:"اتصال سريع",     unit:"اتصال", hint:"الاتصالات السريعة" },
+  course:  { ic:"🎓", ar:"ورش وديوانيات", one:"ورشة / ديوانية", unit:"مقعد",  hint:"مقاعد ورشة أو ديوانية وحدة" },
+  contract:{ ic:"📄", ar:"عقود",           one:"عقد",            unit:"عقد",   hint:"العقود المسجلة يدوياً" },
+};
+const tgUnitWord=kind=>(GL_KINDS[kind]||GL_KINDS.consult).unit;
+const GL_ST={ ok:"على المسار", behind:"متأخر", hit:"تحقق 🎉", future:"ما بدأ", missed:"خلصت المدة" };
+let GLS="live", GLK="all", GLO="", GLOPEN={};
 
 function tgSlug(label){
   /* an Arabic label cannot be a document id, so the id is derived from the
@@ -3717,68 +3980,283 @@ function tgSlug(label){
   for(let i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; }
   return "t"+Math.abs(h).toString(36);
 }
+const glMayEdit=()=>!!(DATA && (DATA.role==="all" || DATA.role==="sales"));
+function glOwners(){
+  const act=((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).filter(c=>c.active!==false).map(c=>({ id:c.id, name:c.name }));
+  if(!act.some(c=>c.id==="nora")) act.push({ id:"nora", name:"نورة" });
+  return act;
+}
+const glOwnerName=id=>{ if(!id) return ""; const o=glOwners().find(x=>x.id===id); return o?o.name:id; };
+/* where the window stands today: how far through it we are */
+function glTiming(t){
+  const s=Date.parse(t.from+"T00:00:00+03:00"), e=Date.parse(t.to+"T00:00:00+03:00")+864e5;
+  const frac=(s&&e&&e>s)?Math.min(1,Math.max(0,(Date.now()-s)/(e-s))):0;
+  return { s, e, frac };
+}
+function glStatus(t){
+  if(t.hit) return "hit";
+  if(t.future) return "future";
+  if(t.ended) return "missed";
+  /* on track while the bar is no more than 5 points behind where the days are */
+  return (Number(t.pct)||0) >= glTiming(t).frac*100-5 ? "ok" : "behind";
+}
+const glBucket=t=>t.future?"future":t.ended?"ended":"live";
+function glDay(k){ if(!k) return ""; const [y,m,d]=String(k).split("-").map(Number); return `${d} ${(TG_MONTHS_AR[m-1]||"").slice(0,3)}`; }
+function glFollows(t){
+  if(t.kind==="book") return { txt:t.productName||"الكتيّبات كلها" };
+  if(t.kind==="course") return t.pkgName ? { txt:t.pkgName+(t.pkg&&!t.pkgSaved?" · من اسم الهدف":"") } : { txt:"⚠️ ما اخترتوا ورشة — يحسب كل الورش مع بعض. عدّل الهدف واختر وحدة", warn:true };
+  if(t.kind==="consult"||t.kind==="call") return { txt:(t.pkgName||"الباقات كلها")+(t.pkg&&!t.pkgSaved?" · من اسم الهدف":"") };
+  return { txt:"العقود المسجلة" };
+}
+function glNeed(t){
+  if(t.hit||t.future||t.ended) return "";
+  const days=Math.max(1, Number(t.daysLeft)||1);
+  if(t.unit==="count"){
+    const left=Math.max(0,(t.target||0)-(t.count||0)); if(!left) return "";
+    const per=left/days;
+    return per<=1 ? `باقي ${fmt(left)} ${tgUnitWord(t.kind)} خلال ${fmt(days)} يوم` : `تحتاج تقريباً ${fmt(Math.ceil(per))} ${tgUnitWord(t.kind)} باليوم عشان توصل`;
+  }
+  if(TG&&TG.money){
+    const left=Math.max(0,(t.target||0)-(t.achieved||0)); if(!left) return "";
+    return `تحتاج تقريباً ${kwd(Math.ceil(left/days))} باليوم عشان توصل`;
+  }
+  return `باقي ${fmt(Math.max(0,100-(Number(t.pct)||0)))}% خلال ${fmt(days)} يوم`;
+}
 
 function renderTarget(){
   const box=$("#tgList"); if(!box||!TG) return;
-  /* full access and نورة add, edit (13 Oct 2026) and delete (22 Oct 2026) goals */
-  const mayEdit = !!(DATA && (DATA.role==="all" || DATA.role==="sales"));
-  const form=$("#tgForm"); if(form) form.hidden=!mayEdit;
-  const bsel=$("#tgBook");
-  if(mayEdit && bsel && bsel.options.length<2 && (TG.books||[]).length){
-    bsel.innerHTML='<option value="">الكتيّبات كلها</option>'+TG.books.map(b=>`<option value="${esc(b.key)}">${esc(b.name)}</option>`).join("");
-    tgBookShow();
-  }
-  if(mayEdit) tgBookShow();      // the package list arrives with the goals
-  const osel=$("#tgOwner");
-  if(mayEdit && osel && !osel.options.length){
-    osel.innerHTML='<option value="">— بدون صاحب —</option>'+
-      /* a departed consultant is not somebody a NEW goal can belong to. The
-         diary picker is the one place they stay visible, and only until their
-         remaining sessions have been moved. */
-      ((DATA&&DATA.bookings&&DATA.bookings.consultants)||[]).filter(c=>c.active!==false).map(c=>
-        `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")+
-      '<option value="nora">نورة</option>';
-  }
+  const mayEdit=glMayEdit();
+  const nb=$("#glNew"); if(nb) nb.hidden=!mayEdit;
   const ms=$("#tgMonth");
   if(ms && (TG.months||[]).length && ms.options.length!==(TG.months.length)){
     ms.innerHTML=TG.months.map((k,i)=>`<option value="${i?esc(k):""}">${esc(tgMonthName(k))}${i?"":" (الحالي)"}</option>`).join("");
   }
   if(ms) ms.value=TGMONTH;
-  const rows=TG.targets||[];
-  if(!rows.length){ box.innerHTML='<div class="muted" style="font-size:13px;padding:10px">ما في أهداف مسجّلة.</div>'; return; }
+  const all=TG.targets||[];
+  /* owner filter: whoever owns a goal on screen */
+  const os=$("#glOwner");
+  if(os){
+    const ids=[...new Set(all.map(t=>t.owner||"").filter(Boolean))];
+    const want=`<option value="">كل الأشخاص</option>`+ids.map(id=>`<option value="${esc(id)}">${esc(glOwnerName(id))}</option>`).join("")+(all.some(t=>!t.owner)?`<option value="-">بدون صاحب</option>`:"");
+    if(os.dataset.sig!==want){ os.innerHTML=want; os.dataset.sig=want; }
+    if(GLO && !ids.includes(GLO) && GLO!=="-") GLO="";
+    os.value=GLO;
+  }
+  const byOwner=all.filter(t=>!GLO || (GLO==="-" ? !t.owner : t.owner===GLO));
+  /* state tabs with their counts */
+  const nIn=b=>byOwner.filter(t=>b==="all"||glBucket(t)===b).length;
+  document.querySelectorAll("#glState [data-gls]").forEach(b=>{
+    const k=b.dataset.gls; b.classList.toggle("on",k===GLS);
+    b.innerHTML=`${{live:"جارية",future:"قادمة",ended:"منتهية",all:"الكل"}[k]}<i>${fmt(nIn(k))}</i>`;
+  });
+  const inState=byOwner.filter(t=>GLS==="all"||glBucket(t)===GLS);
+  /* type chips — only the kinds that have goals here */
+  const kinds=Object.keys(GL_KINDS).filter(k=>inState.some(t=>(t.kind||"book")===k));
+  if(GLK!=="all" && !kinds.includes(GLK)) GLK="all";
+  $("#glKinds").innerHTML = kinds.length>1 ? [`<button type="button" data-glk="all" class="${GLK==="all"?"on":""}">الكل<i>${fmt(inState.length)}</i></button>`]
+    .concat(kinds.map(k=>`<button type="button" data-glk="${k}" class="${GLK===k?"on":""}">${GL_KINDS[k].ic} ${GL_KINDS[k].ar}<i>${fmt(inState.filter(t=>(t.kind||"book")===k).length)}</i></button>`)).join("") : "";
+  const rows=inState.filter(t=>GLK==="all"||(t.kind||"book")===GLK);
+  /* the strip reads the running goals under the same owner/type filter */
+  const live=byOwner.filter(t=>glBucket(t)==="live"&&(GLK==="all"||(t.kind||"book")===GLK));
+  const cnt=s=>live.filter(t=>glStatus(t)===s).length;
+  const hitAll=byOwner.filter(t=>t.hit&&(GLK==="all"||(t.kind||"book")===GLK)).length;
+  $("#glSum").innerHTML=
+    `<div class="s"><b>${fmt(live.length)}</b><span>أهداف جارية</span></div>`+
+    `<div class="s ok"><b>${fmt(cnt("ok"))}</b><span>على المسار</span></div>`+
+    `<div class="s bh"><b>${fmt(cnt("behind"))}</b><span>متأخرة عن الأيام</span></div>`+
+    `<div class="s hit"><b>${fmt(hitAll)}</b><span>تحققت</span></div>`;
+  if(!all.length){
+    box.innerHTML=`<div class="glempty">ما في أهداف مسجّلة لهالشهر.${mayEdit?`<br><button class="addbtn" type="button" data-glnew style="margin-top:12px">＋ أضف أول هدف</button>`:""}</div>`; return;
+  }
+  if(!rows.length){ box.innerHTML=`<div class="glempty">ما في أهداف ${{live:"جارية",future:"قادمة",ended:"منتهية",all:""}[GLS]} بهالاختيار.</div>`; return; }
+  const order={ behind:0, ok:1, future:2, hit:3, missed:4 };
+  rows.sort((a,b)=>order[glStatus(a)]-order[glStatus(b)] || (a.daysLeft||0)-(b.daysLeft||0));
   box.innerHTML=rows.map(t=>{
-    /* the bar is capped so going past target does not overflow the track,
-       while the number above it still shows the real figure */
-    const w=Math.min(100, Math.max(0, Number(t.pct)||0));
-    return `<div class="tgcard">
+    const st=glStatus(t), K=GL_KINDS[t.kind||"book"]||GL_KINDS.book, fol=glFollows(t);
+    const w=Math.min(100,Math.max(0,Number(t.pct)||0));
+    const pace=(st==="ok"||st==="behind")?Math.round(glTiming(t).frac*1000)/10:null;
+    const need=glNeed(t);
+    const big=t.unit==="count"?`${fmt(t.count)} من ${fmt(t.target)} ${esc(tgUnitWord(t.kind))}`:(TG.money?`${kwd(t.achieved)} من ${kwd(t.target)}`:`من هدف ${kwd(t.target)}`);
+    const open=!!GLOPEN[t.id];
+    const det=(TG.money&&(t.byProduct||[]).length)||(t.mix||[]).length;
+    return `<article class="glcard st-${st}">
+      <header><span class="glk">${K.ic} ${esc(K.one)}</span><span class="glst">${esc(GL_ST[st])}</span></header>
       <h3>${esc(t.label)}</h3>
-      ${t.kind==="book"?`<div class="tgwin">📘 ${t.productName?esc(t.productName):"الكتيّبات كلها"}</div>`:""}
-      ${t.kind==="book"&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">بيع هالفترة: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}
-      ${t.kind==="course"?`<div class="tgwin">🎓 ${t.pkgName?esc(t.pkgName):"⚠️ ما اخترتوا ديوانية — يحسب كل الورش مع بعض، عدّل الهدف واختر وحدة"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر عشان تثبت)</span>':""}</div>${!t.pkg&&(t.mix||[]).length?`<div class="tgwin" style="opacity:.8">انحسب: ${(t.mix||[]).map(x=>`${esc(x.name)} ${fmt(x.count)}`).join(" · ")}</div>`:""}`:""}
-      ${(t.kind==="consult"||t.kind==="call")?`<div class="tgwin">📦 ${t.pkgName?esc(t.pkgName):"الباقات كلها"}${t.pkg&&!t.pkgSaved?' <span style="opacity:.7">(من اسم الهدف — عدّل واختر الباقة عشان تثبت)</span>':""}</div>`:""}
-      ${t.kind==="course"?`<div class="tgwin">🎟️ ${t.pkgName?esc(t.pkgName):"الورش كلها"}</div>`:""}
-      <div class="tgwin">${t.fixed?"📅 فترة محددة · ":""}من <bdi>${esc(t.from)}</bdi> إلى <bdi>${esc(t.to)}</bdi> · ${t.ended?"خلصت المدة":t.future?"ما بدت للحين":"باقي "+fmt(t.daysLeft)+" يوم"}</div>
-      <div class="tgbig">
-        <span class="pct">${fmt(t.pct)}%</span>
-        <span class="of">${t.unit==="count"?`${fmt(t.count)} من هدف ${fmt(t.target)} ${esc(tgUnitWord(t.kind))}`:`من هدف ${kwd(t.target)}`}</span>
+      <div class="glfol${fol.warn?" warn":""}">${esc(fol.txt)}</div>
+      <div class="glnum"><b>${fmt(t.pct)}%</b><span>${big}</span></div>
+      <div class="gltrack" role="img" aria-label="${fmt(t.pct)}%"><div class="glfill" style="width:${w}%"></div>${pace!=null?`<i class="glpace" style="inset-inline-start:${pace}%" title="المفروض نكون هني اليوم: ${pace}%"></i>`:""}</div>
+      <div class="glmeta">
+        <span>📅 <bdi>${esc(glDay(t.from))}</bdi> – <bdi>${esc(glDay(t.to))}</bdi>${t.fixed?" · فترة محددة":" · شهري"}${t.ended?"":t.future?"":" · باقي <b>"+fmt(t.daysLeft)+"</b> يوم"}</span>
+        ${t.owner?`<span>👤 ${esc(glOwnerName(t.owner))}</span>`:""}
+        <span>🧾 <b>${fmt(t.count)}</b> عملية${t.gifts?` · 🎁 منها <b>${fmt(t.gifts)}</b> قسيمة هدية`:""}</span>
+        ${TG.money&&t.unit!=="count"?`<span>باقي <b>${kwd(Math.max(0,(t.target||0)-(t.achieved||0)))}</b></span>`:""}
       </div>
-      <div class="tgtrack"><div class="tgfill${t.hit?" hit":""}" style="width:${w}%"></div></div>
-      <div class="tgmeta">
-        <span>عدد المبيعات: <b>${fmt(t.count)}</b></span>
-        ${TG.money?`<span>تحقّق: <b>${kwd(t.achieved)}</b></span>
-                    <span>باقي: <b>${kwd(Math.max(0,(t.target||0)-(t.achieved||0)))}</b></span>`:""}
-      </div>
-      ${t.hit?`<div class="tghit">🎉 وصلنا الهدف! ${t.unit==="count"?fmt(t.count)+" من "+fmt(t.target)+" "+esc(tgUnitWord(t.kind)):TG.money?esc(kwd(t.achieved))+" من "+esc(kwd(t.target)):fmt(t.pct)+"%"}</div>`:""}
-      ${mayEdit?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="pfbtn" data-tgedit="${esc(t.id)}">عدّل</button>
-        <button class="pfbtn" data-tgoff="${esc(t.id)}">احذف</button></div>`:""}
-      ${TG.money&&(t.byProduct||[]).length?`<table class="pftab" style="margin-top:16px">
-        <thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>`+
-        t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")+
-        `</tbody></table>`:""}
-    </div>`;
+      ${need?`<div class="glneed${st==="ok"?" ok":""}">${esc(need)}</div>`:""}
+      ${(det||mayEdit)?`<footer>
+        ${det?`<button class="pfbtn" type="button" data-gldet="${esc(t.id)}">${open?"أخفِ التفاصيل":"التفاصيل"}</button>`:""}
+        ${mayEdit?`<button class="pfbtn" type="button" data-tgedit="${esc(t.id)}">عدّل</button><button class="pfbtn" type="button" data-tgoff="${esc(t.id)}">احذف</button>`:""}
+      </footer>`:""}
+      ${open?`<div class="gldet">
+        ${(t.mix||[]).length?`<div>${t.kind==="course"?"انحسب":"انباع هالفترة"}: ${(t.mix||[]).map(x=>`${esc(x.name)} <b>${fmt(x.count)}</b>`).join(" · ")}</div>`:""}
+        ${TG.money&&(t.byProduct||[]).length?`<table><thead><tr><th>المنتج</th><th>عدد</th><th>المبلغ</th></tr></thead><tbody>${t.byProduct.map(b=>`<tr><td>${esc(b.product)}</td><td class="num">${fmt(b.count)}</td><td class="num">${kwd(b.revenue)}</td></tr>`).join("")}</tbody></table>`:""}
+      </div>`:""}
+    </article>`;
   }).join("");
 }
+
+$("#tgMonth") && $("#tgMonth").addEventListener("change", e=>{ TGMONTH=e.target.value; TG=null; GLS=TGMONTH?"all":"live"; loadTarget(); });
+$("#glOwner") && $("#glOwner").addEventListener("change", e=>{ GLO=e.target.value; renderTarget(); });
+document.addEventListener("click", async (e)=>{
+  const s=e.target.closest("#glState [data-gls]"); if(s){ GLS=s.dataset.gls; renderTarget(); return; }
+  const k=e.target.closest("#glKinds [data-glk]"); if(k){ GLK=k.dataset.glk; renderTarget(); return; }
+  const d=e.target.closest("[data-gldet]"); if(d){ GLOPEN[d.dataset.gldet]=!GLOPEN[d.dataset.gldet]; renderTarget(); return; }
+  if(e.target.closest("#glNew,[data-glnew]")){ glOpen(null); return; }
+  const ed=e.target.closest("[data-tgedit]");
+  if(ed){ const t=((TG&&TG.targets)||[]).find(x=>x.id===ed.dataset.tgedit); if(t) glOpen(t); return; }
+  const off=e.target.closest("[data-tgoff]");
+  if(off){
+    const t=((TG&&TG.targets)||[]).find(x=>x.id===off.dataset.tgoff)||{};
+    if(!confirm(`تحذف «${t.label||"الهدف"}»؟ يختفي من القائمة ويوقف عدّه.`)) return;
+    off.disabled=true;
+    try{ await setSalesTarget({ id:off.dataset.tgoff, remove:true }); TG=null; await loadTarget(); tgMsg("انحذف الهدف",true); }
+    catch(err){ tgMsg((err&&err.message)||"تعذّر",false); off.disabled=false; }
+  }
+});
+
+/* ---- the add/edit dialog: five short questions ---- */
+let GW=null;
+const GL_STEPS=5;
+function glOpen(t){
+  if(!TG) return;
+  GW = t ? {
+    id:t.id, step:0, kind:t.kind||"book", follow:t.kind==="book"?(t.product||""):(t.pkgSaved||t.pkg||""),
+    label:t.label||"", touched:true, unit:t.unit==="count"?"count":"money", amount:t.target||"",
+    period:t.fixed?"fixed":"cycle", day:t.cycleDay||1, from:t.fromDate||"", to:t.toDate||"", owner:t.owner||"", seen:GL_STEPS-1,
+  } : { id:"", step:0, kind:"", follow:"", label:"", touched:false, unit:"money", amount:"", period:"cycle", day:1, from:"", to:"", owner:"", seen:0 };
+  $("#glWizTitle").textContent=t?"تعديل الهدف":"هدف جديد";
+  glMsgSet("");
+  glPaint();
+  document.getElementById("glOvl").classList.add("on");
+}
+function glClose(){ document.getElementById("glOvl").classList.remove("on"); GW=null; }
+window.glClose=glClose;
+function glMsgSet(t,ok){ const m=$("#glMsg"); if(!m) return; m.textContent=t||""; m.className="addmsg"+(t?(ok?" ok":" err"):""); }
+function glFollowList(){
+  if(!GW) return [];
+  if(GW.kind==="book") return [{ key:"", name:"الكتيّبات كلها", sub:"كل كتيّب ينباع" }].concat((TG.books||[]).map(b=>({ key:b.key, name:b.name })));
+  if(GW.kind==="course") return ((TG.packages||[]).filter(x=>x.kind==="course")).map(x=>({ key:x.key, name:x.name }));
+  if(GW.kind==="consult"||GW.kind==="call") return [{ key:"", name:"الباقات كلها", sub:"كل "+(GW.kind==="call"?"اتصال":"باقة")+" تنباع" }].concat(((TG.packages||[]).filter(x=>x.kind===GW.kind)).map(x=>({ key:x.key, name:x.name })));
+  return [];
+}
+function glAutoLabel(){
+  if(!GW || GW.touched) return;
+  const f=glFollowList().find(x=>x.key===GW.follow);
+  const K=GL_KINDS[GW.kind]||{};
+  GW.label = GW.kind==="contract" ? "هدف العقود" : ("هدف "+(f&&f.key?f.name:(K.ar||"")));
+}
+function glPaint(){
+  if(!GW) return;
+  const st=GW.step;
+  document.querySelectorAll("#glSteps li").forEach(li=>{
+    const i=Number(li.dataset.step);
+    li.classList.toggle("on",i===st); li.classList.toggle("done",i!==st&&i<=GW.seen);
+  });
+  document.querySelectorAll(".glpane").forEach(p=>p.hidden=Number(p.dataset.pane)!==st);
+  $("#glBack").style.visibility=st?"visible":"hidden";
+  $("#glNext").textContent = st===GL_STEPS-1 ? (GW.id?"احفظ التعديل":"احفظ الهدف") : "التالي";
+  if(st===0){
+    $("#glKindTiles").innerHTML=Object.keys(GL_KINDS).map(k=>`<button type="button" class="gltile${GW.kind===k?" on":""}" data-glkind="${k}"><span class="i">${GL_KINDS[k].ic}</span><b>${esc(GL_KINDS[k].ar)}</b><small>${esc(GL_KINDS[k].hint)}</small></button>`).join("");
+  }
+  if(st===1){
+    const L=glFollowList();
+    $("#glFollowQ").textContent = GW.kind==="course" ? "أي ورشة أو ديوانية؟" : GW.kind==="book" ? "أي كتيّب؟" : GW.kind==="contract" ? "هدف العقود يحسب كل العقود المسجلة — سمّه بس" : "أي باقة؟";
+    if(GW.kind==="course" && !GW.follow && L.length===1) GW.follow=L[0].key;
+    $("#glFollow").innerHTML=L.map(x=>`<button type="button" class="glopt${GW.follow===x.key?" on":""}" data-glfol="${esc(x.key)}"><span>${esc(x.name)}</span>${x.sub?`<small>${esc(x.sub)}</small>`:""}</button>`).join("")
+      || (GW.kind==="course"?`<div class="muted" style="font-size:13px">ما في ورش مفتوحة الحين.</div>`:"");
+    glAutoLabel(); $("#tgLabel").value=GW.label;
+  }
+  if(st===2){
+    document.querySelectorAll("#glUnit [data-u]").forEach(b=>b.classList.toggle("on",b.dataset.u===GW.unit));
+    $("#tgAmount").value=GW.amount;
+    $("#glUnitWord").textContent = GW.unit==="count" ? tgUnitWord(GW.kind) : "د.ك";
+    const q = GW.unit==="count" ? [5,10,20,30,50] : [250,500,1000,1500,3000];
+    $("#glQuick").innerHTML=q.map(n=>`<button type="button" data-glq="${n}">${fmt(n)}</button>`).join("");
+    setTimeout(()=>{ const a=$("#tgAmount"); if(a) a.focus(); }, 60);
+  }
+  if(st===3){
+    document.querySelectorAll("#glPeriod [data-p]").forEach(b=>b.classList.toggle("on",b.dataset.p===GW.period));
+    $("#glCycle").hidden=GW.period!=="cycle"; $("#glFixed").hidden=GW.period!=="fixed";
+    $("#tgDay").value=GW.day; $("#tgFrom").value=GW.from; $("#tgTo").value=GW.to;
+    $("#glPeriodHint").textContent = GW.period==="cycle"
+      ? `يبدأ كل شهر يوم ${GW.day} ويخلص قبله بيوم بالشهر اللي بعده — ويتجدد بروحه.`
+      : "ينحسب بس بين هالتاريخين، ويخلص بعدها.";
+  }
+  if(st===4){
+    const O=[{ id:"", name:"بدون صاحب" }].concat(glOwners());
+    $("#glOwnerTiles").innerHTML=O.map(o=>`<button type="button" class="glopt${GW.owner===o.id?" on":""}" data-glown="${esc(o.id)}"><span>${o.id?"👤 ":""}${esc(o.name)}</span></button>`).join("");
+    const f=glFollowList().find(x=>x.key===GW.follow);
+    $("#glReview").innerHTML=
+      `<div>🎯 <b>${esc(GW.label)}</b></div>`+
+      `<div>${(GL_KINDS[GW.kind]||{}).ic||""} ${esc((GL_KINDS[GW.kind]||{}).one||"")}${f?` · ${esc(f.name)}`:""}</div>`+
+      `<div>الهدف: <b>${GW.unit==="count"?fmt(GW.amount)+" "+esc(tgUnitWord(GW.kind)):kwd(GW.amount)}</b></div>`+
+      `<div>${GW.period==="fixed"?`من <bdi>${esc(GW.from)}</bdi> إلى <bdi>${esc(GW.to)}</bdi>`:`كل شهر من يوم ${fmt(GW.day)}`}</div>`;
+  }
+}
+/* each answer is checked before the next question */
+function glCheck(st){
+  if(st===0 && !GW.kind) return "اختر نوع الهدف";
+  if(st===1){
+    GW.label=String($("#tgLabel").value||"").trim();
+    if(GW.kind==="course" && !GW.follow) return "اختر الورشة أو الديوانية اللي يتبعها الهدف";
+    if(GW.label.length<2) return "اكتب اسم الهدف";
+  }
+  if(st===2){ GW.amount=Number($("#tgAmount").value)||0; if(!(GW.amount>0)) return GW.unit==="count"?"العدد لازم يكون أكبر من صفر":"المبلغ لازم يكون أكبر من صفر"; }
+  if(st===3){
+    GW.day=Math.min(28,Math.max(1,Number($("#tgDay").value)||1)); GW.from=$("#tgFrom").value||""; GW.to=$("#tgTo").value||"";
+    if(GW.period==="fixed"){
+      if(!GW.from||!GW.to) return "اختر تاريخ البداية والنهاية";
+      if(GW.to<GW.from) return "تاريخ النهاية قبل البداية";
+    }
+  }
+  return "";
+}
+async function glSave(){
+  const b=$("#glNext"); b.disabled=true; const t0=b.textContent; b.textContent="لحظة…";
+  try{
+    const fixed=GW.period==="fixed";
+    await setSalesTarget({ id:GW.id||tgSlug(GW.label), label:GW.label, kind:GW.kind,
+      fromDate:fixed?GW.from:"", toDate:fixed?GW.to:"",
+      product:GW.kind==="book"?(GW.follow||""):"",
+      pkg:(GW.kind==="consult"||GW.kind==="call"||GW.kind==="course")?(GW.follow||""):"",
+      amount:GW.amount, unit:GW.unit, currency:"KWD", cycleDay:GW.day, owner:GW.owner||"", active:true });
+    const was=!!GW.id; glClose();
+    TG=null; await loadTarget(); tgMsg(was?"انحفظ التعديل ✅":"انحفظ الهدف ✅",true);
+  }catch(e){ glMsgSet((e&&e.message)||"تعذّر الحفظ"); b.textContent=t0; }
+  finally{ b.disabled=false; }
+}
+$("#glNext") && $("#glNext").addEventListener("click", ()=>{
+  if(!GW) return;
+  const err=glCheck(GW.step); if(err) return glMsgSet(err);
+  glMsgSet("");
+  if(GW.step===GL_STEPS-1) return glSave();
+  GW.step+=1; GW.seen=Math.max(GW.seen,GW.step); glPaint();
+});
+$("#glBack") && $("#glBack").addEventListener("click", ()=>{ if(!GW||!GW.step) return; if(GW.step===1) GW.label=String($("#tgLabel").value||"").trim(); GW.step-=1; glMsgSet(""); glPaint(); });
+document.addEventListener("click", e=>{
+  if(!GW) return;
+  const li=e.target.closest("#glSteps li.done");
+  if(li){ const to=Number(li.dataset.step); for(let i=GW.step;i<to;i++){ const er=glCheck(i); if(er){ glMsgSet(er); return; } } if(GW.step===1) GW.label=String($("#tgLabel").value||"").trim(); GW.step=to; glMsgSet(""); glPaint(); return; }
+  const kd=e.target.closest("[data-glkind]");
+  if(kd){ if(GW.kind!==kd.dataset.glkind){ GW.kind=kd.dataset.glkind; GW.follow=""; if(!GW.id) GW.touched=false; } GW.step=1; GW.seen=Math.max(GW.seen,1); glMsgSet(""); glPaint(); return; }
+  const fo=e.target.closest("[data-glfol]");
+  if(fo){ GW.follow=fo.dataset.glfol; GW.label=String($("#tgLabel").value||"").trim(); glAutoLabel(); glPaint(); return; }
+  const un=e.target.closest("#glUnit [data-u]"); if(un){ GW.amount=Number($("#tgAmount").value)||""; GW.unit=un.dataset.u; glPaint(); return; }
+  const qk=e.target.closest("[data-glq]"); if(qk){ GW.amount=Number(qk.dataset.glq); $("#tgAmount").value=GW.amount; return; }
+  const pe=e.target.closest("#glPeriod [data-p]"); if(pe){ GW.day=Number($("#tgDay").value)||1; GW.from=$("#tgFrom").value||""; GW.to=$("#tgTo").value||""; GW.period=pe.dataset.p; glPaint(); return; }
+  const ow=e.target.closest("[data-glown]"); if(ow){ GW.owner=ow.dataset.glown; glPaint(); return; }
+});
+$("#tgLabel") && $("#tgLabel").addEventListener("input", ()=>{ if(GW){ GW.touched=true; } });
+$("#tgDay") && $("#tgDay").addEventListener("input", ()=>{ if(GW){ GW.day=Math.min(28,Math.max(1,Number($("#tgDay").value)||1)); const h=$("#glPeriodHint"); if(h&&GW.period==="cycle") h.textContent=`يبدأ كل شهر يوم ${GW.day} ويخلص قبله بيوم بالشهر اللي بعده — ويتجدد بروحه.`; } });
 
 let PFPERSON="";
 async function loadProfit(month){
@@ -5551,7 +6029,7 @@ const PANELS = [
     load:()=>{ if(!FU) loadFollowUp(); } },
   { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
   { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
-  { id:"target",      group:"team",   icon:"🎯", family:"money", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
+  { id:"target",      group:"sales",  icon:"🎯", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
   { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
     count:()=>((RD&&RD.rows)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
@@ -5560,7 +6038,7 @@ const PANELS = [
 ];
 let ST=null, FU=null, BS=null, RF=null;
 let IR=null, IRF="all", IROPEN=null;
-const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة", target:"هدف المبيعات" };
+const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
 /* a tapped notification opens the dashboard at …#salesteam, #tasks … — start
@@ -7647,7 +8125,7 @@ $("#vuSave") && $("#vuSave").addEventListener("click", async ()=>{
       startIso:nbIso(dt,tm), notes:$("#vuNotes").value.trim(), notify:$("#vuNotify").checked })).data||{};
     $("#vuMsg").className="addmsg ok";
     $("#vuMsg").textContent=`✓ انحجز الموعد مع ${r.consultantName||""}${r.confirmed?" ووصل العميل التأكيد":""}${r.mailError?" — بس الإيميل ما انرسل: "+r.mailError:""}`;
-    setTimeout(()=>{ vuClose(); refreshAll(); }, 1400);
+    setTimeout(()=>{ vuClose(); refreshAll(); if(typeof GV!=="undefined" && GV){ GV=null; if(STTAB==="gifts") loadGifts(); } }, 1400);
   }catch(e){
     $("#vuMsg").textContent=(e&&e.message)||"تعذّر الحجز"; $("#vuMsg").className="addmsg err";
   }finally{ btn.disabled=false; btn.textContent=t; }
@@ -8819,6 +9297,72 @@ $("#grpFlt") && $("#grpFlt").addEventListener("click",e=>{
 });
 </script>
 <div class="ovl" id="ovl" onclick="if(event.target===this)closeResult()"><div class="modal" id="modalBody"></div></div>
+
+<!-- الأهداف: a goal is set up one question at a time -->
+<div class="ovl" id="glOvl" onclick="if(event.target===this)glClose()">
+  <div class="modal m-pad glwiz" style="max-width:640px;position:relative">
+    <button class="m-x" type="button" onclick="glClose()">×</button>
+    <h3 class="glwiz-t" id="glWizTitle">هدف جديد</h3>
+    <ol class="glsteps" id="glSteps">
+      <li data-step="0"><span>١</span>النوع</li><li data-step="1"><span>٢</span>يتبع</li>
+      <li data-step="2"><span>٣</span>الرقم</li><li data-step="3"><span>٤</span>المدة</li><li data-step="4"><span>٥</span>صاحبه</li>
+    </ol>
+    <div class="glpane" data-pane="0">
+      <p class="glq">شنو تبي تقيس؟</p>
+      <div class="gltiles" id="glKindTiles"></div>
+    </div>
+    <div class="glpane" data-pane="1" hidden>
+      <p class="glq" id="glFollowQ">شنو يتبع الهدف؟</p>
+      <div class="gllist" id="glFollow"></div>
+      <div class="addf" style="margin-top:16px"><label>اسم الهدف</label><input id="tgLabel" type="text" maxlength="120" placeholder="مثال: هدف بيع الكتيبات"></div>
+    </div>
+    <div class="glpane" data-pane="2" hidden>
+      <p class="glq">كم الهدف؟</p>
+      <div class="glseg" id="glUnit"><button type="button" data-u="money" class="on">مبلغ (د.ك)</button><button type="button" data-u="count">عدد</button></div>
+      <div class="glamount"><input id="tgAmount" type="number" min="1" step="1" inputmode="decimal" aria-label="الهدف"><span id="glUnitWord">د.ك</span></div>
+      <div class="glquick" id="glQuick"></div>
+    </div>
+    <div class="glpane" data-pane="3" hidden>
+      <p class="glq">متى ينحسب؟</p>
+      <div class="glseg" id="glPeriod"><button type="button" data-p="cycle" class="on">يتجدد كل شهر</button><button type="button" data-p="fixed">فترة محددة</button></div>
+      <div id="glCycle" class="addgrid" style="margin-top:14px"><div class="addf"><label>يبدأ كل شهر يوم</label><input id="tgDay" type="number" min="1" max="28" value="1"></div></div>
+      <div id="glFixed" class="addgrid" style="margin-top:14px" hidden>
+        <div class="addf"><label>من تاريخ</label><input id="tgFrom" type="date"></div>
+        <div class="addf"><label>إلى تاريخ</label><input id="tgTo" type="date"></div></div>
+      <p class="glhint" id="glPeriodHint"></p>
+    </div>
+    <div class="glpane" data-pane="4" hidden>
+      <p class="glq">لمن الهدف؟</p>
+      <div class="gllist" id="glOwnerTiles"></div>
+      <div class="glreview" id="glReview"></div>
+    </div>
+    <div class="glnav">
+      <button class="pfbtn" id="glBack" type="button">رجوع</button>
+      <button class="addbtn" id="glNext" type="button">التالي</button>
+    </div>
+    <div class="addmsg" id="glMsg"></div>
+  </div>
+</div>
+
+<!-- قسائم الهدايا: using a gift that isn't a session, and editing one -->
+<div class="ovl" id="gvOvl" onclick="if(event.target===this)gvClose()">
+  <div class="modal m-pad" style="max-width:560px;position:relative">
+    <button class="m-x" type="button" onclick="gvClose()">×</button>
+    <h3 style="margin:0 0 4px;font-size:19px" id="gvDlgTitle">القسيمة</h3>
+    <p class="muted" style="font-size:13px;margin:0 0 16px;line-height:1.8" id="gvDlgSub"></p>
+    <div class="addgrid">
+      <div class="addf"><label>اسم اللي الهدية له</label><input id="gvToName" type="text" maxlength="120"></div>
+      <div class="addf"><label>إيميله</label><input id="gvToEmail" type="email" dir="ltr" maxlength="160"></div>
+      <div class="addf"><label>جواله</label><input id="gvToPhone" type="tel" dir="ltr" maxlength="32"></div>
+      <div class="addf" id="gvUntilF"><label>صالحة لين</label><input id="gvUntil" type="date"></div>
+    </div>
+    <div class="addf" style="margin-top:12px" id="gvMsgF"><label>رسالة الهدية</label><input id="gvMessage" type="text" maxlength="400"></div>
+    <div class="addrow">
+      <button class="addbtn" id="gvDlgGo" type="button">احفظ</button>
+    </div>
+    <div class="addmsg" id="gvDlgMsg"></div>
+  </div>
+</div>
 
 <div class="ovl" id="vuOvl" onclick="if(event.target===this)vuClose()">
   <div class="modal m-pad" style="max-width:520px;position:relative">

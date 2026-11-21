@@ -45,7 +45,7 @@ const getOrderStatus=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"get
 const card=document.getElementById("card");
 const orderId=new URLSearchParams(location.search).get("order");
 let productName="الكتاب";
-  let orderKind="book", orderMode=null, orderTool="", orderWho="", orderStart="";
+  let orderKind="book", orderMode=null, orderTool="", orderWho="", orderStart="", giftTo="", giftMailed=false;
 const L='<div class="lock"><img src="cc-mark.png" alt="Cash Clinic"><span class="wm">cash <b>clinic</b></span></div>';
 /* a consultation: its own screen, not the book's (12 Nov 2026) */
 function whenLabel(){
@@ -67,6 +67,16 @@ function okBooking(){
 }
 function ok(){
   if(orderKind==="booking"){ okBooking(); return; }
+  /* a gift voucher bought for someone else (21 Nov 2026) */
+  if(orderKind==="gift"){
+    const esc=t=>String(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    card.innerHTML=L+`<div class="ic ok">✓</div><h1>تم الدفع — هديتك جاهزة 🎁</h1>
+  <p>قسيمة <span class="mail">${esc(productName)}</span>${giftTo?" لـ <b>"+esc(giftTo)+"</b>":""}.</p>
+  <p>أرسلنا كود القسيمة لإيميلك${giftMailed?"، ووصل للي الهدية له بعد":" — عطه الكود، وهو يكلمنا عشان يستخدمها"}.</p>
+  <p>لو ما لقيت الرسالة، تأكد من <b>Spam / المهملات</b>.</p>
+  <div class="wa">أي مساعدة؟ <a href="https://wa.me/${CONFIG.whatsapp}" target="_blank" rel="noopener">راسلنا واتساب</a></div>`;
+    return;
+  }
   if(orderKind==="digital"){
     /* متابعة كاش (tool "app") or خطة رمضان — each says what it is (12 Nov 2026) */
     const isApp=orderTool==="app";
@@ -108,6 +118,8 @@ async function poll(t=0){
       if(r.data.tool) orderTool=String(r.data.tool).replace(/[^a-z]/g,"");
       if(r.data.consultant) orderWho=String(r.data.consultant);
       if(r.data.startIso) orderStart=String(r.data.startIso);
+      if(r.data.toName) giftTo=String(r.data.toName);
+      if(r.data.toMailed) giftMailed=true;
     if(s==="paid"){ok();return;} if(["failed","declined","cancelled"].includes(s)){fail();return;}
   }catch(e){console.warn(e);}
   if(t<8){setTimeout(()=>poll(t+1),2500);}else{pending();}

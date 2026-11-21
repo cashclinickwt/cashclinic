@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قسيمة هدية | كاش كلينك</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="brand/mark/mark-purple.png">
+<link rel="stylesheet" href="assets/ds/fonts/fonts.css">
+<style>
+  :root{
+    --auber:#2F1748; --purple:#614588; --gold:#D3A146; --cream:#FFE7BC;
+    --teal:#2F8789; --ink:#1B1226; --muted:#6B6577; --line:#E4E1EA; --bg:#F7F6FA;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:560px;margin:0 auto;padding:34px 18px 60px}
+  .logo{display:block;height:38px;margin:0 auto 26px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    box-shadow:0 18px 48px rgba(47,23,72,.09)}
+  .head{background:var(--auber);color:#fff;padding:28px 24px;text-align:center;position:relative}
+  .head .gift{font-size:38px;line-height:1}
+  .head .eyebrow{font-size:12.5px;color:var(--cream);letter-spacing:.02em;margin-top:8px}
+  .head h1{margin:6px 0 0;font-size:22px;font-weight:700;text-wrap:balance}
+  .head .who{margin-top:8px;font-size:14.5px;color:#D9D2E4}
+  .head .who b{color:#fff}
+  .body{padding:24px}
+  .row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .row[hidden]{display:none}
+  .row .k{color:var(--muted);flex:0 0 110px}
+  .row .v{font-weight:700;flex:1}
+  .total{display:flex;align-items:center;justify-content:space-between;
+    background:var(--cream);border-radius:14px;padding:15px 18px;margin-top:14px}
+  .total .l{font-size:14.5px;color:var(--auber)}
+  .total .a{font-size:23px;font-weight:700;color:var(--auber)}
+  .pay{display:block;width:100%;border:0;border-radius:999px;background:var(--auber);color:#fff;
+    padding:16px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
+  .pay:disabled{opacity:.55;cursor:default}
+  .note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.9}
+  .msg{display:none;font-size:14px;border-radius:12px;padding:13px 16px;margin-top:16px;line-height:1.8}
+  .msg.err{display:block;background:#FDECEC;color:#962E37}
+  .msg.ok{display:block;background:#E8F5E9;color:#2E7D32}
+  .load{text-align:center;color:var(--muted);padding:50px 0;font-size:15px}
+  .paidbox{text-align:center;padding:10px 0 4px}
+  .paidbox .tick{font-size:44px}
+  .paidbox h2{margin:8px 0 6px;font-size:20px;color:var(--teal)}
+  .paidbox p{margin:0;font-size:14.5px;color:var(--muted)}
+  .wa{display:inline-block;margin-top:16px;border:1.5px solid var(--teal);color:var(--teal);
+    border-radius:999px;padding:9px 20px;font-size:14px;text-decoration:none}
+
+  /* Same rules box, same words as book.html — reused, not reinvented. */
+  .cc-agree{background:#F4F2F7;border:1.5px solid #E4E1EA;border-radius:14px;padding:14px 16px;margin:16px 0 0;text-align:start}
+  .cc-agree label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;line-height:1.9;color:#2F1749}
+  .cc-agree input{width:19px;height:19px;flex:0 0 auto;margin-top:3px;accent-color:#2F1749;cursor:pointer}
+  .cc-agree a{color:#2F1749;font-weight:700}
+  .cc-agree.bad{border-color:#962E37;background:#FDECEC}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" src="brand/logo/logo-primary.png" alt="Cash Clinic">
+  <div class="card">
+    <div id="load" class="load">جارٍ تحميل القسيمة…</div>
+    <div id="main" hidden>
+      <div class="head">
+        <div class="gift">🎁</div>
+        <div class="eyebrow">قسيمة هدية · كاش كلينك</div>
+        <h1 id="giftName">—</h1>
+        <div class="who" id="who"></div>
+      </div>
+      <div class="body">
+        <div id="paidBox" class="paidbox" hidden>
+          <div class="tick">✅</div>
+          <h2>القسيمة مدفوعة</h2>
+          <p>أرسلنا الكود بالإيميل. شكراً لك 🌿</p>
+        </div>
+
+        <div id="details">
+          <div class="row"><span class="k">نوع الهدية</span><span class="v" id="what">—</span></div>
+          <div class="row" id="modeRow" hidden><span class="k">الطريقة</span><span class="v" id="mode">—</span></div>
+          <div class="row"><span class="k">صلاحيتها</span><span class="v" id="months">—</span></div>
+          <div class="total">
+            <span class="l">المبلغ المطلوب</span>
+            <span class="a" id="amount">—</span>
+          </div>
+          <div class="cc-agree" id="agreeBox"><label><input type="checkbox" id="termsChk"><span>إتمام الدفع يعتبر موافقة على جميع <a href="policy.html" target="_blank" rel="noopener">الشروط والسياسات</a> الخاصة بكاش كلينيك.</span></label></div>
+          <button class="pay" id="payBtn">ادفع وأرسل الهدية</button>
+          <div class="note">الدفع آمن عبر Tap. أول ما تدفع يوصلك كود القسيمة بالإيميل، ويوصل للي الهدية له إذا عطيتونا إيميله.</div>
+        </div>
+        <div class="msg" id="msg"></div>
+        <div style="text-align:center">
+          <a class="wa" href="https://wa.me/96522260820" target="_blank" rel="noopener">عندك سؤال؟ راسلنا</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const CONFIG = {
+  firebase: {
+    apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",
+    authDomain:"cash-quiz-906a6.firebaseapp.com",
+    projectId:"cash-quiz-906a6",
+    storageBucket:"cash-quiz-906a6.firebasestorage.app",
+    messagingSenderId:"547780714224",
+    appId:"1:547780714224:web:0e97107045a803623dec35"
+  },
+  functionsRegion:"us-central1"
+};
+const app = initializeApp(CONFIG.firebase);
+const fns = getFunctions(app, CONFIG.functionsRegion);
+const getGiftOffer = httpsCallable(fns, "getGiftOffer");
+const payGiftOffer = httpsCallable(fns, "payGiftOffer");
+
+const $ = s => document.querySelector(s);
+const TOKEN = new URLSearchParams(location.search).get("t") || "";
+
+function msg(text, kind){ const m = $("#msg"); m.textContent = text; m.className = "msg " + (kind||"err"); }
+
+async function load(){
+  if(!TOKEN){ $("#load").textContent = "الرابط غير صحيح."; return; }
+  try{
+    const r = await getGiftOffer({ token: TOKEN });
+    const o = (r.data||{}).offer;
+    if(!o){ $("#load").textContent = "القسيمة غير موجودة."; return; }
+    $("#giftName").textContent = o.name || "هدية";
+    const who = $("#who"); who.textContent = "";
+    if(o.toName){ who.append("هدية لـ "); const b = document.createElement("b"); b.textContent = o.toName; who.append(b); }
+    if(o.buyer){ who.append((o.toName ? " · من " : "من ") + o.buyer); }
+    $("#what").textContent = o.whatLabel || "هدية";
+    if(o.mode){ $("#modeRow").hidden = false; $("#mode").textContent = o.mode === "online" ? "أونلاين" : "حضوري"; }
+    $("#months").textContent = `${o.months} شهور من يوم الدفع`;
+    $("#amount").textContent = `${o.amount} د.ك`;
+    if(o.status === "cancelled"){
+      $("#details").hidden = true;
+      msg("هالرابط انلغى. راسلنا واتساب لو تبي تكمل الهدية.", "err");
+    } else if(o.paid){
+      $("#details").hidden = true;
+      $("#paidBox").hidden = false;
+    }
+    $("#load").hidden = true; $("#main").hidden = false;
+  }catch(e){
+    $("#load").textContent = (e && e.message) || "تعذّر تحميل القسيمة.";
+  }
+}
+
+$("#payBtn").addEventListener("click", async () => {
+  if(!$("#termsChk").checked){
+    $("#agreeBox").classList.add("bad");
+    $("#agreeBox").scrollIntoView({behavior:"smooth",block:"center"});
+    msg("لازم توافق على الشروط والسياسات قبل الدفع", "err"); return;
+  }
+  $("#agreeBox").classList.remove("bad");
+  const b = $("#payBtn"); b.disabled = true; const t = b.textContent; b.textContent = "جارٍ التحويل للدفع…";
+  try{
+    const r = await payGiftOffer({ token: TOKEN, agreePolicy: true });
+    const url = (r.data||{}).url;
+    if(!url) throw new Error("تعذّر إنشاء الدفعة");
+    location.href = url;
+  }catch(e){
+    b.disabled = false; b.textContent = t;
+    msg((e && e.message) || "تعذّر إنشاء الدفعة، حاول مرة ثانية.", "err");
+  }
+});
+
+load();
+</script>
+<script src="assets/js/hit.js" defer></script>
+</body>
+</html>
