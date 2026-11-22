@@ -15,6 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="كاش كلينك">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
 <style>
   :root{ --auber:#2F1748; --gold:#D3A146; --teal:#2F8789; --olive:#505632;
          --cream:#FFE7BC; --ink:#2F1748; --muted:#6B6577; --line:#E4E1EA; --bg:#F7F6F9; }
@@ -810,6 +811,161 @@
   .gvtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   .gvtools input{flex:1 1 220px;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;font-family:inherit;font-size:13.5px}
   @media(max-width:720px){ .gvsum{grid-template-columns:repeat(2,minmax(0,1fr))} .gvlist{grid-template-columns:1fr} .gvpay{grid-template-columns:1fr} }
+  /* ================================================================
+     REDESIGN · 22 Nov 2026 — the Cash Clinic Design System on the same
+     dashboard: one dark rail of grouped sections, a sticky top bar (search,
+     ＋ جديد, the bell), soft cards, ledger tables, and a bottom bar on the
+     phone. These rules come last on purpose: they restyle what is above
+     without touching how any section works.
+     ================================================================ */
+  :root{ --auber:#2F1748; --gold:#D5A347; --teal:#2A898C; --olive:#515732; --cream:#FFE7BC;
+         --ink:#1B1226; --muted:#756E80; --line:#E4E1EA; --bg:#FAF9FB;
+         --p050:#F3F0F8; --p100:#E3DEEC; --p300:#9384AD; --lav:#D1D4E3; --teal100:#D9ECEC; --teal700:#1F696B;
+         --sh-sm:0 2px 6px rgba(47,23,72,.07),0 1px 2px rgba(47,23,72,.05);
+         --sh-md:0 8px 24px rgba(47,23,72,.09),0 2px 6px rgba(47,23,72,.06);
+         --sh-lg:0 18px 48px rgba(47,23,72,.13),0 4px 12px rgba(47,23,72,.07); }
+  body{font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:3px solid rgba(42,137,140,.45);outline-offset:2px}
+  #dash .wrap{max-width:none;margin:0;padding:0}
+  /* the rail */
+  .shell{display:flex;gap:0;align-items:stretch;min-height:100vh}
+  .tabs{position:sticky;top:0;align-self:flex-start;flex:0 0 260px;height:100vh;max-height:100vh;
+    background:var(--auber);border:0;border-radius:0;padding:18px 12px 14px;gap:2px;color:var(--lav);
+    scrollbar-color:rgba(255,231,188,.25) transparent}
+  .navbrand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 8px 16px}
+  .navbrand img{height:30px;width:auto;display:block}
+  .navtoggle{width:auto;margin:0;padding:6px 10px;border:1px solid rgba(255,231,188,.22);color:var(--lav);font-size:14px}
+  .navtoggle:hover{border-color:var(--cream);color:var(--cream)}
+  .tabs button[data-tab]{color:var(--lav);font-weight:500;font-size:14px;padding:9px 12px;border-radius:12px}
+  .tabs button[data-tab]:hover{background:rgba(255,231,188,.08);color:#fff}
+  .tabs button[data-tab].on{background:rgba(255,231,188,.15);color:var(--cream);font-weight:600}
+  .tabs .ico{display:inline-grid;place-items:center;width:20px;height:20px;flex:0 0 20px}
+  .tabs .ico svg{width:19px;height:19px}
+  .navgrp{color:var(--p300);font-weight:600;font-size:11.5px;padding:16px 12px 6px;letter-spacing:.02em}
+  #dashTabs button .cnt{background:var(--teal);color:#fff;font-weight:700}
+  .navme{margin-top:auto;padding:14px 6px 2px;border-top:1px solid rgba(255,231,188,.16);display:flex;align-items:center;gap:10px}
+  .navme .av{width:34px;height:34px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:0 0 34px}
+  .navme .who{flex:1;min-width:0;display:flex;flex-direction:column}
+  .navme .who b{color:var(--cream);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .navme .who span{color:var(--p300);font-size:11px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .navme button{flex:0 0 auto;width:38px;height:38px;padding:0 !important;border-radius:999px !important;display:grid !important;place-items:center;
+    background:transparent;border:1px solid rgba(255,231,188,.22) !important;color:var(--lav);cursor:pointer;font:inherit}
+  .navme button .lbl,.navme button .cnt{display:none}
+  .navme button .ico{width:auto;flex:none}
+  .navme button.on{background:rgba(255,231,188,.15)}
+  .shell.mini .tabs{flex-basis:72px}
+  .shell.mini .navbrand img{display:none}
+  .shell.mini .navme .who{display:none}
+  .shell.mini .navme{flex-direction:column}
+  .shellbody{padding:0 32px 64px;min-width:0}
+  /* the top bar */
+  .top{position:sticky;top:0;z-index:35;margin:0 -32px 26px;padding:14px 32px;background:rgba(250,249,251,.94);
+    -webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);gap:12px;justify-content:flex-start}
+  .gsearch{flex:1 1 360px;max-width:560px;margin:0}
+  .gsearch input{border:0;background:#F1EFF4;border-radius:999px;padding:12px 18px 12px 44px;font-size:14px;height:46px}
+  .gsearch input:focus{background:#fff;box-shadow:0 0 0 2px var(--auber) inset}
+  .gsearch::after{content:"⌘K";position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);
+    border:1px solid #C7C2CF;border-radius:6px;padding:0 5px;direction:ltr;pointer-events:none}
+  .gsdrop{border:0;border-radius:18px;box-shadow:var(--sh-lg);padding:6px}
+  .gsrow{border:0;border-radius:12px}
+  .topacts{display:flex;align-items:center;gap:10px;margin-inline-start:auto}
+  .iconbtn{position:relative;width:46px;height:46px;padding:0;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--auber);
+    display:grid;place-items:center;cursor:pointer;font:inherit;font-size:18px}
+  .iconbtn:hover{border-color:var(--auber)}
+  #refreshBtn{width:auto;min-width:46px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:13px}
+  .bdot{position:absolute;top:3px;inset-inline-end:3px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#962D38;color:#fff;
+    font-size:11px;font-weight:700;display:grid;place-items:center;line-height:1}
+  .qadd{position:relative}
+  #qaBtn{padding:12px 22px;font-size:14.5px;display:inline-flex;align-items:center;gap:6px}
+  .qamenu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;width:250px;background:#fff;border-radius:18px;box-shadow:var(--sh-lg);padding:6px;z-index:60;display:flex;flex-direction:column}
+  .qamenu button{display:flex;align-items:center;gap:10px;border:0;background:none;border-radius:12px;padding:11px 12px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-align:start}
+  .qamenu button:hover{background:var(--p050)}
+  .qamenu button svg{color:var(--teal)}
+  /* sections */
+  .sec h2{font-size:28px;font-weight:300;color:var(--auber);letter-spacing:-.01em;margin:0 0 18px}
+  .sec h2 > span:first-child{display:none}
+  .sec h2 span.whoname{display:inline-block}
+  .kpis{gap:14px;margin-bottom:18px}
+  .kpi{border:0;border-radius:18px;box-shadow:var(--sh-sm);padding:18px 20px}
+  .kpi .n{font-size:30px;font-weight:300;color:var(--auber);letter-spacing:-.01em}
+  .kpi .l{font-size:12.5px}
+  .kpi.kpx:hover{box-shadow:var(--sh-md)}
+  .hmcard,.addbox,.hmpie,.glcard,.gvcard,.gvform,.glsum .s,.gvsum .s{border-color:transparent;box-shadow:var(--sh-sm)}
+  .hmcard,.hmpie{border-radius:18px;padding:18px 20px}
+  .addbox{border-radius:18px}
+  .tbl{border:0;border-radius:18px;box-shadow:var(--sh-sm)}
+  th{background:#fff;color:var(--auber);font-weight:600;border-bottom:1.5px solid var(--auber)}
+  td{border-bottom-color:#F1EFF4}
+  .flt button{border-color:var(--line);color:var(--ink)}
+  .flt button.on{background:var(--auber);border-color:var(--auber);color:#fff}
+  /* a family's pages read as tabs with a teal underline, not as more buttons */
+  .subtabs{gap:4px;margin:-6px 0 22px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .subtabs button{border:0;border-bottom:2.5px solid transparent;border-radius:0;background:transparent;padding:10px 14px 11px;
+    font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+  .subtabs button:hover{color:var(--auber)}
+  .subtabs button.on{background:transparent;color:var(--auber);font-weight:700;border-bottom-color:var(--teal)}
+  .addmsg.ok{border-radius:14px}
+  .ovl{background:rgba(27,18,38,.55)}
+  .modal{border-radius:22px;box-shadow:var(--sh-lg)}
+  /* a client's file and an appointment open beside the page, not over it */
+  #clOvl,#bkEditOvl{justify-content:flex-end;align-items:stretch;padding:0}
+  #clOvl > .modal,#bkEditOvl > .modal{max-width:520px;min-height:100vh;border-radius:0 24px 24px 0;margin:0;overflow-y:auto;animation:ccside .22s cubic-bezier(.22,.61,.36,1)}
+  @keyframes ccside{from{transform:translateX(-36px);opacity:.4}to{transform:none;opacity:1}}
+  /* الرئيسية · يحتاجك الحين */
+  .needs{background:#fff;border-radius:18px;box-shadow:var(--sh-sm);padding:16px 20px;margin:0 0 16px}
+  .needs .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+  .needs .hd b{font-size:17px;color:var(--auber);font-weight:600}
+  .needs .hd span{font-size:12.5px;color:var(--muted)}
+  .needrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid #F1EFF4}
+  .needrow:first-of-type{border-top:0}
+  .needrow i{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+  .needrow .t{flex:1;min-width:0}
+  .needrow .t b{display:block;font-size:14.5px;font-weight:500;color:var(--ink)}
+  .needrow .t span{display:block;font-size:12.5px;color:var(--muted)}
+  .needrow button{border:1.5px solid var(--auber);background:#fff;color:var(--auber);border-radius:999px;padding:7px 16px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .needrow button:hover{background:var(--auber);color:#fff}
+  .needs .none{padding:10px 0 4px;color:var(--muted);font-size:13.5px}
+  /* فريق المبيعات · the leads as a board */
+  .ldboard{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(196px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+  .ldcol{background:#F1EFF4;border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  .ldcol > header{display:flex;justify-content:space-between;align-items:center;padding:4px 8px 2px}
+  .ldcol > header b{font-size:14px;color:var(--auber)}
+  .ldcol > header span{font-size:12px;color:var(--muted)}
+  .ldcol .hmcard{margin:0 !important;padding:12px 14px}
+  .ldcol .ldempty{font-size:12.5px;color:var(--muted);text-align:center;padding:12px 4px}
+  /* phone: bottom bar, the + button, and the rail as a sheet */
+  .bbar,.fab{display:none}
+  @media(max-width:900px){
+    .shellbody{padding:0 16px calc(96px + env(safe-area-inset-bottom,0px))}
+    .top{margin:0 -16px 18px;padding:10px 16px;flex-wrap:nowrap}
+    .gsearch{flex:1 1 auto;max-width:none}
+    .gsearch::after{display:none}
+    .gsearch input{padding:11px 16px;height:44px}
+    .qadd{display:none}
+    #refreshBtn{display:none}
+    .navburger{display:none !important}
+    .tabs{position:fixed;top:0;bottom:0;height:100vh;width:84%;max-width:320px;border-radius:24px 0 0 24px}
+    .ldboard{grid-auto-columns:minmax(78%,1fr)}
+    #qaBtn,#loadTime{display:none !important}
+    .bbar button span:not(.bdot){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+    .sec h2{font-size:23px}
+    .bbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:fixed;bottom:0;left:0;right:0;z-index:38;background:#fff;
+      border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom,0px))}
+    .bbar button{border:0;background:transparent;font:inherit;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:3px;min-height:54px;border-radius:14px;cursor:pointer;position:relative}
+    .bbar button svg{width:22px;height:22px}
+    .bbar button.on{color:var(--auber);font-weight:700;background:var(--p050)}
+    .bbar button .bdot{top:2px;inset-inline-end:16%}
+    .fab{display:grid;place-items:center;position:fixed;inset-inline-start:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:39;width:56px;height:56px;
+      border-radius:999px;border:0;background:var(--teal);color:#fff;box-shadow:0 10px 28px rgba(42,137,140,.35);cursor:pointer}
+    .qamenu.sheet{position:fixed;top:auto;bottom:0;left:0;right:0;width:auto;border-radius:24px 24px 0 0;padding:10px 14px calc(18px + env(safe-area-inset-bottom,0px));z-index:70}
+    .qamenu.sheet button{min-height:50px;font-size:15px}
+    .qascrim{position:fixed;inset:0;background:rgba(27,18,38,.55);z-index:69}
+    #clOvl > .modal,#bkEditOvl > .modal{max-width:100%;border-radius:0}
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  .topacts{position:relative}
+  #bkLines,#bkCosts{overflow-x:auto;max-width:100%}
 </style>
 </head>
 <body>
@@ -838,14 +994,60 @@
 
 <!-- DASHBOARD -->
 <div id="dash"><div class="wrap">
+  <div class="shell" id="shell">
+  <div class="navscrim" id="navScrim"></div>
+  <nav class="tabs" id="dashTabs" aria-label="الأقسام">
+    <div class="navbrand"><img src="https://cashclinic.net/brand/logo/logo-cream.png" alt="Cash Clinic"><button class="navtoggle" id="navToggle" type="button" aria-label="طيّ القائمة" title="طيّ القائمة">⇄<span hidden>طيّ القائمة</span></button></div>
+    <button data-tab="home" class="on">اليوم</button>
+    <div class="navgrp" data-grp="daily">العمل اليومي</div>
+    <button data-tab="bookings">المواعيد</button>
+    <button data-tab="clients" data-child="cl">العملاء</button>
+    <button data-tab="myclinic" data-child="cl" hidden>العملاء</button>
+    <button data-tab="reports" data-child="rep">التقارير</button>
+    <button data-tab="inreports" data-child="rep" hidden>التقارير</button>
+    <div class="navgrp" data-grp="sales">المبيعات</div>
+    <button data-tab="sales" data-child="sell">المبيعات</button>
+    <button data-tab="addsale" data-child="sell" hidden>المبيعات</button>
+    <button data-tab="salesteam">فريق المبيعات</button>
+    <button data-tab="target">الأهداف</button>
+    <div class="navgrp" data-grp="mkt">التسويق والفعاليات</div>
+    <button data-tab="courses">الورش والديوانيات</button>
+    <button data-tab="events" data-child="meet">اللقاءات والبث</button>
+    <button data-tab="live" data-child="meet" hidden>اللقاءات والبث</button>
+    <button data-tab="composer" data-child="msg">المراسلات والنشرة</button>
+    <button data-tab="subscribers" data-child="msg" hidden>المراسلات والنشرة</button>
+    <button data-tab="feedback" data-child="voice">صوت العميل</button>
+    <button data-tab="bookrate" data-child="voice" hidden>صوت العميل</button>
+    <button data-tab="quiz" data-child="voice" hidden>صوت العميل</button>
+    <div class="navgrp" data-grp="money">المال</div>
+    <button data-tab="profit" data-child="money">المال</button>
+    <button data-tab="books" data-child="money" hidden>المال</button>
+    <div class="navgrp" data-grp="team">الفريق</div>
+    <button data-tab="tasks">المهام والمراسلات</button>
+    <button data-tab="meetings">الاجتماعات</button>
+    <button data-tab="ideas">الأفكار والأولويات</button>
+    <button data-tab="followup">متابعة الفريق</button>
+    <button data-tab="careers">التوظيف</button>
+    <div class="navme">
+      <span class="av" id="uAv" aria-hidden="true"></span>
+      <div class="who"><b id="uName">—</b><span id="uRole"></span></div>
+      <button data-tab="notify" aria-label="إعدادات الإشعارات" title="إعدادات الإشعارات">الإشعارات</button>
+      <button id="logoutBtn" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M14 7l5 5-5 5M19 12H9"/></svg></button>
+    </div>
+  </nav>
+  <div class="shellbody">
   <div class="top">
-    <div class="who">مرحباً<b id="uName">—</b><span id="uRole" class="muted"></span><span id="loadTime" class="muted" style="font-size:11.5px;margin-inline-start:6px" hidden></span></div>
     <div class="gsearch" id="gSearch" hidden>
-      <input type="search" id="gsInput" placeholder="ابحث باسم أو رقم أو إيميل عميل" autocomplete="off">
+      <input type="search" id="gsInput" placeholder="ابحث عن عميل أو رقم أو أي صفحة" autocomplete="off" aria-label="بحث">
       <div class="gsdrop" id="gsDrop" hidden></div>
     </div>
-    <button class="lo" id="refreshBtn" title="حدّث البيانات" aria-label="حدّث البيانات">↻ حدّث</button>
-    <button class="lo" id="logoutBtn">تسجيل الخروج</button>
+    <div class="topacts">
+      <button class="addbtn" id="qaBtn" type="button" hidden>＋ جديد</button>
+      <div class="qamenu" id="qaMenu" hidden></div>
+      <button class="iconbtn" id="bellBtn" type="button" aria-label="اللي يحتاجك الحين"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="bdot" id="bellCnt" hidden></span></button>
+      <button class="lo" id="refreshBtn" title="حدّث البيانات" aria-label="حدّث البيانات">↻ حدّث</button>
+    </div>
+    <span id="loadTime" class="muted" style="font-size:11.5px" hidden></span>
   </div>
   <!-- a home-screen app has no address bar, so a new deploy has no way to
        announce itself. This is that way. -->
@@ -864,42 +1066,6 @@
 
   <button class="navburger" id="navBurger" type="button">☰ <span id="navHere">الأقسام</span></button>
 
-  <div class="shell" id="shell">
-  <div class="navscrim" id="navScrim"></div>
-  <nav class="tabs" id="dashTabs">
-    <button class="navtoggle" id="navToggle" type="button">⇄ <span>طيّ القائمة</span></button>
-    <button data-tab="home" class="on">الرئيسية</button>
-    <div class="navgrp" data-grp="sales">المبيعات</div>
-    <button data-tab="sales">المبيعات</button>
-    <button data-tab="addsale">إضافة عمليات البيع</button>
-    <button data-tab="clients">كل العملاء</button>
-    <button data-tab="salesteam">فريق المبيعات</button>
-    <button data-tab="target">الأهداف</button>
-    <div class="navgrp" data-grp="clients">العملاء</div>
-    <button data-tab="bookings">المواعيد</button>
-    <button data-tab="quiz">الاختبارات</button>
-    <button data-tab="feedback">التقييمات والاستبيانات</button>
-    <button data-tab="myclinic">عيادتي</button>
-    <div class="navgrp" data-grp="events">الفعاليات</div>
-    <button data-tab="events" data-family="meet">اللقاءات والبث</button>
-    <button data-tab="live" data-child="meet" hidden>البث المباشر</button>
-    <button data-tab="courses">الدورات</button>
-    <div class="navgrp" data-grp="comms">التواصل</div>
-    <button data-tab="composer">مراسلة العملاء</button>
-    <button data-tab="subscribers">المشتركين بالنشرة</button>
-    <button data-tab="notify">الإشعارات</button>
-    <div class="navgrp" data-grp="team">الفريق</div>
-    <button data-tab="tasks">مراسلات الفريق</button>
-    <button data-tab="meetings">اجتماعاتي</button>
-    <button data-tab="ideas">أفكارنا</button>
-    <button data-tab="followup">متابعة الفريق</button>
-    <button data-tab="profit" data-family="money">المال</button>
-    <button data-tab="books" data-child="money" hidden>حسابات الشركة</button>
-    <button data-tab="careers">التوظيف</button>
-    <button data-tab="reports">التقارير</button>
-    <button data-tab="inreports">التقارير الداخلية</button>
-  </nav>
-  <div class="shellbody">
 
   <!-- ===== الرئيسية — what needs me today ===== -->
   <div class="sec" id="homeSec" data-panel="home" hidden>
@@ -908,6 +1074,7 @@
         <div class="muted" id="hmDate" style="font-size:12.5px;margin-top:4px"></div></div>
     </div>
     <div class="kpis" id="hmKpis"></div>
+    <div id="hmNeeds"></div>
     <div class="hmgrid">
       <div class="hmcard"><div class="hmt"><b>مواعيد اليوم والقادمة</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
       <div class="hmcard"><div class="hmt"><b>مهام عليّ</b><button type="button" class="hmlink" data-go="tasks">كل المهام</button></div><div id="hmTasks"></div></div>
@@ -921,6 +1088,7 @@
   <!-- ===== تقييم الجلسات ===== -->
   <div class="sec" id="fbSec" data-panel="feedback" hidden>
     <h2><span></span> الاستبيانات</h2>
+    <div class="subtabs" data-fam="voice"></div>
     <div class="flt" id="svKind"></div>
     <div class="flt" id="svWho"></div>
     <div class="kpis" id="svKpis"></div>
@@ -936,6 +1104,7 @@
   <!-- ===== تقييم الكتيّبات ===== -->
   <div class="sec" id="brSec" data-panel="bookrate" hidden>
     <h2><span></span> تقييم الكتيّبات</h2>
+    <div class="subtabs" data-fam="voice"></div>
     <div class="kpis" id="brKpis"></div>
     <div class="flt" id="brFlt"></div>
     <div id="brList"></div>
@@ -1008,6 +1177,7 @@
   <!-- ===== عيادتي: every client account, opened as the client sees it ===== -->
   <div class="sec" id="mcSec" data-panel="myclinic" hidden>
     <h2><span></span> عيادتي</h2>
+    <div class="subtabs" data-fam="cl"></div>
     <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل اللي سوّوا حساب بعيادتي. «افتح عيادته» يفتحها مثل ما يشوفها العميل بالضبط — للقراءة فقط.
       متابعة كاش تنفتح لعملاء أساس الحرية والوفرة بعد أول جلسة.</p>
     <div class="kpis" id="mcKpis"></div>
@@ -1255,6 +1425,7 @@
 
   <div class="sec" id="reportsSec" data-panel="reports" hidden>
     <h2><span></span> أنظمة التقارير</h2>
+    <div class="subtabs" data-fam="rep"></div>
     <div class="report-links">
       <a class="report-btn" id="rptRiyada" href="https://cashclinickw.github.io/cash-riyada-reports/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير كاش ريادة ←</a>
       <a class="report-btn" id="rptNas" href="https://cashclinickw.github.io/cashclinicslides/dashboard.html" target="_blank" rel="noopener" hidden>سستم تقارير اللجنة الخيرية ←</a>
@@ -1287,6 +1458,7 @@
   <!-- ===== التقارير الداخلية (5 Nov 2026) — the team's weekly reports ===== -->
   <div class="sec" id="inrepSec" data-panel="inreports">
     <h2><span></span> التقارير الداخلية</h2>
+    <div class="subtabs" data-fam="rep"></div>
     <p class="muted" style="font-size:13px;line-height:1.8;margin:-2px 0 10px">كل سبت يوصل تذكير لنورة (المبيعات) وأشواق (خدمة العملاء) يرفعون تقرير الأسبوع. الفريق كله يشوف التقارير هني. التقرير ملف، أو مكتوب، أو الاثنين.</p>
     <div id="irDue"></div>
     <div class="pfcard" style="margin:12px 0">
@@ -1308,6 +1480,7 @@
 
   <div class="sec" id="composerSec" data-panel="composer">
     <h2><span></span> مراسلة العملاء</h2>
+    <div class="subtabs" data-fam="msg"></div>
     <button class="report-btn" id="openComposer">✉️ إنشاء رسالة جديدة</button>
 
     <div class="addbox" id="nlBox" hidden style="margin-top:18px">
@@ -1334,6 +1507,7 @@
 
   <div class="sec" id="salesSec" data-panel="sales">
     <h2><span></span> المبيعات</h2>
+    <div class="subtabs" data-fam="sell"></div>
     <div class="flt" id="salesFlt">
       <button data-f="all" class="on">الكل</button>
       <button data-f="month">هذا الشهر</button>
@@ -1355,6 +1529,7 @@
   <!-- إضافة عمليات البيع — its own section (13 Oct 2026), out of المبيعات -->
   <div class="sec" id="addSaleSec" data-panel="addsale">
     <h2><span></span> إضافة عمليات البيع</h2>
+    <div class="subtabs" data-fam="sell"></div>
     <div class="addbox" id="addBox" hidden>
       <h3>➕ أضف عملية بيع</h3>
       <p>للمبيعات اللي تصير خارج الموقع — واتساب، تحويل، أو بيع مباشر: الكتب، و«رفع الميزانية»، و«خدمات تقنية». تنضاف للمبيعات مثل أي عملية ثانية، وتطلع بملف العميل في «كل العملاء»، وتقدر ترسل الكتاب للعميل على طول.</p>
@@ -1381,6 +1556,7 @@
 
   <div class="sec" id="quizSec" data-panel="quiz">
     <h2><span></span> نتائج الاختبارات</h2>
+    <div class="subtabs" data-fam="voice"></div>
     <div class="flt" id="quizFlt"></div>
     <div class="flt" id="grpFlt" style="display:none"></div>
     <div class="kpis" id="quizKpis"></div>
@@ -1676,6 +1852,7 @@
 
   <div class="sec" id="clientsSec" data-panel="clients" hidden>
     <h2><span></span> كل العملاء</h2>
+    <div class="subtabs" data-fam="cl"></div>
     <p class="muted" style="font-size:13px;margin:0 0 14px">
       كل شخص تعامل معنا، وكل شي سواه بمكان واحد. نجمع سجلاته بالإيميل والجوال، فلو استخدم أكثر من إيميل أو رقم يطلع لك كشخص واحد.
     </p>
@@ -1753,12 +1930,15 @@
 
   <div class="sec" id="subscribersSec" data-panel="subscribers" hidden>
     <h2><span></span> المشتركين بالنشرة</h2>
+    <div class="subtabs" data-fam="msg"></div>
     <div class="kpis" id="subKpis"></div>
     <div class="tbl" id="subTbl"></div>
   </div>
 
   </div><!-- /shellbody -->
   </div><!-- /shell -->
+  <nav class="bbar" id="bbar" aria-label="الأقسام الرئيسية"></nav>
+  <button class="fab" id="fabBtn" type="button" aria-label="جديد" hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
 </div></div>
 <script src="../assets/js/email-typo.js"></script>
 
@@ -2043,6 +2223,7 @@ async function refreshAll(opt){
        different means the file in front of you is older than the deploy */
     if(DATA && DATA.build){
       if(!PAGE_BUILD) PAGE_BUILD = DATA.build;
+      if(!window.__ccPrefetched){ window.__ccPrefetched=1; setTimeout(prefetchPanels, 900); }
       const nb=$("#newBuild"); if(nb) nb.hidden = (DATA.build === PAGE_BUILD);
     }
     /* the first fill after login keeps what the open tab already loaded —
@@ -2527,7 +2708,8 @@ function renderTasks(){
   /* the badge is your own workload, not whoever you are currently reading */
   if(tab && (!TK.viewing || TK.viewing===TK.me)){
     const n=(TK.mine||[]).filter(t=>!t.done).length;
-    tab.textContent = "مراسلات الفريق" + (n?` · ${fmt(n)}`:"");
+    /* the rail's badge carries the count now (22 Nov 2026) */
+    tab.textContent = "المهام والمراسلات"; void n;
   }
 }
 
@@ -3081,7 +3263,8 @@ function renderSalesTeam(){
   if(STTAB==="gifts"){ renderGifts(box); if(!GV) loadGifts(); return; }
   if(STTAB==="leads"){
     const rows=(ST.leads||[]);
-    box.innerHTML = rows.length ? rows.map(l=>`
+    /* a board, one column per state, so where every lead stands is seen at once (22 Nov 2026) */
+    const card=(l)=>`
       <div class="hmcard" style="margin-bottom:10px">
         <div class="hmt"><b>${esc(l.name||l.email)}</b>
           <span class="pill">${esc(l.state)}</span></div>
@@ -3097,7 +3280,14 @@ function renderSalesTeam(){
                  placeholder="ملاحظة" style="flex:1 1 100%;min-width:160px">${esc(l.note||"")}</textarea>
           <button class="pfbtn" data-lead-rm="${esc(l.id)}">شيله</button>
         </div>
-      </div>`).join("")
+      </div>`;
+    const states=(ST.states||[]).slice();
+    rows.forEach(l=>{ if(states.indexOf(l.state)===-1) states.push(l.state); });
+    box.innerHTML = rows.length ? `<div class="ldboard">${states.map(st=>{
+        const inCol=rows.filter(l=>l.state===st);
+        return `<section class="ldcol"><header><b>${esc(st)}</b><span>${fmt(inCol.length)}</span></header>
+          ${inCol.length?inCol.map(card).join(""):`<div class="ldempty">ما في أحد</div>`}</section>`;
+      }).join("")}</div>`
       : `<div class="pfrule">ما في عملاء للمتابعة — ارسلهم من «كل العملاء».</div>`;
     box.querySelectorAll("textarea.stnote").forEach(stGrow);
   }else{
@@ -5925,6 +6115,11 @@ function gsRows(q){
       if(hit(b.name,[b.email],[b.phone])){ seen[key]=1; out.push({kind:"booking",id:b.id,name:b.name,sub:b.email||b.phone||"",tag:bkWhen(b.startIso)}); }
     });
   }
+  /* the pages too: type a section's name and go there (22 Nov 2026) */
+  document.querySelectorAll('#dashTabs button[data-tab]:not([hidden])').forEach(b=>{
+    const l=((b.querySelector(".lbl")||b).textContent||"").trim();
+    if(l && l.toLowerCase().indexOf(s)!==-1) out.unshift({kind:"page",id:b.dataset.tab,name:l,sub:"",tag:"صفحة"});
+  });
   return out.slice(0,8);
 }
 let GS_SEL=-1;
@@ -5940,6 +6135,7 @@ function gsPaint(rows){
 function gsOpen(r){
   if(!r) return;
   $("#gsDrop").hidden=true; $("#gsInput").value="";
+  if(r.kind==="page"){ showPanel(r.id); window.scrollTo({top:0,behavior:"smooth"}); return; }
   if(r.kind==="client"){ const c=(DATA.clients||[]).find(x=>x.id===r.id); if(c) openClient(c); }
   else { const b=((DATA.bookings||{}).list||[]).find(x=>x.id===r.id); if(b){ showPanel("bookings"); if(mayEdit()) bkEditOpen(b); } }
 }
@@ -5994,24 +6190,24 @@ const MARKETING_PANELS = ["home","clients","events","subscribers","courses","com
 const gated = (k) => { const el=panelEl(k); return !!el && !el.hidden; };   // the server hid it for this role
 const PANELS = [
   { id:"home",        group:"",       icon:"🏠", allowed:()=>true },
-  { id:"sales",       group:"sales",  icon:"💳", allowed:()=>true },
+  { id:"sales",       group:"sales",  icon:"💳", family:"sell", allowed:()=>true },
   /* recording a sale by hand — the desk and full access */
-  { id:"addsale",     group:"sales",  icon:"➕", allowed:()=>!!(DATA&&["all","sales","service"].indexOf(DATA.role)!==-1) },
-  { id:"clients",     group:"sales",  icon:"👥", allowed:()=>gated("clients") },
-  { id:"bookings",    group:"clients",icon:"📅", allowed:()=>true,
+  { id:"addsale",     group:"sales",  icon:"➕", family:"sell", allowed:()=>!!(DATA&&["all","sales","service"].indexOf(DATA.role)!==-1) },
+  { id:"clients",     group:"daily",  icon:"👥", family:"cl", allowed:()=>gated("clients") },
+  { id:"bookings",    group:"daily",icon:"📅", allowed:()=>true,
     count:()=>{ const B=(DATA&&DATA.bookings)||{}; return hmTodayRows(B.list||[]).length; } },
-  { id:"quiz",        group:"clients",icon:"📝", allowed:()=>true },
-  { id:"feedback",    group:"clients",icon:"⭐", allowed:()=>true, load:()=>{ if(!FB) loadFeedback(); } },
-  { id:"bookrate",    group:"clients",icon:"📖", allowed:()=>true,
+  { id:"feedback",    group:"mkt",icon:"⭐", family:"voice", allowed:()=>true, load:()=>{ if(!FB) loadFeedback(); } },
+  { id:"bookrate",    group:"mkt",icon:"📖", family:"voice", allowed:()=>true,
     count:()=>((DATA&&DATA.bookRatings&&DATA.bookRatings.totals&&DATA.bookRatings.totals.count)||0) },
-  { id:"events",      group:"events", icon:"🎟️", family:"meet", allowed:()=>gated("events") },
-  { id:"live",        group:"events", icon:"🔴", family:"meet", allowed:()=>true },
-  { id:"courses",     group:"events", icon:"🎓", allowed:()=>gated("courses") },
-  { id:"composer",    group:"comms",  icon:"📣", allowed:()=>true, load:()=>{ const b=$("#cmpCheck"); if(b) b.hidden=!(DATA&&DATA.role==="all"); } },
-  { id:"subscribers", group:"comms",  icon:"✉️", allowed:()=>gated("subscribers") },
+  { id:"quiz",        group:"mkt",icon:"📝", family:"voice", allowed:()=>true },
+  { id:"events",      group:"mkt", icon:"🎟️", family:"meet", allowed:()=>gated("events") },
+  { id:"live",        group:"mkt", icon:"🔴", family:"meet", allowed:()=>true },
+  { id:"courses",     group:"mkt", icon:"🎓", allowed:()=>gated("courses") },
+  { id:"composer",    group:"mkt",  icon:"📣", family:"msg", allowed:()=>true, load:()=>{ const b=$("#cmpCheck"); if(b) b.hidden=!(DATA&&DATA.role==="all"); } },
+  { id:"subscribers", group:"mkt",  icon:"✉️", family:"msg", allowed:()=>gated("subscribers") },
   /* everyone with a login gets this one: the point of it is deciding what
      reaches your own phone */
-  { id:"notify",      group:"team",   icon:"🔔", allowed:()=>true, load:()=>{ loadNotify(); loadTelegram(); } },
+  { id:"notify",      group:"",   icon:"🔔", allowed:()=>true, load:()=>{ loadNotify(); loadTelegram(); } },
   { id:"tasks",       group:"team",   icon:"✅", allowed:()=>true, load:()=>{ if(!TK) loadTasks(); },
     count:()=>((TK&&TK.mine)||[]).filter(t=>!t.done).length },
   { id:"meetings",    group:"team",   icon:"🤝", allowed:()=>true, load:()=>{ if(!MT) loadMeetings(); },
@@ -6023,22 +6219,25 @@ const PANELS = [
     count:()=>((ST&&ST.leads)||[]).filter(l=>l.state==="جديد").length },
   /* بصمتك المالية left the dashboard on 17 Oct — its records stay where they are */
   /* full access only: a client's file is their finances */
-  { id:"myclinic",    group:"clients",icon:"🩺", allowed:()=>!!(DATA&&DATA.role==="all"), load:()=>{ if(!MC) loadMyClinic(); } },
+  { id:"myclinic",    group:"daily",icon:"🩺", family:"cl", allowed:()=>!!(DATA&&DATA.role==="all"), load:()=>{ if(!MC) loadMyClinic(); } },
   /* full access only: the four who can already read every other number */
   { id:"followup",    group:"team",   icon:"📋", allowed:()=>!!(DATA&&DATA.role==="all"),
     load:()=>{ if(!FU) loadFollowUp(); } },
-  { id:"profit",      group:"team",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
-  { id:"books",       group:"team",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
+  { id:"profit",      group:"money",   icon:"💰", family:"money", allowed:()=>!!(DATA&&DATA.profitMember), load:()=>{ if(!PF) loadProfit(); } },
+  { id:"books",       group:"money",   icon:"📊", family:"money", allowed:()=>!!(DATA&&DATA.seesBooks),    load:()=>{ if(!BK) loadBooks(); } },
   { id:"target",      group:"sales",  icon:"🎯", allowed:()=>!!(DATA&&(DATA.role==="all"||DATA.role==="sales")), load:()=>{ if(!TG) loadTarget(); } },
   { id:"careers",     group:"team",   icon:"🧑‍💼", allowed:()=>true },
-  { id:"reports",     group:"team",   icon:"📄", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
+  { id:"reports",     group:"daily",   icon:"📄", family:"rep", allowed:()=>gated("reports"), load:()=>{ if(DATA&&DATA.reportDuty&&!RD) loadReportDuty(); },
     count:()=>((RD&&RD.rows)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length },
-  { id:"inreports",   group:"team",   icon:"📊", allowed:()=>true, load:()=>{ loadInReports(); },
+  { id:"inreports",   group:"daily",   icon:"📊", family:"rep", allowed:()=>true, load:()=>{ loadInReports(); },
     count:()=>((IR&&IR.due)||[]).filter(x=>x.mine&&!x.done).length },
 ];
 let ST=null, FU=null, BS=null, RF=null;
 let IR=null, IRF="all", IROPEN=null;
-const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة" };
+const FAMILY_LABEL = { events:"معلومات اللقاء", live:"البث المباشر", profit:"أرباحي", books:"حسابات الشركة",
+  clients:"كل العملاء", myclinic:"حسابات عيادتي", reports:"تقارير الجلسات", inreports:"التقارير الداخلية",
+  sales:"المبيعات", addsale:"＋ سجّل عملية بيع", composer:"رسالة جديدة", subscribers:"المشتركين بالنشرة",
+  feedback:"الاستبيانات", bookrate:"تقييم الكتيّبات", quiz:"نتائج الاختبارات" };
 const PANEL_ORDER = PANELS.map(p=>p.id);
 const panelDef = (k) => PANELS.find(p=>p.id===k);
 /* a tapped notification opens the dashboard at …#salesteam, #tasks … — start
@@ -6085,6 +6284,7 @@ function showPanel(k){
   if(k==="home"){ renderHome(); if(DATA&&DATA.profitMember) loadPies(); }
   renderPayoutNudge();
   renderTapAlert();
+  paintChrome();
 }
 
 /* the pills at the top of a merged family: اللقاءات (events · live) and
@@ -6103,7 +6303,31 @@ document.addEventListener("click", e=>{
   showPanel(b.dataset.sub);
 });
 /* An icon per section, so a collapsed rail is still navigable. */
-const TAB_ICON = Object.fromEntries(PANELS.map(p=>[p.id,p.icon]));
+const NAV_ICON = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  bookings:'<rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 10h18"/>',
+  clients:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
+  reports:'<path d="M14 2.5H6.5A2.5 2.5 0 0 0 4 5v14a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 19V8.5z"/><path d="M14 2.5v6h6M8 13h8M8 17h5"/>',
+  sales:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/>',
+  salesteam:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="14" width="5" height="6" rx="2"/><rect x="16.5" y="14" width="5" height="6" rx="2"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  courses:'<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v5c1.5 1.5 3.5 2.3 5.5 2.3s4-.8 5.5-2.3v-5"/>',
+  events:'<rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/>',
+  composer:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
+  feedback:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.5 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  profit:'<path d="M19 7.5V6a2 2 0 0 0-2-2H5a2.5 2.5 0 0 0 0 5h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2.5 2.5 0 0 1-2.5-2.5V6.5"/><path d="M16.5 14.5h.01"/>',
+  tasks:'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8 12 3 3 5-6"/>',
+  meetings:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  ideas:'<path d="M9 18h6M10 21.5h4M12 2.5a6.5 6.5 0 0 0-4 11.6c.6.5 1 1.2 1 2V17h6v-.9c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z"/>',
+  followup:'<rect x="5" y="4" width="14" height="17.5" rx="2.5"/><path d="M9 2.5h6v3H9zM9 11h6M9 15h4"/>',
+  careers:'<rect x="2.5" y="7" width="19" height="13" rx="2.5"/><path d="M8.5 7V5.5A2 2 0 0 1 10.5 3.5h3a2 2 0 0 1 2 2V7M2.5 12.5h19"/>',
+  notify:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+};
+["myclinic"].forEach(k=>NAV_ICON[k]=NAV_ICON.clients); ["inreports"].forEach(k=>NAV_ICON[k]=NAV_ICON.reports);
+["addsale"].forEach(k=>NAV_ICON[k]=NAV_ICON.sales); ["live"].forEach(k=>NAV_ICON[k]=NAV_ICON.events);
+["subscribers"].forEach(k=>NAV_ICON[k]=NAV_ICON.composer); ["bookrate","quiz"].forEach(k=>NAV_ICON[k]=NAV_ICON.feedback);
+["books"].forEach(k=>NAV_ICON[k]=NAV_ICON.profit);
+const TAB_ICON = Object.fromEntries(PANELS.map(p=>[p.id, NAV_ICON[p.id] ? '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+NAV_ICON[p.id]+'</svg>' : p.icon]));
 
 /* Labels are wrapped once so collapsing can hide the text without losing it,
    and so a live count (مهامي · 2) can be rewritten without eating the icon. */
@@ -6163,6 +6387,168 @@ function syncTabs(){
 document.querySelectorAll('#dashTabs button[data-tab]').forEach(b=>b.addEventListener("click",()=>{
   showPanel(b.dataset.tab); window.scrollTo({top:0,behavior:"smooth"});
 }));
+
+/* ================= REDESIGN CHROME (22 Nov 2026) =================
+   The parts of the new layout that are not a section of their own: the
+   avatar and name in the rail, «يحتاجك الحين» on اليوم, the bell, ＋ جديد,
+   the phone's bottom bar, and loading the other sections in the background
+   so moving between them is instant. Every action goes through the same
+   showPanel()/load functions the sections already use. */
+const QA_SVG = {
+  gift: '<path d="M3.5 10h17v10.5h-17zM2.5 6.5h19V10h-19zM12 6.5v14"/><path d="M12 6.5C10.5 3 7 3 7 5s2.5 1.5 5 1.5c2.5 0 5 .5 5-1.5s-3.5-2-5 1.5"/>',
+};
+const svgOf = (d, s) => `<svg viewBox="0 0 24 24" width="${s||19}" height="${s||19}" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+function headOf(k){
+  const def=panelDef(k)||{};
+  return def.family ? (PANELS.find(p=>p.family===def.family && panelAvailable(p.id))||def).id : k;
+}
+function needsList(){
+  if(!DATA) return [];
+  const out=[];
+  const bl=((DATA.bookings||{}).list)||[];
+  if(panelAvailable("bookings")){
+    let today=[]; try{ today=hmTodayRows(bl,false)||[]; }catch(e){}
+    const noIntake=today.filter(b=>b && b.intake && !b.intake.done && b.canSendIntake && b.status!=="cancelled");
+    if(noIntake.length) out.push({ c:"#D5A347", go:"bookings", cta:"شوفهم",
+      t: noIntake.length===1 ? `${noIntake[0].name||"عميل"} ما عبّى الاستبيان` : `${fmt(noIntake.length)} عملاء موعدهم اليوم وما عبّوا الاستبيان`,
+      s: noIntake.slice(0,3).map(b=>(b.name||"")+(b.startTime?" "+b.startTime:"")).join(" · ") });
+  }
+  if(ST && panelAvailable("salesteam")){
+    const n=(ST.leads||[]).filter(l=>l.state==="جديد").length;
+    if(n) out.push({ c:"#2A898C", go:"salesteam", cta:"تابعهم", t:`${fmt(n)} عملاء محتملين جدد`, s:"بانتظار أول تواصل" });
+  }
+  if(RD && panelAvailable("reports")){
+    const n=((RD.rows)||[]).filter(r=>r.mine&&(r.status==="missing"||r.status==="rejected")).length;
+    if(n) out.push({ c:"#5A3E84", go:"reports", cta:"ارفعها", t:`${fmt(n)} تقارير جلسات ناقصة عليك`, s:"العملاء ينتظرونها بعيادتي" });
+  }
+  if(IR && panelAvailable("inreports")){
+    const n=((IR.due)||[]).filter(x=>x.mine&&!x.done).length;
+    if(n) out.push({ c:"#5A3E84", go:"inreports", cta:"اكتبه", t:"تقريرك الداخلي لهالأسبوع مستحق", s:"" });
+  }
+  if(TK){
+    const open=((TK.mine)||[]).filter(t=>!t.done);
+    if(open.length) out.push({ c:"#962D38", go:"tasks", cta:"المهام", t:`${fmt(open.length)} مهام مفتوحة عليك`, s:String((open[0]&&(open[0].text||open[0].title))||"").slice(0,80) });
+  }
+  if(MT){ let n=0; try{ n=mtNext(2).length; }catch(e){}
+    if(n) out.push({ c:"#2D4A6B", go:"meetings", cta:"الاجتماعات", t:`${fmt(n)} اجتماعات خلال يومين`, s:"" }); }
+  if(typeof GV!=="undefined" && GV && panelAvailable("salesteam")){
+    const n=(GV.gifts||[]).filter(g=>g.state==="unpaid").length;
+    if(n) out.push({ c:"#D5A347", go:"gifts", cta:"شوفها", t:`${fmt(n)} قسائم هدايا بانتظار الدفع`, s:"ذكّر اللي بيدفع برابط الدفع" });
+  }
+  return out;
+}
+function goNeed(k){
+  if(k==="gifts"){ openSalesTab("gifts"); return; }
+  showPanel(k); window.scrollTo({top:0,behavior:"smooth"});
+}
+function openSalesTab(tab){
+  showPanel("salesteam");
+  STTAB=tab;
+  const t=$("#stTabs"); if(t) t.querySelectorAll("button").forEach(x=>x.classList.toggle("on", x.dataset.st===tab));
+  if(ST) renderSalesTeam();
+}
+function renderNeeds(){
+  const box=$("#hmNeeds"); if(!box) return;
+  const L=needsList(); box._needs=L;
+  box.innerHTML=`<div class="needs"><div class="hd"><b>يحتاجك الحين</b><span>${L.length?"كل شي ينتظر منك خطوة، بمكان واحد":""}</span></div>${
+    L.length ? L.map((n,i)=>`<div class="needrow"><i style="background:${n.c}"></i><div class="t"><b>${esc(n.t)}</b>${n.s?`<span>${esc(n.s)}</span>`:""}</div><button type="button" data-need="${i}">${esc(n.cta)}</button></div>`).join("")
+             : `<div class="none">ما في شي ينتظرك الحين.</div>`}</div>`;
+}
+document.addEventListener("click", e=>{
+  const b=e.target.closest("#hmNeeds [data-need]"); if(!b) return;
+  const n=($("#hmNeeds")._needs||[])[Number(b.dataset.need)]; if(n) goNeed(n.go);
+});
+
+/* ＋ جديد — on a phone the same list rises from the bottom */
+const QA_ITEMS = [
+  { l:"عملية بيع", ic:"sales", ok:()=>panelAvailable("addsale"), go:()=>showPanel("addsale") },
+  { l:"موعد لعميل", ic:"bookings", ok:()=>panelAvailable("bookings") && !!$("#nasBox") && !$("#nasBox").hidden,
+    go:()=>{ showPanel("bookings"); setTimeout(()=>{ const b=$("#nasBox"); if(b) b.scrollIntoView({behavior:"smooth",block:"start"}); const s=$("#nbPkg"); if(s) s.focus({preventScroll:true}); }, 120); } },
+  { l:"قسيمة هدية", ic:"gift", ok:()=>panelAvailable("salesteam") && !!DATA && ["all","sales","service"].indexOf(DATA.role)!==-1,
+    go:()=>{ GVFORM=gvNewForm(); GVDONE=null; openSalesTab("gifts"); } },
+  { l:"مهمة أو رسالة للفريق", ic:"tasks", ok:()=>panelAvailable("tasks"), go:()=>{ showPanel("tasks"); setTimeout(()=>{ const t=$("#tkText"); if(t) t.focus(); }, 150); } },
+  { l:"هدف", ic:"target", ok:()=>panelAvailable("target") && glMayEdit(),
+    go:()=>{ showPanel("target"); if(TG) return glOpen(null); const t=setInterval(()=>{ if(TG){ clearInterval(t); glOpen(null); } }, 150); setTimeout(()=>clearInterval(t), 9000); } },
+  { l:"اجتماع", ic:"meetings", ok:()=>panelAvailable("meetings"), go:()=>showPanel("meetings") },
+  { l:"فكرة", ic:"ideas", ok:()=>panelAvailable("ideas"), go:()=>showPanel("ideas") },
+];
+function qaClose(){ const m=$("#qaMenu"); if(m){ m.hidden=true; m.classList.remove("sheet"); } const s=$("#qaScrim"); if(s) s.remove(); }
+function qaOpen(asSheet){
+  const m=$("#qaMenu"); if(!m) return;
+  if(!m.hidden){ qaClose(); return; }
+  const items=QA_ITEMS.filter(x=>{ try{ return x.ok(); }catch(e){ return false; } });
+  m.innerHTML=(asSheet?`<div style="width:44px;height:5px;border-radius:999px;background:var(--line);margin:4px auto 10px"></div><div style="font-weight:700;color:var(--auber);padding:2px 12px 6px">شنو تبي تضيف؟</div>`:"")+
+    items.map((x,i)=>`<button type="button" data-qa="${i}">${svgOf(NAV_ICON[x.ic]||QA_SVG[x.ic]||"",18)}<span>${esc(x.l)}</span></button>`).join("");
+  m._items=items;
+  m.classList.toggle("sheet", !!asSheet);
+  if(asSheet){ const s=document.createElement("div"); s.className="qascrim"; s.id="qaScrim"; s.addEventListener("click", qaClose); document.body.appendChild(s); }
+  m.hidden=false;
+}
+document.addEventListener("click", e=>{
+  if(e.target.closest("#qaBtn")){ qaOpen(false); return; }
+  if(e.target.closest("#fabBtn")){ qaOpen(true); return; }
+  const it=e.target.closest("#qaMenu [data-qa]");
+  if(it){ const x=($("#qaMenu")._items||[])[Number(it.dataset.qa)]; qaClose(); if(x) x.go(); return; }
+  if(!e.target.closest("#qaMenu")) { const m=$("#qaMenu"); if(m && !m.hidden && !m.classList.contains("sheet")) qaClose(); }
+  if(e.target.closest("#bellBtn")){ showPanel("home"); setTimeout(()=>{ const n=$("#hmNeeds"); if(n) n.scrollIntoView({behavior:"smooth",block:"center"}); }, 80); }
+});
+document.addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && (e.key==="k"||e.key==="K")){ const i=$("#gsInput"); if(i && !$("#gSearch").hidden){ e.preventDefault(); i.focus(); i.select(); } }
+  if(e.key==="Escape") qaClose();
+});
+
+/* the phone's bottom bar: اليوم, two of the person's main sections, المهام, المزيد */
+const BB_PREF = ["bookings","sales","salesteam","clients","composer","courses","reports"];
+function navShown(k){ const b=document.querySelector('#dashTabs button[data-tab="'+k+'"]'); return !!(b && !b.hidden); }
+function paintBottomBar(){
+  const bb=$("#bbar"); if(!bb || !DATA) return;
+  const picks=["home"];
+  BB_PREF.forEach(k=>{ if(picks.length<3 && navShown(k)) picks.push(k); });
+  if(navShown("tasks")) picks.push("tasks");
+  const here=headOf(ACTIVE_PANEL||"home");
+  const SHORT={tasks:"المهام",salesteam:"فريق البيع",composer:"المراسلات",courses:"الورش"};
+  const lbl=(k)=>{ if(SHORT[k]) return SHORT[k]; const b=document.querySelector('#dashTabs button[data-tab="'+k+'"] .lbl'); return b?b.textContent.trim():k; };
+  bb.innerHTML=picks.map(k=>{ const c=(panelDef(k)||{}).count; let n=0; try{ n=c?c():0; }catch(e){}
+      return `<button type="button" data-bb="${k}" class="${k===here?"on":""}">${svgOf(NAV_ICON[k]||"",22)}<span>${esc(lbl(k))}</span>${n>0?`<span class="bdot">${fmt(n)}</span>`:""}</button>`; }).join("")+
+    `<button type="button" data-bb="more">${svgOf('<path d="M4 7h16M4 12h16M4 17h16"/>',22)}<span>المزيد</span></button>`;
+  bb.style.gridTemplateColumns=`repeat(${picks.length+1},minmax(0,1fr))`;
+}
+document.addEventListener("click", e=>{
+  const b=e.target.closest("#bbar [data-bb]"); if(!b) return;
+  if(b.dataset.bb==="more"){ const sh=$("#shell"); if(sh) sh.classList.add("navopen"); return; }
+  showPanel(b.dataset.bb); window.scrollTo({top:0,behavior:"smooth"});
+});
+
+function paintChrome(){
+  if(!DATA) return;
+  const nm=(typeof myName==="function"&&myName())||"";
+  const av=$("#uAv"); if(av) av.textContent=(nm||"؟").trim().charAt(0);
+  const un=$("#uName"); if(un && nm) un.textContent=nm;
+  renderNeeds();
+  const n=((($("#hmNeeds")||{})._needs)||[]).length;
+  const bc=$("#bellCnt"); if(bc){ bc.hidden=!n; bc.textContent=fmt(n); }
+  paintBottomBar();
+  const qa=$("#qaBtn"), fab=$("#fabBtn");
+  const any=QA_ITEMS.some(x=>{ try{ return x.ok(); }catch(e){ return false; } });
+  if(qa) qa.hidden=!any; if(fab) fab.hidden=!any;
+}
+
+/* the other sections load in the background after the first paint, so
+   opening one is instant instead of waiting on the server each time */
+function prefetchPanels(){
+  const order=["salesteam","tasks","reports","target","profit","meetings","feedback","ideas","books","followup","myclinic"];
+  let delay=0;
+  order.forEach(k=>{
+    const d=panelDef(k);
+    if(!d || !d.load || k===ACTIVE_PANEL || !panelAvailable(k)) return;
+    setTimeout(()=>{ try{ d.load(); }catch(e){ console.error("prefetch "+k, e); } }, delay);
+    delay+=350;
+  });
+  if(panelAvailable("salesteam") && DATA && ["all","sales","service"].indexOf(DATA.role)!==-1)
+    setTimeout(()=>{ if(!GV) loadGifts(); }, delay+200);
+  [delay+2500, delay+7000].forEach(t=>setTimeout(paintChrome, t));
+}
+
 
 /* the server strips contacts for restricted roles; the page just stops
    drawing the empty columns so the table doesn't fill with dashes */
