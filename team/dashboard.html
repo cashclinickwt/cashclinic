@@ -917,6 +917,11 @@
   .needs .hd b{font-size:17px;color:var(--auber);font-weight:600}
   .needs .hd span{font-size:12.5px;color:var(--muted)}
   .needrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid #F1EFF4}
+  .refgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:10px}
+  .refgrid>div{background:#F7F5FA;border-radius:14px;padding:12px 14px;min-width:0}
+  .refgrid b{display:block;font-size:22px;font-weight:600;color:#2F1748;font-variant-numeric:tabular-nums}
+  .refgrid span{font-size:12.5px;color:#6B6577}
+  .refnote{font-size:12.5px;color:#6B6577;margin-top:10px;line-height:1.7}
   .needrow:first-of-type{border-top:0}
   .needrow i{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
   .needrow .t{flex:1;min-width:0}
@@ -1075,6 +1080,7 @@
     </div>
     <div class="kpis" id="hmKpis"></div>
     <div id="hmNeeds"></div>
+    <div id="hmRefs"></div>
     <div class="hmgrid">
       <div class="hmcard"><div class="hmt"><b>مواعيد اليوم والقادمة</b><button type="button" class="hmlink" data-go="bookings">كل المواعيد</button></div><div id="hmToday"></div></div>
       <div class="hmcard"><div class="hmt"><b>مهام عليّ</b><button type="button" class="hmlink" data-go="tasks">كل المهام</button></div><div id="hmTasks"></div></div>
@@ -6454,6 +6460,25 @@ function renderNeeds(){
     L.length ? L.map((n,i)=>`<div class="needrow"><i style="background:${n.c}"></i><div class="t"><b>${esc(n.t)}</b>${n.s?`<span>${esc(n.s)}</span>`:""}</div><button type="button" data-need="${i}">${esc(n.cta)}</button></div>`).join("")
              : `<div class="none">ما في شي ينتظرك الحين.</div>`}</div>`;
 }
+/* personal links (24 Nov 2026): cashclinic.net/sara — visits, and what those visitors did */
+function renderRefLinks(){
+  const box=$("#hmRefs"); if(!box) return;
+  const L=(DATA&&DATA.refLinks)||[];
+  if(!L.length){ box.innerHTML=""; return; }
+  const KIND={book:"كتاب",booking:"موعد",course:"ورشة",digital:"اشتراك",gift:"قسيمة"};
+  box.innerHTML=L.map(r=>{
+    const kinds=Object.keys(r.kinds||{}).map(k=>`${KIND[k]||k} ${fmt(r.kinds[k])}`).join(" · ");
+    return `<div class="needs refl"><div class="hd"><b>${esc(r.label)}</b><span dir="ltr">${esc(r.path)}</span></div>
+      <div class="refgrid">
+        <div><b>${fmt(r.visitsMonth||0)}</b><span>زيارة هالشهر</span></div>
+        <div><b>${fmt(r.visitsTotal||0)}</b><span>زيارة من البداية</span></div>
+        <div><b>${fmt(r.leads||0)}</b><span>سوّوا الاختبار</span></div>
+        <div><b>${fmt(r.paid||0)}</b><span>حجزوا أو اشتروا</span></div>
+        ${r.amount!=null?`<div><b>${fmt(r.amount)} د.ك</b><span>قيمة اللي دفعوه</span></div>`:""}
+      </div>
+      <div class="refnote">${kinds?esc(kinds)+" · ":""}الحجز أو الشراء ينحسب للرابط إذا صار خلال ${fmt(r.days||30)} يوم من دخولهم منه.</div></div>`;
+  }).join("");
+}
 document.addEventListener("click", e=>{
   const b=e.target.closest("#hmNeeds [data-need]"); if(!b) return;
   const n=($("#hmNeeds")._needs||[])[Number(b.dataset.need)]; if(n) goNeed(n.go);
@@ -6525,6 +6550,7 @@ function paintChrome(){
   const av=$("#uAv"); if(av) av.textContent=(nm||"؟").trim().charAt(0);
   const un=$("#uName"); if(un && nm) un.textContent=nm;
   renderNeeds();
+  renderRefLinks();
   const n=((($("#hmNeeds")||{})._needs)||[]).length;
   const bc=$("#bellCnt"); if(bc){ bc.hidden=!n; bc.textContent=fmt(n); }
   paintBottomBar();
