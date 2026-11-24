@@ -6701,6 +6701,7 @@ function renderEvents(){
   $("#eventKpis").innerHTML=
     `<div class="kpi"><div class="n">${fmt(regs.length)}</div><div class="l">المسجّلين</div></div>` +
     (income>0?`<div class="kpi"><div class="n">${fmt(income)} د.ك</div><div class="l">الدخل · ${fmt(paidRegs.length)} مقعد مدفوع</div></div>`:"") +
+    (regs.some(r=>r.invited)?`<div class="kpi"><div class="n">${fmt(regs.filter(r=>r.invited).length)}</div><div class="l">قبلوا الدعوة · مقعد مجاني</div></div>`:"") +
     (vip?`<div class="kpi"><div class="n">${fmt(vip)}</div><div class="l">عملاء VIP · ساعة إضافية</div></div>`:"") +
     ((EVFILTER==="__all"||!EVFILTER)&&E.totals?`<div class="kpi"><div class="n">${fmt(E.totals.count||0)}</div><div class="l">إجمالي كل اللقاءات</div></div>`:"");
 
@@ -6712,7 +6713,7 @@ function renderEvents(){
     regs.map(r=>`<tr>
       <td class="num">${dt(r.when)}</td>
       ${showEv?`<td>${esc(r.eventName)||"—"}</td>`:""}
-      <td>${esc(r.name)||"—"}${r.vip?' <span class="badge" style="background:#D3A146;color:#2F1749">VIP</span>':""}${r.paid?' <span class="badge" style="background:#2F8789;color:#fff">مدفوع</span>':""}</td>
+      <td>${esc(r.name)||"—"}${r.vip?' <span class="badge" style="background:#D3A146;color:#2F1749">VIP</span>':""}${r.paid?' <span class="badge" style="background:#2F8789;color:#fff">مدفوع</span>':""}${r.invited?' <span class="badge" style="background:#962E37;color:#fff">دعوة</span>':""}</td>
       <td>${esc(r.audience)||"—"}</td>
       <td style="white-space:normal;max-width:260px">${esc(r.goal)||"—"}</td>
       <td class="num">${esc(r.phone)||"—"}</td>

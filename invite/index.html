@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دعوة خاصة | كاش كلينك</title>
+<!-- A free invitation to an event (24 Nov 2026). The link carries a code
+     (?c=…); the server says which event it is for and whether it can still be
+     accepted. Accepting takes a real seat at 0 KD and sends the same
+     confirmation email a paying guest gets. Not linked from anywhere. -->
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:title" content="دعوة خاصة من كاش كلينك">
+<meta property="og:description" content="يسعدنا حضورك .. افتح الدعوة وأكّد مقعدك.">
+<meta property="og:image" content="https://cashclinic.net/brand/logo/logo-primary.png">
+<link rel="icon" href="../brand/mark/mark-purple.png">
+<link rel="stylesheet" href="../assets/ds/fonts/fonts.css">
+<style>
+  :root{ --wine:#962E37; --wine-d:#5E1A22; --cream:#FFE7BC; --gold:#E9C77B; --ink:#2F1749; --sub:#5B5566; --line:#E4E1EA; --bad:#962E37 }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  html{background:var(--wine)}
+  body{font-family:"IBM Plex Sans Arabic",system-ui,"Segoe UI",sans-serif;color:#fff;line-height:1.8;min-height:100vh;
+       background:linear-gradient(160deg,var(--wine-d),var(--wine) 70%);
+       display:flex;align-items:center;justify-content:center;padding:28px 16px}
+  [hidden]{display:none!important}
+  .card{position:relative;width:100%;max-width:520px;border-radius:28px;overflow:hidden;
+        background:linear-gradient(170deg,#6B1F28,#8A2A33);border:1px solid rgba(233,199,123,.35);
+        box-shadow:0 30px 70px rgba(0,0,0,.35)}
+  .card .deco{position:absolute;inset-inline-start:-90px;top:-70px;width:300px;opacity:.10;pointer-events:none}
+  .in{position:relative;padding:34px 28px 30px;text-align:center}
+  .logo{height:40px;width:auto;display:block;margin:0 auto 22px}
+  .eyebrow{display:inline-block;font-size:13.5px;font-weight:600;color:var(--wine-d);background:var(--gold);border-radius:999px;padding:4px 16px}
+  .pre{margin:18px 0 0;font-size:16px;color:var(--cream);opacity:.92}
+  h1{margin:4px 0 0;font-size:clamp(34px,9vw,48px);font-weight:300;line-height:1.25;color:#fff}
+  .subt{font-size:18px;color:var(--cream);margin:6px 0 0}
+  .topic{font-size:17px;font-weight:600;color:var(--gold);margin:14px 0 0}
+  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:24px 0 0}
+  .facts div{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px 8px;min-width:0}
+  .facts span{display:block;font-size:12px;color:var(--cream);opacity:.85}
+  .facts b{display:block;font-size:15px;font-weight:600;color:#fff;line-height:1.6}
+  @media(max-width:420px){.facts{grid-template-columns:1fr}}
+  .who{font-size:14.5px;color:var(--cream);margin:16px 0 0}
+  .free{margin:22px 0 0;font-size:16px;color:#fff}
+  .free b{color:var(--gold);font-weight:600}
+  .btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:17px;border-radius:999px;padding:15px 30px;
+       background:var(--cream);color:var(--wine);width:100%;margin-top:18px;transition:transform .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:disabled{opacity:.6;cursor:default;transform:none}
+  .btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .note{font-size:13px;color:var(--cream);opacity:.85;margin:12px 0 0}
+  /* the form sits on white so the fields read clearly */
+  .sheet{background:#fff;color:var(--ink);border-radius:22px;padding:24px 20px;margin-top:22px;text-align:start}
+  .sheet h2{margin:0 0 4px;font-size:20px;font-weight:600;color:var(--ink)}
+  .sheet p{margin:0 0 16px;font-size:14px;color:var(--sub)}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:0 0 6px}
+  .field{margin-bottom:14px}
+  input,select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#FAF9FB;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+  .phone{display:flex;gap:8px;direction:ltr}
+  .phone select{flex:0 0 auto;width:auto;max-width:46%}
+  .phone input{flex:1 1 auto;min-width:0;text-align:left}
+  .err{color:var(--bad);font-size:14px;font-weight:600;margin:0 0 10px}
+  .sheet .btn{background:var(--wine);color:#fff;margin-top:4px}
+  .done h2{font-size:26px;font-weight:300;color:#fff;margin:18px 0 6px}
+  .done p{color:var(--cream);margin:0 0 6px;font-size:15.5px}
+  .wa{display:inline-block;margin-top:18px;color:#fff;font-weight:600;font-size:15px;border:1.5px solid rgba(255,255,255,.5);border-radius:999px;padding:11px 24px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+</head>
+<body>
+
+<main class="card">
+  <img class="deco" src="../brand/elements/tangle-line-cream.png" alt="">
+  <div class="in">
+    <img class="logo" src="../brand/logo/logo-cream.png" alt="Cash Clinic">
+
+    <!-- while the server is asked what this invitation is for -->
+    <div id="vLoad"><p class="pre">لحظة… نجهّز دعوتك</p></div>
+
+    <!-- a link that is wrong, or an event that has started or filled up -->
+    <div id="vOff" hidden>
+      <h1 id="offT" style="font-size:28px">رابط الدعوة غير صحيح</h1>
+      <p class="pre" id="offP">تأكد من الرابط اللي وصلك، أو تواصل معنا.</p>
+      <a class="wa" href="https://wa.me/96522260820" target="_blank" rel="noopener">تواصل واتساب</a>
+    </div>
+
+    <!-- the invitation -->
+    <div id="vInvite" hidden>
+      <span class="eyebrow">دعوة خاصة</span>
+      <p class="pre">يسعدنا ندعوك إلى</p>
+      <h1 id="evName"></h1>
+      <div class="subt" id="evSub" hidden></div>
+      <div class="topic" id="evGift" hidden></div>
+      <div class="facts">
+        <div><span>التاريخ</span><b id="evDate"></b></div>
+        <div><span>الساعة</span><b id="evTime"></b></div>
+        <div><span>المكان</span><b id="evPlace"></b></div>
+      </div>
+      <div class="who" id="evWho" hidden></div>
+      <p class="free">مقعدك علينا .. <b>دعوة مجانية</b></p>
+      <button class="btn" id="acceptBtn" type="button">أقبل الدعوة</button>
+
+      <div class="sheet" id="form" hidden>
+        <h2>أكّد حضورك</h2>
+        <p>اكتب بياناتك عشان نحجز مقعدك ونرسل لك التفاصيل.</p>
+        <div class="field"><label for="gName">الاسم</label><input id="gName" autocomplete="name" placeholder="اسمك الكامل"></div>
+        <div class="field"><label for="gEmail">الإيميل</label><input id="gEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" dir="ltr"></div>
+        <div class="field"><label for="gPhone">رقم الواتساب</label>
+          <div class="phone">
+            <select id="gCC" aria-label="مفتاح الدولة">
+              <option value="965" selected>🇰🇼 +965</option>
+              <option value="966">🇸🇦 +966</option>
+              <option value="971">🇦🇪 +971</option>
+              <option value="974">🇶🇦 +974</option>
+              <option value="973">🇧🇭 +973</option>
+              <option value="968">🇴🇲 +968</option>
+            </select>
+            <input id="gPhone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="9xxxxxxx">
+          </div>
+        </div>
+        <div class="err" id="gErr" hidden></div>
+        <button class="btn" id="sendBtn" type="button">أكّد حضوري</button>
+      </div>
+      <p class="note" id="inviteNote">الدعوة شخصية .. نتمنى ما تنرسل لأحد ثاني.</p>
+    </div>
+
+    <!-- accepted -->
+    <div id="vDone" class="done" hidden>
+      <span class="eyebrow">تم تأكيد مقعدك</span>
+      <h2 id="doneT">ننتظرك 🎉</h2>
+      <p id="doneP"></p>
+      <p id="doneWhen"></p>
+      <a class="wa" href="https://wa.me/96522260820" target="_blank" rel="noopener">عندك سؤال؟ واتساب</a>
+    </div>
+  </div>
+</main>
+
+<script src="../assets/js/email-typo.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+const CONFIG={firebase:{apiKey:"AIzaSyCfD6ocmBsGVJms69TDbKt1PkcdSsGc3so",authDomain:"cash-quiz-906a6.firebaseapp.com",
+  projectId:"cash-quiz-906a6",storageBucket:"cash-quiz-906a6.firebasestorage.app",
+  messagingSenderId:"547780714224",appId:"1:547780714224:web:0e97107045a803623dec35"},functionsRegion:"us-central1"};
+const fns=getFunctions(initializeApp(CONFIG.firebase),CONFIG.functionsRegion);
+const getInvite=httpsCallable(fns,"getCourseInvite"), acceptInvite=httpsCallable(fns,"acceptCourseInvite");
+const $=s=>document.querySelector(s);
+const CODE=(new URLSearchParams(location.search).get("c")||"").trim();
+/* who presents each event — the server knows the date and the place, not the faces */
+const WHO={ diwaniya3:"مع أ. غالية النويف · م. سارة الهندي" };
+let EV=null;
+
+function show(id){ ["vLoad","vOff","vInvite","vDone"].forEach(v=>{ $("#"+v).hidden=(v!==id); }); }
+function off(title,text){ $("#offT").textContent=title; $("#offP").textContent=text; show("vOff"); }
+function err(m){ const e=$("#gErr"); e.textContent=m||""; e.hidden=!m; }
+
+(async()=>{
+  if(!CODE) return off("رابط الدعوة غير صحيح","تأكد من الرابط اللي وصلك، أو تواصل معنا.");
+  try{
+    EV=((await getInvite({code:CODE})).data)||{};
+  }catch(e){
+    if((e&&e.code)==="functions/not-found") return off("رابط الدعوة غير صحيح","تأكد من الرابط اللي وصلك، أو تواصل معنا.");
+    return off("تعذّر فتح الدعوة","جرّب مرة ثانية بعد شوي، أو تواصل معنا.");
+  }
+  const parts=String(EV.name||"").split(" · ");
+  $("#evName").textContent=parts[0]||EV.name||"";
+  if(parts[1]){ $("#evSub").textContent=parts.slice(1).join(" · "); $("#evSub").hidden=false; }
+  if(EV.gift){ $("#evGift").textContent=EV.gift; $("#evGift").hidden=false; }
+  $("#evDate").textContent=(EV.dates||[]).join(" · ")||"—";
+  $("#evTime").textContent=EV.time||"—";
+  $("#evPlace").textContent=EV.location||"—";
+  if(WHO[EV.courseId]){ $("#evWho").textContent=WHO[EV.courseId]; $("#evWho").hidden=false; }
+  document.title="دعوة خاصة · "+(parts[0]||"كاش كلينك");
+  if(EV.closed) return off("انتهى وقت الدعوة","بدأت "+(EV.noun||"الفعالية")+" والتسجيل مقفل. نشوفك بالجاية.");
+  if(EV.full)   return off("المقاعد اكتملت","للأسف ما بقى مقاعد. تواصل معنا واتساب ونبلغك لو فضى مقعد.");
+  show("vInvite");
+})();
+
+$("#acceptBtn").addEventListener("click",()=>{
+  $("#acceptBtn").hidden=true; $("#form").hidden=false;
+  $("#form").scrollIntoView({behavior:"smooth",block:"center"});
+  setTimeout(()=>{ try{ $("#gName").focus({preventScroll:true}); }catch(e){} },350);
+});
+
+function done(already){
+  $("#doneT").textContent=already?"مقعدك محجوز من قبل 🎉":"ننتظرك 🎉";
+  $("#doneP").textContent=already?"سجّلناك بهالإيميل من قبل، ومقعدك محفوظ.":"حجزنا مقعدك، ووصلك إيميل بكل التفاصيل.";
+  $("#doneWhen").textContent=[(EV.dates||[]).join(" · "),EV.time,EV.location].filter(Boolean).join(" · ");
+  show("vDone"); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("#sendBtn").addEventListener("click",async()=>{
+  err("");
+  const name=$("#gName").value.trim(), email=$("#gEmail").value.trim(), phone=$("#gPhone").value.trim();
+  if(name.length<2) return err("اكتب اسمك");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("إيميل غير صحيح");
+  const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
+  if(fix) return err("تأكد من إيميلك، هل تقصد "+fix+"؟");
+  if(phone.replace(/\D/g,"").length<7) return err("رقم واتساب غير صحيح");
+  const cc=$("#gCC").value;
+  let local=phone.replace(/\D/g,"").replace(/^0+/,"");
+  if(cc && local.indexOf(cc)===0 && local.length>cc.length) local=local.slice(cc.length);
+  const btn=$("#sendBtn"); btn.disabled=true; btn.textContent="لحظة…";
+  try{
+    const r=((await acceptInvite({code:CODE,name,email,phone:"+"+cc+local})).data)||{};
+    if(r.ok) return done(!!r.already);
+    err("تعذّر تأكيد الحضور، حاول مرة ثانية");
+  }catch(e){
+    if((e&&e.code)==="functions/resource-exhausted") return off("المقاعد اكتملت","للأسف ما بقى مقاعد. تواصل معنا واتساب ونبلغك لو فضى مقعد.");
+    err((e&&e.message)||"صار خطأ، حاول مرة ثانية");
+  }
+  btn.disabled=false; btn.textContent="أكّد حضوري";
+});
+</script>
+<script src="../assets/js/hit.js" defer></script>
+</body>
+</html>
