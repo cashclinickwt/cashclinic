@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>كاش كلينك</title>
-<!-- Sara's Instagram link (24 Nov 2026): counts the visit as «sara», keeps a
+<!-- The link's first address, cashclinic.net/sara. It moved to /sarah the same
+     evening; this page stays so the old address still works, and counts as «sarah».
+     Sara's Instagram link (24 Nov 2026): counts the visit, keeps a
      30-day note of where the visitor came from, then opens the home page.
      The note travels with any booking, purchase or quiz so the dashboard can
      say what visitors from this link went on to do. -->
@@ -24,7 +26,7 @@
 <p>لحظة… <a href="/">ادخل الموقع</a></p>
 <script>
 (function () {
-  var REF = "sara";
+  var REF = "sarah";
   try { localStorage.setItem("cc_ref", JSON.stringify({ k: REF, t: Date.now() })); } catch (e) {}
   try {
     var URL_ = "https://us-central1-cash-quiz-906a6.cloudfunctions.net/trackVisit";

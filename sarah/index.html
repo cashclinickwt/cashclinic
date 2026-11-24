@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>كاش كلينك</title>
+<!-- Sara's Instagram link, cashclinic.net/sarah (24 Nov 2026): counts the visit as «sarah», keeps a
+     30-day note of where the visitor came from, then opens the home page.
+     The note travels with any booking, purchase or quiz so the dashboard can
+     say what visitors from this link went on to do. -->
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://cashclinic.net/">
+<meta property="og:title" content="كاش كلينك | Cash Clinic">
+<meta property="og:description" content="عيادة الصحة المالية في الكويت.">
+<meta property="og:image" content="https://cashclinic.net/assets/img/sara-blob.jpg">
+<meta http-equiv="refresh" content="2; url=/">
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#2F1749;color:#FFE7BC;
+       font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;font-size:16px}
+  a{color:#FFE7BC}
+</style>
+</head>
+<body>
+<p>لحظة… <a href="/">ادخل الموقع</a></p>
+<script>
+(function () {
+  var REF = "sarah";
+  try { localStorage.setItem("cc_ref", JSON.stringify({ k: REF, t: Date.now() })); } catch (e) {}
+  try {
+    var URL_ = "https://us-central1-cash-quiz-906a6.cloudfunctions.net/trackVisit";
+    var body = JSON.stringify({ p: "/" + REF + "/" });
+    if (navigator.sendBeacon) navigator.sendBeacon(URL_, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+    else fetch(URL_, { method: "POST", body: body, keepalive: true, mode: "no-cors", headers: { "Content-Type": "text/plain" } }).catch(function () {});
+  } catch (e) {}
+  /* the beacon is queued by the browser, so leaving straight away does not lose it */
+  setTimeout(function () { location.replace("/"); }, 60);
+})();
+</script>
+</body>
+</html>
