@@ -1,4 +1,4 @@
-/* Cash Clinic — Ghalia's videos (27 Nov 2026).
+/* Cash Clinic — our consultants' videos (27 Nov 2026; Ghalia's first, then Sara's too).
    ---------------------------------------------------------------------------
    One list for the whole site. The home page shows the first three, the page
    /videos/ shows them all.
@@ -16,6 +16,7 @@
 (function () {
   var VIDEOS = [
     { id: "kxGk6eFIdMo" },
+    { id: "4eP1nqT_bQI" },   // سارة — second on purpose: the middle of the three on the home page
     { id: "aON7kODa1is" },
     { id: "2y28GAWZmCo" },
     { id: "DTJGMQkXmI8" },
