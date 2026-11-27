@@ -234,3 +234,36 @@ html[data-lang="en"] .cc-arrow-cta:hover .cc-arrow{transform:translateX(6px);}
 @media (max-width:1340px){ .cc-nav-links{gap:18px;} .cc-header .cc-social-row{display:none;} }
 @media (max-width:1180px){ .cc-nav-links{gap:13px;} .cc-navlink{font-size:14px;} .cc-header-in{gap:14px;padding-left:20px;padding-right:20px;} .cc-header-cta .cc-btn-wa span{display:none;} }
 @media (max-width:1060px){ .cc-burger{display:inline-flex;} .cc-nav-links{display:none!important;} }
+
+/* ---------- Videos (27 Nov 2026): Ghalia's videos, on the home page and on /videos/ ---------- */
+.ccv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 22px;margin-top:38px;}
+@media (max-width:900px){ .ccv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px;} }
+@media (max-width:560px){ .ccv-grid{grid-template-columns:1fr;} }
+.ccv-card{min-width:0;}
+.ccv-frame{position:relative;aspect-ratio:16/9;border-radius:var(--radius-lg);overflow:hidden;background:var(--cc-purple);box-shadow:var(--shadow-sm);}
+.ccv-thumb{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer;display:block;}
+.ccv-thumb[hidden]{display:none;}
+.ccv-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;}
+.ccv-thumb:hover img{transform:scale(1.03);}
+.ccv-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(47,23,72,0) 45%,rgba(47,23,72,.45));}
+.ccv-play{position:absolute;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;background:var(--cc-cream);color:var(--cc-purple);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(27,18,38,.35);transition:transform .18s;}
+.ccv-play svg{margin-left:3px;}
+.ccv-thumb:hover .ccv-play{transform:translate(-50%,-50%) scale(1.07);}
+.ccv-thumb:focus-visible{outline:3px solid var(--cc-gold);outline-offset:-3px;}
+.ccv-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.ccv-title{margin:13px 2px 0;font-size:16.5px;font-weight:600;line-height:1.6;color:var(--cc-ink);text-wrap:balance;}
+.ccv-title.is-wait{width:70%;border-radius:8px;background:var(--cc-grey-200);color:transparent;}
+
+/* ---------- The menu gained «فيديوهات» (27 Nov 2026) ----------
+   Ten links now. A little less air between them keeps all ten on one line in
+   Arabic. English labels are longer and were already crowding the buttons
+   before this link, so in English the menu is tighter, the two social icons
+   leave the header, and the burger takes over a little earlier. */
+.cc-nav-links{gap:20px;}
+@media (max-width:1340px){ .cc-nav-links{gap:15px;} }
+@media (max-width:1180px){ .cc-nav-links{gap:11px;} .cc-navlink{font-size:13.5px;} }
+html[lang="en"] .cc-nav-links{gap:14px;}
+html[lang="en"] .cc-navlink{font-size:14px;}
+html[lang="en"] .cc-header .cc-social-row{display:none;}
+@media (max-width:1340px){ html[lang="en"] .cc-nav-links{gap:11px;} html[lang="en"] .cc-header-cta .cc-btn-wa span{display:none;} }
+@media (max-width:1200px){ html[lang="en"] .cc-burger{display:inline-flex;} html[lang="en"] .cc-nav-links{display:none!important;} }
