@@ -377,6 +377,17 @@
   .addmsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
   .addmsg.err{display:block;background:#FDECEC;color:#962E37}
   .addmsg.warn{display:block;background:#FFF7E8;color:#8A6410}
+  /* payment links sent from «أضف عملية بيع» (27 Nov 2026) */
+  .asoff{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+  .asoff .t{flex:1;min-width:190px}
+  .asoff .t b{display:block;font-size:14px;color:var(--ink)}
+  .asoff .t span{display:block;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .asoff .st{font-size:12px;font-weight:700;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .asoff .st.w{background:#FFF7E8;color:#8A6410} .asoff .st.p{background:#E7F5EC;color:#1B7A43} .asoff .st.r{background:#FDECEC;color:#B02A37}
+  .asoff .acts{display:flex;flex-wrap:wrap;gap:6px}
+  .asoff .acts button,.asoff .acts a{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:5px 13px;
+    font-size:12.5px;font-family:inherit;cursor:pointer;text-decoration:none;line-height:1.6}
+  .asoff .acts .x{color:#B02A37}
   .manualpill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#6B6577;color:#fff;margin-inline-start:6px}
   /* customer groups */
   .grpbadge{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff;white-space:nowrap}
@@ -922,6 +933,37 @@
   .refgrid b{display:block;font-size:22px;font-weight:600;color:#2F1748;font-variant-numeric:tabular-nums}
   .refgrid span{font-size:12.5px;color:#6B6577}
   .refnote{font-size:12.5px;color:#6B6577;margin-top:10px;line-height:1.7}
+  /* تفاصيل الرابط (27 Nov 2026): one hue for every bar — they all measure the same thing, clicks */
+  .refmore{margin-top:12px;border:1.5px solid #2F1748;background:#fff;color:#2F1748;border-radius:999px;padding:7px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+  .refmore[aria-expanded="true"]{background:#2F1748;color:#fff}
+  .refins{margin-top:14px;border-top:1px solid #E4E1EA;padding-top:14px}
+  .refins .ri-load{font-size:13.5px;color:#6B6577;padding:10px 0}
+  .ri-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin-top:12px}
+  .ri-card{background:#F7F5FA;border-radius:14px;padding:14px 16px;min-width:0}
+  .ri-card.wide{grid-column:1/-1}
+  .ri-card h4{margin:0;font-size:13.5px;font-weight:700;color:#2F1748}
+  .ri-card .sub{font-size:12px;color:#6B6577;margin:2px 0 12px;line-height:1.6}
+  .ri-bars{display:flex;align-items:flex-end;gap:2px;height:112px;border-bottom:1px solid #DCD6E6}
+  .ri-bars i{flex:1;min-width:0;background:#7A5FA3;border-radius:4px 4px 0 0;min-height:2px}
+  .ri-bars i.ri-z{background:#E4DFEC;min-height:2px}
+  .ri-bars i.ri-top{background:#2F1748}
+  .ri-bars i:hover{background:#D3A146}
+  .ri-ax{display:flex;justify-content:space-between;font-size:11px;color:#6B6577;margin-top:5px}
+  .ri-ax.even span{flex:1;text-align:center}
+  .ri-h{display:grid;grid-template-columns:minmax(84px,max-content) 1fr max-content;gap:7px 10px;align-items:center;font-size:12.5px;color:#1B1226}
+  .ri-h .trk{background:#E7E2EE;border-radius:4px;height:8px;overflow:hidden}
+  .ri-h .trk b{display:block;height:100%;background:#7A5FA3;border-radius:4px}
+  .ri-h .n{font-variant-numeric:tabular-nums;color:#6B6577;white-space:nowrap}
+  .ri-fun .trk{height:14px} .ri-fun .trk b{background:#2F1748}
+  .ri-rows{font-size:12.5px}
+  .ri-rows>div{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:8px 0;border-top:1px solid #E7E2EE}
+  .ri-rows>div:first-child{border-top:0}
+  .ri-rows b{color:#2F1748;font-weight:700}
+  .ri-rows .m{color:#6B6577}
+  .ri-rows .tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 9px;background:#E7F5EC;color:#1B7A43}
+  .ri-rows .tag.q{background:#EEE8F6;color:#2F1748}
+  .ri-empty{font-size:12.5px;color:#6B6577}
+  #riTip{position:fixed;z-index:9999;background:#1B1226;color:#fff;font-size:12px;border-radius:8px;padding:5px 10px;pointer-events:none;white-space:nowrap;display:none}
   .needrow:first-of-type{border-top:0}
   .needrow i{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
   .needrow .t{flex:1;min-width:0}
@@ -1544,18 +1586,38 @@
         <div class="addf"><label>اسم العميل</label><input id="asName" type="text" placeholder="الاسم الكامل"></div>
         <div class="addf"><label>الإيميل <span>(للإرسال)</span></label><input id="asEmail" type="email" style="direction:ltr;text-align:left" placeholder="name@email.com"></div>
         <div class="addf"><label>الجوال <span>(اختياري)</span></label><input id="asPhone" type="text" style="direction:ltr;text-align:left" placeholder="+9659xxxxxxx"></div>
-        <div class="addf"><label>المبلغ المدفوع</label><input id="asAmount" type="number" min="0" step="0.5"></div>
+        <div class="addf"><label id="asAmtLbl">المبلغ المدفوع</label><input id="asAmount" type="number" min="0" step="0.5"></div>
         <div class="addf" id="asDateF"><label>تاريخ البيع <span>(اختياري)</span></label><input id="asDate" type="date"></div>
         <div class="addf" id="asExpF" hidden><label>مصاريف <span>(اختياري — تنخصم قبل الشركة)</span></label><input id="asExpense" type="number" min="0" step="0.5"></div>
       </div>
       <p class="muted" id="asBudgetHint" hidden style="font-size:12.5px;margin:8px 0 0">رفع الميزانية يروح كامل للشركة ويتسجّل بهذا الشهر، ويطلع بملف العميل في «كل العملاء» — لازم رقمه أو إيميله.</p>
       <p class="muted" id="asTechHint" hidden style="font-size:12.5px;margin:8px 0 0">خدمات تقنية: اكتب المبلغ اللي دفعه العميل. تطلع بملف العميل في «كل العملاء» — لازم رقمه أو إيميله.</p>
       <div class="addf" style="margin-top:12px"><label>ملاحظة <span>(اختياري)</span></label><input id="asNote" type="text" placeholder="مثال: بيع عبر واتساب"></div>
+      <!-- like المواعيد: paid already, or send the client a link to pay (27 Nov 2026) -->
+      <div class="addrow" style="margin-top:12px" id="asPayWrap">
+        <label><input type="radio" name="asPay" value="paid" checked> دفع وخلّص — سجّلها الحين</label>
+        <label><input type="radio" name="asPay" value="link"> أرسل له رابط دفع</label>
+      </div>
+      <div id="asPayHint" hidden style="font-size:12.5px;color:var(--muted);line-height:1.8;margin-top:6px"></div>
       <div class="addrow">
         <label id="asDeliverL"><input type="checkbox" id="asDeliver" checked> أرسل الكتاب على إيميله</label>
         <button class="addbtn" id="asAdd">أضف العملية</button>
       </div>
       <div class="addmsg" id="asMsg"></div>
+      <div id="asLink" hidden style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+        <div id="asLinkWho" style="font-size:13px;color:var(--muted);margin-bottom:8px">أرسل هذا الرابط للعميل:</div>
+        <input id="asUrl" type="text" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;direction:ltr;text-align:left;font-family:inherit;background:#fff">
+        <div class="addrow" style="margin-top:10px">
+          <button class="addbtn" id="asCopy" style="background:var(--auber)">انسخ الرابط</button>
+          <a class="addbtn" id="asWa" style="background:#128C4A;text-decoration:none;display:inline-block" target="_blank" rel="noopener">أرسله واتساب</a>
+        </div>
+      </div>
+    </div>
+    <div class="addbox" id="asOffersBox" hidden>
+      <h3>🔗 روابط الدفع <span id="asOffersCnt" style="font-size:12.5px;font-weight:400;color:var(--muted)"></span>
+        <button type="button" id="asOffersRefresh" style="margin-inline-start:auto;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:4px 13px;font-size:12.5px;font-family:inherit;cursor:pointer">حدّث</button></h3>
+      <p>الروابط اللي أرسلتوها للعملاء. اللي يدفع تتسجل عمليته بروحها، ويبقى هني أسبوعين.</p>
+      <div id="asOffers"></div>
     </div>
 
   </div>
@@ -2093,6 +2155,9 @@ const setBookingLive=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"set
 const getCvFile=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getCvFile");
 const repairOrder=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"repairOrder");
 const addManualSale=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"addManualSale");
+const listSaleOffers=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"listSaleOffers");
+const cancelSaleOffer=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"cancelSaleOffer");
+const getRefInsights=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"getRefInsights");
 const createStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"createStaffBooking");
 const updateStaffBooking=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"updateStaffBooking");
 const redeemVoucher=httpsCallable(getFunctions(app,CONFIG.functionsRegion),"redeemVoucher");
@@ -6476,9 +6541,129 @@ function renderRefLinks(){
         <div><b>${fmt(r.paid||0)}</b><span>حجزوا أو اشتروا</span></div>
         ${r.amount!=null?`<div><b>${fmt(r.amount)} د.ك</b><span>قيمة اللي دفعوه</span></div>`:""}
       </div>
-      <div class="refnote">${kinds?esc(kinds)+" · ":""}الحجز أو الشراء ينحسب للرابط إذا صار خلال ${fmt(r.days||30)} يوم من دخولهم منه.</div></div>`;
+      <div class="refnote">${kinds?esc(kinds)+" · ":""}الحجز أو الشراء ينحسب للرابط إذا صار خلال ${fmt(r.days||30)} يوم من دخولهم منه.</div>
+      <button type="button" class="refmore" data-refmore="${esc(r.key)}" aria-expanded="${REFINS.open[r.key]?"true":"false"}">${REFINS.open[r.key]?"سكّر التفاصيل":"📊 تفاصيل أكثر ورسوم"}</button>
+      ${REFINS.open[r.key]?`<div class="refins">${refInsHtml(r.key)}</div>`:""}</div>`;
   }).join("");
 }
+/* ---- تفاصيل الرابط (27 Nov 2026): who clicks, when, from what, and what they do next ---- */
+const REFINS={ open:{}, data:{}, err:{} };
+const RI_SRC={instagram:"إنستغرام",direct:"مباشر (نسخ الرابط)",facebook:"فيسبوك",tiktok:"تيك توك",snapchat:"سناب شات",whatsapp:"واتساب",x:"إكس (تويتر)",search:"بحث قوقل",linktree:"لينك تري",other:"موقع ثاني"};
+const RI_DEV={phone:"جوال",tablet:"تابلت",computer:"كمبيوتر"};
+const RI_OS={iphone:"آيفون",android:"أندرويد",ipad:"آيباد",windows:"ويندوز",mac:"ماك",other:"غيره"};
+const RI_DOW=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const RI_KIND={book:"كتاب",booking:"موعد",course:"ورشة",digital:"اشتراك",gift:"قسيمة",quiz:"اختبار"};
+const RI_PAGE={home:"الصفحة الرئيسية",books:"الكتب",book_html:"حجز موعد",courses:"الورش",clinic:"عيادتي",policy_html:"الشروط والسياسات",quiz_checkout_html:"صفحة الدفع",quiz_success_html:"تم الدفع",gift_html:"قسيمة هدية",pay_html:"رابط دفع"};
+function riPage(k){
+  if(RI_PAGE[k]) return RI_PAGE[k];
+  const t=String(k||"").replace(/_html$/,"").replace(/_index$/,"");
+  if(/^consultants_/.test(t)) return "صفحة مستشار · "+t.slice(12);
+  if(/^clinics_/.test(t)) return "عيادة · "+t.slice(8).replace(/_/g," ");
+  if(/^quiz_/.test(t)) return "اختبار / كتاب · "+t.slice(5).replace(/_/g," ");
+  return t.replace(/_/g," / ");
+}
+const riHour=h=>h===0?"12 الفجر":h<12?h+" الصبح":h===12?"12 الظهر":(h-12)+(h<17?" العصر":" المسا");
+const riDay=d=>{ const p=String(d||"").split("-"); return p.length===3?Number(p[2])+"/"+Number(p[1]):d; };
+const riPct=(a,b)=>b>0?Math.round(a/b*100)+"%":"—";
+/* vertical bars: one measure, one hue; the tallest is darker and named in the caption, every bar answers to a hover */
+function riBars(vals, tipOf){
+  const mx=Math.max(1,...vals), top=vals.indexOf(Math.max(...vals));
+  return `<div class="ri-bars">${vals.map((n,i)=>`<i class="${n?(i===top?"ri-top":""):"ri-z"}" style="height:${n?Math.max(3,Math.round(n/mx*100)):0}%" data-ritip="${esc(tipOf(i,n))}"></i>`).join("")}</div>`;
+}
+/* horizontal bars for a short ranked list, each with its own number */
+function riRank(rows, total){
+  if(!rows.length) return `<div class="ri-empty">ما في بيانات للحين.</div>`;
+  const mx=Math.max(1,...rows.map(r=>r.n));
+  return `<div class="ri-h">${rows.map(r=>`<span>${esc(r.l)}</span><span class="trk"><b style="width:${Math.max(2,Math.round(r.n/mx*100))}%"></b></span><span class="n">${fmt(r.n)}${total?` · ${riPct(r.n,total)}`:""}</span>`).join("")}</div>`;
+}
+function refInsHtml(key){
+  const d=REFINS.data[key];
+  if(REFINS.err[key]) return `<div class="ri-load">تعذّر تحميل التفاصيل: ${esc(REFINS.err[key])}</div>`;
+  if(!d) return `<div class="ri-load">جارٍ تحميل التفاصيل…</div>`;
+  const t=d.totals||{}, days=d.byDay||[], hrs=d.byHour||[], dow=d.byDow||[];
+  const kp=(n,l,s)=>`<div><b>${n}</b><span>${l}${s?`<br>${s}`:""}</span></div>`;
+  const trend=t.prev7>0?(t.last7>=t.prev7?"▲ ":"▼ ")+Math.abs(Math.round((t.last7-t.prev7)/t.prev7*100))+"% عن الأسبوع اللي قبله":(t.last7?"أول أسبوع ينحسب":"");
+  const logged=t.logged||0;
+  const head=`<div class="refgrid">
+      ${kp(fmt(t.today||0),"ضغطة اليوم")}
+      ${kp(fmt(t.last7||0),"آخر ٧ أيام",trend)}
+      ${kp(fmt(t.visitors||0),"زائر جديد","كل جهاز ينحسب مرة")}
+      ${kp(fmt(d.cameBack||0),"رجعوا بيوم ثاني")}
+      ${kp(riPct(t.leads||0,t.visitors||0),"من الزوّار سوّوا اختبار")}
+      ${kp(riPct(t.paid||0,t.visitors||0),"من الزوّار حجزوا أو اشتروا")}
+    </div>`;
+  if(!d.since){
+    return head+`<div class="ri-load">الرسوم تبدأ من أول ضغطة على الرابط بعد تحديث اليوم — قبلها كنا نحسب العدد بس. ارجع بعد شوي وبتلقاها.</div>`;
+  }
+  const dayVals=days.map(x=>x.n), dTop=days.reduce((a,x)=>x.n>a.n?x:a,{n:0,d:""});
+  const hTop=hrs.indexOf(Math.max(...hrs)), wTop=dow.indexOf(Math.max(...dow));
+  const funnel=[{l:"ضغطوا الرابط",n:logged},{l:"زوّار (بدون تكرار)",n:t.visitors||0},{l:"تصفّحوا أكثر من صفحة",n:t.deep||0},{l:"سوّوا اختبار",n:t.leads||0},{l:"حجزوا أو اشتروا",n:t.paid||0}];
+  const fmx=Math.max(1,...funnel.map(f=>f.n));
+  const did=(d.quizzes||[]).map(q=>({l:"اختبار · "+q.k,n:q.n})).concat(Object.keys(d.kinds||{}).map(k=>({l:RI_KIND[k]||k,n:d.kinds[k]})));
+  const vis=d.visitors||[];
+  return head+`<div class="ri-grid">
+    <div class="ri-card wide"><h4>الضغطات كل يوم</h4><div class="sub">آخر ٣٠ يوم${dTop.n?` · أعلى يوم ${riDay(dTop.d)} بـ ${fmt(dTop.n)} ضغطة`:""}. مرّر على أي عمود وتشوف رقمه.</div>
+      ${riBars(dayVals,(i,n)=>`${riDay(days[i].d)} · ${fmt(n)} ضغطة${days[i].fresh?` · ${fmt(days[i].fresh)} جديد`:""}`)}
+      <div class="ri-ax"><span>${riDay((days[0]||{}).d)}</span><span>${riDay((days[14]||{}).d)}</span><span>اليوم</span></div></div>
+    <div class="ri-card"><h4>أي ساعة يدخلون</h4><div class="sub">بتوقيت الكويت${hrs[hTop]?` · أكثر شي ${riHour(hTop)}`:""} — أحسن وقت للنشر.</div>
+      ${riBars(hrs,(i,n)=>`${riHour(i)} · ${fmt(n)} ضغطة`)}
+      <div class="ri-ax"><span>12 الفجر</span><span>6 الصبح</span><span>12 الظهر</span><span>6 المسا</span><span>11</span></div></div>
+    <div class="ri-card"><h4>أي يوم بالأسبوع</h4><div class="sub">${dow[wTop]?`أكثر يوم: ${RI_DOW[wTop]}`:"—"}</div>
+      ${riBars(dow,(i,n)=>`${RI_DOW[i]} · ${fmt(n)} ضغطة`)}
+      <div class="ri-ax even">${RI_DOW.map(x=>`<span>${x.replace(/^ال/,"")}</span>`).join("")}</div></div>
+    <div class="ri-card"><h4>من وين فتحوا الرابط</h4><div class="sub">التطبيق أو الموقع اللي ضغطوا منه.</div>
+      ${riRank((d.sources||[]).map(x=>({l:RI_SRC[x.k]||x.k,n:x.n})),logged)}</div>
+    <div class="ri-card"><h4>الجهاز</h4><div class="sub">جوال ولا كمبيوتر، وأي نوع.</div>
+      ${riRank((d.devices||[]).map(x=>({l:RI_DEV[x.k]||x.k,n:x.n})).concat((d.os||[]).map(x=>({l:"· "+(RI_OS[x.k]||x.k),n:x.n}))),logged)}</div>
+    <div class="ri-card"><h4>من الضغطة لين الدفع</h4><div class="sub">كم واحد كمّل كل خطوة، من يوم بدينا نسجّل (${riDay(d.since)}).</div>
+      <div class="ri-h ri-fun">${funnel.map(f=>`<span>${f.l}</span><span class="trk"><b style="width:${f.n?Math.max(2,Math.round(f.n/fmx*100)):0}%"></b></span><span class="n">${fmt(f.n)}</span>`).join("")}</div></div>
+    <div class="ri-card"><h4>شنو فتحوا بعد الرابط</h4><div class="sub">أكثر الصفحات اللي دخلوها زوّار الرابط.</div>
+      ${riRank((d.pages||[]).slice(0,8).map(x=>({l:riPage(x.page),n:x.n})))}</div>
+    <div class="ri-card"><h4>شنو سوّوا</h4><div class="sub">الاختبارات والحجوزات والمشتريات اللي جت من الرابط${t.amount!=null?` · ${fmt(t.amount)} د.ك`:""}.</div>
+      ${riRank(did)}</div>
+    <div class="ri-card"><h4>بالشهور</h4><div class="sub">كل الضغطات من أول يوم للرابط (${fmt(t.clicks||0)} بالمجموع).</div>
+      ${riRank((d.monthly||[]).slice(-6).map(x=>({l:x.month,n:x.n})))}</div>
+    <div class="ri-card wide"><h4>آخر الزوّار</h4><div class="sub">كل زائر برقم عشوائي بدون اسم — ${fmt(t.visitors||0)} زائر للحين، نعرض آخر ${fmt(vis.length)}.</div>
+      ${vis.length?`<div class="ri-rows">${vis.slice(0,REFINS.all&&REFINS.all[key]?60:12).map(v=>`<div><b>زائر ‎#${esc(v.id)}</b>
+        <span class="m">${esc([RI_DEV[v.device]||"",RI_OS[v.os]||"",RI_SRC[v.src]||""].filter(Boolean).join(" · "))}</span>
+        <span class="m">آخر دخول ${dt(v.lastMs)}</span>
+        <span class="m">${fmt(v.clicks||0)} ضغطة · ${fmt(v.views||0)} صفحة${v.activeDays>1?` · رجع ${fmt(v.activeDays)} أيام`:""}</span>
+        ${v.quiz?`<span class="tag q">سوّى اختبار</span>`:""}${v.paid?`<span class="tag">دفع</span>`:""}
+        ${(v.pages||[]).length?`<span class="m" style="flex-basis:100%">فتح: ${esc(v.pages.map(p=>riPage(p.page)).join("، "))}</span>`:""}</div>`).join("")}</div>
+        ${vis.length>12&&!(REFINS.all&&REFINS.all[key])?`<button type="button" class="refmore" data-refall="${esc(key)}">اعرض الكل (${fmt(vis.length)})</button>`:""}`
+        :`<div class="ri-empty">ما في زوّار مسجّلين للحين.</div>`}</div>
+    ${d.people?`<div class="ri-card wide"><h4>بالأسماء</h4><div class="sub">اللي كتبوا اسمهم بنفسهم — باختبار أو حجز أو شراء. تطلع بس لأصحاب الصلاحية الكاملة.</div>
+      ${d.people.length?`<div class="ri-rows">${d.people.map(p=>`<div><b>${esc(p.name||"—")}</b><span class="m">${esc(p.what||"")}</span>
+        ${p.amount!=null&&p.kind!=="quiz"?`<span class="m">${fmt(p.amount)} د.ك</span>`:""}<span class="m">${dt(p.when)}</span>${p.id?`<span class="m">زائر ‎#${esc(p.id)}</span>`:""}</div>`).join("")}</div>`
+        :`<div class="ri-empty">ما أحد سوّى اختبار أو حجز من الرابط للحين.</div>`}</div>`:""}
+  </div>
+  <div class="refnote">ما نحفظ اسم ولا رقم ولا عنوان لأي زائر — بس رقم عشوائي بمتصفحه. الاسم يطلع فقط إذا الشخص نفسه سوّى اختبار أو حجز أو اشترى.</div>`;
+}
+document.addEventListener("click", async e=>{
+  const b=e.target && e.target.closest && e.target.closest("[data-refmore],[data-refall]"); if(!b) return;
+  if(b.dataset.refall){ REFINS.all=REFINS.all||{}; REFINS.all[b.dataset.refall]=true; renderRefLinks(); return; }
+  const key=b.dataset.refmore;
+  REFINS.open[key]=!REFINS.open[key];
+  renderRefLinks();
+  if(!REFINS.open[key]) return;
+  /* read fresh each time it is opened: the numbers move all day */
+  try{ const r=await getRefInsights({ key }); REFINS.data[key]=r.data||{}; delete REFINS.err[key]; }
+  catch(err){ REFINS.err[key]=(err&&err.message)||"خطأ"; }
+  renderRefLinks();
+});
+/* one small tooltip for every bar — follows the pointer, and a tap shows it on a phone */
+(function(){
+  let tip=null;
+  const show=(el,x,y)=>{
+    if(!tip){ tip=document.createElement("div"); tip.id="riTip"; document.body.appendChild(tip); }
+    tip.textContent=el.dataset.ritip; tip.style.display="block";
+    const w=tip.offsetWidth; tip.style.left=Math.max(8,Math.min(window.innerWidth-w-8,x-w/2))+"px"; tip.style.top=Math.max(8,y-40)+"px";
+  };
+  const hide=()=>{ if(tip) tip.style.display="none"; };
+  document.addEventListener("mousemove",e=>{ const el=e.target.closest&&e.target.closest("[data-ritip]"); if(el) show(el,e.clientX,e.clientY); else hide(); });
+  document.addEventListener("touchstart",e=>{ const el=e.target.closest&&e.target.closest("[data-ritip]"); const p=e.touches&&e.touches[0]; if(el&&p) show(el,p.clientX,p.clientY); else hide(); },{passive:true});
+  window.addEventListener("scroll",hide,{passive:true});
+})();
 document.addEventListener("click", e=>{
   const b=e.target.closest("#hmNeeds [data-need]"); if(!b) return;
   const n=($("#hmNeeds")._needs||[])[Number(b.dataset.need)]; if(n) goNeed(n.go);
@@ -7292,7 +7477,75 @@ function renderAddSale(){
       + (budget?`<option value="tech" data-price="">خدمات تقنية (اكتب المبلغ)</option>`:"");
     syncPrice();
   }
+  /* the links already out: read once when the form first shows */
+  if(!ASO.loaded){ ASO.loaded=true; loadOffers(); }
 }
+/* ---- payment links (27 Nov 2026): the sale is recorded when the client pays, not before ---- */
+const ASO={ loaded:false, rows:[] };
+function asPayMode(){ const el=document.querySelector('input[name="asPay"]:checked'); return el?el.value:"paid"; }
+function syncPay(){
+  const sel=$("#asProduct"); if(!sel) return;
+  const link=asPayMode()==="link", isB=sel.value==="budget"||sel.value==="tech";
+  const lbl=$("#asAmtLbl"); if(lbl) lbl.textContent=link?"المبلغ المطلوب":"المبلغ المدفوع";
+  const df=$("#asDateF"); if(df) df.hidden=link;
+  const dl=$("#asDeliverL"); if(dl) dl.hidden=link||isB;
+  const btn=$("#asAdd"); if(btn && !btn.disabled) btn.textContent=link?"جهّز رابط الدفع":"أضف العملية";
+  const h=$("#asPayHint");
+  if(h){ h.hidden=!link;
+    h.textContent=isB
+      ? "بيطلع لك رابط ترسله للعميل. الخدمة ما تتسجل بحسابات الشركة إلا لما يدفع، وبيوصلك إشعار أول ما يدفع."
+      : "بيطلع لك رابط ترسله للعميل. العملية ما تتسجل بالمبيعات إلا لما يدفع، وطلبه يوصله تلقائياً على الإيميل اللي يأكده بصفحة الدفع."; }
+}
+document.querySelectorAll('input[name="asPay"]').forEach(r=>r.addEventListener("change", syncPay));
+function waNum(p){ const w=String(p||"").replace(/\D/g,""); return w.length===8?"965"+w:w; }
+function showPayLink(o){
+  const url=location.origin+o.payPath;
+  $("#asUrl").value=url;
+  $("#asLinkWho").textContent=`رابط الدفع لـ ${o.name||"العميل"} · ${o.product} · ${fmt(o.amount)} د.ك — أرسله له:`;
+  $("#asWa").href="https://wa.me/"+waNum(o.phone)+"?text="+encodeURIComponent(
+    `هلا ${o.name||""} 👋\nهذا رابط الدفع لـ «${o.product}» — ${fmt(o.amount)} د.ك:\n${url}\n\nالدفع آمن عبر Tap (كي نت أو بطاقة).`);
+  $("#asLink").hidden=false;
+}
+async function loadOffers(){
+  if(!$("#asOffers")) return;
+  try{ const r=await listSaleOffers({}); ASO.rows=(r.data||{}).rows||[]; }
+  catch(e){ console.warn("offers:", e); return; }
+  renderOffers();
+}
+function renderOffers(){
+  const box=$("#asOffersBox"), list=$("#asOffers"); if(!box||!list) return;
+  const R=ASO.rows||[]; box.hidden=!R.length; if(!R.length) return;
+  const wait=R.filter(o=>o.status==="offer").length;
+  $("#asOffersCnt").textContent=wait?`· ${fmt(wait)} ينتظر الدفع`:"· كلها اندفعت";
+  list.innerHTML=R.map((o,i)=>{
+    const st=o.status==="paid"?`<span class="st p">اندفع ✅</span>`:o.status==="offer"?`<span class="st w">ينتظر الدفع</span>`:`<span class="st r">يحتاج مراجعة</span>`;
+    const when=o.status==="paid"&&o.paidMs?`اندفع ${dt(o.paidMs)}`:`انرسل ${dt(o.when)}`;
+    return `<div class="asoff"><div class="t"><b>${esc(o.name||"عميل")} · ${fmt(o.amount)} د.ك</b>
+      <span>${esc(o.product)}${o.byName?" · "+esc(o.byName):""} · ${esc(when)}</span></div>${st}
+      <div class="acts">${o.status==="offer"?`<button type="button" data-offshow="${i}">الرابط</button><button type="button" class="x" data-offcancel="${i}">ألغِ</button>`:""}</div></div>`;
+  }).join("");
+}
+document.addEventListener("click", async e=>{
+  const t=e.target && e.target.closest && e.target.closest("[data-offshow],[data-offcancel],#asOffersRefresh,#asCopy"); if(!t) return;
+  if(t.id==="asCopy"){
+    const i=$("#asUrl"); i.select(); i.setSelectionRange(0,99999);
+    try{ document.execCommand("copy"); asMsg("انتسخ الرابط ✅","ok"); }catch(err){ asMsg("انسخه يدوياً","err"); }
+    return;
+  }
+  if(t.id==="asOffersRefresh"){
+    const had=(ASO.rows||[]).filter(o=>o.status==="paid").length;
+    t.disabled=true; await loadOffers(); t.disabled=false;
+    /* someone paid since we last looked: the sale is in the lists now */
+    if((ASO.rows||[]).filter(o=>o.status==="paid").length!==had){ await refreshSections(["sales","clients"]); render(); }
+    return;
+  }
+  const show=t.dataset.offshow, o=(ASO.rows||[])[Number(show!=null?show:t.dataset.offcancel)]; if(!o) return;
+  if(show!=null){ showPayLink(o); $("#asLink").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if(!confirm(`تلغي رابط الدفع مال ${o.name||"العميل"}؟\n\nما راح يقدر يدفع منه بعدين.`)) return;
+  t.disabled=true;
+  try{ await cancelSaleOffer({ id:o.id }); asMsg("انلغى الرابط","ok"); await loadOffers(); }
+  catch(err){ asMsg((err&&err.message)||"تعذّر الإلغاء","err"); t.disabled=false; }
+});
 function syncPrice(){
   const sel=$("#asProduct"), amt=$("#asAmount"); if(!sel||!amt) return;
   const o=sel.options[sel.selectedIndex];
@@ -7306,6 +7559,7 @@ function syncPrice(){
   ["#asExpF","#asBudgetHint"].forEach(id=>{ const e=$(id); if(e) e.hidden=!isBudget; });
   const th=$("#asTechHint"); if(th) th.hidden=!isTech;
   if(isB){ amt.placeholder="المبلغ اللي دفعه"; amt.focus(); } else amt.placeholder="";
+  syncPay();
 }
 $("#asProduct") && $("#asProduct").addEventListener("change", syncPrice);
 
@@ -7318,6 +7572,24 @@ $("#asAdd") && $("#asAdd").addEventListener("click", async ()=>{
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return asMsg("الإيميل غير صحيح","err");
     const fix=window.ccEmailSuggest?window.ccEmailSuggest(email):"";
     if(fix) return asMsg("تأكد من الإيميل، هل تقصد "+fix+"؟","err");
+  }
+  if(asPayMode()==="link"){
+    const amount=Number($("#asAmount").value), phone=$("#asPhone").value.trim();
+    if(!(amount>0)) return asMsg("اكتب المبلغ المطلوب — رابط الدفع لازم له مبلغ","err");
+    if(!phone && !email) return asMsg("اكتب رقم العميل أو إيميله — عشان نعرف منو دفع","err");
+    const btn=$("#asAdd"); btn.disabled=true; btn.textContent="جارٍ تجهيز الرابط…";
+    try{
+      const r=await addManualSale({ productKey, name, email, phone, note:$("#asNote").value.trim(),
+                                    amount:$("#asAmount").value, expense:productKey==="budget"?($("#asExpense").value||0):0, payMethod:"link" });
+      const d=r.data||{};
+      if(!d.payPath) throw new Error("ما طلع الرابط — حدّث الصفحة وجرّب مرة ثانية");
+      showPayLink({ payPath:d.payPath, name, phone, product:d.product, amount:d.amount });
+      asMsg("جهز رابط الدفع ✅ أرسله للعميل — العملية تتسجل أول ما يدفع.","ok");
+      ["#asName","#asEmail","#asPhone","#asNote","#asExpense"].forEach(id=>{ $(id).value=""; });
+      loadOffers();
+    }catch(e){ asMsg((e&&e.message)||"تعذّر تجهيز الرابط","err"); }
+    finally{ btn.disabled=false; syncPay(); }
+    return;
   }
   if(productKey==="budget"||productKey==="tech"){
     const isTech=productKey==="tech", what=isTech?"خدمات تقنية":"رفع الميزانية";

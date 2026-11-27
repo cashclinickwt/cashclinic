@@ -25,10 +25,30 @@
 <script>
 (function () {
   var REF = "sarah";
-  try { localStorage.setItem("cc_ref", JSON.stringify({ k: REF, t: Date.now() })); } catch (e) {}
+  /* a random number for this browser (27 Nov 2026) — not a name or an address.
+     It lets the dashboard tell a new visitor from a returning one, and which
+     pages the link's visitors open afterwards. A click inside the 30 days
+     keeps the number it already has. */
+  var v = "", fresh = 1, pv = 0;
+  try {
+    var old = JSON.parse(localStorage.getItem("cc_ref") || "null");
+    if (old && old.k === REF && /^[a-z0-9]{10,24}$/.test(old.v || "") && Date.now() - Number(old.t) < 30 * 864e5) {
+      v = old.v; fresh = 0; pv = Number(old.pv) || 0;
+    }
+  } catch (e) {}
+  if (!v) {
+    try {
+      var a = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(a);
+      for (var i = 0; i < a.length; i++) v += "abcdefghijklmnopqrstuvwxyz0123456789".charAt(a[i] % 36);
+    } catch (e) { v = ""; }
+  }
+  try { localStorage.setItem("cc_ref", JSON.stringify({ k: REF, t: Date.now(), v: v, pv: pv })); } catch (e) {}
+  /* where the click came from: only the site's name, never the full address */
+  var from = "";
+  try { from = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
   try {
     var URL_ = "https://us-central1-cash-quiz-906a6.cloudfunctions.net/trackVisit";
-    var body = JSON.stringify({ p: "/" + REF + "/" });
+    var body = JSON.stringify({ p: "/" + REF + "/", ref: REF, v: v, n: fresh, r: from });
     if (navigator.sendBeacon) navigator.sendBeacon(URL_, new Blob([body], { type: "text/plain;charset=UTF-8" }));
     else fetch(URL_, { method: "POST", body: body, keepalive: true, mode: "no-cors", headers: { "Content-Type": "text/plain" } }).catch(function () {});
   } catch (e) {}
